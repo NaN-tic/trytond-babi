@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -1329,7 +1329,6 @@ msgctxt "selection:babi.report.execution.open.select,view_type:"
 msgid "Tree"
 msgstr "Arbre"
 
-#, fuzzy
 msgctxt "selection:ir.ui.menu,babi_type:"
 msgid ""
 msgstr " "
@@ -1413,6 +1412,10 @@ msgstr "Execució"
 msgctxt "view:babi.report.execution:"
 msgid "Open"
 msgstr "Obre"
+
+msgctxt "view:babi.report.execution:"
+msgid "Time"
+msgstr "Temps"
 
 msgctxt "view:babi.report.execution:"
 msgid "s"
