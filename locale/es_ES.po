@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -1414,6 +1414,10 @@ msgstr "Ejecución"
 msgctxt "view:babi.report.execution:"
 msgid "Open"
 msgstr "Abrir"
+
+msgctxt "view:babi.report.execution:"
+msgid "Time"
+msgstr "Tiempo"
 
 msgctxt "view:babi.report.execution:"
 msgid "s"
