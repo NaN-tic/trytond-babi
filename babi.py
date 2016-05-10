@@ -2434,6 +2434,7 @@ class OpenChart(Wizard):
             'model': model_name,
             'res_model': model_name,
             'type': 'ir.action.act_window',
+            'context_model': '',
             'pyson_domain': domain,
             'pyson_context': context,
             'pyson_order': '[]',
