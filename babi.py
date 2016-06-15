@@ -1425,7 +1425,7 @@ class ReportExecution(ModelSQL, ModelView):
                 cursor.execute('SELECT MAX(id) FROM %s' % table_name)
                 row = cursor.fetchone()
                 if row:
-                    previous_id = row[0]
+                    previous_id = row[0] or 0
                 query += select_query
                 cursor.execute(query)
                 cursor.execute('SELECT id from %s WHERE id > %s ' % (
