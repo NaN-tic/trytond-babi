@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!-- The COPYRIGHT file at the top level of this repository contains the full
-      copyright notices and license terms. -->
+<!--The COPYRIGHT file at the top level of this repository
+contains the full copyright notices and license terms. -->
 <form string="Clean Executions" col="2">
     <image name="tryton-dialog-information" xexpand="0" xfill="0"/>
     <group col="3" id="label_date">
