@@ -6,7 +6,7 @@ contains the full copyright notices and license terms. -->
     <field name="date" widget="date"/>
     <field name="date" widget="time" string="Time"/>
     <field name="duration">
-        <suffix string="s"/>
+        <suffix name="duration" string="s"/>
     </field>
     <field name="state"/>
     <field name="filtered"/>
