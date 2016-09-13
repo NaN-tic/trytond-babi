@@ -20,7 +20,8 @@ except ImportError:
 
 from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
     Button
-from trytond.model import ModelSQL, ModelView, fields, Unique, Check
+from trytond.model import ModelSQL, ModelView, fields, Unique, Check, \
+    sequence_ordered
 from trytond.model.fields import depends
 from trytond.pyson import Eval, Bool, PYSONEncoder, Id, In, Not, PYSONDecoder
 from trytond.pool import Pool, PoolMeta
@@ -1931,11 +1932,10 @@ class ReportGroup(ModelSQL):
             ]
 
 
-class DimensionMixin:
+class DimensionMixin(sequence_ordered()):
 
     report = fields.Many2One('babi.report', 'Report', required=True,
         ondelete='CASCADE')
-    sequence = fields.Integer('Sequence')
     name = fields.Char('Name', required=True, translate=True)
     internal_name = fields.Function(fields.Char('Internal Name'),
         'get_internal_name')
@@ -1947,11 +1947,6 @@ class DimensionMixin:
 
     def get_internal_name(self, name):
         return 'babi_dimension_%d' % self.id
-
-    @staticmethod
-    def order_sequence(tables):
-        table, _ = tables[None]
-        return [table.sequence == None, table.sequence]
 
     @staticmethod
     def default_group_by():
@@ -1981,7 +1976,6 @@ class Dimension(ModelSQL, ModelView, DimensionMixin):
     def __setup__(cls):
         super(Dimension, cls).__setup__()
         t = cls.__table__()
-        cls._order.insert(0, ('sequence', 'ASC'))
         cls._sql_constraints += [
             ('report_and_name_unique', Unique(t, t.report, t.name),
                 'Dimension name must be unique per report.'),
@@ -2042,20 +2036,14 @@ class DimensionColumn(ModelSQL, ModelView, DimensionMixin):
     __name__ = 'babi.dimension.column'
     _history = True
 
-    @classmethod
-    def __setup__(cls):
-        super(DimensionColumn, cls).__setup__()
-        cls._order.insert(0, ('sequence', 'ASC'))
 
-
-class Measure(ModelSQL, ModelView):
+class Measure(ModelSQL, ModelView, sequence_ordered()):
     "Measure"
     __name__ = 'babi.measure'
     _history = True
 
     report = fields.Many2One('babi.report', 'Report', required=True,
         ondelete='CASCADE')
-    sequence = fields.Integer('Sequence')
     name = fields.Char('Name', required=True, translate=True)
     internal_name = fields.Function(fields.Char('Internal Name'),
         'get_internal_name')
@@ -2071,16 +2059,10 @@ class Measure(ModelSQL, ModelView):
     def __setup__(cls):
         super(Measure, cls).__setup__()
         t = cls.__table__()
-        cls._order.insert(0, ('sequence', 'ASC'))
         cls._sql_constraints += [
             ('report_and_name_unique', Unique(t, t.report, t.name),
                 'Measure name must be unique per report.'),
             ]
-
-    @staticmethod
-    def order_sequence(tables):
-        table, _ = tables[None]
-        return [table.sequence == None, table.sequence]
 
     @staticmethod
     def default_aggregate():
@@ -2201,14 +2183,13 @@ class InternalMeasure(ModelSQL, ModelView):
                 }
 
 
-class Order(ModelSQL, ModelView):
+class Order(ModelSQL, ModelView, sequence_ordered()):
     "Order"
     __name__ = 'babi.order'
     _history = True
 
     report = fields.Many2One('babi.report', 'Report', required=True,
         ondelete='CASCADE')
-    sequence = fields.Integer('Sequence', required=True)
     dimension = fields.Many2One('babi.dimension', 'Dimension', readonly=True)
     measure = fields.Many2One('babi.measure', 'Measure', readonly=True)
     order = fields.Selection([
@@ -2224,7 +2205,6 @@ class Order(ModelSQL, ModelView):
     def __setup__(cls):
         super(Order, cls).__setup__()
         t = cls.__table__()
-        cls._order.insert(0, ('sequence', 'ASC'))
         cls._error_messages.update({
                 'cannot_create_order_entry': ('Order entries are created '
                     'automatically'),
