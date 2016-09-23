@@ -654,7 +654,7 @@ class Report(ModelSQL, ModelView):
         cls.remove_menus(reports)
         cls.remove_crons(reports)
         with Transaction().set_context(babi_order_force=True):
-            return super(Report, cls).delete(reports)
+            super(Report, cls).delete(reports)
 
     @classmethod
     def copy(cls, reports, default=None):
@@ -991,11 +991,13 @@ class ReportExecution(ModelSQL, ModelView):
 
     @classmethod
     def delete(cls, executions):
+        Model = Pool().get('ir.model')
+        Model.delete([x.babi_model for x in executions if x.babi_model])
         cls.remove_data(executions)
         cls.remove_keywords(executions)
         to_delete = set([e.internal_name for e in executions])
         super(ReportExecution, cls).delete(executions)
-        # We should remove the classes from the pool so when removing realted
+        # We should remove the classes from the pool so when removing related
         # records it doesn't fail checking unexisting models
         pool = Pool()
         with pool.lock:
@@ -1005,6 +1007,7 @@ class ReportExecution(ModelSQL, ModelView):
                 except KeyError:
                     # The model may not be registered on the pool
                     continue
+
 
     @classmethod
     def remove_keywords(cls, executions):
