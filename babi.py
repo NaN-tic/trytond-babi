@@ -13,10 +13,7 @@ import subprocess
 import tempfile
 import time
 import unicodedata
-try:
-    import simplejson as json
-except ImportError:
-    import json
+import json
 
 from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
     Button
