@@ -1,9 +1,12 @@
 # encoding: utf-8
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
+try:
+    import cStringIO as StringIO
+except ImportError:
+    from io import StringIO
 import datetime as mdatetime
 from datetime import datetime, timedelta
-from StringIO import StringIO
 from collections import defaultdict
 import logging
 import os
@@ -1265,6 +1268,7 @@ class ReportExecution(ModelSQL, ModelView):
                     data = StringIO(to_create)
                     cursor.copy_from(data, table, sep='|', null='',
                         columns=columns)
+                    data.close()
                 else:
                     base_query = 'INSERT INTO %s (' % table
                     base_query += ','.join([unicode(x) for x in columns])
