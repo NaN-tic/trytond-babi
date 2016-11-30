@@ -1,19 +1,15 @@
 # encoding: utf-8
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-try:
-    import cStringIO as StringIO
-except ImportError:
-    from io import StringIO
+from io import BytesIO
 import datetime as mdatetime
 from datetime import datetime, timedelta
 from collections import defaultdict
 import logging
 import os
+import sys
 from sql import Null
 from sql.operators import Or
-import subprocess
-import tempfile
 import time
 import unicodedata
 try:
@@ -29,7 +25,7 @@ from trytond.pyson import Eval, Bool, PYSONEncoder, Id, In, Not, PYSONDecoder
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.tools import grouped_slice
-from trytond.config import config
+from trytond.config import config as config_
 from trytond import backend
 from trytond.protocols.jsonrpc import JSONDecoder, JSONEncoder
 
@@ -64,6 +60,12 @@ AGGREGATE_TYPES = [
 
 SRC_CHARS = u""" .'"()/*-+?¿!&$[]{}@#`'^:;<>=~%,|\\"""
 DST_CHARS = u"""__________________________________"""
+
+BABI_CELERY = config_.getboolean('babi', 'celery', default=True)
+BABI_RETENTION_DAYS = config_.getint('babi', 'retention_days', default=30)
+BABI_CELERY_TASK = config_.get('babi', 'celery_task',
+    default='trytond.modules.babi.tasks.calculate_execution')
+
 CELERY_AVAILABLE = False
 try:
     import celery
@@ -74,6 +76,17 @@ except AttributeError:
     # If run from within frepple we will get
     # AttributeError: 'module' object has no attribute 'argv'
     pass
+CELERY_CONFIG = config_.get('celery', 'config',
+    default='trytond.modules.babi.celeryconfig')
+CELERY_BROKER = 'amqp://%(user)s:%(password)s@%(host)s:%(port)s/%(vhost)s' % {
+    'user': config_.get('celery', 'user', default='guest'),
+    'password': config_.get('celery', 'password', default='guest'),
+    'host': config_.get('celery', 'host', default='localhost'),
+    'port': config_.getint('celery', 'port', default=5672),
+    'vhost': config_.get('celery', 'vhost', default='/'),
+    }
+
+logger = logging.getLogger(__name__)
 
 
 def unaccent(text):
@@ -87,31 +100,6 @@ def unaccent(text):
             break
         text = text.replace(SRC_CHARS[c], DST_CHARS[c])
     return unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore')
-
-
-def start_celery():
-    celery_start = config.getboolean('celery', 'auto_start', default=True)
-    if not CELERY_AVAILABLE or not celery_start:
-        return
-    db = Transaction().cursor.database_name
-    _, config_path = tempfile.mkstemp(prefix='trytond-celery-')
-    with open(config_path, 'w') as f:
-        config.write(f)
-    env = {
-        'TRYTON_DATABASE': db,
-        'TRYTON_CONFIG': config_path
-    }
-    # Copy environment variables in order to get virtualenvs working
-    for key, value in os.environ.iteritems():
-        env[key] = value
-    call = ['celery', 'worker', '--app=tasks', '--loglevel=info',
-        '--workdir=./modules/babi', '--queues=' + db,
-        '--time-limit=7400',
-        '--concurrency=1',
-        '--hostname=' + db + '.%h',
-        '--pidfile=' + os.path.join(tempfile.gettempdir(), 'trytond_celery_' +
-            db + '.pid')]
-    subprocess.Popen(call, env=env)
 
 
 class DynamicModel(ModelSQL, ModelView):
@@ -618,8 +606,6 @@ class Report(ModelSQL, ModelView):
                 'remove_menus': {},
                 })
 
-        start_celery()
-
     @staticmethod
     def default_timeout():
         Config = Pool().get('babi.configuration')
@@ -846,29 +832,42 @@ class Report(ModelSQL, ModelView):
         reports = cls.search([('id', '=', args)])
         return cls.calculate(reports)
 
+    def execute(self, execution):
+        Execution = Pool().get('babi.report.execution')
+
+        transaction = Transaction()
+        user = transaction.user
+        database_name = transaction.cursor.database_name
+
+        logger.info('Babi execution %s (report "%s")' % (
+            execution.id, self.rec_name))
+
+        if CELERY_AVAILABLE and BABI_CELERY:
+            os.system('%s/celery call %s --broker=%s --args=[%d,%d] --config="%s" --queue=%s' % (
+                os.path.dirname(sys.executable),
+                BABI_CELERY_TASK,
+                CELERY_BROKER,
+                execution.id,
+                user,
+                CELERY_CONFIG,
+                database_name))
+        else:
+            # Fallback to synchronous mode if celery is not available
+            Execution.calculate([execution])
+
     @classmethod
     def calculate(cls, reports):
-        pool = Pool()
-        transaction = Transaction()
-        cursor = transaction.cursor
-        Execution = pool.get('babi.report.execution')
-        celery_start = config.getboolean('celery', 'auto_start', default=True)
+        Execution = Pool().get('babi.report.execution')
+
         for report in reports:
             if not report.measures:
                 cls.raise_user_error('no_measures', report.rec_name)
             if not report.dimensions:
                 cls.raise_user_error('no_dimensions', report.rec_name)
             execution, = Execution.create([report.get_execution_data()])
-            cursor.commit()
-            if CELERY_AVAILABLE and celery_start:
-                os.system('celery call tasks.calculate_execution '
-                    '--args=[%d,%d] '
-                    '--config="trytond.modules.babi.celeryconfig" '
-                    '--queue=%s' % (execution.id, transaction.user,
-                        cursor.database_name))
-            else:
-                # Fallback to synchronous mode if celery is not available
-                Execution.calculate([execution])
+            Transaction().cursor.commit()
+
+            report.execute(execution)
 
 
 class ReportExecution(ModelSQL, ModelView):
@@ -1028,8 +1027,7 @@ class ReportExecution(ModelSQL, ModelView):
         pool = Pool()
         Date = pool.get('ir.date')
         if date is None:
-            days = config.getint('babi', 'retention_days', default=30)
-            date = Date.today() - timedelta(days=days)
+            date = Date.today() - timedelta(days=BABI_RETENTION_DAYS)
 
         date = datetime.combine(date, mdatetime.time.min)
         executions = cls.search([('date', '<', date)])
@@ -1152,8 +1150,6 @@ class ReportExecution(ModelSQL, ModelView):
         BIModel = pool.get(self.babi_model.model)
         checker = TimeoutChecker(self.timeout, self.timeout_exception)
 
-        logger = logging.getLogger()
-
         logger.info('Updating Data of report: %s' % self.rec_name)
         update_start = time.time()
         model = self.report.model.model
@@ -1266,7 +1262,7 @@ class ReportExecution(ModelSQL, ModelView):
 
             if to_create:
                 if hasattr(cursor, 'copy_from'):
-                    data = StringIO(to_create)
+                    data = BytesIO(to_create)
                     cursor.copy_from(data, table, sep='|', null='',
                         columns=columns)
                     data.close()
@@ -1387,7 +1383,6 @@ class ReportExecution(ModelSQL, ModelView):
             InternalMeasure.create(to_create)
 
     def update_measures(self, checker):
-        logger = logging.getLogger(self.__name__)
         # Mapping from types to their null values
         types_null = defaultdict(int)
         types_null['bool'] = False
