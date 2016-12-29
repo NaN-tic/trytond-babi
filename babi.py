@@ -10,8 +10,6 @@ import os
 import sys
 from sql import Null
 from sql.operators import Or
-import subprocess
-import tempfile
 import time
 import unicodedata
 import json
@@ -1037,6 +1035,7 @@ class ReportExecution(ModelSQL, ModelView):
     @classmethod
     def remove_data(cls, executions):
         TableHandler = backend.get('TableHandler')
+        cursor = Transaction().connection.cursor()
         # Add a transaction for each 200 executions otherwise locks are not
         # released on Postgresql and a exception is raised about too many locks
         for sub_executions in grouped_slice(executions, 200):
@@ -1081,7 +1080,7 @@ class ReportExecution(ModelSQL, ModelView):
         " Save state in a new transaction"
         DatabaseOperationalError = backend.get('DatabaseOperationalError')
         Transaction().rollback()
-        with Transaction().new_transaction():
+        with Transaction().new_transaction() as new_transaction:
             try:
                 pool = Pool()
                 Execution = pool.get('babi.report.execution')
@@ -1144,7 +1143,7 @@ class ReportExecution(ModelSQL, ModelView):
         pool = Pool()
         Model = pool.get(self.report.model.model)
         transaction = Transaction()
-        cursor = transaction.cursor
+        cursor = transaction.connection.cursor()
 
         BIModel = pool.get(self.babi_model.model)
         checker = TimeoutChecker(self.timeout, self.timeout_exception)
