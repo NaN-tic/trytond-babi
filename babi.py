@@ -1420,8 +1420,7 @@ class ReportExecution(ModelSQL, ModelView):
 
             query = "INSERT INTO %s(%s)" % (table_name, ','.join(fields))
 
-            if (not hasattr(cursor, 'has_returning')
-                    or not cursor.has_returning()):
+            if not Transaction().database.has_returning():
                 previous_id = 0
                 cursor.execute('SELECT MAX(id) FROM %s' % table_name)
                 row = cursor.fetchone()
