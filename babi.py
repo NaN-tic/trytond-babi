@@ -835,7 +835,7 @@ class Report(ModelSQL, ModelView):
 
         transaction = Transaction()
         user = transaction.user
-        database_name = transaction.cursor.database_name
+        database_name = transaction.database.name
 
         logger.info('Babi execution %s (report "%s")' % (
             execution.id, self.rec_name))
@@ -1418,7 +1418,7 @@ class ReportExecution(ModelSQL, ModelView):
 
             query = "INSERT INTO %s(%s)" % (table_name, ','.join(fields))
 
-            if not cursor.has_returning():
+            if not Transaction().database.has_returning():
                 previous_id = 0
                 cursor.execute('SELECT MAX(id) FROM %s' % table_name)
                 row = cursor.fetchone()
