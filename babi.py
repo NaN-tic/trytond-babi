@@ -1389,7 +1389,8 @@ class ReportExecution(ModelSQL, ModelView):
         def query_inserts(table_name, measures, select_group, group,
                 extra=None):
             """Inserts a group record"""
-            cursor = Transaction().connection.cursor()
+            transaction = Transaction()
+            cursor = transaction.connection.cursor()
 
             babi_group = ""
 
@@ -1418,12 +1419,12 @@ class ReportExecution(ModelSQL, ModelView):
 
             query = "INSERT INTO %s(%s)" % (table_name, ','.join(fields))
 
-            if not Transaction().database.has_returning():
+            if not transaction.database.has_returning():
                 previous_id = 0
                 cursor.execute('SELECT MAX(id) FROM %s' % table_name)
                 row = cursor.fetchone()
                 if row:
-                    previous_id = row[0]
+                    previous_id = row[0] or 0
                 query += select_query
                 cursor.execute(query)
                 cursor.execute('SELECT id from %s WHERE id > %s ' % (
@@ -1908,6 +1909,7 @@ class OpenExecution(Wizard):
             self.raise_user_error('no_menus', report.rec_name)
         action['res_model'] = execution.babi_model.model
         action['name'] = execution.rec_name
+        action['context_model'] = None
         return action, {}
 
 
@@ -2338,7 +2340,6 @@ class OpenChartStart(ModelView):
                 # If it was not found it means user clicked on 'root'
                 # babi_group
                 fields = [x.id for x in report.dimensions]
-
         return {
             'report': execution.report.id,
             'execution': execution.id,
@@ -2404,19 +2405,25 @@ class OpenChart(Wizard):
         context['interpolation'] = self.start.interpolation
         context['model_name'] = model_name
         context = json.dumps(context)
-        return {
+
+        action = {
             'id': -1,
             'name': '%s - %s Chart' % (self.start.execution.rec_name,
                 self.start.dimension.rec_name),
             'model': model_name,
             'res_model': model_name,
             'type': 'ir.action.act_window',
+            'context_model': None,
             'pyson_domain': domain,
             'pyson_context': context,
             'pyson_order': '[]',
             'pyson_search_value': '[]',
             'domains': [],
-            }, {}
+            }
+        print '*' * 50
+        print "ACTION", action
+
+        return action, {}
 
 
 class CleanExecutionsStart(ModelView):
