@@ -2420,9 +2420,6 @@ class OpenChart(Wizard):
             'pyson_search_value': '[]',
             'domains': [],
             }
-        print '*' * 50
-        print "ACTION", action
-
         return action, {}
 
 
