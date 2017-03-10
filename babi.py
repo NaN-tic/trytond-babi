@@ -2035,6 +2035,9 @@ class DimensionColumn(ModelSQL, ModelView, DimensionMixin):
     __name__ = 'babi.dimension.column'
     _history = True
 
+    def get_internal_name(self, name):
+        return 'babi_dimension_column_%d' % self.id
+
 
 class Measure(ModelSQL, ModelView, sequence_ordered()):
     "Measure"
