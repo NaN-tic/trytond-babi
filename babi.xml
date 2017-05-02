@@ -3,7 +3,6 @@
 contains the full copyright notices and license terms. -->
 <tryton>
     <data>
-
         <record model="res.group" id="group_babi_admin">
             <field name="name">Business Intelligence Administration</field>
         </record>
@@ -691,6 +690,15 @@ contains the full copyright notices and license terms. -->
             id="menu_execution_group_babi_admin">
             <field name="menu" ref="menu_babi_execution"/>
             <field name="group" ref="group_babi_admin"/>
+        </record>
+
+        <!-- HTML Report -->
+        <record model="ir.action.report" id="report_babi_execution">
+            <field name="name">Babi Report</field>
+            <!-- <field name="model">babi.report.execution</field> -->
+            <field name="report_name">babi.report.execution</field>
+            <field name="report">babi/report/babi.html</field>
+            <field name="extension">pdf</field>
         </record>
     </data>
 </tryton>

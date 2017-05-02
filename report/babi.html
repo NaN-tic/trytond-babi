@@ -1,0 +1,62 @@
+{% extends 'html_report/report/base.html' %}
+
+{% block custom_style %}
+<style type="text/css">
+  @page {
+    size: landscape;
+  }
+  hr {
+    border-top: 1px solid #000;
+  }
+  .h3 {
+    font-size: 16px;
+  }
+  body {
+    font-family: 'Arial';
+    font-size: 10px;
+  }
+  .page-break {
+    padding-top: 10px;
+    page-break-before: always;
+  }
+  .top20 {
+    padding-top: 20px;
+  }
+  tbody tr {
+    page-break-inside: avoid;
+  }
+  table.no-border td {
+    border: 0px !important;
+  }
+  #footer {
+    position: fixed;
+    bottom: 0;
+  }
+</style>
+{% endblock %}
+
+{% block title %}
+  {{ data['report_name'] }}
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+
+      <h2>{{ data['report_name'] }}</h2>
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table borderless bottom2px top2px">
+            <thead>
+              {% for header in data['headers'] %}{% set key = header.keys()[0] %}{% set title = header.values()[0] %}<th id="{{ key }}" nowrap>{{ title }}</th>{% endfor %}
+            </thead>
+            <tbody>
+              {% for record in records %}<tr>
+                {% for k in data['columns'] %}<td>{{ record|attr(k) or '' }}</td>{% endfor %}
+              </tr>{% endfor %}
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+{% endblock %}
