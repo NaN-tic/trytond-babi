@@ -2550,4 +2550,5 @@ class BabiHTMLReport(HTMLReport):
                     'columns': columns,
                     'report_name': data['report_name'],
                     'output_format': 'pdf',
+                    'now': datetime.now(),
                     })
