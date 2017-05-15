@@ -51,7 +51,7 @@
             </thead>
             <tbody>
               {% for record in records %}<tr>
-                {% for k in data['columns'] %}<td>{{ record|attr(k) or '' }}</td>{% endfor %}
+                {% for k in data['columns'] %}<td>{{ record|attr(k)|rec_name or '' }}</td>{% endfor %}
               </tr>{% endfor %}
           </table>
 
