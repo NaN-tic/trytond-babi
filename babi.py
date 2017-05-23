@@ -21,7 +21,7 @@ from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
     Button
 from trytond.model import ModelSQL, ModelView, fields, Unique, Check
 from trytond.model.fields import depends
-from trytond.pyson import Eval, Bool, PYSONEncoder, Id, In, Not, PYSONDecoder
+from trytond.pyson import If, Eval, Bool, PYSONEncoder, Id, In, Not, PYSONDecoder
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.tools import grouped_slice
@@ -822,6 +822,7 @@ class Report(ModelSQL, ModelView):
         return {
             'report': self.id,
             'timeout': self.timeout,
+            'company': Transaction().context.get('company'),
             }
 
     @classmethod
@@ -902,6 +903,12 @@ class ReportExecution(ModelSQL, ModelView):
     internal_measures = fields.One2Many('babi.internal.measure',
         'execution', 'Internal Measures', readonly=True)
     pid = fields.Integer('Pid', readonly=True)
+    company = fields.Many2One('company.company', 'Company', required=True,
+        domain=[
+            ('id', If(Eval('context', {}).contains('company'), '=', '!='),
+                Eval('context', {}).get('company', -1)),
+            ],
+        select=True)
 
     @classmethod
     def __setup__(cls):
@@ -943,6 +950,10 @@ class ReportExecution(ModelSQL, ModelView):
         Config = Pool().get('babi.configuration')
         config = Config(1)
         return config.default_timeout
+
+    @staticmethod
+    def default_company():
+        return Transaction().context.get('company')
 
     def get_rec_name(self, name):
         return '%s (%s)' % (self.report.rec_name, self.date)
