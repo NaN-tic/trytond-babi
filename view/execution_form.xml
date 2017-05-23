@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <!--The COPYRIGHT file at the top level of this repository
 contains the full copyright notices and license terms. -->
-<form string="Execution">
+<form string="Execution" col="4">
     <label name="report"/>
     <field name="report" colspan="3"/>
     <label name="date"/>
     <field name="date"/>
+    <label name="company"/>
+    <field name="company"/>
     <label name="duration"/>
     <field name="duration"/>
     <label name="timeout"/>
@@ -14,5 +16,5 @@ contains the full copyright notices and license terms. -->
     <field name="filtered"/>
     <label name="state"/>
     <field name="state"/>
-    <button name="open" string="Open" />
+    <button name="open" string="Open" colspan="4"/>
 </form>
