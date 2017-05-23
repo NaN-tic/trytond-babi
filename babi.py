@@ -1946,6 +1946,8 @@ class DimensionMixin:
             ('model', '=', Eval('_parent_report', {}).get('model', 0)),
             ])
     group_by = fields.Boolean('Group By This Dimension')
+    width = fields.Integer('Width',
+        help='Widht report columns (%)')
 
     def get_internal_name(self, name):
         return 'babi_dimension_%d' % self.id
@@ -2068,6 +2070,8 @@ class Measure(ModelSQL, ModelView):
     aggregate = fields.Selection(AGGREGATE_TYPES, 'Aggregate', required=True)
     internal_measures = fields.One2Many('babi.internal.measure',
         'measure', 'Internal Measures')
+    width = fields.Integer('Width',
+        help='Widht report columns (%)')
 
     @classmethod
     def __setup__(cls):
@@ -2476,27 +2480,24 @@ class OpenChart(Wizard):
             }, {}
 
     def do_print_(self, action):
-        pool = Pool()
-
         context = Transaction().context
         model_name = context.get('active_model')
         active_ids = context.get('active_ids')
 
-        Model = pool.get(model_name)
         report = self.start.report
-
-        # group_name = self.start.dimension.internal_name
-        records = Model.search([
-                # ('babi_group', '=', group_name),
-                ('parent', 'child_of', active_ids),
-                ])
 
         data = {
             'model_name': model_name,
             'report_name': report.name,
-            'records': [x.id for x in records],
-            'headers': [{d.internal_name: d.name} for d in report.dimensions] +
-                [{m.internal_name: m.name} for m in report.measures],
+            'records': active_ids,
+            'headers': [{d.internal_name: {
+                        'name': d.name,
+                        'width': d.width or '',
+                        }} for d in report.dimensions] +
+                    [{m.internal_name: {
+                        'name': m.name,
+                        'width': m.width or '',
+                        }} for m in report.measures],
             }
         return action, data
 
@@ -2532,6 +2533,32 @@ class BabiHTMLReport(HTMLReport):
     __name__ = 'babi.report.execution'
 
     @classmethod
+    def prepare(cls, ids, data):
+        Model = Pool().get(data['model_name'])
+
+        records = []
+        parameters = {}
+
+        def get_childs(record):
+            childs = []
+            for r in Model.search([
+                    # ('babi_group', '=', group_name),
+                    ('parent', '=', record.id),
+                    ]):
+                childs.append(get_childs(r))
+            return {
+                'record': record,
+                'childs': childs,
+                }
+
+        for record in  Model.search([
+                ('id', 'in', data['records']),
+                ]):
+            records.append(get_childs(record))
+
+        return records, parameters
+
+    @classmethod
     def execute(cls, ids, data):
         context = Transaction().context
         context['report_lang'] = Transaction().language
@@ -2543,12 +2570,16 @@ class BabiHTMLReport(HTMLReport):
             columns += header.keys()
 
         with Transaction().set_context(**context):
+            records, parameters = cls.prepare(ids, data)
+
             return super(BabiHTMLReport, cls).execute(data['records'], {
                     'name': 'babi.report.execution',
                     'model': data['model_name'],
                     'headers': data['headers'],
                     'columns': columns,
                     'report_name': data['report_name'],
+                    'records': records,
+                    'parameters': parameters,
                     'output_format': 'pdf',
                     'now': datetime.now(),
                     })

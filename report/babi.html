@@ -4,6 +4,15 @@
 <style type="text/css">
   @page {
     size: landscape;
+    @top-left {
+      content: "{{ company.rec_name }}. {{ company.party.vat_code }}";
+    }
+    @top-right {
+      content: "{{ data['now']|dateformat }}";
+    }
+    @bottom-right {
+      content: counter(page) " / " counter(pages);
+    }
   }
   hr {
     border-top: 1px solid #000;
@@ -26,7 +35,13 @@
     page-break-inside: avoid;
   }
   table.no-border td {
-    border: 0px !important;
+    border: 0px;
+  }
+  .border-cell-active {
+    border-top: solid 1px #000 !important;
+  }
+  .border-cell {
+    border-top: 0px !important;
   }
   #footer {
     position: fixed;
@@ -39,16 +54,26 @@
   {{ data['report_name'] }}
 {% endblock %}
 
+{% macro draw_table(record, before) %}
+  {% set current = [] %}
+  {% set total_columns = data['columns']|length %}
+  <tr>
+    {% for k in data['columns'] %}
+      {% set val = record['record'][k]|rec_name %}
+      {% do current.append(val) %}
+      <td class="border-cell{% if not val in before or total_columns == current|length or val == None %}-active{% endif %}">
+      {% if not val in before or total_columns == current|length %}{{ val or '' }}{% endif %}
+    </td>{% endfor %}
+  </tr>
+    {% if record['childs'] %}
+      {% for child in record['childs'] %}
+          {{ draw_table(child, current) }}
+      {% endfor %}
+    {% endif %}
+{% endmacro %}
+
 {% block main %}
     <div class="container-fluid">
-      <div id="header" class="row">
-        <div class="col-xs-6">
-          <p>{{ company.rec_name }}. {{ company.party.vat_code }}</p>
-        </div>
-        <div class="col-xs-6 text-right">
-          <p>{{ data['now']|datetimeformat }}</p>
-        </div>
-      </div>
 
       <div class="row">
         <div class="col-md-12">
@@ -58,14 +83,15 @@
 
       <div class="row">
         <div class="col-md-12">
-          <table class="table borderless bottom2px top2px">
+          <table class="table no-border bottom2px top2px">
             <thead>
-              {% for header in data['headers'] %}{% set key = header.keys()[0] %}{% set title = header.values()[0] %}<th id="{{ key }}" nowrap>{{ title }}</th>{% endfor %}
+              {% for header in data['headers'] %}{% set key = header.keys()[0] %}{% set title = header.values()[0]['name'] %}{% set width = header.values()[0]['width'] %}
+              <th id="{{ key }}" {% if width %}style="width: {{ width }}%"{% endif %} nowrap>{{ title }}</th>{% endfor %}
             </thead>
             <tbody>
-              {% for record in records %}<tr>
-                {% for k in data['columns'] %}<td>{{ record|attr(k)|rec_name or '' }}</td>{% endfor %}
-              </tr>{% endfor %}
+              {% for record in data['records'] %}
+                  {{ draw_table(record, []) }}
+              {% endfor %}
           </table>
 
         </div>
