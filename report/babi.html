@@ -63,7 +63,7 @@
       {% set val_render = val|render_field %}
       {% set val_type = val|type_field %}
       {% do current.append(val_render) %}
-      <td class="border-cell{% if not val_render in before or total_columns == current|length or (val_render == None and loop.index != 1) %}-active{% endif %}{% if val_type in ('float', 'Decimal') %} text-right{% endif %}">
+      <td class="border-cell{% if not val_render in before or total_columns == current|length or val_render == None %}-active{% endif %}{% if val_type in ('float', 'Decimal') %} text-right{% endif %}">
       {% if not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
     </td>{% endfor %}
   </tr>
