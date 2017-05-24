@@ -59,10 +59,12 @@
   {% set total_columns = data['columns']|length %}
   <tr>
     {% for k in data['columns'] %}
-      {% set val = record['record'][k]|rec_name %}
-      {% do current.append(val) %}
-      <td class="border-cell{% if not val in before or total_columns == current|length or val == None %}-active{% endif %}">
-      {% if not val in before or total_columns == current|length %}{{ val or '' }}{% endif %}
+      {% set val = record['record'][k] %}
+      {% set val_render = val|render_field %}
+      {% set val_type = val|type_field %}
+      {% do current.append(val_render) %}
+      <td class="border-cell{% if not val_render in before or total_columns == current|length or (val_render == None and loop.index != 1) %}-active{% endif %}{% if val_type in ('float', 'Decimal') %} text-right{% endif %}">
+      {% if not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
     </td>{% endfor %}
   </tr>
     {% if record['childs'] %}
@@ -85,8 +87,12 @@
         <div class="col-md-12">
           <table class="table no-border bottom2px top2px">
             <thead>
-              {% for header in data['headers'] %}{% set key = header.keys()[0] %}{% set title = header.values()[0]['name'] %}{% set width = header.values()[0]['width'] %}
-              <th id="{{ key }}" {% if width %}style="width: {{ width }}%"{% endif %} nowrap>{{ title }}</th>{% endfor %}
+              {% for header in data['headers'] %}
+                {% set key = header.keys()[0] %}
+                {% set title = header.values()[0]['name'] %}
+                {% set width = header.values()[0]['width'] %}
+                {% set text_align = header.values()[0]['text-align'] %}
+              <th id="{{ key }}" {% if width %}style="width: {{ width }}%"{% endif %} class="text-{{ text_align }}" nowrap>{{ title }}</th>{% endfor %}
             </thead>
             <tbody>
               {% for record in data['records'] %}
