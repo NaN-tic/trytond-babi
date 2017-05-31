@@ -10,4 +10,6 @@ contains the full copyright notices and license terms. -->
     <field name="name"/>
     <label name="group_by"/>
     <field name="group_by"/>
+    <label name="width"/>
+    <field name="width"/>
 </form>

@@ -18,7 +18,7 @@ except ImportError:
     import json
 
 from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
-    Button
+    StateReport, Button
 from trytond.model import ModelSQL, ModelView, fields, Unique, Check
 from trytond.model.fields import depends
 from trytond.pyson import Eval, Bool, PYSONEncoder, Id, In, Not, PYSONDecoder
@@ -28,7 +28,7 @@ from trytond.tools import grouped_slice
 from trytond.config import config as config_
 from trytond import backend
 from trytond.protocols.jsonrpc import JSONDecoder, JSONEncoder
-
+from trytond.modules.html_report.html_report import HTMLReport
 from .babi_eval import babi_eval
 
 
@@ -37,7 +37,8 @@ __all__ = ['Filter', 'Expression', 'Report', 'ReportGroup', 'Dimension',
     'Menu', 'Keyword', 'Model', 'OpenChartStart', 'OpenChart',
     'ReportExecution', 'OpenExecutionSelect', 'OpenExecution',
     'UpdateDataWizardStart', 'UpdateDataWizardUpdated', 'UpdateDataWizard',
-    'FilterParameter', 'CleanExecutionsStart', 'CleanExecutions']
+    'FilterParameter', 'CleanExecutionsStart', 'CleanExecutions',
+    'BabiHTMLReport']
 __metaclass__ = PoolMeta
 
 
@@ -1946,6 +1947,8 @@ class DimensionMixin:
             ('model', '=', Eval('_parent_report', {}).get('model', 0)),
             ])
     group_by = fields.Boolean('Group By This Dimension')
+    width = fields.Integer('Width',
+        help='Widht report columns (%)')
 
     def get_internal_name(self, name):
         return 'babi_dimension_%d' % self.id
@@ -2068,6 +2071,8 @@ class Measure(ModelSQL, ModelView):
     aggregate = fields.Selection(AGGREGATE_TYPES, 'Aggregate', required=True)
     internal_measures = fields.One2Many('babi.internal.measure',
         'measure', 'Internal Measures')
+    width = fields.Integer('Width',
+        help='Widht report columns (%)')
 
     @classmethod
     def __setup__(cls):
@@ -2301,35 +2306,54 @@ class OpenChartStart(ModelView):
             ('hbar', 'Horizontal Bars'),
             ('line', 'Line'),
             ('pie', 'Pie'),
+            ('report', 'Report'),
             ], 'Graph', required=True, sort=False)
     interpolation = fields.Selection([
             ('linear', 'Linear'),
             ('constant-center', 'Constant Center'),
             ('constant-left', 'Constant Left'),
             ('constant-right', 'Constant Right'),
-            ], 'Interpolation', states={
-                'required': Eval('graph_type') == 'line',
-                'invisible': Eval('graph_type') != 'line',
-            }, sort=False)
-    show_legend = fields.Boolean('Show Legend')
-    report = fields.Many2One('babi.report', 'Report')
-    execution = fields.Many2One('babi.report.execution', 'Execution')
-    execution_date = fields.DateTime('Execution Time')
+            ], 'Interpolation',
+        states={
+            'required': Eval('graph_type') == 'line',
+            'invisible': Eval('graph_type').in_(['line', 'report']),
+        }, depends=['graph_type'], sort=False)
+    show_legend = fields.Boolean('Show Legend',
+        states={
+            'invisible': (Eval('graph_type') == 'report'),
+        }, depends=['graph_type'])
+    report = fields.Many2One('babi.report', 'Report',
+        states={
+            'invisible': (Eval('graph_type') == 'report'),
+        }, depends=['graph_type'])
+    execution = fields.Many2One('babi.report.execution', 'Execution',
+        states={
+            'invisible': (Eval('graph_type') == 'report'),
+        }, depends=['graph_type'])
+    execution_date = fields.DateTime('Execution Time',
+        states={
+            'invisible': (Eval('graph_type') == 'report'),
+        }, depends=['graph_type'])
     dimension = fields.Many2One('babi.dimension', 'Dimension',
-        required=True,
         domain=[
             ('report', '=', Eval('report')),
             ],
         context={
             '_datetime': Eval('execution_date'),
             },
-        depends=['report', 'execution_date'])
+        states={
+            'required': Eval('graph_type') == 'line',
+            'invisible': Eval('graph_type').in_(['line', 'report']),
+        }, depends=['report', 'execution_date', 'graph_type'])
     measures = fields.Many2Many('babi.internal.measure', None, None,
         'Measures', required=True,
         domain=[
             ('execution', '=', Eval('execution')),
             ],
-        depends=['execution'])
+        states={
+            'invisible': (Eval('graph_type') == 'report'),
+            },
+        depends=['execution', 'graph_type'])
 
     @classmethod
     def default_get(cls, fields, with_rec_name=True):
@@ -2390,9 +2414,19 @@ class OpenChart(Wizard):
     start = StateView('babi.open_chart.start',
         'babi.open_chart_start_form_view', [
             Button('Cancel', 'end', 'tryton-cancel'),
-            Button('Open', 'open_', 'tryton-ok', default=True),
+            Button('Print', 'print_', 'tryton-ok',
+                states={
+                    'invisible': (Eval('graph_type') != 'report'),
+                },
+            ),
+            Button('Open', 'open_', 'tryton-ok', default=True,
+                states={
+                    'invisible': (Eval('graph_type') == 'report'),
+                },
+            ),
             ])
     open_ = EmptyStateAction()
+    print_ = StateReport('babi.report.execution')
 
     @classmethod
     def __setup__(cls):
@@ -2404,10 +2438,12 @@ class OpenChart(Wizard):
 
     def do_open_(self, action):
         pool = Pool()
-        model_name = Transaction().context.get('active_model')
-        Model = pool.get(model_name)
 
-        active_ids = Transaction().context.get('active_ids')
+        context = Transaction().context
+        model_name = context.get('active_model')
+        active_ids = context.get('active_ids')
+
+        Model = pool.get(model_name)
 
         if len(self.start.measures) > 1 and self.start.graph_type == 'pie':
             self.raise_user_error('one_measure_in_pie_charts')
@@ -2445,6 +2481,35 @@ class OpenChart(Wizard):
             }
         return action, {}
 
+    def do_print_(self, action):
+        context = Transaction().context
+        model_name = context.get('active_model')
+        active_ids = context.get('active_ids')
+
+        report = self.start.report
+
+        data = {
+            'model_name': model_name,
+            'report_name': report.name,
+            'records': active_ids,
+            'headers': [{d.internal_name: {
+                        'name': d.name,
+                        'width': d.width or '',
+                        'text-align': 'right' if d.expression.ttype in [
+                            'float', 'numeric'] else 'left',
+                        }} for d in report.dimensions] +
+                    [{m.internal_name: {
+                        'name': m.name,
+                        'width': m.width or '',
+                        'text-align': 'right' if m.expression.ttype in [
+                            'float', 'numeric'] else 'left',
+                        }} for m in report.measures],
+            }
+        return action, data
+
+    def transition_print_(self):
+        return 'end'
+
 
 class CleanExecutionsStart(ModelView):
     'Clean Execution Start'
@@ -2468,3 +2533,59 @@ class CleanExecutions(Wizard):
         Execution = pool.get('babi.report.execution')
         Execution.clean(self.start.date)
         return 'end'
+
+
+class BabiHTMLReport(HTMLReport):
+    __name__ = 'babi.report.execution'
+
+    @classmethod
+    def prepare(cls, ids, data):
+        Model = Pool().get(data['model_name'])
+
+        records = []
+        parameters = {}
+
+        def get_childs(record):
+            childs = []
+            for r in Model.search([
+                    # ('babi_group', '=', group_name),
+                    ('parent', '=', record.id),
+                    ]):
+                childs.append(get_childs(r))
+            return {
+                'record': record,
+                'childs': childs,
+                }
+
+        for record in  Model.search([
+                ('id', 'in', data['records']),
+                ]):
+            records.append(get_childs(record))
+
+        return records, parameters
+
+    @classmethod
+    def execute(cls, ids, data):
+        context = Transaction().context
+        context['report_lang'] = Transaction().language
+        context['report_translations'] = os.path.join(
+            os.path.dirname(__file__), 'report', 'translations')
+
+        columns = []
+        for header in data['headers']:
+            columns += header.keys()
+
+        with Transaction().set_context(**context):
+            records, parameters = cls.prepare(ids, data)
+
+            return super(BabiHTMLReport, cls).execute(data['records'], {
+                    'name': 'babi.report.execution',
+                    'model': data['model_name'],
+                    'headers': data['headers'],
+                    'columns': columns,
+                    'report_name': data['report_name'],
+                    'records': records,
+                    'parameters': parameters,
+                    'output_format': 'pdf',
+                    'now': datetime.now(),
+                    })

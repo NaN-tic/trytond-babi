@@ -39,3 +39,6 @@ def register():
         UpdateDataWizard,
         CleanExecutions,
         module='babi', type_='wizard')
+    Pool.register(
+        BabiHTMLReport,
+        module='babi', type_='report')
