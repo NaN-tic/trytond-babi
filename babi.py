@@ -2063,6 +2063,9 @@ class DimensionColumn(ModelSQL, ModelView, DimensionMixin):
         super(DimensionColumn, cls).__setup__()
         cls._order.insert(0, ('sequence', 'ASC'))
 
+    def get_internal_name(self, name):
+        return 'babi_dimension_column_%d' % self.id
+
 
 class Measure(ModelSQL, ModelView):
     "Measure"
