@@ -1,0 +1,110 @@
+{% extends 'html_report/report/base.html' %}
+
+{% block custom_style %}
+<style type="text/css">
+  @page {
+    size: landscape;
+    @top-left {
+      content: "{{ company.rec_name }}. {{ company.party.vat_code }}";
+    }
+    @top-right {
+      content: "{{ data['now']|dateformat }}";
+    }
+    @bottom-right {
+      content: counter(page) " / " counter(pages);
+    }
+  }
+  hr {
+    border-top: 1px solid #000;
+  }
+  .h3 {
+    font-size: 16px;
+  }
+  body {
+    font-family: 'Arial';
+    font-size: 10px;
+  }
+  .page-break {
+    padding-top: 10px;
+    page-break-before: always;
+  }
+  .top20 {
+    padding-top: 20px;
+  }
+  thead > tr > th {
+    border-bottom: solid 1px #000 !important;
+  }
+  tbody tr {
+    page-break-inside: avoid;
+  }
+  table.no-border td {
+    border: 0px;
+  }
+  .border-cell-active {
+    border-top: solid 1px #999 !important;
+  }
+  .border-cell {
+    border-top: 0px !important;
+  }
+  #footer {
+    position: fixed;
+    bottom: 0;
+  }
+</style>
+{% endblock %}
+
+{% block title %}
+  {{ data['report_name'] }}
+{% endblock %}
+
+{% macro draw_table(record, before) %}
+  {% set current = [] %}
+  {% set total_columns = data['columns']|length %}
+  <tr>
+    {% for k in data['columns'] %}
+      {% set val = record['record'][k] %}
+      {% set val_render = val|render_field %}
+      {% set val_type = val|type_field %}
+      {% do current.append(val_render) %}
+      <td class="border-cell{% if not val_render in before or total_columns == current|length or val_render == None %}-active{% endif %}{% if val_type in ('float', 'Decimal') %} text-right{% endif %}">
+      {% if not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
+    </td>{% endfor %}
+  </tr>
+    {% if record['childs'] %}
+      {% for child in record['childs'] %}
+          {{ draw_table(child, current) }}
+      {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+{% block main %}
+    <div class="container-fluid">
+
+      <div class="row">
+        <div class="col-md-12">
+          <h2>{{ data['report_name'] }}</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table no-border bottom2px top2px">
+            <thead>
+              {% for header in data['headers'] %}
+                {% set key = header.keys()[0] %}
+                {% set title = header.values()[0]['name'] %}
+                {% set width = header.values()[0]['width'] %}
+                {% set text_align = header.values()[0]['text-align'] %}
+              <th id="{{ key }}" {% if width %}style="width: {{ width }}%"{% endif %} class="text-{{ text_align }}" nowrap>{{ title }}</th>{% endfor %}
+            </thead>
+            <tbody>
+              {% for record in data['records'] %}
+                  {{ draw_table(record, []) }}
+              {% endfor %}
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+{% endblock %}

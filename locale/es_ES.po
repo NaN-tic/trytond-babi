@@ -1272,6 +1272,10 @@ msgid "Pie"
 msgstr "Circular"
 
 msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Report"
+msgstr "Informe"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
 msgid "Vertical Bars"
 msgstr "Barras verticales"
 
