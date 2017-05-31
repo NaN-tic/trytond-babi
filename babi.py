@@ -15,7 +15,7 @@ import unicodedata
 import json
 
 from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
-    Button
+    StateReport, Button
 from trytond.model import ModelSQL, ModelView, fields, Unique, Check, \
     sequence_ordered
 from trytond.model.fields import depends
@@ -2056,6 +2056,8 @@ class Measure(ModelSQL, ModelView, sequence_ordered()):
     aggregate = fields.Selection(AGGREGATE_TYPES, 'Aggregate', required=True)
     internal_measures = fields.One2Many('babi.internal.measure',
         'measure', 'Internal Measures')
+    width = fields.Integer('Width',
+        help='Widht report columns (%)')
 
     @classmethod
     def __setup__(cls):
