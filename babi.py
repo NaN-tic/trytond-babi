@@ -1,18 +1,19 @@
 # encoding: utf-8
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from io import BytesIO
 import datetime as mdatetime
-from datetime import datetime, timedelta
-from collections import defaultdict
 import logging
 import os
 import sys
-from sql import Null
-from sql.operators import Or
 import time
 import unicodedata
 import json
+
+from sql import Null
+from sql.operators import Or
+from datetime import datetime, timedelta
+from collections import defaultdict
+from io import BytesIO
 
 from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
     StateReport, Button
@@ -37,7 +38,6 @@ __all__ = ['Filter', 'Expression', 'Report', 'ReportGroup', 'Dimension',
     'UpdateDataWizardStart', 'UpdateDataWizardUpdated', 'UpdateDataWizard',
     'FilterParameter', 'CleanExecutionsStart', 'CleanExecutions',
     'BabiHTMLReport']
-__metaclass__ = PoolMeta
 
 
 FIELD_TYPES = [
@@ -91,14 +91,17 @@ logger = logging.getLogger(__name__)
 def unaccent(text):
     if not (isinstance(text, str) or isinstance(text, unicode)):
         return str(text)
-    if isinstance(text, str):
+    if isinstance(text, str) and bytes == str:
         text = unicode(text, 'utf-8')
     text = text.lower()
     for c in xrange(len(SRC_CHARS)):
         if c >= len(DST_CHARS):
             break
         text = text.replace(SRC_CHARS[c], DST_CHARS[c])
-    return unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore')
+    text = unicodedata.normalize('NFKD', text)
+    if bytes == str:
+        text.encode('ASCII', 'ignore')
+    return text
 
 
 class DynamicModel(ModelSQL, ModelView):
@@ -1253,7 +1256,7 @@ class ReportExecution(ModelSQL, ModelView):
             logger.info('Calculated %s,  %s records in %s seconds'
                 % (model, index * offset, datetime.today() - start))
 
-            to_create = ''
+            to_create = '' if bytes == str else b''
             # var o it's used on expression!!
             # Don't rename var
             # chunk = records[index * offset:(index + 1) * offset]
@@ -1267,12 +1270,15 @@ class ReportExecution(ModelSQL, ModelView):
                     for x in dimension_expressions]
                 vals += [sanitanize(babi_eval(x, record, convert_none='zero'))
                     for x in measure_expressions]
-                record = u'|'.join(vals).replace('\n', ' ')
-                to_create += record.replace('\\', '').encode('utf-8') + '\n'
+                record = '|'.join(vals).replace('\n', ' ')
+                record.replace('\\', '')
+                record += '\n'
+                record = record.encode('utf-8')
+                to_create += record
 
             if to_create:
+                data = BytesIO(to_create)
                 if hasattr(cursor, 'copy_from'):
-                    data = BytesIO(to_create)
                     cursor.copy_from(data, table, sep='|', null='',
                         columns=columns)
                     data.close()
@@ -1280,9 +1286,11 @@ class ReportExecution(ModelSQL, ModelView):
                     base_query = 'INSERT INTO %s (' % table
                     base_query += ','.join([unicode(x) for x in columns])
                     base_query += ' ) VALUES '
-                    for line in to_create.split('\n'):
+                    for line in data.readlines():
                         if len(line) == 0:
                             continue
+                        if bytes != str:
+                            line = line.decode('utf-8')
                         query = base_query + '(now(),'
                         query += ','.join(["'%s'" % unicode(x)
                                 for x in line.split('|')[1:]])
@@ -1943,10 +1951,11 @@ class ReportGroup(ModelSQL):
             ]
 
 
-class DimensionMixin(sequence_ordered()):
+class DimensionMixin:
 
     report = fields.Many2One('babi.report', 'Report', required=True,
         ondelete='CASCADE')
+    sequence = fields.Integer('Sequence')
     name = fields.Char('Name', required=True, translate=True)
     internal_name = fields.Function(fields.Char('Internal Name'),
         'get_internal_name')
@@ -1960,6 +1969,11 @@ class DimensionMixin(sequence_ordered()):
 
     def get_internal_name(self, name):
         return 'babi_dimension_%d' % self.id
+
+    @staticmethod
+    def order_sequence(tables):
+        table, _ = tables[None]
+        return [table.sequence == None, table.sequence]
 
     @staticmethod
     def default_group_by():
@@ -1989,6 +2003,7 @@ class Dimension(ModelSQL, ModelView, DimensionMixin):
     def __setup__(cls):
         super(Dimension, cls).__setup__()
         t = cls.__table__()
+        cls._order.insert(0, ('sequence', 'ASC'))
         cls._sql_constraints += [
             ('report_and_name_unique', Unique(t, t.report, t.name),
                 'Dimension name must be unique per report.'),
@@ -2049,17 +2064,23 @@ class DimensionColumn(ModelSQL, ModelView, DimensionMixin):
     __name__ = 'babi.dimension.column'
     _history = True
 
+    @classmethod
+    def __setup__(cls):
+        super(DimensionColumn, cls).__setup__()
+        cls._order.insert(0, ('sequence', 'ASC'))
+
     def get_internal_name(self, name):
         return 'babi_dimension_column_%d' % self.id
 
 
-class Measure(ModelSQL, ModelView, sequence_ordered()):
+class Measure(ModelSQL, ModelView):
     "Measure"
     __name__ = 'babi.measure'
     _history = True
 
     report = fields.Many2One('babi.report', 'Report', required=True,
         ondelete='CASCADE')
+    sequence = fields.Integer('Sequence')
     name = fields.Char('Name', required=True, translate=True)
     internal_name = fields.Function(fields.Char('Internal Name'),
         'get_internal_name')
@@ -2077,10 +2098,16 @@ class Measure(ModelSQL, ModelView, sequence_ordered()):
     def __setup__(cls):
         super(Measure, cls).__setup__()
         t = cls.__table__()
+        cls._order.insert(0, ('sequence', 'ASC'))
         cls._sql_constraints += [
             ('report_and_name_unique', Unique(t, t.report, t.name),
                 'Measure name must be unique per report.'),
             ]
+
+    @staticmethod
+    def order_sequence(tables):
+        table, _ = tables[None]
+        return [table.sequence == None, table.sequence]
 
     @staticmethod
     def default_aggregate():
@@ -2255,12 +2282,14 @@ class Order(ModelSQL, ModelView, sequence_ordered()):
 
 
 class ActWindow:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.action.act_window'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
 
 
 class Menu:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.ui.menu'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
@@ -2274,6 +2303,7 @@ class Menu:
 
 
 class Keyword:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.action.keyword'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
@@ -2281,7 +2311,8 @@ class Keyword:
         'BABI Filter Parameter')
 
 
-class Model(ModelSQL, ModelView):
+class Model:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.model'
 
     babi_enabled = fields.Boolean('BI Enabled', help='Check if you want '
