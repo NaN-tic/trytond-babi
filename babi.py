@@ -1,21 +1,19 @@
 # encoding: utf-8
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from io import BytesIO
 import datetime as mdatetime
-from datetime import datetime, timedelta
-from collections import defaultdict
 import logging
 import os
 import sys
-from sql import Null
-from sql.operators import Or
 import time
 import unicodedata
-try:
-    import simplejson as json
-except ImportError:
-    import json
+import json
+
+from sql import Null
+from sql.operators import Or
+from datetime import datetime, timedelta
+from collections import defaultdict
+from io import BytesIO
 
 from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
     StateReport, Button
@@ -39,7 +37,6 @@ __all__ = ['Filter', 'Expression', 'Report', 'ReportGroup', 'Dimension',
     'UpdateDataWizardStart', 'UpdateDataWizardUpdated', 'UpdateDataWizard',
     'FilterParameter', 'CleanExecutionsStart', 'CleanExecutions',
     'BabiHTMLReport']
-__metaclass__ = PoolMeta
 
 
 FIELD_TYPES = [
@@ -93,14 +90,17 @@ logger = logging.getLogger(__name__)
 def unaccent(text):
     if not (isinstance(text, str) or isinstance(text, unicode)):
         return str(text)
-    if isinstance(text, str):
+    if isinstance(text, str) and bytes == str:
         text = unicode(text, 'utf-8')
     text = text.lower()
     for c in xrange(len(SRC_CHARS)):
         if c >= len(DST_CHARS):
             break
         text = text.replace(SRC_CHARS[c], DST_CHARS[c])
-    return unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore')
+    text = unicodedata.normalize('NFKD', text)
+    if bytes == str:
+        text.encode('ASCII', 'ignore')
+    return text
 
 
 class DynamicModel(ModelSQL, ModelView):
@@ -1255,7 +1255,7 @@ class ReportExecution(ModelSQL, ModelView):
             logger.info('Calculated %s,  %s records in %s seconds'
                 % (model, index * offset, datetime.today() - start))
 
-            to_create = ''
+            to_create = '' if bytes == str else b''
             # var o it's used on expression!!
             # Don't rename var
             # chunk = records[index * offset:(index + 1) * offset]
@@ -1269,12 +1269,15 @@ class ReportExecution(ModelSQL, ModelView):
                     for x in dimension_expressions]
                 vals += [sanitanize(babi_eval(x, record, convert_none='zero'))
                     for x in measure_expressions]
-                record = u'|'.join(vals).replace('\n', ' ')
-                to_create += record.replace('\\', '').encode('utf-8') + '\n'
+                record = '|'.join(vals).replace('\n', ' ')
+                record.replace('\\', '')
+                record += '\n'
+                record = record.encode('utf-8')
+                to_create += record
 
             if to_create:
+                data = BytesIO(to_create)
                 if hasattr(cursor, 'copy_from'):
-                    data = BytesIO(to_create)
                     cursor.copy_from(data, table, sep='|', null='',
                         columns=columns)
                     data.close()
@@ -1282,9 +1285,11 @@ class ReportExecution(ModelSQL, ModelView):
                     base_query = 'INSERT INTO %s (' % table
                     base_query += ','.join([unicode(x) for x in columns])
                     base_query += ' ) VALUES '
-                    for line in to_create.split('\n'):
+                    for line in data.readlines():
                         if len(line) == 0:
                             continue
+                        if bytes != str:
+                            line = line.decode('utf-8')
                         query = base_query + '(now(),'
                         query += ','.join(["'%s'" % unicode(x)
                                 for x in line.split('|')[1:]])
@@ -2278,12 +2283,14 @@ class Order(ModelSQL, ModelView):
 
 
 class ActWindow:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.action.act_window'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
 
 
 class Menu:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.ui.menu'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
@@ -2297,6 +2304,7 @@ class Menu:
 
 
 class Keyword:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.action.keyword'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
@@ -2304,7 +2312,8 @@ class Keyword:
         'BABI Filter Parameter')
 
 
-class Model(ModelSQL, ModelView):
+class Model:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.model'
 
     babi_enabled = fields.Boolean('BI Enabled', help='Check if you want '
