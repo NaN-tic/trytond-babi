@@ -690,5 +690,14 @@ contains the full copyright notices and license terms. -->
             <field name="menu" ref="menu_babi_execution"/>
             <field name="group" ref="group_babi_admin"/>
         </record>
+
+        <!-- HTML Report -->
+        <record model="ir.action.report" id="report_babi_execution">
+            <field name="name">Babi Report</field>
+            <!-- <field name="model">babi.report.execution</field> -->
+            <field name="report_name">babi.report.execution</field>
+            <field name="report">babi/report/babi.html</field>
+            <field name="extension">pdf</field>
+        </record>
     </data>
 </tryton>
