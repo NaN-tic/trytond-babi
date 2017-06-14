@@ -445,8 +445,8 @@ class FilterParameter(ModelSQL, ModelView):
     filter = fields.Many2One('babi.filter', 'Filter', required=True)
     name = fields.Char('Name', required=True, translate=True, help='Name used '
         'on the domain substitution')
-    ttype = fields.Selection(FIELD_TYPES + [('many2many', 'Many To Many')],
-        'Field Type', required=True)
+    ttype = fields.Selection(FIELD_TYPES + [('date', 'Date'),
+        ('many2many', 'Many To Many')], 'Field Type', required=True)
     related_model = fields.Many2One('ir.model', 'Related Model', states={
             'required': Eval('ttype').in_(['many2one', 'many2many']),
             'readonly': Not(Eval('ttype').in_(['many2one', 'many2many'])),
