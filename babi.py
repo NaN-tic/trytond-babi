@@ -2,6 +2,7 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 import datetime as mdatetime
+import pytz
 import logging
 import os
 import sys
@@ -958,7 +959,16 @@ class ReportExecution(ModelSQL, ModelView):
         return Transaction().context.get('company')
 
     def get_rec_name(self, name):
-        return '%s (%s)' % (self.report.rec_name, self.date)
+        Company = Pool().get('company.company')
+        company_id = Transaction().context.get('company')
+        date = self.date
+        if company_id:
+            company = Company(company_id)
+            if company.timezone:
+                timezone = pytz.timezone(company.timezone)
+                date = timezone.localize(self.date)
+                date = self.date + date.utcoffset()
+        return '%s (%s)' % (self.report.rec_name, date)
 
     def get_internal_name(self, name):
         return 'babi_execution_%d' % self.id
