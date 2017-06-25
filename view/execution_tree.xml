@@ -10,6 +10,6 @@ contains the full copyright notices and license terms. -->
     </field>
     <field name="state"/>
     <field name="filtered"/>
-    <button name="open" string="Open" />
-    <button name="cancel" string="Cancel" />
+    <button name="open" string="Open" tree_invisible="1"/>
+    <button name="cancel" string="Cancel" tree_invisible="1"/>
 </tree>
