@@ -401,7 +401,7 @@ class Filter(ModelSQL, ModelView):
     def check_dinamic_filters(self):
         for filter in self.parameters:
             placeholder = '{%s}' % filter.name
-            if ((self.domain and placeholder not in self.domain) or
+            if ((self.domain and placeholder not in self.domain) and
                     (self.python_expression and
                         placeholder not in self.python_expression)):
                 self.raise_user_error('parameter_not_found', filter.name)
