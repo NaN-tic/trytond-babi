@@ -386,27 +386,6 @@ class Filter(ModelSQL, ModelView):
             'Model Fields', depends=['model']),
         'on_change_with_fields')
 
-    @classmethod
-    def __setup__(cls):
-        super(Filter, cls).__setup__()
-        cls._error_messages.update({
-                'parameter_not_found': ('Parameter "%s" not found in Domain '
-                    'nor in Python Expression.'),
-                })
-
-    @classmethod
-    def validate(cls, filters):
-        for filter in filters:
-            filter.check_dinamic_filters()
-
-    def check_dinamic_filters(self):
-        for filter in self.parameters:
-            placeholder = '{%s}' % filter.name
-            if ((self.domain and placeholder not in self.domain) and
-                    (self.python_expression and
-                        placeholder not in self.python_expression)):
-                self.raise_user_error('parameter_not_found', filter.name)
-
     @depends('model')
     def on_change_with_model_name(self, name=None):
         return self.model.model if self.model else None
@@ -462,6 +441,28 @@ class FilterParameter(ModelSQL, ModelView):
             keyword.action = action.action
             keyword.babi_filter_parameter = self
             keyword.save()
+
+    @classmethod
+    def __setup__(cls):
+        super(FilterParameter, cls).__setup__()
+        cls._error_messages.update({
+                'parameter_not_found': ('Parameter "%(parameter)s" not found '
+                    'in Domain nor in Python Expression of filter '
+                    '"%(filter)s".'),
+                })
+
+    def check_parameter_in_filter(self):
+        placeholder = '{%s}' % self.name
+        if ((self.filter.domain and placeholder not in self.filter.domain) and
+                    (self.filter.python_expression and placeholder not in
+                        self.filter.python_expression)):
+            self.raise_user_warning('babi_check_parameter_in_filter.{}'.format(
+                    self.name), 'parameter_not_found', {
+                    'parameter': self.rec_name,
+                    'filter': self.filter.rec_name,
+                    })
+            return False
+        return True
 
     @classmethod
     def create(cls, vlist):
@@ -1144,9 +1145,40 @@ class ReportExecution(ModelSQL, ModelView):
                     execution.save()
                     raise
 
+    def replace_parameters(self, expression):
+        if self.report.filter and self.report.filter.parameters:
+            if not self.filter_values:
+                self.raise_user_error('filter_parameters', self.rec_name)
+            filter_data = json.loads(self.filter_values.encode('utf-8'),
+                object_hook=JSONDecoder())
+            parameters = dict((p.id, p.name) for p in
+                self.report.filter.parameters)
+            values = {}
+            for key, value in filter_data.iteritems():
+                filter_name = parameters[int(key.split('_')[-1:][0])]
+                if not value or filter_name not in expression:
+                    continue
+                values[filter_name] = value
+            expression = expression.format(**values)
+        return expression
+
     def get_python_filter(self):
         if self.report.filter and self.report.filter.python_expression:
-            return self.report.filter.python_expression
+            return self.replace_parameters(self.report.filter.python_expression)
+
+    def get_domain_filter(self):
+        domain = '[]'
+        if self.report.filter and self.report.filter.domain:
+            domain = self.report.filter.domain
+            if '__' in domain:
+                domain = str(PYSONDecoder().decode(domain))
+        domain = self.replace_parameters(domain)
+        # TODO: Use a PYSON domain?
+        return eval(domain, {
+                'datetime': mdatetime,
+                'false': False,
+                'true': True,
+                })
 
     def create_keywords(self):
         pool = Pool()
@@ -1181,33 +1213,7 @@ class ReportExecution(ModelSQL, ModelView):
         if not self.report.dimensions:
             self.raise_user_error('no_dimensions', self.rec_name)
 
-        domain = '[]'
-        if self.report.filter and self.report.filter.domain:
-            domain = self.report.filter.domain
-            if '__' in domain:
-                domain = str(PYSONDecoder().decode(domain))
-        if domain and self.report.filter and (
-                len(self.report.filter.parameters) > 0):
-            if not self.filter_values:
-                self.raise_user_error('filter_parameters', self.rec_name)
-            filter_data = json.loads(self.filter_values.encode('utf-8'),
-                object_hook=JSONDecoder())
-            parameters = dict((p.id, p.name)
-                for p in self.report.filter.parameters)
-            values = {}
-            for key, value in filter_data.iteritems():
-                filter_name = parameters[int(key.split('_')[-1:][0])]
-                if not value or filter_name not in domain:
-                    continue
-                values[filter_name] = value
-            if domain:
-                domain = domain.format(**values)
-        # TODO: Use a PYSON domain?
-        domain = eval(domain, {
-                'datetime': mdatetime,
-                'false': False,
-                'true': True,
-                })
+        domain = self.get_domain_filter()
         start = datetime.today()
         self.update_internal_measures()
         with_columns = len(self.report.columns) > 0
@@ -1639,7 +1645,7 @@ class OpenExecutionFiltered(StateView):
                 ]
         super(OpenExecutionFiltered, self).__init__('babi.report', 0, buttons)
 
-    def get_view(self):
+    def get_view(self, wizard, state_name):
         pool = Pool()
         Menu = pool.get('ir.ui.menu')
         Report = pool.get('babi.report')
@@ -1687,6 +1693,12 @@ class OpenExecutionFiltered(StateView):
 
         if not parameters:
             self.raise_user_error('no_filter_parameter', model.model)
+        parameters_to_remove = []
+        for parameter in parameters:
+            if not parameter.check_parameter_in_filter():
+                parameters_to_remove.append(parameter)
+        for parameter in parameters_to_remove:
+            parameters.remove(parameter)
 
         xml = '<form string="Generate Filtered Report">\n'
         xml += '<label name="report"/>\n'
