@@ -10,7 +10,7 @@ import time
 import unicodedata
 import json
 
-from sql import Null
+from sql import Null, Column
 from sql.operators import Or
 from datetime import datetime, timedelta
 from collections import defaultdict
@@ -42,10 +42,10 @@ __all__ = ['Filter', 'Expression', 'Report', 'ReportGroup', 'Dimension',
 
 FIELD_TYPES = [
     ('char', 'Char'),
-    ('int', 'Integer'),
+    ('integer', 'Integer'),
     ('float', 'Float'),
     ('numeric', 'Numeric'),
-    ('bool', 'Boolean'),
+    ('boolean', 'Boolean'),
     ('many2one', 'Many To One'),
     ]
 
@@ -442,6 +442,19 @@ class FilterParameter(ModelSQL, ModelView):
             keyword.save()
 
     @classmethod
+    def __register__(cls, module_name):
+        super(FilterParameter, cls).__register__(module_name)
+        cursor = Transaction().connection.cursor()
+        sql_table = cls.__table__()
+
+        # Migration from int to integer
+        cursor.execute(*sql_table.update([Column(sql_table, 'ttype')],
+                ['integer'], where=sql_table.ttype == 'int'))
+        # Migration from bool to boolean
+        cursor.execute(*sql_table.update([Column(sql_table, 'ttype')],
+                ['boolean'], where=sql_table.ttype == 'bool'))
+
+    @classmethod
     def __setup__(cls):
         super(FilterParameter, cls).__setup__()
         cls._error_messages.update({
@@ -522,6 +535,19 @@ class Expression(ModelSQL, ModelView):
             }, depends=['ttype'])
     fields = fields.Function(fields.Many2Many('ir.model.field', None, None,
             'Model Fields'), 'on_change_with_fields')
+
+    @classmethod
+    def __register__(cls, module_name):
+        super(Expression, cls).__register__(module_name)
+        cursor = Transaction().connection.cursor()
+        sql_table = cls.__table__()
+
+        # Migration from int to integer
+        cursor.execute(*sql_table.update([Column(sql_table, 'ttype')],
+                ['integer'], where=sql_table.ttype == 'int'))
+        # Migration from bool to boolean
+        cursor.execute(*sql_table.update([Column(sql_table, 'ttype')],
+                ['boolean'], where=sql_table.ttype == 'bool'))
 
     @depends('model')
     def on_change_with_fields(self, name=None):
@@ -1717,8 +1743,7 @@ class OpenExecutionFiltered(StateView):
                 'help': '',
                 'context': {},
                 'delete': True,
-                'type': ('integer' if parameter.ttype == 'int'
-                    else parameter.ttype),
+                'type': parameter.ttype,
                 'select': False,
                 'readonly': False,
                 'required': True,
@@ -2232,11 +2257,20 @@ class InternalMeasure(ModelSQL, ModelView):
     def __register__(cls, module_name):
         TableHandler = backend.get('TableHandler')
         super(InternalMeasure, cls).__register__(module_name)
+        cursor = Transaction().connection.cursor()
+        sql_table = cls.__table__()
 
         # Migration from 3.0: no more relation with reports.
         table = TableHandler(cls, module_name)
         if table.column_exist('report'):
             table.not_null_action('report', action='remove')
+
+        # Migration from int to integer
+        cursor.execute(*sql_table.update([Column(sql_table, 'ttype')],
+                ['integer'], where=sql_table.ttype == 'int'))
+        # Migration from bool to boolean
+        cursor.execute(*sql_table.update([Column(sql_table, 'ttype')],
+                ['boolean'], where=sql_table.ttype == 'bool'))
 
     def get_measure_data(self):
         return {
