@@ -61,7 +61,7 @@ class BaBITestCase(ModuleTestCase):
             self.expression.create([{
                         'name': 'Id',
                         'model': model.id,
-                        'ttype': 'int',
+                        'ttype': 'integer',
                         'expression': 'o.id',
                         }, {
                         'name': 'Year',
