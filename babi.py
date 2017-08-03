@@ -2011,7 +2011,7 @@ class DimensionMixin:
             ])
     group_by = fields.Boolean('Group By This Dimension')
     width = fields.Integer('Width',
-        help='Widht report columns (%)')
+        help='Width report columns (%)')
 
     def get_internal_name(self, name):
         return 'babi_dimension_%d' % self.id
@@ -2138,7 +2138,7 @@ class Measure(ModelSQL, ModelView):
     internal_measures = fields.One2Many('babi.internal.measure',
         'measure', 'Internal Measures')
     width = fields.Integer('Width',
-        help='Widht report columns (%)')
+        help='Width report columns (%)')
 
     @classmethod
     def __setup__(cls):
