@@ -2435,6 +2435,12 @@ class OpenChartStart(ModelView):
         depends=['execution', 'graph_type'])
 
     @classmethod
+    def view_attributes(cls):
+        return super(OpenChartStart, cls).view_attributes() + [(
+            '/form/group[@id="labels"]', 'states',
+            {'invisible': Eval('graph_type') != 'report'})]
+
+    @classmethod
     def default_get(cls, fields, with_rec_name=True):
         pool = Pool()
         Execution = pool.get('babi.report.execution')
@@ -2582,8 +2588,15 @@ class OpenChart(Wizard):
                         'width': m.width or '',
                         'text-align': 'right' if m.expression.ttype in [
                             'float', 'numeric'] else 'left',
-                        }} for m in report.measures],
+                        }} for m in report.measures]
             }
+
+        if self.start.graph_type == 'report':
+            data['headers'] += [{m.internal_name: {
+                    'name': m.name,
+                    'width': '',
+                    'text-align': 'right',
+                    }} for m in self.start.measures]
         return action, data
 
     def transition_print_(self):
@@ -2636,7 +2649,7 @@ class BabiHTMLReport(HTMLReport):
                 'childs': childs,
                 }
 
-        for record in  Model.search([
+        for record in Model.search([
                 ('id', 'in', data['records']),
                 ]):
             records.append(get_childs(record))
