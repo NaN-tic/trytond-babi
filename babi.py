@@ -2585,21 +2585,21 @@ class OpenChart(Wizard):
                         }} for d in report.dimensions]
             }
 
-        if ((self.start.graph_type != 'report') or
-             (self.start.graph_type == 'report') and not self.start.measures):
-            data['headers'] += [{m.internal_name: {
+        if (self.start.graph_type == 'report'):
+            if self.start.measures:
+                data['headers'] += [{m.internal_name: {
                         'name': m.name,
-                        'width': m.width or '',
-                        'text-align': 'right' if m.expression.ttype in [
-                            'float', 'numeric'] else 'left',
-                        }} for m in report.measures]
+                        'width': '',
+                        'text-align': 'right',
+                        }} for m in self.start.measures]
+            else:
+                data['headers'] += [{m.internal_name: {
+                            'name': m.name,
+                            'width': m.width or '',
+                            'text-align': 'right' if m.expression.ttype in [
+                                'float', 'numeric'] else 'left',
+                            }} for m in report.measures]
 
-        if self.start.graph_type == 'report':
-            data['headers'] += [{m.internal_name: {
-                    'name': m.name,
-                    'width': '',
-                    'text-align': 'right',
-                    }} for m in self.start.measures]
         return action, data
 
     def transition_print_(self):
