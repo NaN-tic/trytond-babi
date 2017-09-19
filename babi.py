@@ -1615,7 +1615,7 @@ class OpenExecutionSelect(ModelView):
     report_readonly = fields.Boolean('Report Readonly')
     execution_readonly = fields.Boolean('Execution Readonly')
 
-     @classmethod
+    @classmethod
     def view_attributes(cls):
         return super(OpenChartStart, cls).view_attributes() + [(
             '/form/group[@id="labels"]', 'states',
