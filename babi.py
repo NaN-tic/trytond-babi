@@ -2582,14 +2582,17 @@ class OpenChart(Wizard):
                         'width': d.width or '',
                         'text-align': 'right' if d.expression.ttype in [
                             'float', 'numeric'] else 'left',
-                        }} for d in report.dimensions] +
-                    [{m.internal_name: {
+                        }} for d in report.dimensions]
+            }
+
+        if ((self.start.graph_type != 'report') or
+             (self.start.graph_type == 'report') and not self.start.measures):
+            data['headers'] += [{m.internal_name: {
                         'name': m.name,
                         'width': m.width or '',
                         'text-align': 'right' if m.expression.ttype in [
                             'float', 'numeric'] else 'left',
                         }} for m in report.measures]
-            }
 
         if self.start.graph_type == 'report':
             data['headers'] += [{m.internal_name: {

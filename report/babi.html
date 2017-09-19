@@ -67,7 +67,7 @@
       {% set val_type = val|type_field %}
       {% do current.append(val_render) %}
       <td class="border-cell{% if not val_render in before or total_columns == current|length or val_render == None %}-active{% endif %}{% if val_type in ('float', 'Decimal') %} text-right{% endif %}">
-      {% if not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
+      {% if 'measure' in k or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
     </td>{% endfor %}
   </tr>
     {% if record['childs'] %}
