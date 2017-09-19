@@ -18,11 +18,11 @@
     border-top: 1px solid #000;
   }
   .h3 {
-    font-size: 16px;
+    font-size: 14px;
   }
   body {
     font-family: 'Arial';
-    font-size: 10px;
+    font-size: 9px;
   }
   .page-break {
     padding-top: 10px;
@@ -66,8 +66,8 @@
       {% set val_render = val|render_field %}
       {% set val_type = val|type_field %}
       {% do current.append(val_render) %}
-      <td class="border-cell{% if not val_render in before or total_columns == current|length or val_render == None %}-active{% endif %}{% if val_type in ('float', 'Decimal') %} text-right{% endif %}">
-      {% if not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
+      <td class="border-cell{% if not val_render in before or total_columns == current|length or val_render == None or 'measure' in k %}-active{% endif %}{% if val_type in ('float', 'Decimal') %} text-right{% endif %}">
+      {% if 'measure' in k or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
     </td>{% endfor %}
   </tr>
     {% if record['childs'] %}
