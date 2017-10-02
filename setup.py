@@ -10,7 +10,9 @@ import ConfigParser
 
 MODULE = 'babi'
 PREFIX = 'nantic'
-MODULE2PREFIX = {}
+MODULE2PREFIX = {
+    'html_report': 'trytonspain',
+}
 
 
 def read(fname):
@@ -43,7 +45,7 @@ setup(name='%s_%s' % (PREFIX, MODULE),
     version=info.get('version', '0.0.1'),
     description='Business Inteligence module for tryton',
     long_description=read('README'),
-    author='NaN·tic',
+    author='NaN-tic',
     url='http://www.nan-tic.com/',
     download_url="https://bitbucket.org/nantic/trytond-%s" % MODULE,
     package_dir={'trytond.modules.%s' % MODULE: '.'},
