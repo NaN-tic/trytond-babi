@@ -792,10 +792,7 @@ class Report(ModelSQL, ModelView):
                 'parent': parent,
                 'babi_report': self.id,
                 'icon': 'tryton-executable',
-                'groups': [
-                    ('remove', [g.id for g in menu.groups]),
-                    ('add', [x.id for x in self.groups]),
-                    ],
+                'groups': [x.id for x in self.groups],
                 'babi_type': 'wizard',
                 'active': True,
                 })
@@ -813,10 +810,7 @@ class Report(ModelSQL, ModelView):
                 'parent': parent,
                 'babi_report': self.id,
                 'icon': 'tryton-executable',
-                'groups': [
-                    ('remove', [g.id for g in menu.groups]),
-                    ('add', [x.id for x in self.groups]),
-                    ],
+                'groups': [x.id for x in self.groups],
                 'babi_type': 'history',
                 'active': True,
                 })
