@@ -111,7 +111,6 @@ class BaBITestCase(ModuleTestCase):
         Report = pool.get('babi.report')
         Expression = pool.get('babi.expression')
         Dimension = pool.get('babi.dimension')
-        Expression = pool.get('babi.expression')
         Measure = pool.get('babi.measure')
 
         company = create_company()
@@ -488,8 +487,8 @@ class BaBITestCase(ModuleTestCase):
             evens = ReportModel.search([(category.internal_name, '=', 'even')])
             self.assertEqual(len(evens), 0)
 
-            #Test with datetime fields as they are JSONEncoded on saved
-            #searches
+            # Test with datetime fields as they are JSONEncoded
+            # on saved searches
             date_filter, = Filter.search([('name', '=', 'Date')])
             report, = Report.create([{
                         'name': 'Date filter Report',

@@ -3,6 +3,7 @@
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 
+
 def calculate_execution(execution_id, user_id=None):
     'Calculates exectuion data passed by parameters'
     pool = Pool()

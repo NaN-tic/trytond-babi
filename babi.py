@@ -21,7 +21,8 @@ from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
 from trytond.model import ModelSQL, ModelView, fields, Unique, Check, \
     sequence_ordered
 from trytond.model.fields import depends
-from trytond.pyson import If, Eval, Bool, PYSONEncoder, Id, In, Not, PYSONDecoder
+from trytond.pyson import If, Eval, Bool, PYSONEncoder, Id, In, Not, \
+    PYSONDecoder
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.tools import grouped_slice
@@ -36,7 +37,7 @@ __all__ = ['Filter', 'Expression', 'Report', 'ReportGroup', 'Dimension',
     'DimensionColumn', 'Measure', 'InternalMeasure', 'Order', 'ActWindow',
     'Menu', 'Keyword', 'Model', 'OpenChartStart', 'OpenChart',
     'ReportExecution', 'OpenExecutionSelect', 'OpenExecution',
-    'UpdateDataWizardStart', 'UpdateDataWizardUpdated', 'UpdateDataWizard',
+    'UpdateDataWizardStart', 'UpdateDataWizardUpdated',
     'FilterParameter', 'CleanExecutionsStart', 'CleanExecutions',
     'BabiHTMLReport']
 
@@ -66,12 +67,10 @@ BABI_RETENTION_DAYS = config_.getint('babi', 'retention_days', default=30)
 BABI_CELERY_TASK = config_.get('babi', 'celery_task',
     default='trytond.modules.babi.tasks.calculate_execution')
 
-CELERY_AVAILABLE = False
 try:
     import celery
-    CELERY_AVAILABLE = True
 except ImportError:
-    pass
+    celery = None
 except AttributeError:
     # If run from within frepple we will get
     # AttributeError: 'module' object has no attribute 'argv'
@@ -468,9 +467,9 @@ class FilterParameter(ModelSQL, ModelView):
 
     def check_parameter_in_filter(self):
         placeholder = '{%s}' % self.name
-        if ((self.filter.domain and placeholder not in self.filter.domain) and
-                    (self.filter.python_expression and placeholder not in
-                        self.filter.python_expression)):
+        if ((self.filter.domain and placeholder not in self.filter.domain)
+                and (self.filter.python_expression
+                    and placeholder not in self.filter.python_expression)):
             self.raise_user_warning('babi_check_parameter_in_filter.{}'.format(
                     self.name), 'parameter_not_found', {
                     'parameter': self.rec_name,
@@ -869,15 +868,17 @@ class Report(ModelSQL, ModelView):
         logger.info('Babi execution %s (report "%s")' % (
             execution.id, self.rec_name))
 
-        if CELERY_AVAILABLE and BABI_CELERY:
-            os.system('%s/celery call %s --broker=%s --args=[%d,%d] --config="%s" --queue=%s' % (
-                os.path.dirname(sys.executable),
-                BABI_CELERY_TASK,
-                CELERY_BROKER,
-                execution.id,
-                user,
-                CELERY_CONFIG,
-                database_name))
+        if celery and BABI_CELERY:
+            os.system(
+                '%s/celery call %s '
+                '--broker=%s --args=[%d,%d] --config="%s" --queue=%s' % (
+                    os.path.dirname(sys.executable),
+                    BABI_CELERY_TASK,
+                    CELERY_BROKER,
+                    execution.id,
+                    user,
+                    CELERY_CONFIG,
+                    database_name))
         else:
             # Fallback to synchronous mode if celery is not available
             Execution.calculate([execution])
@@ -1057,7 +1058,6 @@ class ReportExecution(ModelSQL, ModelView):
                     # The model may not be registered on the pool
                     continue
 
-
     @classmethod
     def remove_keywords(cls, executions):
         pool = Pool()
@@ -1186,7 +1186,8 @@ class ReportExecution(ModelSQL, ModelView):
 
     def get_python_filter(self):
         if self.report.filter and self.report.filter.python_expression:
-            return self.replace_parameters(self.report.filter.python_expression)
+            return self.replace_parameters(
+                self.report.filter.python_expression)
 
     def get_domain_filter(self):
         domain = '[]'
@@ -1719,8 +1720,6 @@ class OpenExecutionFiltered(StateView):
                     parameter2report[key] = [report.id]
             report_definition['domain'] = ['id', 'in', [r.id for r in reports]]
 
-        if not parameters:
-            self.raise_user_error('no_filter_parameter', model.model)
         parameters_to_remove = []
         for parameter in parameters:
             if not parameter.check_parameter_in_filter():
@@ -1822,11 +1821,6 @@ class UpdateDataWizardUpdated(ModelView):
     __name__ = 'babi.update_data.wizard.done'
 
 
-class UpdateDataWizard(Wizard):
-    "Update Data Wizard"
-    __name__ = 'babi.update_data.wizard'
-
-
 class OpenExecution(Wizard):
     'Open Report Execution'
     __name__ = 'babi.report.execution.open'
@@ -1860,9 +1854,6 @@ class OpenExecution(Wizard):
                 'no_report': ('No report found for current execution'),
                 'no_execution': ('No execution found for current record. '
                     'Execute the update data wizard in order to create one.'),
-                'no_filter_parameter': ('No parameter found for model %s.'
-                    'In order to view filtered data, parameter should be'
-                    ' defined on the report filter.'),
                 })
 
     def __getattribute__(self, name):
@@ -2022,7 +2013,7 @@ class DimensionMixin:
     @staticmethod
     def order_sequence(tables):
         table, _ = tables[None]
-        return [table.sequence == None, table.sequence]
+        return [table.sequence == Null, table.sequence]
 
     @staticmethod
     def default_group_by():
@@ -2156,7 +2147,7 @@ class Measure(ModelSQL, ModelView):
     @staticmethod
     def order_sequence(tables):
         table, _ = tables[None]
-        return [table.sequence == None, table.sequence]
+        return [table.sequence == Null, table.sequence]
 
     @staticmethod
     def default_aggregate():

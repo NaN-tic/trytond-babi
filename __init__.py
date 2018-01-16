@@ -1,44 +1,43 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from trytond.pool import Pool
-from .configuration import *
-from .cron import *
-from .babi import *
-from .test_model import *
+from . import configuration
+from . import cron
+from . import babi
+from . import test_model
 
 
 def register():
     Pool.register(
-        Configuration,
-        Filter,
-        FilterParameter,
-        Expression,
-        Report,
-        ReportExecution,
-        ReportGroup,
-        Dimension,
-        DimensionColumn,
-        Measure,
-        InternalMeasure,
-        Order,
-        ActWindow,
-        Menu,
-        Keyword,
-        Model,
-        Cron,
-        OpenChartStart,
-        OpenExecutionSelect,
-        UpdateDataWizardStart,
-        UpdateDataWizardUpdated,
-        CleanExecutionsStart,
-        TestBabiModel,
+        configuration.Configuration,
+        babi.Filter,
+        babi.FilterParameter,
+        babi.Expression,
+        babi.Report,
+        babi.ReportExecution,
+        babi.ReportGroup,
+        babi.Dimension,
+        babi.DimensionColumn,
+        babi.Measure,
+        babi.InternalMeasure,
+        babi.Order,
+        babi.ActWindow,
+        babi.Menu,
+        babi.Keyword,
+        babi.Model,
+        cron.Cron,
+        babi.OpenChartStart,
+        babi.OpenExecutionSelect,
+        babi.UpdateDataWizardStart,
+        babi.UpdateDataWizardUpdated,
+        babi.CleanExecutionsStart,
+        test_model.TestBabiModel,
         module='babi', type_='model')
     Pool.register(
-        OpenChart,
-        OpenExecution,
-        UpdateDataWizard,
-        CleanExecutions,
+        babi.OpenChart,
+        babi.OpenExecution,
+        babi.CleanExecutions,
         module='babi', type_='wizard')
     Pool.register(
-        BabiHTMLReport,
+        babi.BabiHTMLReport,
         module='babi', type_='report')
