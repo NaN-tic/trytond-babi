@@ -1619,7 +1619,7 @@ class OpenExecutionSelect(ModelView):
 
     @classmethod
     def view_attributes(cls):
-        return super(OpenChartStart, cls).view_attributes() + [(
+        return super(OpenExecutionSelect, cls).view_attributes() + [(
             '/form/group[@id="labels"]', 'states',
             {'invisible': Eval('graph_type') != 'report'})]
 
