@@ -237,7 +237,7 @@ def create_columns(name, ffields):
         fname = field['name']
         field_name = field['internal_name']
         ttype = field['ttype']
-        if ttype == 'int':
+        if ttype == 'integer':
             columns[field_name] = fields.Integer(fname)
         elif ttype == 'float':
             columns[field_name] = fields.Float(fname, digits=(16, 2))
@@ -245,11 +245,13 @@ def create_columns(name, ffields):
             columns[field_name] = fields.Numeric(fname, digits=(16, 2))
         elif ttype == 'char':
             columns[field_name] = fields.Char(fname)
-        elif ttype == 'bool':
+        elif ttype == 'boolean':
             columns[field_name] = fields.Boolean(fname)
         elif ttype == 'many2one':
             columns[field_name] = fields.Many2One(field['related_model'],
                 fname, ondelete='SET NULL')
+        else:
+            raise ValueError("Unknown type: %s" % ttype)
 
     columns['babi_group'] = fields.Char('Group', size=500)
     columns['parent'] = fields.Many2One(name, 'Parent', ondelete='CASCADE',
