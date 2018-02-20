@@ -65,6 +65,7 @@ BABI_CELERY = config_.getboolean('babi', 'celery', default=True)
 BABI_RETENTION_DAYS = config_.getint('babi', 'retention_days', default=30)
 BABI_CELERY_TASK = config_.get('babi', 'celery_task',
     default='trytond.modules.babi.tasks.calculate_execution')
+BABI_MAX_BD_COLUMN = config_.getint('babi', 'max_db_column', default=60)
 
 CELERY_AVAILABLE = False
 try:
@@ -101,8 +102,12 @@ def unaccent(text):
         text = text.replace(SRC_CHARS[c], DST_CHARS[c])
     text = unicodedata.normalize('NFKD', text)
     if bytes == str:
-        text.encode('ASCII', 'ignore')
+        text = text.encode('ASCII', 'ignore')
     return text
+
+
+def _replace(x):
+    return x.replace("'", '')
 
 
 class DynamicModel(ModelSQL, ModelView):
@@ -1407,33 +1412,39 @@ class ReportExecution(ModelSQL, ModelView):
                 iterator = [None]
             for combination in iterator:
                 name = []
-                internal_name = []
+                internal_names = []
                 expression = measure.expression.expression
                 if combination:
                     for key, index in combination.iteritems():
                         dimension = columns[key]
                         value = distincts[key][index]
                         name.append(dimension.name + ' ' + value)
-                        internal_name.append(dimension.internal_name + '_' +
-                            unaccent(value))
+                        internal_names.append(
+                            dimension.internal_name + '_' + unaccent(value))
                         # Zero will always be the '(all)' entry added above
                         if index > 0:
                             expression = ('CASE WHEN "%s" = \'%s\' THEN "%s"'
                                 'END') % (dimension.internal_name,
-                                    value, measure.internal_name)
+                                    _replace(value), measure.internal_name)
                         else:
                             expression = "%s" % (measure.internal_name)
 
                 name.append(measure.name)
-                internal_name.append(measure.internal_name)
+                internal_names.append(measure.internal_name)
                 name = '/'.join(name)
-                internal_name = '_'.join(internal_name)
+                # PSQL default column name max characters
+                if ((len(internal_names) > 1)
+                        and (len('_'.join(internal_names)) > BABI_MAX_BD_COLUMN)):
+                    measure_len = len(measure.internal_name)
+                    max_len = BABI_MAX_BD_COLUMN - measure_len
+                    combination_name = internal_names.pop(0)[:max_len]
+                    internal_names.insert(0, combination_name)
                 to_create.append({
                         'execution': self.id,
                         'measure': measure.id,
                         'sequence': sequence,
                         'name': name,
-                        'internal_name': internal_name,
+                        'internal_name': '_'.join(internal_names),
                         'aggregate': measure.aggregate,
                         'expression': expression,
                         'ttype': measure.expression.ttype,
