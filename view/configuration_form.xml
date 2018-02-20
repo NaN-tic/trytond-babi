@@ -4,4 +4,6 @@ contains the full copyright notices and license terms. -->
 <form string="Business Intelligence Configuration">
     <label name="default_timeout"/>
     <field name="default_timeout"/>
+    <label name="report_cell_level"/>
+    <field name="report_cell_level"/>
 </form>

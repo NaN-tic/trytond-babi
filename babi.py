@@ -625,6 +625,8 @@ class Report(ModelSQL, ModelView):
         'Last Executions', readonly=True), 'get_last_execution')
     crons = fields.One2Many('ir.cron', 'babi_report', 'Schedulers',
         context={'babi_report': Eval('id')})
+    report_cell_level = fields.Integer('Cell Level',
+        help='Start cell level that not has indentation')
 
     @classmethod
     def __setup__(cls):
@@ -648,6 +650,12 @@ class Report(ModelSQL, ModelView):
         Config = Pool().get('babi.configuration')
         config = Config(1)
         return config.default_timeout
+
+    @staticmethod
+    def default_report_cell_level():
+        Config = Pool().get('babi.configuration')
+        config = Config(1)
+        return config.report_cell_level or 3
 
     @depends('model')
     def on_change_with_model_name(self, name=None):
@@ -2577,7 +2585,8 @@ class OpenChart(Wizard):
                         'width': d.width or '',
                         'text-align': 'right' if d.expression.ttype in [
                             'float', 'numeric'] else 'left',
-                        }} for d in report.dimensions]
+                        }} for d in report.dimensions],
+            'cell_level': report.report_cell_level or 3,
             }
 
         if (self.start.graph_type == 'report'):
@@ -2677,5 +2686,8 @@ class BabiHTMLReport(HTMLReport):
                     'records': records,
                     'parameters': parameters,
                     'output_format': 'pdf',
-                    'now': datetime.now(),
+                    'report_options': {
+                        'now': datetime.now(),
+                        'cell_level': data['cell_level'],
+                        }
                     })
