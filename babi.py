@@ -1287,8 +1287,8 @@ class ReportExecution(ModelSQL, ModelView):
             if (isinstance(x, basestring) or isinstance(x, str)
                     or isinstance(x, unicode)):
                 x = x.replace('|', '-')
-            if not isinstance(x, unicode):
-                return unicode(x)
+            if not isinstance(x, unicode) and isinstance(x, str):
+                return unicode(x.decode('utf-8'))
             else:
                 return unicode(x)
 
