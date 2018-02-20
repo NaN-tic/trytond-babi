@@ -35,6 +35,8 @@ contains the full copyright notices and license terms. -->
             <field name="internal_name"/>
             <label name="timeout"/>
             <field name="timeout"/>
+            <label name="report_cell_level"/>
+            <field name="report_cell_level"/>
             <group id="internal" colspan="4" col="2" yexpand="1" yfill="1">
                 <field name="actions"/>
                 <field name="keywords"/>

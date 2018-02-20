@@ -8,7 +8,7 @@
       content: "{{ company.rec_name }}. {{ company.party.vat_code }}";
     }
     @top-right {
-      content: "{{ data['now']|dateformat }}";
+      content: "{{ data['report_options']['now']|dateformat }}";
     }
     @bottom-right {
       content: counter(page) " / " counter(pages);
@@ -60,14 +60,15 @@
 {% macro draw_table(record, before) %}
   {% set current = [] %}
   {% set total_columns = data['columns']|length %}
+  {% set cell_level = data['report_options']['cell_level'] %}
   <tr>
     {% for k in data['columns'] %}
       {% set val = record['record'][k] %}
       {% set val_render = val|render_field %}
       {% set val_type = val|type_field %}
       {% do current.append(val_render) %}
-      <td class="border-cell{% if not val_render in before or total_columns == current|length or val_render == None or 'measure' in k %}-active{% endif %}{% if val_type in ('float', 'Decimal') %} text-right{% endif %}">
-      {% if 'measure' in k or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
+      <td class="border-cell{% if current|length > cell_level or not val_render in before or total_columns == current|length or val_render == None or 'measure' in k %}-active{% endif %}
+      {% if val_type in ('float', 'Decimal') %} text-right{% endif %}">{% if 'measure' in k or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
     </td>{% endfor %}
   </tr>
     {% if record['childs'] %}
