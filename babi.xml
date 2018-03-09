@@ -513,6 +513,24 @@ contains the full copyright notices and license terms. -->
             <field name="perm_delete" eval="True"/>
         </record>
 
+        <record model="ir.model.button" id="babi_report_calculate_button">
+            <field name="name">calculate</field>
+            <field name="string">Calculate</field>
+            <field name="model" search="[('model', '=', 'babi.report')]"/>
+        </record>
+
+        <record model="ir.model.button" id="babi_report_create_menus_button">
+            <field name="name">create_menus</field>
+            <field name="string">Create Menus</field>
+            <field name="model" search="[('model', '=', 'babi.report')]"/>
+        </record>
+
+        <record model="ir.model.button" id="babi_report_remove_menus_button">
+            <field name="name">remove_menus</field>
+            <field name="string">Remove Menus</field>
+            <field name="model" search="[('model', '=', 'babi.report')]"/>
+        </record>
+
         <record model="ir.action.act_window" id="act_babi_report_execution_form">
             <field name="name">Executions</field>
             <field name="res_model">babi.report.execution</field>
@@ -575,6 +593,18 @@ contains the full copyright notices and license terms. -->
                 eval="[('company', '=', Eval('user', {}).get('company', None))]"
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_babi_execution"/>
+        </record>
+
+        <record model="ir.model.button" id="babi_execution_open_button">
+            <field name="name">open</field>
+            <field name="string">Open</field>
+            <field name="model" search="[('model', '=', 'babi.report.execution')]"/>
+        </record>
+
+        <record model="ir.model.button" id="babi_execution_cancel_button">
+            <field name="name">cancel</field>
+            <field name="string">Cancel</field>
+            <field name="model" search="[('model', '=', 'babi.report.execution')]"/>
         </record>
 
         <!-- ir.model -->

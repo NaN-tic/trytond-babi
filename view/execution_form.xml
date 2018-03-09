@@ -16,5 +16,5 @@ contains the full copyright notices and license terms. -->
     <field name="filtered"/>
     <label name="state"/>
     <field name="state"/>
-    <button name="open" string="Open" colspan="4"/>
+    <button name="open" colspan="4"/>
 </form>
