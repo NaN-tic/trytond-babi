@@ -16,13 +16,13 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 from io import BytesIO
 
-from trytond.wizard import Wizard, StateView, StateAction, StateTransition, \
-    StateReport, Button
-from trytond.model import ModelSQL, ModelView, fields, Unique, Check, \
-    sequence_ordered
+from trytond.wizard import (Wizard, StateView, StateAction, StateTransition,
+    StateReport, Button)
+from trytond.model import (ModelSQL, ModelView, fields, Unique, Check,
+    sequence_ordered)
 from trytond.model.fields import depends
-from trytond.pyson import If, Eval, Bool, PYSONEncoder, Id, In, Not, \
-    PYSONDecoder
+from trytond.pyson import (Bool, Eval, Id, If, In, Not, Or as pysonOr,
+    PYSONDecoder, PYSONEncoder)
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.tools import grouped_slice
@@ -571,7 +571,14 @@ class Report(ModelSQL, ModelView):
     name = fields.Char('Name', required=True, translate=True,
         help='New virtual model name.')
     model = fields.Many2One('ir.model', 'Model', required=True,
-        domain=[('babi_enabled', '=', True)], help='Model for data extraction')
+        domain=[('babi_enabled', '=', True)],
+        states={'readonly': pysonOr(
+                Bool(Eval('dimensions', [0])),
+                Bool(Eval('columns', [0])),
+                Bool(Eval('measures', [0]))
+                ),
+            },
+        help='Model for data extraction')
     model_name = fields.Function(fields.Char('Model Name'),
         'on_change_with_model_name')
     internal_name = fields.Function(fields.Char('Internal Name', states={
