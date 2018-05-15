@@ -1,14 +1,17 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from trytond.pool import Pool
+from . import action
 from . import configuration
 from . import cron
 from . import babi
+from . import translation
 from . import test_model
 
 
 def register():
     Pool.register(
+        action.ActionReport,
         configuration.Configuration,
         babi.Filter,
         babi.FilterParameter,
@@ -37,6 +40,7 @@ def register():
         babi.OpenChart,
         babi.OpenExecution,
         babi.CleanExecutions,
+        translation.ReportTranslationSet,
         module='babi', type_='wizard')
     Pool.register(
         babi.BabiHTMLReport,

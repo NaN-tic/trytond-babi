@@ -739,6 +739,7 @@ contains the full copyright notices and license terms. -->
             <field name="report_name">babi.report.execution</field>
             <field name="report">babi/report/babi.html</field>
             <field name="extension">pdf</field>
+            <field name="template_extension">jinja</field>
         </record>
     </data>
 </tryton>
