@@ -605,7 +605,11 @@ class Report(ModelSQL, ModelView):
                 'no_measures': ('Report "%s" has no measures. At least one '
                     'is needed.'),
                 'timeout_exception': ('Report calculation exceeded timeout '
-                    'limit.')
+                    'limit.'),
+                'report_modification_warning': ('Report "%s" will be renamed, '
+                    'but if you want to also rename the menus you should '
+                    'create the menus again. Are you sure you want to '
+                    'continue with this action?')
                 })
         cls._buttons.update({
                 'calculate': {},
@@ -637,21 +641,24 @@ class Report(ModelSQL, ModelView):
     @classmethod
     def write(cls, *args):
         actions = iter(args)
-        to_update = []
         for reports, values in zip(actions, actions):
             if 'name' in values:
                 for report in reports:
                     if report.name != values['name']:
-                        to_update.append(report)
-        if to_update:
-            cls.remove_menus(to_update)
+                        cls.raise_user_warning(
+                            'report_modification_warning_%s' % report.id,
+                            'report_modification_warning', report.name)
+
         return super(Report, cls).write(*args)
 
     @classmethod
     def delete(cls, reports):
-        cls.remove_menus(reports)
-        cls.remove_crons(reports)
-        with Transaction().set_context(babi_order_force=True):
+        with Transaction().set_user(0), \
+                Transaction().set_context(_check_access=False,
+                    user=0,
+                    babi_order_force=True):
+            cls.remove_menus(reports)
+            cls.remove_crons(reports)
             super(Report, cls).delete(reports)
 
     @classmethod
