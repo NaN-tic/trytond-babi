@@ -8,8 +8,7 @@ from trytond.transaction import Transaction
 __all__ = ['Cron']
 
 
-class Cron:
-    __metaclass__ = PoolMeta
+class Cron(metaclass=PoolMeta):
     __name__ = "ir.cron"
     babi_report = fields.Many2One('babi.report', 'Babi Report')
 
