@@ -59,8 +59,8 @@ AGGREGATE_TYPES = [
     ('min', 'Min'),
     ]
 
-SRC_CHARS = u""" .'"()/*-+?¿!&$[]{}@#`'^:;<>=~%,|\\"""
-DST_CHARS = u"""__________________________________"""
+SRC_CHARS = """ .'"()/*-+?¿!&$[]{}@#`'^:;<>=~%,|\\"""
+DST_CHARS = """__________________________________"""
 
 BABI_CELERY = config_.getboolean('babi', 'celery', default=True)
 BABI_RETENTION_DAYS = config_.getint('babi', 'retention_days', default=30)
@@ -90,12 +90,12 @@ logger = logging.getLogger(__name__)
 
 
 def unaccent(text):
-    if not (isinstance(text, str) or isinstance(text, unicode)):
+    if not (isinstance(text, str) or isinstance(text, str)):
         return str(text)
     if isinstance(text, str) and bytes == str:
-        text = unicode(text, 'utf-8')
+        text = str(text, 'utf-8')
     text = text.lower()
-    for c in xrange(len(SRC_CHARS)):
+    for c in range(len(SRC_CHARS)):
         if c >= len(DST_CHARS):
             break
         text = text.replace(SRC_CHARS[c], DST_CHARS[c])
@@ -228,8 +228,8 @@ class DynamicModel(ModelSQL, ModelView):
                 result.append('-')
             elif isinstance(value, ModelSQL):
                 result.append(value.rec_name)
-            elif not isinstance(value, unicode):
-                result.append(unicode(value))
+            elif not isinstance(value, str):
+                result.append(str(value))
             else:
                 result.append(value)
         return ' / '.join(result)
@@ -351,8 +351,8 @@ class DimensionIterator:
     def __iter__(self):
         return self
 
-    def next(self):
-        for x in xrange(len(self.keys)):
+    def __next__(self):
+        for x in range(len(self.keys)):
             key = self.keys[x]
             if self.current[key] >= len(self.values[key]) - 1:
                 if x == len(self.keys) - 1:
@@ -1203,7 +1203,7 @@ class ReportExecution(ModelSQL, ModelView):
             parameters = dict((p.id, p.name) for p in
                 self.report.filter.parameters)
             values = {}
-            for key, value in filter_data.iteritems():
+            for key, value in filter_data.items():
                 filter_name = parameters[int(key.split('_')[-1:][0])]
                 if not value or filter_name not in expression:
                     continue
@@ -1307,13 +1307,13 @@ class ReportExecution(ModelSQL, ModelView):
         index = 0
 
         def sanitanize(x):
-            if (isinstance(x, basestring) or isinstance(x, str)
-                    or isinstance(x, unicode)):
+            if (isinstance(x, str) or isinstance(x, str)
+                    or isinstance(x, str)):
                 x = x.replace('|', '-')
-            if not isinstance(x, unicode) and isinstance(x, str):
-                return unicode(x.decode('utf-8'))
+            if not isinstance(x, str) and isinstance(x, str):
+                return str(x.decode('utf-8'))
             else:
-                return unicode(x)
+                return str(x)
 
         with transaction.set_context(_datetime=None):
             records = Model.search(domain, offset=index * offset, limit=offset)
@@ -1350,7 +1350,7 @@ class ReportExecution(ModelSQL, ModelView):
                     data.close()
                 else:
                     base_query = 'INSERT INTO %s (' % table
-                    base_query += ','.join([unicode(x) for x in columns])
+                    base_query += ','.join([str(x) for x in columns])
                     base_query += ' ) VALUES '
                     for line in data.readlines():
                         if len(line) == 0:
@@ -1358,7 +1358,7 @@ class ReportExecution(ModelSQL, ModelView):
                         if bytes != str:
                             line = line.decode('utf-8')
                         query = base_query + '(now(),'
-                        query += ','.join(["'%s'" % unicode(x)
+                        query += ','.join(["'%s'" % str(x)
                                 for x in line.split('|')[1:]])
                         query += ')'
                         cursor.execute(query)
@@ -1373,12 +1373,12 @@ class ReportExecution(ModelSQL, ModelView):
             self.update_internal_measures(distincts)
             self.validate_model()
             query = 'INSERT INTO %s ('
-            query += ','.join([unicode(x) for x in columns])
-            query += ',' + ','.join([unicode(x.internal_name) for x in
+            query += ','.join([str(x) for x in columns])
+            query += ',' + ','.join([str(x.internal_name) for x in
                     self.internal_measures])
             query += ') SELECT '
-            query += ','.join([unicode(x) for x in columns])
-            query += ',' + ','.join([unicode(x.expression) for x in
+            query += ','.join([str(x) for x in columns])
+            query += ',' + ','.join([str(x.expression) for x in
                     self.internal_measures])
             query += ' FROM %s '
             cursor.execute(query % (BIModel._table, table))
@@ -1399,7 +1399,7 @@ class ReportExecution(ModelSQL, ModelView):
         for dimension in self.report.columns:
             cursor.execute('SELECT %s from %s group by 1 order by 1' % (
                     dimension.internal_name, tablename))
-            distincts[dimension.id] = [unicode(x[0]) for x in
+            distincts[dimension.id] = [str(x[0]) for x in
                 cursor.fetchall()]
         return distincts
 
@@ -1434,7 +1434,7 @@ class ReportExecution(ModelSQL, ModelView):
                 internal_names = []
                 expression = measure.expression.expression
                 if combination:
-                    for key, index in combination.iteritems():
+                    for key, index in combination.items():
                         dimension = columns[key]
                         value = distincts[key][index]
                         name.append(dimension.name + ' ' + value)
@@ -1542,7 +1542,7 @@ class ReportExecution(ModelSQL, ModelView):
                     'where id = %(parent_id)d)') % values
                 sql_query.append(group_query)
 
-            sql_query = u' AND '.join(sql_query)
+            sql_query = ' AND '.join(sql_query)
             sql_query[:-5]
 
             query = """
@@ -1926,7 +1926,7 @@ class OpenExecution(Wizard):
             self.raise_user_error('no_report_found')
 
         data = {}
-        for key, value in self.filter_values.iteritems():
+        for key, value in self.filter_values.items():
             # Fields has id of the field appendend, so it must be removed.
             new_key = '_'.join(key.split('_')[:-1])
             data[new_key] = value
@@ -2363,15 +2363,13 @@ class Order(ModelSQL, ModelView, sequence_ordered()):
         return super(Order, cls).delete(orders)
 
 
-class ActWindow:
-    __metaclass__ = PoolMeta
+class ActWindow(metaclass=PoolMeta):
     __name__ = 'ir.action.act_window'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
 
 
-class Menu:
-    __metaclass__ = PoolMeta
+class Menu(metaclass=PoolMeta):
     __name__ = 'ir.ui.menu'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
@@ -2384,8 +2382,7 @@ class Menu:
             ], 'BABI Type', readonly=True)
 
 
-class Keyword:
-    __metaclass__ = PoolMeta
+class Keyword(metaclass=PoolMeta):
     __name__ = 'ir.action.keyword'
 
     babi_report = fields.Many2One('babi.report', 'BABI Report')
@@ -2393,8 +2390,7 @@ class Keyword:
         'BABI Filter Parameter')
 
 
-class Model:
-    __metaclass__ = PoolMeta
+class Model(metaclass=PoolMeta):
     __name__ = 'ir.model'
 
     babi_enabled = fields.Boolean('BI Enabled', help='Check if you want '
@@ -2689,7 +2685,7 @@ class BabiHTMLReport(HTMLReport):
 
         columns = []
         for header in data['headers']:
-            columns += header.keys()
+            columns += list(header.keys())
 
         with Transaction().set_context(**context):
             records, parameters = cls.prepare(ids, data)
