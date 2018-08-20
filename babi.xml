@@ -686,7 +686,7 @@ contains the full copyright notices and license terms. -->
         <menuitem id="menu_babi" name="Business Intelligence" sequence="1"
             icon="tryton-graph"/>
         <menuitem id="menu_configuration" name="Configuration"
-            parent="menu_babi" sequence="10" icon="tryton-preferences"/>
+            parent="menu_babi" sequence="10" icon="tryton-settings"/>
         <menuitem id="menu_update_data" name="Update data"
             parent="menu_babi" sequence="10" active="0"/>
         <menuitem id="menu_historical_data" name="View historical data"
