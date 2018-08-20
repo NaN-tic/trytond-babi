@@ -818,7 +818,7 @@ class Report(ModelSQL, ModelView):
         menu, = Menu.copy([menu], {
                 'parent': parent,
                 'babi_report': self.id,
-                'icon': 'tryton-executable',
+                'icon': 'tryton-launch',
                 'groups': [x.id for x in self.groups],
                 'babi_type': 'wizard',
                 'active': True,
@@ -836,7 +836,7 @@ class Report(ModelSQL, ModelView):
         menu, = Menu.copy([menu], {
                 'parent': parent,
                 'babi_report': self.id,
-                'icon': 'tryton-executable',
+                'icon': 'tryton-launch',
                 'groups': [x.id for x in self.groups],
                 'babi_type': 'history',
                 'active': True,
