@@ -1121,8 +1121,8 @@ msgid "Babi Report"
 msgstr "Informe Babi"
 
 msgctxt "model:ir.cron,name:cron_clean_executions"
-msgid "Cron Clean Executions"
-msgstr "Eliminar Execucions"
+msgid "Babi Cron Clean Executions"
+msgstr "Babi eliminar execucions"
 
 msgctxt "model:ir.ui.menu,name:menu_babi"
 msgid "Business Intelligence"
