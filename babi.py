@@ -90,7 +90,7 @@ logger = logging.getLogger(__name__)
 
 
 def unaccent(text):
-    if not (isinstance(text, str) or isinstance(text, str)):
+    if not (isinstance(text, str)):
         return str(text)
     if isinstance(text, str) and bytes == str:
         text = str(text, 'utf-8')
