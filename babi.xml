@@ -640,7 +640,7 @@ contains the full copyright notices and license terms. -->
         </record>
 
         <record model="ir.cron" id="cron_clean_executions">
-            <field name="name">Cron Clean Executions</field>
+            <field name="name">Babi Cron Clean Executions</field>
             <field name="request_user" ref="res.user_admin"/>
             <field name="user" ref="user_clean_executions"/>
             <field name="active" eval="True"/>
