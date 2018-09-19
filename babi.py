@@ -1104,7 +1104,8 @@ class ReportExecution(ModelSQL, ModelView):
 
         date = datetime.combine(date, mdatetime.time.min)
         executions = cls.search([('date', '<', date)])
-        cls.delete(executions)
+        if executions:
+            cls.delete(executions)
         return True
 
     @classmethod
