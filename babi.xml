@@ -585,6 +585,7 @@ contains the full copyright notices and license terms. -->
         </record>
 
         <record model="ir.rule.group" id="rule_group_babi_execution">
+            <field name="name">Babi Execution</field>
             <field name="model" search="[('model', '=', 'babi.report.execution')]"/>
             <field name="global_p" eval="True"/>
         </record>

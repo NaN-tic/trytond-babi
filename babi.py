@@ -31,6 +31,8 @@ from trytond import backend
 from trytond.protocols.jsonrpc import JSONDecoder, JSONEncoder
 from trytond.modules.html_report.html_report import HTMLReport
 from .babi_eval import babi_eval
+from trytond.i18n import gettext
+from trytond.exceptions import UserError, UserWarning
 
 
 __all__ = ['Filter', 'Expression', 'Report', 'ReportGroup', 'Dimension',
@@ -113,10 +115,6 @@ class DynamicModel(ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super(DynamicModel, cls).__setup__()
-        cls._error_messages.update({
-                'report_not_exists': ('Report "%s" no longer exists or you do '
-                    'not have the rights to access it.'),
-                })
         pool = Pool()
         Execution = pool.get('babi.report.execution')
         executions = Execution.search([
@@ -144,7 +142,9 @@ class DynamicModel(ModelSQL, ModelView):
                 ('babi_model.model', '=', cls.__name__),
                 ], limit=1)
         if not executions:
-            cls.raise_user_error('report_not_exists', cls.__name__)
+            raise UserError(gettext('babi.report_not_exists',
+                report=cls.__name__))
+
         context = Transaction().context
         execution, = executions
         with Transaction().set_context(_datetime=execution.create_date):
@@ -461,25 +461,16 @@ class FilterParameter(ModelSQL, ModelView):
         cursor.execute(*sql_table.update([Column(sql_table, 'ttype')],
                 ['boolean'], where=sql_table.ttype == 'bool'))
 
-    @classmethod
-    def __setup__(cls):
-        super(FilterParameter, cls).__setup__()
-        cls._error_messages.update({
-                'parameter_not_found': ('Parameter "%(parameter)s" not found '
-                    'in Domain nor in Python Expression of filter '
-                    '"%(filter)s".'),
-                })
-
     def check_parameter_in_filter(self):
         placeholder = '{%s}' % self.name
         if ((self.filter.domain and placeholder not in self.filter.domain)
                 and (self.filter.python_expression
                     and placeholder not in self.filter.python_expression)):
-            self.raise_user_warning('babi_check_parameter_in_filter.{}'.format(
-                    self.name), 'parameter_not_found', {
-                    'parameter': self.rec_name,
-                    'filter': self.filter.rec_name,
-                    })
+            raise UserWarning('babi_check_parameter_in_filter.{}'.format(
+                    self.name),gettext('babi.parameter_not_found',
+                        parameter=self.rec_name,
+                        filter=self.filter.rec_name))
+
             return False
         return True
 
@@ -637,18 +628,6 @@ class Report(ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super(Report, cls).__setup__()
-        cls._error_messages.update({
-                'no_dimensions': ('Report "%s" has no dimensions. At least '
-                    'one is needed.'),
-                'no_measures': ('Report "%s" has no measures. At least one '
-                    'is needed.'),
-                'timeout_exception': ('Report calculation exceeded timeout '
-                    'limit.'),
-                'report_modification_warning': ('Report "%s" will be renamed, '
-                    'but if you want to also rename the menus you should '
-                    'create the menus again. Are you sure you want to '
-                    'continue with this action?')
-                })
         cls._buttons.update({
                 'calculate': {},
                 'create_menus': {},
@@ -687,9 +666,10 @@ class Report(ModelSQL, ModelView):
             if 'name' in values:
                 for report in reports:
                     if report.name != values['name']:
-                        cls.raise_user_warning(
+                        raise UserWarning(
                             'report_modification_warning_%s' % report.id,
-                            'report_modification_warning', report.name)
+                            gettext('babi.report_modification_warning',
+                                report=report.name))
 
         return super(Report, cls).write(*args)
 
@@ -916,9 +896,11 @@ class Report(ModelSQL, ModelView):
 
         for report in reports:
             if not report.measures:
-                cls.raise_user_error('no_measures', report.rec_name)
+                raise UserError(gettext('babi.no_measures',
+                    report=report.rec_name))
             if not report.dimensions:
-                cls.raise_user_error('no_dimensions', report.rec_name)
+                raise UserError(gettext('babi.no_dimensions',
+                    report=report.rec_name))
             execution, = Execution.create([report.get_execution_data()])
             Transaction().commit()
 
@@ -968,15 +950,6 @@ class ReportExecution(ModelSQL, ModelView):
     def __setup__(cls):
         super(ReportExecution, cls).__setup__()
         cls._order.insert(0, ('date', 'DESC'))
-        cls._error_messages.update({
-                'filter_parameters': ('Execution "%s" has filter parameters '
-                    ' and you did not provide any of them. Please execute it '
-                    ' from the menu.'),
-                'no_dimensions': ('Execution "%s" has no dimensions. At least '
-                    'one is needed.'),
-                'no_measures': ('Execution "%s" has no measures. At least one '
-                    'is needed.'),
-                })
         cls._buttons.update({
                 'open': {
                     'invisible': Eval('state') != 'calculated',
@@ -1188,7 +1161,7 @@ class ReportExecution(ModelSQL, ModelView):
                 except TimeoutException:
                     execution.save_state(execution.id, 'timeout',
                         exception=True)
-                    cls.raise_user_error('timeout_exception')
+                    raise UserError(gettext('babi.timeout_exception'))
                 except Exception:
                     execution.save_state(execution.id, 'failed',
                         exception=True)
@@ -1879,17 +1852,6 @@ class OpenExecution(Wizard):
             Button('Ok', 'end', 'tryton-ok', default=True),
             ])
 
-    @classmethod
-    def __setup__(cls):
-        super(OpenExecution, cls).__setup__()
-        cls._error_messages.update({
-                'no_menus': ('No menus found for report %s. In order to view '
-                    'it\'s data you must create menu entries.'),
-                'no_report': ('No report found for current execution'),
-                'no_execution': ('No execution found for current record. '
-                    'Execute the update data wizard in order to create one.'),
-                })
-
     def __getattribute__(self, name):
         if name == 'filtered':
             if not hasattr(self, 'filter_values'):
@@ -1924,7 +1886,7 @@ class OpenExecution(Wizard):
 
         report = self.filter_values.pop('report', None)
         if not report:
-            self.raise_user_error('no_report_found')
+            raise UserError(gettext('babi.no_report_found'))
 
         data = {}
         for key, value in self.filter_values.items():
@@ -1985,7 +1947,8 @@ class OpenExecution(Wizard):
             view_type = self.select.view_type
 
         if not execution:
-            self.raise_user_error('no_execution', report.rec_name)
+            raise UserError(gettext('babi.no_execution',
+                report=report.rec_name))
 
         with transaction.set_context(_datetime=execution.date):
             execution.validate_model()
@@ -2000,7 +1963,7 @@ class OpenExecution(Wizard):
             action, = ActionWindow.search(domain, limit=1)
             action = Action.get_action_values(action.type, [action.id])[0]
         except ValueError:
-            self.raise_user_error('no_menus', report.rec_name)
+            raise UserError(gettext('babi.no_menus', report=report.rec_name))
         action['res_model'] = execution.babi_model.model
         action['name'] = execution.rec_name
         action['context_model'] = None
@@ -2333,12 +2296,6 @@ class Order(ModelSQL, ModelView, sequence_ordered()):
     def __setup__(cls):
         super(Order, cls).__setup__()
         t = cls.__table__()
-        cls._error_messages.update({
-                'cannot_create_order_entry': ('Order entries are created '
-                    'automatically'),
-                'cannot_remove_order_entry': ('Order entries are deleted '
-                    'automatically'),
-                })
         cls._sql_constraints += [
             ('report_and_dimension_unique', Unique(t, t.report, t.dimension),
                 'Dimension must be unique per report.'),
@@ -2354,13 +2311,13 @@ class Order(ModelSQL, ModelView, sequence_ordered()):
     @classmethod
     def create(cls, values):
         if not Transaction().context.get('babi_order_force'):
-            cls.raise_user_error('cannot_create_order_entry')
+            raise UserError(gettext('babi.cannot_create_order_entry'))
         return super(Order, cls).create(values)
 
     @classmethod
     def delete(cls, orders):
         if not Transaction().context.get('babi_order_force'):
-            cls.raise_user_error('cannot_remove_order_entry')
+            raise UserError(gettext('babi.cannot_remove_order_entry'))
         return super(Order, cls).delete(orders)
 
 
@@ -2529,13 +2486,6 @@ class OpenChart(Wizard):
     open_ = EmptyStateAction()
     print_ = StateReport('babi.report.execution')
 
-    @classmethod
-    def __setup__(cls):
-        super(OpenChart, cls).__setup__()
-        cls._error_messages.update({
-                'one_measure_in_pie_charts': ('Only one measure can be used '
-                    'in pie charts.'),
-                })
 
     def do_open_(self, action):
         pool = Pool()
@@ -2547,7 +2497,7 @@ class OpenChart(Wizard):
         Model = pool.get(model_name)
 
         if len(self.start.measures) > 1 and self.start.graph_type == 'pie':
-            self.raise_user_error('one_measure_in_pie_charts')
+            raise UserError(gettext('babi.one_measure_in_pie_charts'))
 
         group_name = self.start.dimension.internal_name
         records = Model.search([
