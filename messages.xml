@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data group="1">
+    <record model="ir.message" id="report_not_exists">
+        <field name="text">Report "%(report)s" no longer exists or you do
+                    not have the rights to access it.</field>
+    </record>
+    <record model="ir.message" id="parameter_not_found">
+        <field name="text">Parameter "%(parameter)s" not found '
+                    'in Domain nor in Python Expression of filter '
+                    '"%(filter)s".</field>
+    </record>
+    <record model="ir.message" id="no_dimensions">
+        <field name="text">Report "%(report)s" has no dimensions. At least
+                    one is needed.</field>
+    </record>
+    <record model="ir.message" id="no_measures">
+        <field name="text">Report "%s" has no measures. At least one is needed.</field>
+    </record>
+    <record model="ir.message" id="timeout_exception">
+        <field name="text">Report "%(report)s" will be renamed,
+                    but if you want to also rename the menus you should
+                    create the menus again. Are you sure you want to
+                    continue with this action?</field>
+    </record>
+    <record model="ir.message" id="no_menus">
+        <field name="text">No menus found for report %(report)s. In order to view
+                    'it\'s data you must create menu entries.</field>
+    </record>
+<record model="ir.message" id="no_report">
+    <field name="text">No report found for current execution</field>
+</record>
+<record model="ir.message" id="no_execution">
+    <field name="text">No execution found for current record.
+          Execute the update data wizard in order to create one.</field>
+</record>
+<record model="ir.message" id="cannot_create_order_entry">
+    <field name="text">Order entries are created automatically</field>
+</record>
+<record model="ir.message" id="cannot_remove_order_entry">
+    <field name="text">Order entries are deleted automatically</field>
+</record>
+<record model="ir.message" id="one_measure_in_pie_charts">
+    <field name="text">Only one measure can be used in pie charts</field>
+</record>
+<record model="ir.message" id="filter_parameters">
+    <field name="text">Execution "%(execution)s" has filter parameters
+          and you did not provide any of them. Please execute it.
+          from the menu.</field>
+</record>
+
+
+    </data>
+</tryton>
