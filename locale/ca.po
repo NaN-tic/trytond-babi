@@ -12,11 +12,11 @@ msgstr "ID"
 
 msgctxt "field:babi.configuration,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.configuration,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.configuration,default_timeout:"
 msgid "Timeout (s)"
@@ -36,19 +36,19 @@ msgstr "Nivell cel·la"
 
 msgctxt "field:babi.configuration,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.configuration,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.dimension,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.dimension,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.dimension,expression:"
 msgid "Expression"
@@ -88,19 +88,19 @@ msgstr "Amplada"
 
 msgctxt "field:babi.dimension,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.dimension,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.dimension.column,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.dimension.column,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.dimension.column,expression:"
 msgid "Expression"
@@ -140,19 +140,19 @@ msgstr "Amplada"
 
 msgctxt "field:babi.dimension.column,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.dimension.column,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.expression,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.expression,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.expression,expression:"
 msgid "Expression"
@@ -188,19 +188,19 @@ msgstr "Tipus de camp"
 
 msgctxt "field:babi.expression,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.expression,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.filter,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.filter,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.filter,domain:"
 msgid "Domain"
@@ -244,19 +244,19 @@ msgstr "Cerca"
 
 msgctxt "field:babi.filter,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.filter,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.filter.parameter,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.filter.parameter,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.filter.parameter,filter:"
 msgid "Filter"
@@ -284,11 +284,11 @@ msgstr "Tipus de camp"
 
 msgctxt "field:babi.filter.parameter,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.filter.parameter,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.internal.measure,aggregate:"
 msgid "Aggregate"
@@ -296,11 +296,11 @@ msgstr "Agregat"
 
 msgctxt "field:babi.internal.measure,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.internal.measure,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.internal.measure,execution:"
 msgid "Report Execution"
@@ -344,11 +344,11 @@ msgstr "Tipus de camp"
 
 msgctxt "field:babi.internal.measure,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.internal.measure,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.measure,aggregate:"
 msgid "Aggregate"
@@ -356,11 +356,11 @@ msgstr "Agregat"
 
 msgctxt "field:babi.measure,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.measure,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.measure,expression:"
 msgid "Expression"
@@ -400,11 +400,11 @@ msgstr "Amplada"
 
 msgctxt "field:babi.measure,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.measure,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.open_chart.start,dimension:"
 msgid "Dimension"
@@ -444,11 +444,11 @@ msgstr "Mostra la llegenda"
 
 msgctxt "field:babi.order,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.order,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.order,dimension:"
 msgid "Dimension"
@@ -480,11 +480,11 @@ msgstr "Seqüència"
 
 msgctxt "field:babi.order,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.order,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.report,actions:"
 msgid "Actions"
@@ -496,11 +496,11 @@ msgstr "Dimensions en columnes"
 
 msgctxt "field:babi.report,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.report,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.report,crons:"
 msgid "Schedulers"
@@ -580,19 +580,19 @@ msgstr "Temps d'espera"
 
 msgctxt "field:babi.report,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.report,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.report-res.group,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.report-res.group,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.report-res.group,group:"
 msgid "Group"
@@ -612,11 +612,11 @@ msgstr "Informe"
 
 msgctxt "field:babi.report-res.group,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.report-res.group,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.report.execution,babi_model:"
 msgid "BI Model"
@@ -628,11 +628,11 @@ msgstr "Empresa"
 
 msgctxt "field:babi.report.execution,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.report.execution,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.report.execution,date:"
 msgid "Execution Date"
@@ -688,11 +688,11 @@ msgstr "Temps esgotat"
 
 msgctxt "field:babi.report.execution,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.report.execution,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.report.execution.open.select,execution:"
 msgid "Execution"
@@ -728,11 +728,11 @@ msgstr "Categoria"
 
 msgctxt "field:babi.test,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:babi.test,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:babi.test,date:"
 msgid "Date"
@@ -748,11 +748,11 @@ msgstr "Nom"
 
 msgctxt "field:babi.test,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:babi.test,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:babi.update_data.wizard.done,id:"
 msgid "ID"
