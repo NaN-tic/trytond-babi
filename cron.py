@@ -15,19 +15,10 @@ class Cron(metaclass=PoolMeta):
     @classmethod
     def __setup__(cls):
         super(Cron, cls).__setup__()
-        invisible = Bool(Eval('babi_report'))
-        state = {'invisible': invisible}
-        for field_name in ('model', 'function', 'args'):
-            field = getattr(cls, field_name)
-            states = field.states
-            if 'invisible' not in states:
-                states.update(state)
-            else:
-                states.update({
-                        'invisible': states['invisible'] | invisible,
-                        })
-            if 'babi_report' not in field.depends:
-                field.depends.append('babi_report')
+        cls.method.selection.extend([
+            ('babi.report|calculate_babi_report', 'Calculate Babi Report'),
+            ('babi.report.execution|clean', 'Clean Babi Excutions'),
+        ])
 
     @classmethod
     def create(cls, vlist):
@@ -40,17 +31,11 @@ class Cron(metaclass=PoolMeta):
     def default_get(cls, fields, with_rec_name=True):
         User = Pool().get('res.user')
         res = super(Cron, cls).default_get(fields, with_rec_name)
-        cron_user, = User.search([
-                ('active', '=', False),
-                ('login', '=', 'user_cron_trigger'),
-                ])
         admin_user, = User.search([('login', '=', 'admin')])
         context = Transaction().context
         if context.get('babi_report', False):
-            res['user'] = cron_user.id
-            res['request_user'] = admin_user.id
+            res['user'] = admin_user.id
             res['interval_type'] = 'days'
             res['repeat_missed'] = False
-            res['model'] = 'babi.report'
-            res['function'] = 'calculate_babi_report'
+            res['function'] = 'babi.report|calculate_babi_report'
         return res

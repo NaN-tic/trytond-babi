@@ -10,20 +10,11 @@ contains the full copyright notices and license terms. -->
             <field name="user" ref="res.user_admin"/>
             <field name="group" ref="group_babi_admin"/>
         </record>
-        <record model="res.user-res.group" id="user_trigger_group_babi_admin">
-            <field name="user" ref="res.user_trigger"/>
-            <field name="group" ref="group_babi_admin"/>
-        </record>
-
         <record model="res.group" id="group_babi">
             <field name="name">Business Intelligence</field>
         </record>
         <record model="res.user-res.group" id="user_admin_group_babi">
             <field name="user" ref="res.user_admin"/>
-            <field name="group" ref="group_babi"/>
-        </record>
-        <record model="res.user-res.group" id="user_trigger_group_babi">
-            <field name="user" ref="res.user_trigger"/>
             <field name="group" ref="group_babi"/>
         </record>
 
@@ -44,8 +35,6 @@ contains the full copyright notices and license terms. -->
             <field name="name">Dimension</field>
             <field name="res_model">babi.dimension</field>
             <field name="search_value"></field>
-            <!-- <field name="domain">[]</field> -->
-            <!-- <field name="context">{}</field> -->
         </record>
         <record model="ir.action.act_window.view" id="act_babi_dimension_view1">
             <field name="sequence" eval="10"/>
@@ -671,16 +660,10 @@ contains the full copyright notices and license terms. -->
         </record>
 
         <record model="ir.cron" id="cron_clean_executions">
-            <field name="name">Babi Cron Clean Executions</field>
-            <field name="request_user" ref="res.user_admin"/>
-            <field name="user" ref="user_clean_executions"/>
             <field name="active" eval="True"/>
             <field name="interval_number" eval="1"/>
             <field name="interval_type">days</field>
-            <field name="number_calls" eval="-1"/>
-            <field name="repeat_missed" eval="False"/>
-            <field name="model">babi.report.execution</field>
-            <field name="function">clean</field>
+            <field name="method">babi.report.execution|clean</field>
         </record>
 
         <!-- Menus -->
