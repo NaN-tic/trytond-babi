@@ -1036,10 +1036,6 @@ msgctxt "model:ir.action,name:report_babi_execution"
 msgid "Babi Report"
 msgstr "Informe Babi"
 
-msgctxt "model:ir.cron,name:cron_clean_executions"
-msgid "Babi Cron Clean Executions"
-msgstr "Babi eliminar execucions"
-
 msgctxt "model:ir.message,text:cannot_create_order_entry"
 msgid "Order entries are created automatically"
 msgstr "L'ordre d'entrades es crea automàticament."
@@ -1391,6 +1387,14 @@ msgstr "Llista"
 msgctxt "selection:babi.report.execution.open.select,view_type:"
 msgid "Tree"
 msgstr "Arbre"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Calculate Babi Report"
+msgstr "Calcula l'informe Babi"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Clean Babi Excutions"
+msgstr "Netejar execucions Babi"
 
 msgctxt "selection:ir.ui.menu,babi_type:"
 msgid "History"
