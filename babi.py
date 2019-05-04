@@ -662,12 +662,13 @@ class Report(ModelSQL, ModelView):
     @classmethod
     def write(cls, *args):
         actions = iter(args)
+        Warning = Pool().get('res.user.warning')
         for reports, values in zip(actions, actions):
             if 'name' in values:
                 for report in reports:
-                    if report.name != values['name']:
-                        raise UserWarning(
-                            'report_modification_warning_%s' % report.id,
+                    key ='report_modification_warning_%s' % report.id
+                    if report.name != values['name'] and Warning.check(key):
+                        raise UserWarning(key,
                             gettext('babi.report_modification_warning',
                                 report=report.name))
 
