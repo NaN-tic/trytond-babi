@@ -620,8 +620,8 @@ class Report(ModelSQL, ModelView):
             })
     last_execution = fields.Function(fields.Many2One('babi.report.execution',
         'Last Executions', readonly=True), 'get_last_execution')
-    crons = fields.One2Many('ir.cron', 'babi_report', 'Schedulers',
-        context={'babi_report': Eval('id')})
+    crons = fields.One2Many('ir.cron', 'babi_report', 'Schedulers')
+
     report_cell_level = fields.Integer('Cell Level',
         help='Start cell level that not has indentation')
 
