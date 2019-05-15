@@ -1172,7 +1172,8 @@ class ReportExecution(ModelSQL, ModelView):
     def replace_parameters(self, expression):
         if self.report.filter and self.report.filter.parameters:
             if not self.filter_values:
-                self.raise_user_error('filter_parameters', self.rec_name)
+                raise UserError(gettext('babi.filter_parameters',
+                        execution=self.rec_name))
             filter_data = json.loads(self.filter_values.encode('utf-8'),
                 object_hook=JSONDecoder())
             parameters = dict((p.id, p.name) for p in
@@ -1234,9 +1235,10 @@ class ReportExecution(ModelSQL, ModelView):
         update_start = time.time()
         model = self.report.model.model
         if not self.report.measures:
-            self.raise_user_error('no_measures', self.rec_name)
+            raise UserError(gettext('babi.no_measures', report=self.rec_name))
         if not self.report.dimensions:
-            self.raise_user_error('no_dimensions', self.rec_name)
+            raise UserError(gettext('babi.no_dimensions',
+                    report=self.rec_name))
 
         domain = self.get_domain_filter()
         start = datetime.today()
