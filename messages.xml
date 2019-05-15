@@ -17,7 +17,7 @@ this repository contains the full copyright notices and license terms. -->
                     one is needed.</field>
     </record>
     <record model="ir.message" id="no_measures">
-        <field name="text">Report "%s" has no measures. At least one is needed.</field>
+        <field name="text">Report "%(report)s" has no measures. At least one is needed.</field>
     </record>
     <record model="ir.message" id="timeout_exception">
         <field name="text">Report "%(report)s" will be renamed,
