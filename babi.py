@@ -2371,8 +2371,8 @@ class OpenChartStart(ModelView):
             ], 'Interpolation',
         states={
             'required': Eval('graph_type') == 'line',
-            'invisible': Eval('graph_type').in_(['line', 'report']),
-        }, depends=['graph_type'], sort=False)
+            'invisible': Eval('graph_type') != 'line',
+            }, depends=['graph_type'], sort=False)
     show_legend = fields.Boolean('Show Legend',
         states={
             'invisible': (Eval('graph_type') == 'report'),
