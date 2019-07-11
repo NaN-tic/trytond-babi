@@ -92,11 +92,12 @@
           <table class="table no-border bottom2px top2px">
             <thead>
               {% for header in data['headers'] %}
-                {% set key = header.keys()[0] %}
-                {% set title = header.values()[0]['name'] %}
-                {% set width = header.values()[0]['width'] %}
-                {% set text_align = header.values()[0]['text-align'] %}
-              <th id="{{ key }}" {% if width %}style="width: {{ width }}%"{% endif %} class="text-{{ text_align }}" nowrap>{{ title }}</th>{% endfor %}
+                {% set key = header['internal_name'] %}
+                {% set title = header['name'] %}
+                {% set width = header['width'] %}
+                {% set text_align = header['text-align'] %}
+              <th id="{{ key }}" {% if width %}style="width: {{ width }}%"{% endif %} class="text-{{ text_align }}" nowrap>{{ title }}</th>
+              {% endfor %}
             </thead>
             <tbody>
               {% for record in data['records'] %}

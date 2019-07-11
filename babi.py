@@ -2545,29 +2545,32 @@ class OpenChart(Wizard):
             'model_name': model_name,
             'report_name': report.name,
             'records': active_ids,
-            'headers': [{d.internal_name: {
+            'headers': [{
+                        'internal_name': d.internal_name,
                         'name': d.name,
                         'width': d.width or '',
                         'text-align': 'right' if d.expression.ttype in [
                             'float', 'numeric'] else 'left',
-                        }} for d in report.dimensions],
+                        } for d in report.dimensions],
             'cell_level': report.report_cell_level or 3,
             }
 
         if (self.start.graph_type == 'report'):
             if self.start.measures:
-                data['headers'] += [{m.internal_name: {
+                data['headers'] += [{
+                        'internal_name': m.internal_name,
                         'name': m.name,
                         'width': '',
                         'text-align': 'right',
-                        }} for m in self.start.measures]
+                        } for m in self.start.measures]
             else:
-                data['headers'] += [{m.internal_name: {
-                            'name': m.name,
-                            'width': m.width or '',
-                            'text-align': 'right' if m.expression.ttype in [
-                                'float', 'numeric'] else 'left',
-                            }} for m in report.measures]
+                data['headers'] += [{
+                        'internal_name': m.internal_name,
+                        'name': m.name,
+                        'width': m.width or '',
+                        'text-align': 'right' if m.expression.ttype in [
+                            'float', 'numeric'] else 'left',
+                        } for m in report.measures]
 
         return action, data
 
@@ -2637,7 +2640,7 @@ class BabiHTMLReport(HTMLReport):
 
         columns = []
         for header in data['headers']:
-            columns += list(header.keys())
+            columns.append(header['internal_name'])
 
         with Transaction().set_context(**context):
             records, parameters = cls.prepare(ids, data)
