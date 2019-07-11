@@ -1629,12 +1629,6 @@ class OpenExecutionSelect(ModelView):
     execution_readonly = fields.Boolean('Execution Readonly')
 
     @classmethod
-    def view_attributes(cls):
-        return super(OpenExecutionSelect, cls).view_attributes() + [(
-            '/form/group[@id="labels"]', 'states',
-            {'invisible': Eval('graph_type') != 'report'})]
-
-    @classmethod
     def default_get(cls, fields, with_rec_name=True):
         pool = Pool()
         Execution = pool.get('babi.report.execution')
@@ -2415,6 +2409,11 @@ class OpenChartStart(ModelView):
             'invisible': (Eval('graph_type') == 'report'),
             },
         depends=['execution', 'graph_type'])
+
+    @classmethod
+    def view_attributes(cls):
+        return [('/form/group[@id="labels"]', 'states',
+            {'invisible': Eval('graph_type') != 'report'})]
 
     @classmethod
     def default_get(cls, fields, with_rec_name=True):
