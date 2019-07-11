@@ -4,8 +4,6 @@ contains the full copyright notices and license terms. -->
 <form>
     <label name="graph_type"/>
     <field name="graph_type" colspan="3"/>
-    <label name="interpolation"/>
-    <field name="interpolation" colspan="3"/>
     <label name="show_legend"/>
     <field name="show_legend" colspan="3"/>
     <label name="dimension"/>
