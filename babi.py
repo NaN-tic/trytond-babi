@@ -2397,8 +2397,8 @@ class OpenChartStart(ModelView):
             '_datetime': Eval('execution_date'),
             },
         states={
-            'required': Eval('graph_type') == 'line',
-            'invisible': Eval('graph_type').in_(['line', 'report']),
+            'required': Eval('graph_type') != 'report',
+            'invisible': Eval('graph_type') == 'report',
         }, depends=['report', 'execution_date', 'graph_type'])
     measures = fields.Many2Many('babi.internal.measure', None, None,
         'Measures', required=True,
