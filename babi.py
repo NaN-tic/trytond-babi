@@ -2548,6 +2548,8 @@ class OpenChart(Wizard):
             'records': active_ids,
             'headers': [{
                         'internal_name': d.internal_name,
+                        'type': 'dimension',
+                        'group_by': d.group_by,
                         'name': d.name,
                         'width': d.width or '',
                         'text-align': 'right' if d.expression.ttype in [
@@ -2560,6 +2562,8 @@ class OpenChart(Wizard):
             if self.start.measures:
                 data['headers'] += [{
                         'internal_name': m.internal_name,
+                        'type': 'measure',
+                        'group_by': False,
                         'name': m.name,
                         'width': '',
                         'text-align': 'right',
@@ -2567,12 +2571,13 @@ class OpenChart(Wizard):
             else:
                 data['headers'] += [{
                         'internal_name': m.internal_name,
+                        'type': 'measure',
+                        'group_by': False,
                         'name': m.name,
                         'width': m.width or '',
                         'text-align': 'right' if m.expression.ttype in [
                             'float', 'numeric'] else 'left',
                         } for m in report.measures]
-
         return action, data
 
     def transition_print_(self):
@@ -2639,10 +2644,6 @@ class BabiHTMLReport(HTMLReport):
         context['report_translations'] = os.path.join(
             os.path.dirname(__file__), 'report', 'translations')
 
-        columns = []
-        for header in data['headers']:
-            columns.append(header['internal_name'])
-
         with Transaction().set_context(**context):
             records, parameters = cls.prepare(ids, data)
 
@@ -2650,7 +2651,6 @@ class BabiHTMLReport(HTMLReport):
                     'name': 'babi.report.execution',
                     'model': data['model_name'],
                     'headers': data['headers'],
-                    'columns': columns,
                     'report_name': data['report_name'],
                     'records': records,
                     'parameters': parameters,
