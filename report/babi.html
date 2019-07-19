@@ -59,16 +59,19 @@
 
 {% macro draw_table(record, before) %}
   {% set current = [] %}
-  {% set total_columns = data['columns']|length %}
+  {% set total_columns = data['headers']|length %}
   {% set cell_level = data['report_options']['cell_level'] %}
   <tr>
-    {% for k in data['columns'] %}
-      {% set val = record['record'][k] %}
+    {% for header in data['headers'] %}
+      {% set internal_name = header['internal_name'] %}
+      {% set val = record['record'][internal_name] %}
       {% set val_render = val|render_field %}
-      {% set val_type = val|type_field %}
+      {% set type = header['type'] %}
+      {% set group_by = header['group_by'] %}
+      {% set text_align = header['text-align'] %}
       {% do current.append(val_render) %}
-      <td class="border-cell{% if current|length > cell_level or not val_render in before or total_columns == current|length or val_render == None or 'measure' in k %}-active{% endif %}
-      {% if val_type in ('float', 'Decimal') %} text-right{% endif %}">{% if 'measure' in k or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
+      <td class="border-cell{% if current|length > cell_level or not val_render in before or total_columns == current|length or val_render == None or type == 'measure' %}-active{% endif %}
+      text-{{ text_align }}">{% if type == 'measure' or not group_by or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
     </td>{% endfor %}
   </tr>
     {% if record['childs'] %}
