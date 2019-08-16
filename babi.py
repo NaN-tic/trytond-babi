@@ -280,7 +280,7 @@ def create_class(name, description, dimensions, measures):
     return type(name, (DynamicModel, ), body)
 
 
-def register_class(internal_name, name, dimensions, measures):
+def register_class(internal_name, name, dimensions, measures, avoid_registration=False):
     "Register class an return model"
     pool = Pool()
     Model = pool.get('ir.model')
@@ -290,6 +290,16 @@ def register_class(internal_name, name, dimensions, measures):
     Class.__setup__()
     pool.add(Class, type='model')
     Class.__post_setup__()
+    if avoid_registration:
+        models = Model.search([
+                ('model', '=', internal_name),
+                ])
+        if models:
+            return models[0]
+
+    # Register only if the model does not yet exist as otherwise
+    # we can have concurrency errors on the database when ir.model's
+    # register() method updates name and info fields in the database
     Class.__register__('babi')
     model, = Model.search([
             ('model', '=', internal_name),
@@ -1105,14 +1115,14 @@ class ReportExecution(ModelSQL, ModelView):
                     pass
             Transaction().commit()
 
-    def validate_model(self, with_columns=False):
+    def validate_model(self, with_columns=False, avoid_registration=False):
         "makes model available on Tryton and pool instance"
 
         dimensions = self.report.get_dimensions(with_columns)
         measures = self.get_measures()
 
         model = register_class(self.internal_name, self.report.name,
-            dimensions, measures)
+            dimensions, measures, avoid_registration)
 
         if not self.babi_model:
             self.babi_model = model
