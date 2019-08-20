@@ -2562,8 +2562,8 @@ class OpenChart(Wizard):
                         'group_by': d.group_by,
                         'name': d.name,
                         'width': d.width or '',
-                        'text-align': 'right' if d.expression.ttype in [
-                            'float', 'numeric'] else 'left',
+                        'text-align': 'right' if d.expression.ttype in (
+                            'integer', 'float', 'numeric') else 'left',
                         } for d in report.dimensions],
             'cell_level': report.report_cell_level or 3,
             }
@@ -2585,8 +2585,8 @@ class OpenChart(Wizard):
                         'group_by': False,
                         'name': m.name,
                         'width': m.width or '',
-                        'text-align': 'right' if m.expression.ttype in [
-                            'float', 'numeric'] else 'left',
+                        'text-align': 'right' if m.expression.ttype in (
+                            'integer', 'float', 'numeric') else 'left',
                         } for m in report.measures]
         return action, data
 
