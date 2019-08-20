@@ -1196,7 +1196,7 @@ class ReportExecution(ModelSQL, ModelView):
             if not self.filter_values:
                 raise UserError(gettext('babi.filter_parameters',
                         execution=self.rec_name))
-            filter_data = json.loads(self.filter_values.encode('utf-8'),
+            filter_data = json.loads(self.filter_values,
                 object_hook=JSONDecoder())
             parameters = dict((p.id, p.name) for p in
                 self.report.filter.parameters)
