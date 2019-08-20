@@ -10,7 +10,11 @@ contains the full copyright notices and license terms. -->
     <field name="expression" colspan="3"/>
     <label name="ttype"/>
     <field name="ttype"/>
-    <label name="related_model"/>
-    <field name="related_model"/>
+    <group colspan="2" id="extra">
+        <label name="related_model"/>
+        <field name="related_model"/>
+        <label name="decimal_digits"/>
+        <field name="decimal_digits"/>
+    </group>
     <field name="fields" colspan="4"/>
 </form>
