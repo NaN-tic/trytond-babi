@@ -1522,7 +1522,7 @@ msgstr "Cálculo de informe"
 
 msgctxt "view:babi.update_data.wizard.done:"
 msgid "The data for the report has been calculated"
-msgstr "Se ha calcula la información para este informe. "
+msgstr "Se ha calculado la información para este informe."
 
 msgctxt "view:babi.update_data.wizard.start:"
 msgid "Note that this operation may take a few minutes."
