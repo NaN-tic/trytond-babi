@@ -65,7 +65,8 @@
     {% for header in data['headers'] %}
       {% set internal_name = header['internal_name'] %}
       {% set val = record['record'][internal_name] %}
-      {% set val_render = val|render_field %}
+      {% set decimal_digits = header['decimal_digits'] %}
+      {% set val_render = val|render_field(decimal_digits) %}
       {% set type = header['type'] %}
       {% set group_by = header['group_by'] %}
       {% set text_align = header['text-align'] %}
