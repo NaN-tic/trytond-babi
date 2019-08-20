@@ -242,12 +242,15 @@ def create_columns(name, ffields):
         fname = field['name']
         field_name = field['internal_name']
         ttype = field['ttype']
+        digits = field['decimal_digits']
+        if digits is None:
+            digits = 2
         if ttype == 'integer':
             columns[field_name] = fields.Integer(fname)
         elif ttype == 'float':
-            columns[field_name] = fields.Float(fname, digits=(16, 2))
+            columns[field_name] = fields.Float(fname, digits=(16, digits))
         elif ttype == 'numeric':
-            columns[field_name] = fields.Numeric(fname, digits=(16, 2))
+            columns[field_name] = fields.Numeric(fname, digits=(16, digits))
         elif ttype == 'char':
             columns[field_name] = fields.Char(fname)
         elif ttype == 'boolean':
@@ -540,9 +543,18 @@ class Expression(ModelSQL, ModelView):
     related_model = fields.Many2One('ir.model', 'Related Model', states={
             'required': Eval('ttype') == 'many2one',
             'readonly': Eval('ttype') != 'many2one',
+            'invisible': Eval('ttype') != 'many2one',
             }, depends=['ttype'])
+    decimal_digits = fields.Integer('Decimal Digits', states={
+            'invisible': ~Eval('ttype').in_(['float', 'numeric']),
+            'required': Eval('ttype').in_(['float', 'numeric']),
+            })
     fields = fields.Function(fields.Many2Many('ir.model.field', None, None,
             'Model Fields'), 'on_change_with_fields')
+
+    @classmethod
+    def default_decimal_digits(cls):
+        return 2
 
     @classmethod
     def __register__(cls, module_name):
@@ -1455,6 +1467,7 @@ class ReportExecution(ModelSQL, ModelView):
                         'expression': expression,
                         'ttype': measure.expression.ttype,
                         'related_model': related_model_id,
+                        'decimal_digits': measure.expression.decimal_digits,
                         })
         if to_create:
             InternalMeasure.create(to_create)
@@ -1808,8 +1821,8 @@ class OpenExecutionFiltered(StateView):
             defaults['report'] = menu.babi_report.id
         else:
             parameters = Parameter.search([
-                        ('related_model.model', '=', model)]
-                )
+                    ('related_model.model', '=', model),
+                    ])
             for parameter in parameters:
                 name = '%s_%d' % (parameter.name, parameter.id)
                 defaults[name] = context.get('active_id')
@@ -2029,13 +2042,14 @@ class DimensionMixin:
 
     def get_dimension_data(self):
         return {
-                    'name': self.name,
-                    'internal_name': self.internal_name,
-                    'expression': self.expression.expression,
-                    'ttype': self.expression.ttype,
-                    'related_model': (self.expression.related_model
-                        and self.expression.related_model.model),
-                }
+            'name': self.name,
+            'internal_name': self.internal_name,
+            'expression': self.expression.expression,
+            'ttype': self.expression.ttype,
+            'related_model': (self.expression.related_model
+                and self.expression.related_model.model),
+            'decimal_digits': self.expression.decimal_digits,
+            }
 
 
 class Dimension(ModelSQL, ModelView, DimensionMixin):
@@ -2166,13 +2180,14 @@ class Measure(ModelSQL, ModelView):
 
     def get_measure_data(self):
         return {
-                'name': self.name,
-                'internal_name': self.internal_name,
-                'expression': self.expression,
-                'ttype': self.ttype,
-                'related_model': (self.related_model and
-                    self.related_model.model),
-                }
+            'name': self.name,
+            'internal_name': self.internal_name,
+            'expression': self.expression,
+            'ttype': self.ttype,
+            'related_model': (self.related_model and
+                self.related_model.model),
+            'decimal_digits': self.expression.decimal_digits,
+            }
 
     @classmethod
     def update_order(cls, measures):
@@ -2245,6 +2260,8 @@ class InternalMeasure(ModelSQL, ModelView):
     ttype = fields.Selection(FIELD_TYPES, 'Field Type',
         required=True)
     related_model = fields.Many2One('ir.model', 'Related Model')
+    decimal_digits = fields.Integer('Decimal Digits')
+    width = fields.Integer('Width')
 
     @classmethod
     def __setup__(cls):
@@ -2272,13 +2289,14 @@ class InternalMeasure(ModelSQL, ModelView):
 
     def get_measure_data(self):
         return {
-                'name': self.name,
-                'internal_name': self.internal_name,
-                'expression': self.expression,
-                'ttype': self.ttype,
-                'related_model': (self.related_model and
-                    self.related_model.model),
-                }
+            'name': self.name,
+            'internal_name': self.internal_name,
+            'expression': self.expression,
+            'ttype': self.ttype,
+            'related_model': (self.related_model and
+                self.related_model.model),
+            'decimal_digits': self.decimal_digits,
+            }
 
 
 class Order(ModelSQL, ModelView, sequence_ordered()):
@@ -2416,9 +2434,9 @@ class OpenChartStart(ModelView):
             ('execution', '=', Eval('execution')),
             ],
         states={
-            'invisible': (Eval('graph_type') == 'report'),
-            },
-        depends=['execution', 'graph_type'])
+            'required': Eval('graph_type') != 'report',
+            'invisible': Eval('graph_type') == 'report',
+        }, depends=['execution', 'graph_type'])
 
     @classmethod
     def view_attributes(cls):
@@ -2557,37 +2575,29 @@ class OpenChart(Wizard):
             'report_name': report.name,
             'records': active_ids,
             'headers': [{
-                        'internal_name': d.internal_name,
-                        'type': 'dimension',
-                        'group_by': d.group_by,
-                        'name': d.name,
-                        'width': d.width or '',
-                        'text-align': 'right' if d.expression.ttype in (
-                            'integer', 'float', 'numeric') else 'left',
-                        } for d in report.dimensions],
+                    'internal_name': d.internal_name,
+                    'type': 'dimension',
+                    'group_by': d.group_by,
+                    'name': d.name,
+                    'width': d.width or '',
+                    'text-align': 'right' if d.expression.ttype in (
+                        'integer', 'float', 'numeric') else 'left',
+                    'decimal_digits': d.expression.decimal_digits,
+                    } for d in report.dimensions],
             'cell_level': report.report_cell_level or 3,
             }
 
-        if (self.start.graph_type == 'report'):
-            if self.start.measures:
-                data['headers'] += [{
-                        'internal_name': m.internal_name,
-                        'type': 'measure',
-                        'group_by': False,
-                        'name': m.name,
-                        'width': '',
-                        'text-align': 'right',
-                        } for m in self.start.measures]
-            else:
-                data['headers'] += [{
-                        'internal_name': m.internal_name,
-                        'type': 'measure',
-                        'group_by': False,
-                        'name': m.name,
-                        'width': m.width or '',
-                        'text-align': 'right' if m.expression.ttype in (
-                            'integer', 'float', 'numeric') else 'left',
-                        } for m in report.measures]
+        if self.start.graph_type == 'report':
+            data['headers'] += [{
+                    'internal_name': m.internal_name,
+                    'type': 'measure',
+                    'group_by': False,
+                    'name': m.name,
+                    'width': m.width or '',
+                    'text-align': 'right' if m.expression.ttype in (
+                        'integer', 'float', 'numeric') else 'left',
+                    'decimal_digits': m.expression.decimal_digits,
+                    } for m in report.measures]
         return action, data
 
     def transition_print_(self):
