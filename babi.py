@@ -33,6 +33,7 @@ from trytond.modules.html_report.html_report import HTMLReport
 from .babi_eval import babi_eval
 from trytond.i18n import gettext
 from trytond.exceptions import UserError, UserWarning
+from trytond.model.modelstorage import AccessError
 
 
 __all__ = ['Filter', 'Expression', 'Report', 'ReportGroup', 'Dimension',
@@ -1130,7 +1131,14 @@ class ReportExecution(ModelSQL, ModelView):
     def validate_model(self, with_columns=False, avoid_registration=False):
         "makes model available on Tryton and pool instance"
 
-        dimensions = self.report.get_dimensions(with_columns)
+        try:
+            dimensions = self.report.get_dimensions(with_columns)
+        except AccessError:
+            # Do not crash if report no longer exists
+            # Tryton will call ir.model's clean() which will check if all
+            # models stored in ir.model table exist and try to remove them if
+            # they no longer exist.
+            return
         measures = self.get_measures()
 
         model = register_class(self.internal_name, self.report.name,
