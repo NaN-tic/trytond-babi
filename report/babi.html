@@ -88,6 +88,9 @@
       <div class="row">
         <div class="col-md-12">
           <h2>{{ data['report_name'] }}</h2>
+          {% for item in data['filters'] %}
+             {{ item }}<br>
+          {% endfor %}
         </div>
       </div>
 

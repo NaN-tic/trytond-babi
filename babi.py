@@ -2666,17 +2666,69 @@ class BabiHTMLReport(HTMLReport):
         return records, parameters
 
     @classmethod
+    def format_filter(cls, execution):
+        pool = Pool()
+        Lang = pool.get('ir.lang')
+
+        locale = Transaction().context.get(
+            'report_lang', Transaction().language).split('_')[0]
+        lang, = Lang.search([
+                ('code', '=', locale or 'en'),
+                ])
+
+        filter_data = json.loads(execution.filter_values,
+            object_hook=JSONDecoder())
+        parameters = dict((p.id, p) for p in
+            execution.report.filter.parameters)
+        res = []
+        for key in sorted(filter_data.keys()):
+            parameter = parameters[int(key.split('_')[-1:][0])]
+            value = filter_data[key]
+            if parameter.ttype == 'date':
+                value = lang.strftime(value)
+            elif parameter.ttype in ('float', 'numeric'):
+                value = lang.format('%.2f', value, grouping=True)
+            elif parameter.ttype == 'integer':
+                value = lang.format('%d', value, grouping=True)
+            elif parameter.ttype == 'boolean':
+                value = (gettext('babi.msg_true') if value else
+                    gettext('babi.msg_false'))
+            elif parameter.ttype == 'many2many':
+                Model = pool.get(parameter.related_model.model)
+                record = []
+                if value:
+                    record.append(Model(value[0]).rec_name)
+                if len(value) > 2:
+                    record.append('...')
+                if len(value) > 1:
+                    record.append(Model(value[-1]).rec_name)
+                value = ', '.join(record)
+            elif parameter.ttype == 'many2one':
+                Model = pool.get(parameter.related_model.model)
+                value = Model(value).rec_name
+
+            res.append('%s: %s' % (parameter.name, value))
+        return res
+
+    @classmethod
     def execute(cls, ids, data):
+        Execution = Pool().get('babi.report.execution')
+
         context = Transaction().context
         context['report_lang'] = Transaction().language
         context['report_translations'] = os.path.join(
             os.path.dirname(__file__), 'report', 'translations')
+
+        execution_id = data['model_name'].split('_')[-1]
+        execution = Execution(execution_id)
+        filters = cls.format_filter(execution)
 
         with Transaction().set_context(**context):
             records, parameters = cls.prepare(ids, data)
 
             return super(BabiHTMLReport, cls).execute(data['records'], {
                     'name': 'babi.report.execution',
+                    'filters': filters,
                     'model': data['model_name'],
                     'headers': data['headers'],
                     'report_name': data['report_name'],
