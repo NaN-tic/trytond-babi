@@ -2670,6 +2670,9 @@ class BabiHTMLReport(HTMLReport):
         pool = Pool()
         Lang = pool.get('ir.lang')
 
+        if not execution.filter_values:
+            return []
+
         locale = Transaction().context.get(
             'report_lang', Transaction().language).split('_')[0]
         lang, = Lang.search([
