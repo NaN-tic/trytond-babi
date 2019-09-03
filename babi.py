@@ -33,6 +33,11 @@ from trytond.protocols.jsonrpc import JSONDecoder, JSONEncoder
 
 from trytond.modules.html_report.html_report import HTMLReport
 from .babi_eval import babi_eval
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email.header import Header
+from email import encoders
 
 
 __all__ = ['Filter', 'Expression', 'Report', 'ReportGroup', 'Dimension',
@@ -635,6 +640,21 @@ class Report(ModelSQL, ModelView):
         context={'babi_report': Eval('id')})
     report_cell_level = fields.Integer('Cell Level',
         help='Start cell level that not has indentation')
+    email = fields.Boolean('E-mail',
+        help='Mark to see the options to send an email when '
+            'executing the cron')
+    to = fields.Char('To', states={
+        'invisible': Bool(~Eval('email')),
+        'required': Bool(Eval('email')),
+        }, depends=['email'])
+    subject = fields.Char('Subject', states={
+        'invisible': Bool(~Eval('email')),
+        'required': Bool(Eval('email')),
+        }, depends=['email'])
+    smtp = fields.Many2One('smtp.server', 'SMTP', states={
+        'invisible': Bool(~Eval('email')),
+        'required': Bool(Eval('email')),
+        }, depends=['email'])
 
     @classmethod
     def __setup__(cls):
@@ -882,10 +902,44 @@ class Report(ModelSQL, ModelView):
     @classmethod
     def calculate_babi_report(cls, args=None):
         """This method is intended to be called from ir.cron"""
+        ExecutionReport = Pool().get('babi.report.execution', type='report')
+
         if not args:
             args = []
         reports = cls.search([('id', '=', args)])
-        return cls.calculate(reports)
+        executions = cls.calculate(reports)
+
+        for execution in executions:
+            if not execution.report.email:
+                continue
+            Model = Pool().get(execution.internal_name)
+            records = Model.search([('parent', '=', None)])
+
+            data = {
+                'model_name': execution.internal_name,
+                'report_name': execution.report.name,
+                'records': [x.id for x in records],
+                'cell_level': execution.report.report_cell_level or 3,
+                }
+            report = ExecutionReport.execute(records, data)
+            if report:
+                msg = MIMEMultipart()
+                msg['To'] = execution.report.to
+                msg['From'] = execution.report.smtp.smtp_email
+                msg['Subject'] = Header(execution.report.subject, 'utf-8')
+                msg.attach(MIMEText('Business Intelligence', 'plain'))
+
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(report[1])
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', 'attachment; filename=report.pdf')
+                msg.attach(part)
+                try:
+                    server = execution.report.smtp
+                    server.send_mail(msg['From'], msg['To'], msg.as_string())
+                except Exception, exception:
+                    logger.error('Unable to deliver email (%s):\n %s'
+                        % (exception, msg.as_string()))
 
     def execute(self, execution):
         Execution = Pool().get('babi.report.execution')
@@ -913,6 +967,7 @@ class Report(ModelSQL, ModelView):
     @classmethod
     def calculate(cls, reports):
         Execution = Pool().get('babi.report.execution')
+        executions = []
 
         for report in reports:
             if not report.measures:
@@ -921,9 +976,9 @@ class Report(ModelSQL, ModelView):
                 cls.raise_user_error('no_dimensions', report.rec_name)
             execution, = Execution.create([report.get_execution_data()])
             Transaction().cursor.commit()
-
+            executions.append(execution)
             report.execute(execution)
-
+        return executions
 
 class ReportExecution(ModelSQL, ModelView):
     "Report Execution"
@@ -2588,36 +2643,14 @@ class OpenChart(Wizard):
         context = Transaction().context
         model_name = context.get('active_model')
         active_ids = context.get('active_ids')
-
         report = self.start.report
 
         data = {
             'model_name': model_name,
             'report_name': report.name,
             'records': active_ids,
-            'headers': [{d.internal_name: {
-                        'name': d.name,
-                        'width': d.width or '',
-                        'text-align': 'right' if d.expression.ttype in [
-                            'float', 'numeric'] else 'left',
-                        }} for d in report.dimensions],
             'cell_level': report.report_cell_level or 3,
             }
-
-        if (self.start.graph_type == 'report'):
-            if self.start.measures:
-                data['headers'] += [{m.internal_name: {
-                        'name': m.name,
-                        'width': '',
-                        'text-align': 'right',
-                        }} for m in self.start.measures]
-            else:
-                data['headers'] += [{m.internal_name: {
-                            'name': m.name,
-                            'width': m.width or '',
-                            'text-align': 'right' if m.expression.ttype in [
-                                'float', 'numeric'] else 'left',
-                            }} for m in report.measures]
 
         return action, data
 
@@ -2685,8 +2718,26 @@ class BabiHTMLReport(HTMLReport):
         context['report_translations'] = os.path.join(
             os.path.dirname(__file__), 'report', 'translations')
 
+        Execution = Pool().get('babi.report.execution')
+        execution_id = int(data['model_name'].split('_')[-1])
+        execution = Execution(execution_id)
+        report = execution.report
+
+        headers = [{d.internal_name: {
+                    'name': d.name,
+                    'width': d.width or '',
+                    'text-align': 'right' if d.expression.ttype in [
+                        'float', 'numeric'] else 'left',
+                    }} for d in report.dimensions]
+        headers += [{m.internal_name: {
+                    'name': m.name,
+                    'width': m.width or '',
+                    'text-align': 'right' if m.expression.ttype in [
+                        'float', 'numeric'] else 'left',
+                    }} for m in report.measures]
+
         columns = []
-        for header in data['headers']:
+        for header in headers:
             columns += header.keys()
 
         with Transaction().set_context(**context):
@@ -2695,7 +2746,7 @@ class BabiHTMLReport(HTMLReport):
             return super(BabiHTMLReport, cls).execute(data['records'], {
                     'name': 'babi.report.execution',
                     'model': data['model_name'],
-                    'headers': data['headers'],
+                    'headers': headers,
                     'columns': columns,
                     'report_name': data['report_name'],
                     'records': records,

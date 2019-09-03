@@ -603,7 +603,7 @@ contains the full copyright notices and license terms. -->
             <field name="name">open_execution_select_form</field>
         </record>
         <record model="ir.action.wizard" id="open_execution_wizard">
-            <field name="name">Business Inteligence Report</field>
+            <field name="name">Business Intelligence Report</field>
             <field name="wiz_name">babi.report.execution.open</field>
         </record>
 
