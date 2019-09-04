@@ -69,7 +69,7 @@ if minor_version % 2:
 
 setup(name='%s_%s' % (PREFIX, MODULE),
     version=version,
-    description='Business Inteligence module for tryton',
+    description='Business Intelligence module for tryton',
     long_description=read('README'),
     author='NaN-tic',
     url='http://www.nan-tic.com/',

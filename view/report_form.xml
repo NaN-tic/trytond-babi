@@ -44,6 +44,15 @@ contains the full copyright notices and license terms. -->
             </group>
         </page>
         <page id="crons" string="Schedulers">
+            <label name="email"/>
+            <field name="email"/>
+            <newline/>
+            <label name="to"/>
+            <field name="to"/>
+            <label name="subject"/>
+            <field name="subject"/>
+            <label name="smtp"/>
+            <field name="smtp"/>
             <field name="crons" colspan="4" mode="form,tree"/>
         </page>
     </notebook>
