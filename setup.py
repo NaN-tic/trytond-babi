@@ -13,7 +13,8 @@ MODULE = 'babi'
 PREFIX = 'nantic'
 MODULE2PREFIX = {
     'html_report': 'trytonspain',
-    }
+    'smtp': 'trytonspain',
+}
 
 
 def read(fname):
