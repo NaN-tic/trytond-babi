@@ -485,10 +485,12 @@ class FilterParameter(ModelSQL, ModelView):
         if ((self.filter.domain and placeholder not in self.filter.domain)
                 and (self.filter.python_expression
                     and placeholder not in self.filter.python_expression)):
-            raise UserWarning('babi_check_parameter_in_filter.{}'.format(
-                    self.name),gettext('babi.parameter_not_found',
-                        parameter=self.rec_name,
-                        filter=self.filter.rec_name))
+            key = 'task_babi_check_parameter_in_filter.%d' % self.id
+            if Warning.check(key):
+                raise UserWarning('babi_check_parameter_in_filter.{}'.format(
+                        self.name),gettext('babi.parameter_not_found',
+                            parameter=self.rec_name,
+                            filter=self.filter.rec_name))
 
             return False
         return True
