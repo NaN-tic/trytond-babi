@@ -481,6 +481,8 @@ class FilterParameter(ModelSQL, ModelView):
                 ['boolean'], where=sql_table.ttype == 'bool'))
 
     def check_parameter_in_filter(self):
+        Warning = Pool().get('res.user.warning')
+
         placeholder = '{%s}' % self.name
         if ((self.filter.domain and placeholder not in self.filter.domain)
                 and (self.filter.python_expression
