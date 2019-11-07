@@ -1099,7 +1099,7 @@ class ReportExecution(ModelSQL, ModelView):
                             order.append((field, record.order))
         return order
 
-    @depends('report')
+    @depends('_parent_report.id', 'report')
     def on_change_with_report_model(self, name=None):
         if self.report:
             return self.report.model.id
