@@ -39,6 +39,9 @@ this repository contains the full copyright notices and license terms. -->
         <record model="ir.message" id="filter_parameters">
             <field name="text">Execution "%(execution)s" has filter parameters and you did not provide any of them. Please execute it from the menu.</field>
         </record>
+        <record model="ir.message" id="report_modification_warning">
+            <field name="text">Report "%(report)s" will be renamed, but if you want to also rename the menus you should create the menus again. Are you sure you want to continue with this action?</field>
+        </record>
         <record model="ir.message" id="true">
             <field name="text">True</field>
         </record>
