@@ -799,8 +799,8 @@ class Report(ModelSQL, ModelView):
             for lang in langs:
                 with Transaction().set_context(language=lang.code,
                         fuzzy_translation=False):
-                    data, = self.read([self], fields_names=['name'])
-                    Menu.write([menu], data)
+                    data, = self.read([self.id], fields_names=['name'])
+                    Menu.write([menu], {'name': data['name']})
         return menu.id
 
     def create_list_view_menu(self, parent, langs):
@@ -831,8 +831,8 @@ class Report(ModelSQL, ModelView):
             for lang in langs:
                 with Transaction().set_context(language=lang.code,
                         fuzzy_translation=False):
-                    data, = self.read([self], fields_names=['name'])
-                    Menu.write([menu], data)
+                    data, = self.read([self.id], fields_names=['name'])
+                    Menu.write([menu], {'name': data['name']})
         return menu.id
 
     def create_update_wizard_menu(self, parent):
