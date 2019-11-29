@@ -1161,6 +1161,14 @@ class ReportExecution(ModelSQL, ModelView):
         executions = cls.search([('date', '<', date)])
         if executions:
             cls.delete(executions)
+
+        executions = cls.search([()])
+        Keyword = pool.get('ir.action.keyword')
+        models = ['%s,-1' % e.babi_model.model for e in executions
+            if e.babi_model]
+        keywords = Keyword.search([('model', 'not in', models),
+            ('babi_report', '!=', None)])
+        Keyword.delete(keywords)
         return True
 
     @classmethod
