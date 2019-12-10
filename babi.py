@@ -1173,17 +1173,16 @@ class ReportExecution(ModelSQL, ModelView):
 
     @classmethod
     def remove_data(cls, executions):
-        TableHandler = backend.get('TableHandler')
         cursor = Transaction().connection.cursor()
         # Add a transaction for each 200 executions otherwise locks are not
         # released on Postgresql and a exception is raised about too many locks
         for sub_executions in grouped_slice(executions, 200):
             for execution in sub_executions:
                 table = execution.internal_name
-                if not TableHandler.table_exist(table):
+                if not backend.TableHandler.table_exist(table):
                     continue
                 # Table and model are the same.
-                TableHandler.drop_table(table, table)
+                backend.TableHandler.drop_table(table, table)
                 # There is no method to remove sequence in table
                 # handler, so we must remove them manually
                 try:
@@ -1224,7 +1223,7 @@ class ReportExecution(ModelSQL, ModelView):
     @staticmethod
     def save_state(execution_id, state, exception=False):
         " Save state in a new transaction"
-        DatabaseOperationalError = backend.get('DatabaseOperationalError')
+        DatabaseOperationalError = backend.DatabaseOperationalError
         Transaction().rollback()
         with Transaction().new_transaction() as new_transaction:
             try:
@@ -2344,13 +2343,12 @@ class InternalMeasure(ModelSQL, ModelView):
 
     @classmethod
     def __register__(cls, module_name):
-        TableHandler = backend.get('TableHandler')
         super(InternalMeasure, cls).__register__(module_name)
         cursor = Transaction().connection.cursor()
         sql_table = cls.__table__()
 
         # Migration from 3.0: no more relation with reports.
-        table = TableHandler(cls, module_name)
+        table = backend.TableHandler(cls, module_name)
         if table.column_exist('report'):
             table.not_null_action('report', action='remove')
 
