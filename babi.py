@@ -756,6 +756,7 @@ class Report(ModelSQL, ModelView):
         Cron.delete([c for r in reports for c in r.crons])
 
     @classmethod
+    @ModelView.button
     def remove_menus(cls, reports):
         "Remove all menus and actions created"
         pool = Pool()
@@ -872,6 +873,7 @@ class Report(ModelSQL, ModelView):
         menu.save()
 
     @classmethod
+    @ModelView.button
     def create_menus(cls, reports):
         """Regenerates all actions and menu entries"""
         pool = Pool()
@@ -972,6 +974,7 @@ class Report(ModelSQL, ModelView):
             Execution.calculate([execution])
 
     @classmethod
+    @ModelView.button
     def calculate(cls, reports):
         Execution = Pool().get('babi.report.execution')
         executions = []
