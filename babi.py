@@ -38,6 +38,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.header import Header
+from email.utils import getaddresses
 from email import encoders
 
 
@@ -919,6 +920,7 @@ class Report(ModelSQL, ModelView):
         for execution in executions:
             if not execution.report.email:
                 continue
+
             Model = Pool().get(execution.internal_name)
             records = Model.search([('parent', '=', None)])
 
@@ -943,7 +945,8 @@ class Report(ModelSQL, ModelView):
                 msg.attach(part)
                 try:
                     server = execution.report.smtp
-                    server.send_mail(msg['From'], msg['To'], msg.as_string())
+                    to_addrs = [a for _, a in getaddresses([execution.report.to])]
+                    server.send_mail(msg['From'], to_addrs, msg.as_string())
                 except Exception as exception:
                     logger.error('Unable to deliver email (%s):\n %s'
                         % (exception, msg.as_string()))
