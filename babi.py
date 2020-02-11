@@ -993,7 +993,7 @@ class Report(ModelSQL, ModelView):
             Transaction().commit()
             executions.append(execution)
             report.execute(execution)
-        return executions
+
 
 class ReportExecution(ModelSQL, ModelView):
     "Report Execution"
