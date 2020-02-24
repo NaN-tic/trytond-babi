@@ -2150,7 +2150,7 @@ class Dimension(ModelSQL, ModelView, DimensionMixin):
     def update_order(cls, dimensions):
         Order = Pool().get('babi.order')
         cursor = Transaction().connection.cursor()
-        dimension_ids = [x.id for x in dimensions if x.group_by]
+        dimension_ids = [x.id for x in dimensions]
         orders = Order.search([
                 ('dimension', 'in', dimension_ids),
                 ])
