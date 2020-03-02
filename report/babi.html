@@ -5,10 +5,10 @@
   @page {
     size: landscape;
     @top-left {
-      content: "{{ company.rec_name }}. {{ company.party.vat_code }}";
+      content: "{{ company.render.rec_name }}. {{ company.party.render.vat_code }}";
     }
     @top-right {
-      content: "{{ data['report_options']['now']|dateformat }}";
+      content: "{{ data['report_options']['now']|render }}";
     }
     @bottom-right {
       content: counter(page) " / " counter(pages);
@@ -66,7 +66,7 @@
       {% set internal_name = header['internal_name'] %}
       {% set val = record['record'][internal_name] %}
       {% set decimal_digits = header['decimal_digits'] %}
-      {% set val_render = val|render_field(decimal_digits) %}
+      {% set val_render = val|render(digits=decimal_digits) %}
       {% set type = header['type'] %}
       {% set group_by = header['group_by'] %}
       {% set text_align = header['text-align'] %}
