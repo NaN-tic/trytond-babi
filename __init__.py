@@ -5,7 +5,7 @@ from . import configuration
 from . import cron
 from . import babi
 from . import test_model
-
+from . import report
 
 def register():
     Pool.register(
@@ -39,5 +39,5 @@ def register():
         babi.CleanExecutions,
         module='babi', type_='wizard')
     Pool.register(
-        babi.BabiHTMLReport,
+        report.BabiHTMLReport,
         module='babi', type_='report')
