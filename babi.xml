@@ -717,10 +717,9 @@ contains the full copyright notices and license terms. -->
         </record>
 
         <!-- HTML Report -->
-        <record model="ir.action.report" id="report_babi_execution">
+        <record model="ir.action.report" id="report_babi_html_report">
             <field name="name">Babi Report</field>
-            <!-- <field name="model">babi.report.execution</field> -->
-            <field name="report_name">babi.report.execution</field>
+            <field name="report_name">babi.report.html_report</field>
             <field name="report">babi/report/babi.html</field>
             <field name="extension">pdf</field>
             <field name="template_extension">jinja</field>
