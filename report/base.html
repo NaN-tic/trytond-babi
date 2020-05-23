@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="author" content="Nantic">
+    <link rel="stylesheet" href="{{ 'babi/report/base.css'|modulepath }}">
+  </head>
+
+  <body>
+    {% block body %}
+    {% block main scoped %}
+
+    {% block company_header scoped %}
+    {% endblock company_header %}
+
+    {% block report_body scoped %}
+    {% endblock report_body %}
+
+    {% block report_footer scoped %}
+    {% endblock report_footer %}
+
+
+    {% endblock main %}
+    {% endblock body %}
+  </body>
+</html>

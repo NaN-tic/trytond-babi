@@ -9,6 +9,7 @@ from trytond.rpc import RPC
 from trytond.protocols.jsonrpc import JSONDecoder
 from trytond.report import Report
 from trytond.i18n import gettext
+from trytond.tools import file_open
 
 __all__ = ['BabiHTMLReport']
 
@@ -21,6 +22,23 @@ class BabiHTMLReport(Report):
         super(BabiHTMLReport, cls).__setup__()
         cls.__rpc__['execute'] = RPC(False)
 
+
+    @classmethod
+    def get_templates_jinja(cls, action):
+        header, main, footer = super().get_templates_jinja(action)
+        try:
+            with file_open('babi/report/header.html', subdir='modules', mode='r',
+                    encoding='utf-8') as fp:
+                header = fp.read()
+            with file_open('babi/report/footer.html', subdir='modules', mode='r',
+                    encoding='utf-8') as fp:
+                footer = fp.read()
+        except IOError:
+            pass
+
+        return header, main, footer
+
+
     @classmethod
     def prepare(cls, ids, data):
         Model = Pool().get(data['model_name'])
@@ -31,12 +49,12 @@ class BabiHTMLReport(Report):
         def get_childs(record):
             childs = []
             for r in Model.search([
-                    # ('babi_group', '=', group_name),
                     ('parent', '=', record.id),
                     ]):
                 childs.append(get_childs(r))
             return {
-                'record': record,
+                'record': dict( (k, getattr(record, k)) for k in
+                    record._fields.keys()),
                 'childs': childs,
                 }
 
@@ -131,7 +149,6 @@ class BabiHTMLReport(Report):
 
         with Transaction().set_context(**context):
             records, parameters = cls.prepare(ids, data)
-
             return super(BabiHTMLReport, cls).execute(data['records'], {
                     'name': 'babi.report.html_report',
                     'filters': filters,
