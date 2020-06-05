@@ -3,9 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
-    <meta name="description" content="">
-    <meta name="author" content="Nantic">
     <link rel="stylesheet" href="{{ 'babi/report/base.css'|modulepath }}">
+    {% block style %}{% endblock %}
   </head>
 
   <body>

@@ -9,7 +9,6 @@ from trytond.rpc import RPC
 from trytond.protocols.jsonrpc import JSONDecoder
 from trytond.report import Report
 from trytond.i18n import gettext
-from trytond.tools import file_open
 
 __all__ = ['BabiHTMLReport']
 
@@ -21,23 +20,6 @@ class BabiHTMLReport(Report):
     def __setup__(cls):
         super(BabiHTMLReport, cls).__setup__()
         cls.__rpc__['execute'] = RPC(False)
-
-
-    @classmethod
-    def get_templates_jinja(cls, action):
-        header, main, footer = super().get_templates_jinja(action)
-        try:
-            with file_open('babi/report/header.html', subdir='modules', mode='r',
-                    encoding='utf-8') as fp:
-                header = fp.read()
-            with file_open('babi/report/footer.html', subdir='modules', mode='r',
-                    encoding='utf-8') as fp:
-                footer = fp.read()
-        except IOError:
-            pass
-
-        return header, main, footer
-
 
     @classmethod
     def prepare(cls, ids, data):
@@ -157,7 +139,7 @@ class BabiHTMLReport(Report):
                     'report_name': report.rec_name,
                     'records': records,
                     'parameters': parameters,
-                    'output_format': 'pdf',
+                    'output_format': data.get('output_format', 'pdf'),
                     'report_options': {
                         'now': datetime.now(),
                         'cell_level': data['cell_level'],

@@ -1,16 +1,19 @@
 @page {
-  size: A4;
+  size: A4 landscape;
   @top-left {
     content: "";
+    font-family: 'Arial';
+    font-size: 9px;
   }
   @top-right {
     content: "";
+    font-family: 'Arial';
+    font-size: 9px;
   }
   @bottom-right {
     content: counter(page) " / " counter(pages);
     text-align: right;
-    font-family: 'Arial'
-    bottom:0;
+    font-family: 'Arial';
     font-size: 9px;
   }
 }
@@ -37,9 +40,7 @@ header {
 .logo {
     width: auto;
     height: 50px;
-
 }
-
 
 body {
   font-family: 'Arial';
@@ -72,10 +73,9 @@ table {
 }
 
 table.tr {
-margin-left: 0;
-margin-right: 0;
-padding: 0.75rem;
-
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0.75rem;
 }
 
 /* tbody tr border {
@@ -94,6 +94,7 @@ table thead th {
   vertical-align: bottom;
   margin-left: 0;
   margin-right: 0;
+  border-bottom: solid 1px #000 !important;
 }
 
 table tbody.border  {
@@ -101,10 +102,6 @@ table tbody.border  {
   margin-left: 0;
   margin-right: 0;
   padding: 1px;
-}
-
-.text-right {
-  text-align: right;
 }
 
 th.sub_header{
@@ -121,6 +118,26 @@ th.sub_header{
 
 table.condensed tr,td,th{
   padding: 0;
+}
+
+.border-cell-active {
+  border-top: solid 1px #999 !important;
+}
+.border-cell {
+  border-top: 0px !important;
+}
+
+.text-left{
+  text-align:left;
+}
+.text-right{
+  text-align:right;
+}
+.text-center{
+  text-align:center;
+}
+.text-justify{
+  text-align:justify;
 }
 
 h1.document{
@@ -144,7 +161,11 @@ footer {
 }
 
 .right {
-  float:right;
+  text-align: right;
+}
+
+.bold {
+	font-weight: bold;
 }
 
 td.hide {
@@ -152,4 +173,8 @@ td.hide {
   margin:0;
   padding:0;
   border:0;
+}
+
+tr.bottom {
+  border-bottom: 1pt solid black;
 }
