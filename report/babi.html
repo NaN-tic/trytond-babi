@@ -43,7 +43,7 @@
       {% set group_by = header['group_by'] %}
       {% set text_align = header['text-align'] %}
       {% do current.append(val_render) %}
-      <td class="border-cell{% if current|length > cell_level or not val_render in before or total_columns == current|length or val_render == None or type == 'measure' %}-active{% endif %}
+      <td class="border-cell{% if current|length > cell_level or not val_render in before or total_columns == current|length or val_render == None or type == 'measure' or not val %}-active{% endif %}
       text-{{ text_align }}">{% if type == 'measure' or not group_by or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
     </td>{% endfor %}
   </tr>
