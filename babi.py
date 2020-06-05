@@ -2513,11 +2513,14 @@ class OpenChartStart(ModelView):
             'required': Eval('graph_type') != 'report',
             'invisible': Eval('graph_type') == 'report',
         }, depends=['execution', 'graph_type'])
-
-    @classmethod
-    def view_attributes(cls):
-        return [('/form/group[@id="labels"]', 'states',
-            {'invisible': Eval('graph_type') != 'report'})]
+    graph_type_report = fields.Selection([
+            ('pdf', 'PDF'),
+            ('html', 'HTML'),
+        ], 'Report Format',
+        states={
+            'required': Eval('graph_type') == 'report',
+            'invisible': Eval('graph_type') != 'report',
+        }, depends=['graph_type'])
 
     @classmethod
     def default_get(cls, fields, with_rec_name=True):
@@ -2561,6 +2564,7 @@ class OpenChartStart(ModelView):
             'graph_type': 'vbar',
             'show_legend': True,
             'interpolation': 'linear',
+            'graph_type_report': 'pdf',
             }
 
 
@@ -2650,6 +2654,7 @@ class OpenChart(Wizard):
             'report_name': report.name,
             'records': active_ids,
             'cell_level': report.report_cell_level or 3,
+            'output_format': self.start.graph_type_report or 'pdf',
             }
         return action, data
 

@@ -434,6 +434,10 @@ msgctxt "field:babi.open_chart.start,graph_type:"
 msgid "Graph"
 msgstr "Gràfica"
 
+msgctxt "field:babi.open_chart.start,graph_type_report:"
+msgid "Report Format"
+msgstr "Format informe"
+
 msgctxt "field:babi.open_chart.start,id:"
 msgid "ID"
 msgstr "ID"

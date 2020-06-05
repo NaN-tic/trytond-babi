@@ -1,55 +1,27 @@
 {% extends 'babi/report/base.html' %}
 
-{% block custom_style %}
+{% block style %}
 <style type="text/css">
-  @page {
-    size: landscape;
-    @top-left {
-      content: "{{ company.render.rec_name }}. {{ company.party.render.vat_code }}";
-    }
-    @top-right {
-      content: "{{ data['report_options']['now']|render }}";
-    }
-    @bottom-right {
-      content: counter(page) " / " counter(pages);
-    }
+@page {
+  @top-left {
+    content: "{{ company.render.rec_name }}. {{ company.party.render.vat_code }}";
   }
-  hr {
-    border-top: 1px solid #000;
+  @top-right {
+    content: "{{ data['report_options']['now']|render }}";
   }
-  .h3 {
-    font-size: 14px;
+}
+
+@media print {
+  #header-details {
+    display: none;
   }
+}
+
+@media screen {
   body {
-    font-family: 'Arial';
-    font-size: 9px;
+    font-size: 12px !important;
   }
-  .page-break {
-    padding-top: 10px;
-    page-break-before: always;
-  }
-  .top20 {
-    padding-top: 20px;
-  }
-  thead > tr > th {
-    border-bottom: solid 1px #000 !important;
-  }
-  tbody tr {
-    page-break-inside: avoid;
-  }
-  table.no-border td {
-    border: 0px;
-  }
-  .border-cell-active {
-    border-top: solid 1px #999 !important;
-  }
-  .border-cell {
-    border-top: 0px !important;
-  }
-  #footer {
-    position: fixed;
-    bottom: 0;
-  }
+}
 </style>
 {% endblock %}
 
@@ -57,12 +29,11 @@
   {{ data['report_name'] }}
 {% endblock %}
 
-
 {% macro draw_table(record, before) %}
   {% set current = [] %}
   {% set total_columns = data['headers']|length %}
   {% set cell_level = data['report_options']['cell_level'] %}
-  <tr class="table-striped">
+  <tr>
     {% for header in data['headers'] %}
       {% set internal_name = header['internal_name'] %}
       {% set val = record['record'][internal_name] %}
@@ -72,16 +43,9 @@
       {% set group_by = header['group_by'] %}
       {% set text_align = header['text-align'] %}
       {% do current.append(val_render) %}
-      {% if current|length <=  cell_level %}
-        <th class="border text-{{text_align }}">{% if type == 'measure' or not group_by or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
-        </th>
-
-      {% else %}
-        <td class="text-{{ text_align }}">{% if type == 'measure' or not group_by or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
-      </td>
-    {% endif %}
-
-    {% endfor %}
+      <td class="border-cell{% if current|length > cell_level or not val_render in before or total_columns == current|length or val_render == None or type == 'measure' %}-active{% endif %}
+      text-{{ text_align }}">{% if type == 'measure' or not group_by or not val_render in before or total_columns == current|length %}{{ val_render or '' }}{% endif %}
+    </td>{% endfor %}
   </tr>
     {% if record['childs'] %}
       {% for child in record['childs'] %}
@@ -95,7 +59,11 @@
 
       <div class="row">
         <div class="col-md-12">
-          <h1>{{ data['report_name'] }}</h1>
+          <h2>{{ data['report_name'] }}</h2>
+          <span id="header-details">
+            {{ company.render.rec_name }}. {{ company.party.render.vat_code }}<br/>
+            {{ data['report_options']['now']|render }}<br/>
+          </span>
           {% for item in data['filters'] %}
              {{ item }}<br>
           {% endfor %}
@@ -104,7 +72,7 @@
 
       <div class="row">
         <div class="col-md-12">
-          <table class="table-striped">
+          <table class="table no-border bottom2px top2px">
             <thead>
               {% for header in data['headers'] %}
                 {% set key = header['internal_name'] %}
