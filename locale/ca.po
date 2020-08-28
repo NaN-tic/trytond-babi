@@ -1396,7 +1396,7 @@ msgid "Calculated"
 msgstr "Calcul·lat"
 
 msgctxt "selection:babi.report.execution,state:"
-msgid "Canceled"
+msgid "Cancelled"
 msgstr "Cancelat"
 
 msgctxt "selection:babi.report.execution,state:"

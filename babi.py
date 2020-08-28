@@ -1012,7 +1012,7 @@ class ReportExecution(ModelSQL, ModelView):
             ('calculated', 'Calculated'),
             ('timeout', 'Timeout'),
             ('failed', 'Failed'),
-            ('canceled', 'Canceled'),
+            ('cancelled', "Cancelled"),
             ], 'State', required=True, readonly=True)
     timeout = fields.Integer('Timeout', required=True, readonly=True,
         help='If report calculation should take more than the specified '
@@ -1045,6 +1045,18 @@ class ReportExecution(ModelSQL, ModelView):
                         ~Eval('pid', False)),
                     },
                 })
+
+    @classmethod
+    def __register__(cls, module_name):
+        cursor = Transaction().connection.cursor()
+        sql_table = cls.__table__()
+
+        super(ReportExecution, cls).__register__(module_name)
+
+        # Migration from 5.6: rename state canceled to cancelled
+        cursor.execute(*sql_table.update(
+                [sql_table.state], ['cancelled'],
+                where=sql_table.state == 'canceled'))
 
     @staticmethod
     def default_date():
@@ -1122,7 +1134,7 @@ class ReportExecution(ModelSQL, ModelView):
             if not execution.pid:
                 continue
             os.kill(execution.pid, 15)
-            execution.state = 'canceled'
+            execution.state = 'cancelled'
             execution.save()
 
     @classmethod

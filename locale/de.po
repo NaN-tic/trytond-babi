@@ -1408,7 +1408,7 @@ msgid "Calculated"
 msgstr "Berechnet"
 
 msgctxt "selection:babi.report.execution,state:"
-msgid "Canceled"
+msgid "Cancelled"
 msgstr "Abgebrochen"
 
 msgctxt "selection:babi.report.execution,state:"
