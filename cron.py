@@ -21,13 +21,6 @@ class Cron(metaclass=PoolMeta):
         ])
 
     @classmethod
-    def create(cls, vlist):
-        for vals in vlist:
-            if 'babi_report' in vals:
-                vals['args'] = '(%s,)' % vals['babi_report']
-        return super(Cron, cls).create(vlist)
-
-    @classmethod
     def default_get(cls, fields, with_rec_name=True):
         User = Pool().get('res.user')
         res = super(Cron, cls).default_get(fields, with_rec_name)
