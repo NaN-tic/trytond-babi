@@ -537,6 +537,22 @@ contains the full copyright notices and license terms. -->
             <field name="group" ref="group_babi_admin"/>
         </record>
 
+        <record model="ir.action.act_window" id="act_babi_report_cron_form">
+            <field name="name">Crons</field>
+            <field name="res_model">ir.cron</field>
+            <field name="domain" eval="[('babi_report', 'in', Eval('active_ids'))]"
+                pyson="1"/>
+        </record>
+        <record model="ir.action.keyword" id="act_open_babi_report_cron_keyword1">
+            <field name="keyword">form_relate</field>
+            <field name="model">babi.report,-1</field>
+            <field name="action" ref="act_babi_report_cron_form"/>
+        </record>
+        <record model="ir.action-res.group" id="act_babi_report_cron_form-group_babi_admin">
+            <field name="action" ref="act_babi_report_cron_form"/>
+            <field name="group" ref="res.group_admin"/>
+        </record>
+
         <!-- babi.report.execution -->
         <record model="ir.ui.view" id="babi_execution_form_view">
             <field name="model">babi.report.execution</field>
