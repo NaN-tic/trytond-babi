@@ -906,15 +906,11 @@ class Report(ModelSQL, ModelView):
             }
 
     @classmethod
-    def calculate_babi_report(cls, args=None):
-        """This method is intended to be called from ir.cron"""
+    def calculate_babi_report(cls, reports):
+        """Calculate reports and send email (from cron)"""
         HTMLReport = Pool().get('babi.report.html_report', type='report')
 
-        if not args:
-            args = []
-        reports = cls.search([('id', '=', args)])
         executions = cls.calculate(reports)
-
         for execution in executions:
             if not execution.report.email:
                 continue
@@ -929,6 +925,7 @@ class Report(ModelSQL, ModelView):
                 'cell_level': execution.report.report_cell_level or 3,
                 }
             report = HTMLReport.execute(records, data)
+
             if report:
                 msg = MIMEMultipart()
                 msg['To'] = execution.report.to
@@ -945,9 +942,10 @@ class Report(ModelSQL, ModelView):
                     server = execution.report.smtp
                     to_addrs = [a for _, a in getaddresses([execution.report.to])]
                     server.send_mail(msg['From'], to_addrs, msg.as_string())
+                    logger.info('Send email report: %s' % (execution.report.rec_name))
                 except Exception as exception:
-                    logger.error('Unable to deliver email (%s):\n %s'
-                        % (exception, msg.as_string()))
+                    logger.error('Unable to delivery email report: %s:\n %s' % (
+                        execution.report.rec_name, exception))
 
     def execute(self, execution):
         Execution = Pool().get('babi.report.execution')
@@ -978,8 +976,8 @@ class Report(ModelSQL, ModelView):
     @ModelView.button
     def calculate(cls, reports):
         Execution = Pool().get('babi.report.execution')
-        executions = []
 
+        executions = []
         for report in reports:
             if not report.measures:
                 raise UserError(gettext('babi.no_measures',
@@ -991,6 +989,7 @@ class Report(ModelSQL, ModelView):
             Transaction().commit()
             executions.append(execution)
             report.execute(execution)
+        return executions
 
 
 class ReportExecution(ModelSQL, ModelView):
