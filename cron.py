@@ -1,8 +1,7 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from trytond.model import fields
+from trytond.model import fields, dualmethod
 from trytond.pool import Pool, PoolMeta
-from trytond.pyson import Eval, Bool
 from trytond.transaction import Transaction
 
 __all__ = ['Cron']
@@ -32,3 +31,12 @@ class Cron(metaclass=PoolMeta):
             res['repeat_missed'] = False
             res['function'] = 'babi.report|calculate_babi_report'
         return res
+
+    @dualmethod
+    def run_once(cls, crons):
+        BabiReport = Pool().get('babi.report')
+
+        babi_crons = [cron for cron in crons if cron.babi_report]
+        if babi_crons:
+            BabiReport.calculate_babi_report([c.babi_report for c in babi_crons])
+        return super(Cron, cls).run_once(list(set(crons) - set(babi_crons)))
