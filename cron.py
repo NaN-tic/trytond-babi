@@ -37,6 +37,9 @@ class Cron(metaclass=PoolMeta):
         BabiReport = Pool().get('babi.report')
 
         babi_crons = [cron for cron in crons if cron.babi_report]
-        if babi_crons:
-            BabiReport.calculate_babi_report([c.babi_report for c in babi_crons])
+        for cron in babi_crons:
+            # babi execution require company. Run calculate when has a company
+            for company in cron.companies:
+                with Transaction().set_context(company=company.id):
+                    BabiReport.calculate_babi_report([cron.babi_report])
         return super(Cron, cls).run_once(list(set(crons) - set(babi_crons)))
