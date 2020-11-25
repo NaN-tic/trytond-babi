@@ -1432,7 +1432,7 @@ msgid "Calculate Babi Report"
 msgstr "Calcula l'informe Babi"
 
 msgctxt "selection:ir.cron,method:"
-msgid "Clean Babi Excutions"
+msgid "Clean Babi Executions"
 msgstr "Netejar execucions Babi"
 
 msgctxt "selection:ir.ui.menu,babi_type:"

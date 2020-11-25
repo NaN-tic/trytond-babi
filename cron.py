@@ -15,8 +15,8 @@ class Cron(metaclass=PoolMeta):
     def __setup__(cls):
         super(Cron, cls).__setup__()
         cls.method.selection.extend([
-            ('babi.report|calculate_babi_report', 'Calculate Babi Report'),
-            ('babi.report.execution|clean', 'Clean Babi Excutions'),
+            ('babi.report|calculate_reports', 'Calculate Babi Report'),
+            ('babi.report.execution|clean', 'Clean Babi Executions'),
         ])
 
     @classmethod
@@ -29,7 +29,7 @@ class Cron(metaclass=PoolMeta):
             res['user'] = admin_user.id
             res['interval_type'] = 'days'
             res['repeat_missed'] = False
-            res['function'] = 'babi.report|calculate_babi_report'
+            res['function'] = 'babi.report|calculate_reports'
         return res
 
     @dualmethod
@@ -41,5 +41,5 @@ class Cron(metaclass=PoolMeta):
             # babi execution require company. Run calculate when has a company
             for company in cron.companies:
                 with Transaction().set_context(company=company.id):
-                    BabiReport.calculate_babi_report([cron.babi_report])
+                    BabiReport.calculate_reports([cron.babi_report])
         return super(Cron, cls).run_once(list(set(crons) - set(babi_crons)))
