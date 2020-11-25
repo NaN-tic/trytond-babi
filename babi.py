@@ -905,12 +905,52 @@ class Report(ModelSQL, ModelView):
             'company': Transaction().context.get('company'),
             }
 
-    @classmethod
-    def calculate_babi_report(cls, reports):
-        """Calculate reports and send email (from cron)"""
-        HTMLReport = Pool().get('babi.report.html_report', type='report')
+    def execute(self, execution):
+        Execution = Pool().get('babi.report.execution')
 
-        executions = cls.calculate(reports)
+        transaction = Transaction()
+        user = transaction.user
+        database_name = transaction.database.name
+
+        logger.info('Babi execution %s (report "%s")' % (
+            execution.id, self.rec_name))
+
+        if celery and BABI_CELERY:
+            os.system(
+                '%s/celery call %s '
+                '--broker=%s --args=[%d,%d] --config="%s" --queue=%s' % (
+                    os.path.dirname(sys.executable),
+                    BABI_CELERY_TASK,
+                    CELERY_BROKER,
+                    execution.id,
+                    user,
+                    CELERY_CONFIG,
+                    database_name))
+        else:
+            # Fallback to synchronous mode if celery is not available
+            Execution.calculate([execution])
+
+        Execution = Pool().get('babi.report.execution')
+
+    @classmethod
+    def calculate_reports(cls, reports):
+        pool = Pool()
+        Execution = pool.get('babi.report.execution')
+        HTMLReport = pool.get('babi.report.html_report', type='report')
+
+        executions = []
+        for report in reports:
+            if not report.measures:
+                raise UserError(gettext('babi.no_measures',
+                    report=report.rec_name))
+            if not report.dimensions:
+                raise UserError(gettext('babi.no_dimensions',
+                    report=report.rec_name))
+            execution, = Execution.create([report.get_execution_data()])
+            Transaction().commit()
+            executions.append(execution)
+            report.execute(execution)
+
         for execution in executions:
             if not execution.report.email:
                 continue
@@ -946,50 +986,12 @@ class Report(ModelSQL, ModelView):
                 except Exception as exception:
                     logger.error('Unable to delivery email report: %s:\n %s' % (
                         execution.report.rec_name, exception))
-
-    def execute(self, execution):
-        Execution = Pool().get('babi.report.execution')
-
-        transaction = Transaction()
-        user = transaction.user
-        database_name = transaction.database.name
-
-        logger.info('Babi execution %s (report "%s")' % (
-            execution.id, self.rec_name))
-
-        if celery and BABI_CELERY:
-            os.system(
-                '%s/celery call %s '
-                '--broker=%s --args=[%d,%d] --config="%s" --queue=%s' % (
-                    os.path.dirname(sys.executable),
-                    BABI_CELERY_TASK,
-                    CELERY_BROKER,
-                    execution.id,
-                    user,
-                    CELERY_CONFIG,
-                    database_name))
-        else:
-            # Fallback to synchronous mode if celery is not available
-            Execution.calculate([execution])
+            return executions
 
     @classmethod
     @ModelView.button
     def calculate(cls, reports):
-        Execution = Pool().get('babi.report.execution')
-
-        executions = []
-        for report in reports:
-            if not report.measures:
-                raise UserError(gettext('babi.no_measures',
-                    report=report.rec_name))
-            if not report.dimensions:
-                raise UserError(gettext('babi.no_dimensions',
-                    report=report.rec_name))
-            execution, = Execution.create([report.get_execution_data()])
-            Transaction().commit()
-            executions.append(execution)
-            report.execute(execution)
-        return executions
+        cls.calculate_reports(reports)
 
 
 class ReportExecution(ModelSQL, ModelView):
