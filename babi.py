@@ -2029,7 +2029,7 @@ class OpenExecution(Wizard):
         model_name = context.get('active_model')
         if model_name == 'ir.ui.menu':
             menu = Menu(context.get('active_id'))
-            if menu.babi_type == 'history':
+            if menu.babi_type == 'history' and hasattr(self.select, 'report'):
                 report = self.select.report
                 execution = self.select.execution
                 view_type = self.select.view_type
