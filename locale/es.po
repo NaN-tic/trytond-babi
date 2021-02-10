@@ -1024,7 +1024,7 @@ msgstr "Dimensión de columna"
 
 msgctxt "model:ir.action,name:act_babi_execution"
 msgid "Executions"
-msgstr "Ejecuciónes"
+msgstr "Ejecuciones"
 
 msgctxt "model:ir.action,name:act_babi_expression"
 msgid "Expression"
@@ -1056,7 +1056,7 @@ msgstr "Informe"
 
 msgctxt "model:ir.action,name:act_babi_report_execution_form"
 msgid "Executions"
-msgstr "Ejecuciónes"
+msgstr "Ejecuciones"
 
 msgctxt "model:ir.action,name:clear_executions_wizard"
 msgid "Clean Executions"
