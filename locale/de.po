@@ -2,177 +2,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:babi.dimension:"
-msgid "Dimension name must be unique per report."
-msgstr "Dimensionsname muss pro Bericht eindeutig sein."
-
-msgctxt "error:babi.filter.parameter:"
-msgid ""
-"Parameter \"%(parameter)s\" not found in Domain nor in Python Expression of "
-"filter \"%(filter)s\"."
-msgstr ""
-"Parameter \"%(parameter)s\" nicht gefunden in der Domain oder Pythonausdruck"
-" von Filter \"%(filter)s\"."
-
-msgctxt "error:babi.measure:"
-msgid "Measure name must be unique per report."
-msgstr "Messgrössenname muss pro Bericht eindeutig sein."
-
-msgctxt "error:babi.open_chart:"
-msgid "Only one measure can be used in pie charts."
-msgstr "Nur eine Messgrösse kann in Kuchendiagrammen verwendet werden."
-
-msgctxt "error:babi.order:"
-msgid "Dimension must be unique per report."
-msgstr "Dimension muss pro Bericht eindeutig sein."
-
-msgctxt "error:babi.order:"
-msgid "Measure must be unique per report."
-msgstr "Messgrösse muss pro Bericht eindeutig sein."
-
-msgctxt "error:babi.order:"
-msgid "Only dimension or measure can be set."
-msgstr "Es kann nur Dimension oder Messgrösse verwendet werden."
-
-msgctxt "error:babi.order:"
-msgid "Order entries are created automatically"
-msgstr "Sortierungseinträge werden automatisch erstellt."
-
-msgctxt "error:babi.order:"
-msgid "Order entries are deleted automatically"
-msgstr "Sortierungseinträge werden automatisch gelöscht."
-
-msgctxt "error:babi.report-res.group:"
-msgid "Report and Group must be unique."
-msgstr "Bericht und Gruppe müssen eindeutig sein."
-
-msgctxt "error:babi.report.execution.open:"
-msgid ""
-"No execution found for current record. Execute the update data wizard in "
-"order to create one."
-msgstr ""
-"Keine Ausführung für den aktuellen Datensatz gefunden. Es muss eine über den"
-" Datenaktualisierungsassistenten erstellt werden."
-
-msgctxt "error:babi.report.execution.open:"
-msgid ""
-"No menus found for report %s. In order to view it's data you must create "
-"menu entries."
-msgstr ""
-"Keine Menüeinträge für Bericht %s gefunden. Um die Daten darstellen zu "
-"können, müssen zunächst Menüeinträge erstellt werden."
-
-msgctxt "error:babi.report.execution.open:"
-msgid ""
-"No parameter found for model %s.In order to view filtered data, parameter "
-"should be defined on the report filter."
-msgstr ""
-"Keine Parameter für Modell %s gefunden. Um die Daten darstellen zu können, "
-"sollten Parameter im Berichtsfilter definiert werden."
-
-msgctxt "error:babi.report.execution.open:"
-msgid "No report found for current execution"
-msgstr "Kein Bericht für die aktuelle Ausführung gefunden."
-
-msgctxt "error:babi.report.execution:"
-msgid ""
-"Execution \"%s\" has filter parameters  and you did not provide any of them."
-" Please execute it  from the menu."
-msgstr ""
-"Ausführung \"%s\" weist Filterparameter auf, es wurden aber keine angegeben."
-" Rufen Sie die Ausführung bitte über das Menü aus."
-
-msgctxt "error:babi.report.execution:"
-msgid "Execution \"%s\" has no dimensions. At least one is needed."
-msgstr ""
-"Ausführung \"%s\" hat keine Dimensionen definiert. Mindestens eine muss "
-"angegeben werden."
-
-msgctxt "error:babi.report.execution:"
-msgid "Execution \"%s\" has no measures. At least one is needed."
-msgstr ""
-"Ausführung \"%s\" hat keine Messgrössen definiert. Mindestens eine muss "
-"angegeben werden."
-
-msgctxt "error:babi.report:"
-msgid "Report \"%s\" has no dimensions. At least one is needed."
-msgstr "Bericht \"%s\" muss mindestens eine Dimension enthalten."
-
-msgctxt "error:babi.report:"
-msgid "Report \"%s\" has no measures. At least one is needed."
-msgstr ""
-"Bericht \"%s\" hat keine Messgrössen definiert. Mindestens eine muss "
-"agegeben werden."
-
-msgctxt "error:babi.report:"
-msgid "Report calculation exceeded timeout limit."
-msgstr "Berechnung des Berichts hat das Zeitlimit überschritten."
-
-msgctxt "error:babi_execution_10:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_11:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_12:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_13:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_1:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_2:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_3:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_4:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_5:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_6:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_7:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_8:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
-msgctxt "error:babi_execution_9:"
-msgid "Report \"%s\" no longer exists or you do not have the rights to access it."
-msgstr ""
-"Bericht \"%s\" existiert nicht mehr oder Sie haben keine Leseberechtigung.\n"
-
 msgctxt "field:babi.clean_executions.start,date:"
 msgid "Date"
 msgstr "Datum"
@@ -198,8 +27,12 @@ msgid "ID"
 msgstr "ID"
 
 msgctxt "field:babi.configuration,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
+
+msgctxt "field:babi.configuration,report_cell_level:"
+msgid "Cell Level"
+msgstr "Zellebene"
 
 msgctxt "field:babi.configuration,write_date:"
 msgid "Write Date"
@@ -238,7 +71,7 @@ msgid "Name"
 msgstr "Name"
 
 msgctxt "field:babi.dimension,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.dimension,report:"
@@ -290,7 +123,7 @@ msgid "Name"
 msgstr "Name"
 
 msgctxt "field:babi.dimension.column,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.dimension.column,report:"
@@ -321,6 +154,10 @@ msgctxt "field:babi.expression,create_uid:"
 msgid "Create User"
 msgstr "Erstellt durch"
 
+msgctxt "field:babi.expression,decimal_digits:"
+msgid "Decimal Digits"
+msgstr "Dezimalstellen"
+
 msgctxt "field:babi.expression,expression:"
 msgid "Expression"
 msgstr "Ausdruck"
@@ -342,7 +179,7 @@ msgid "Name"
 msgstr "Name"
 
 msgctxt "field:babi.expression,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.expression,related_model:"
@@ -402,7 +239,7 @@ msgid "Python Expression"
 msgstr "Pythonausdruck"
 
 msgctxt "field:babi.filter,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.filter,view_search:"
@@ -438,7 +275,7 @@ msgid "Name"
 msgstr "Name"
 
 msgctxt "field:babi.filter.parameter,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.filter.parameter,related_model:"
@@ -469,6 +306,10 @@ msgctxt "field:babi.internal.measure,create_uid:"
 msgid "Create User"
 msgstr "Erstellt durch"
 
+msgctxt "field:babi.internal.measure,decimal_digits:"
+msgid "Decimal Digits"
+msgstr "Nachkommastellen"
+
 msgctxt "field:babi.internal.measure,execution:"
 msgid "Report Execution"
 msgstr "Berichtsausführung"
@@ -494,7 +335,7 @@ msgid "Name"
 msgstr "Name"
 
 msgctxt "field:babi.internal.measure,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.internal.measure,related_model:"
@@ -508,6 +349,10 @@ msgstr "Reihenfolge"
 msgctxt "field:babi.internal.measure,ttype:"
 msgid "Field Type"
 msgstr "Feldtyp"
+
+msgctxt "field:babi.internal.measure,width:"
+msgid "Width"
+msgstr "Breite"
 
 msgctxt "field:babi.internal.measure,write_date:"
 msgid "Write Date"
@@ -550,7 +395,7 @@ msgid "Name"
 msgstr "Name"
 
 msgctxt "field:babi.measure,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.measure,report:"
@@ -634,7 +479,7 @@ msgid "Order"
 msgstr "Sortierung"
 
 msgctxt "field:babi.order,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.order,report:"
@@ -676,6 +521,10 @@ msgstr "Zeitplaner"
 msgctxt "field:babi.report,dimensions:"
 msgid "Dimensions"
 msgstr "Dimensionen"
+
+msgctxt "field:babi.report,email:"
+msgid "E-mail"
+msgstr "E-Mail"
 
 msgctxt "field:babi.report,executions:"
 msgid "Executions"
@@ -734,12 +583,28 @@ msgid "Parent Menu"
 msgstr "Übergeordneter Menüeintrag"
 
 msgctxt "field:babi.report,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
+
+msgctxt "field:babi.report,report_cell_level:"
+msgid "Cell Level"
+msgstr "Zellebene"
+
+msgctxt "field:babi.report,smtp:"
+msgid "SMTP"
+msgstr "SMTP"
+
+msgctxt "field:babi.report,subject:"
+msgid "Subject"
+msgstr "Betreff"
 
 msgctxt "field:babi.report,timeout:"
 msgid "Timeout"
 msgstr "Zeitlimit"
+
+msgctxt "field:babi.report,to:"
+msgid "To"
+msgstr "Bis"
 
 msgctxt "field:babi.report,write_date:"
 msgid "Write Date"
@@ -766,7 +631,7 @@ msgid "ID"
 msgstr "ID"
 
 msgctxt "field:babi.report-res.group,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.report-res.group,report:"
@@ -830,7 +695,7 @@ msgid "Pid"
 msgstr "PID"
 
 msgctxt "field:babi.report.execution,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.report.execution,report:"
@@ -906,7 +771,7 @@ msgid "ID"
 msgstr "ID"
 
 msgctxt "field:babi.test,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Name"
 
 msgctxt "field:babi.test,write_date:"
@@ -924,822 +789,6 @@ msgstr "ID"
 msgctxt "field:babi.update_data.wizard.start,id:"
 msgid "ID"
 msgstr "ID"
-
-msgctxt "field:babi_execution_1,babi_dimension_52:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_1,babi_dimension_53:"
-msgid "Day"
-msgstr "Tag(e)"
-
-msgctxt "field:babi_execution_1,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_1,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_1,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_1,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_1,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_1,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_1,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_1,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_1,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_1,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_1,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_10,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_10,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_10,babi_dimension_91:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_10,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_10,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_10,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_10,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_10,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_10,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_10,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_10,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_10,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_10,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_10,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_10,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_10,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_11,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_11,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_11,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_11,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_11,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_11,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_11,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_11,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_11,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_11,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_11,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_11,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_11,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_11,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_11,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_12,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_12,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_12,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_12,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_12,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_12,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_12,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_12,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_12,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_12,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_12,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_12,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_12,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_12,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_12,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_13,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_13,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_13,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_13,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_13,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_13,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_13,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_13,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_13,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_13,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_13,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_13,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_13,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_13,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_13,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_2,babi_dimension_74:"
-msgid "Party"
-msgstr "Partei"
-
-msgctxt "field:babi_execution_2,babi_dimension_75:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_2,babi_dimension_76:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_2,babi_dimension_77:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_2,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_2,babi_measure_40:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_2,babi_measure_41:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_2,babi_measure_49:"
-msgid "Discount Average"
-msgstr "Rabatt Mittelwert"
-
-msgctxt "field:babi_execution_2,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_2,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_2,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_2,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_2,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_2,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_2,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_2,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_2,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_2,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_3,babi_dimension_78:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_3,babi_dimension_79:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_3,babi_dimension_80:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_3,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_3,babi_measure_42:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_3,babi_measure_43:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_3,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_3,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_3,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_3,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_3,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_3,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_3,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_3,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_3,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_3,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_4,babi_dimension_78:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_4,babi_dimension_79:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_4,babi_dimension_80:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_4,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_4,babi_measure_42:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_4,babi_measure_43:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_4,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_4,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_4,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_4,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_4,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_4,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_4,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_4,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_4,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_4,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_5,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_5,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_5,babi_dimension_91:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_5,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_5,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_5,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_5,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_5,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_5,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_5,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_5,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_5,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_5,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_5,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_5,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_5,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_6,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_6,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_6,babi_dimension_91:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_6,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_6,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_6,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_6,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_6,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_6,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_6,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_6,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_6,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_6,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_6,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_6,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_6,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_7,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_7,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_7,babi_dimension_91:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_7,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_7,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_7,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_7,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_7,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_7,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_7,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_7,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_7,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_7,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_7,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_7,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_7,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_8,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_8,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_8,babi_dimension_91:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_8,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_8,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_8,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_8,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_8,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_8,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_8,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_8,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_8,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_8,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_8,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_8,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_8,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
-
-msgctxt "field:babi_execution_9,babi_dimension_89:"
-msgid "Product"
-msgstr "Variante"
-
-msgctxt "field:babi_execution_9,babi_dimension_90:"
-msgid "Year"
-msgstr "Jahr"
-
-msgctxt "field:babi_execution_9,babi_dimension_91:"
-msgid "Month"
-msgstr "Monat"
-
-msgctxt "field:babi_execution_9,babi_group:"
-msgid "Group"
-msgstr "Gruppe"
-
-msgctxt "field:babi_execution_9,babi_measure_50:"
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgctxt "field:babi_execution_9,babi_measure_51:"
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgctxt "field:babi_execution_9,children:"
-msgid "Children"
-msgstr "Untergeordnet"
-
-msgctxt "field:babi_execution_9,create_date:"
-msgid "Create Date"
-msgstr "Erstellungsdatum"
-
-msgctxt "field:babi_execution_9,create_uid:"
-msgid "Create User"
-msgstr "Erstellt durch"
-
-msgctxt "field:babi_execution_9,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:babi_execution_9,parent:"
-msgid "Parent"
-msgstr "Übergeordnet"
-
-msgctxt "field:babi_execution_9,parent_left:"
-msgid "Parent Left"
-msgstr "Übergeordnet Links"
-
-msgctxt "field:babi_execution_9,parent_right:"
-msgid "Parent Right"
-msgstr "Übergeordnet Rechts"
-
-msgctxt "field:babi_execution_9,rec_name:"
-msgid "Name"
-msgstr "Name"
-
-msgctxt "field:babi_execution_9,write_date:"
-msgid "Write Date"
-msgstr "Zuletzt geändert"
-
-msgctxt "field:babi_execution_9,write_uid:"
-msgid "Write User"
-msgstr "Letzte Änderung durch"
 
 msgctxt "field:ir.action.act_window,babi_report:"
 msgid "BABI Report"
@@ -1768,6 +817,10 @@ msgstr "BABI Bericht"
 msgctxt "field:ir.ui.menu,babi_type:"
 msgid "BABI Type"
 msgstr "BABI Typ"
+
+msgctxt "help:babi.configuration,report_cell_level:"
+msgid "Start cell level that not has indentation"
+msgstr "Startzellebene ohne Einrückung"
 
 msgctxt "help:babi.dimension,width:"
 msgid "Width report columns (%)"
@@ -1823,6 +876,12 @@ msgctxt "help:babi.measure,width:"
 msgid "Width report columns (%)"
 msgstr "Breite Berichtsspalten (%)"
 
+msgctxt "help:babi.report,email:"
+msgid "Mark to see the options to send an email when executing the cron"
+msgstr ""
+"Aktivieren um die Optionen für den E-Mail-Versand bei Zeitplanerausführung "
+"anzuzeigen"
+
 msgctxt "help:babi.report,groups:"
 msgid "User groups that will be able to see use this report."
 msgstr "Benutzergruppen die diesen Bericht einsehen können."
@@ -1834,6 +893,10 @@ msgstr "Modell zur Datenextraktion"
 msgctxt "help:babi.report,name:"
 msgid "New virtual model name."
 msgstr "Name des neuen virtuellen Modells"
+
+msgctxt "help:babi.report,report_cell_level:"
+msgid "Start cell level that not has indentation"
+msgstr "Startzellenebene ohne Einrückung"
 
 msgctxt "help:babi.report,timeout:"
 msgid ""
@@ -1943,9 +1006,9 @@ msgctxt "model:babi.update_data.wizard.start,name:"
 msgid "Update Data Wizard Start"
 msgstr "Assitent Datenaktualisierung Start"
 
-msgctxt "model:babi_execution_1,name:"
-msgid "Sales by Year - Month - Day"
-msgstr "Verkäufe nach Jahr - Monat - Tag"
+msgctxt "model:ir.action,name:"
+msgid "Babi Report"
+msgstr "BABI Bericht"
 
 msgctxt "model:ir.action,name:act_babi_configuration_form"
 msgid "Business Intelligence Configuration"
@@ -2007,13 +1070,126 @@ msgctxt "model:ir.action,name:open_execution_wizard"
 msgid "Business Intelligence Report"
 msgstr "Business Intelligence Bericht"
 
-msgctxt "model:ir.action,name:report_babi_execution"
+msgctxt "model:ir.action,name:report_babi_html_report"
 msgid "Babi Report"
 msgstr "BABI Bericht"
 
-msgctxt "model:ir.cron,name:cron_clean_executions"
-msgid "Cron Clean Executions"
-msgstr "Zeitplaner BI Ausführungen reinigen"
+msgctxt "model:ir.message,text:cannot_create_order_entry"
+msgid "Order entries are created automatically"
+msgstr "Sortiereinträge werden automatisch erstellt"
+
+msgctxt "model:ir.message,text:cannot_remove_order_entry"
+msgid "Order entries are deleted automatically"
+msgstr "Sortiereinträge werden automatisch gelöscht"
+
+msgctxt "model:ir.message,text:false"
+msgid "False"
+msgstr "Falsch"
+
+msgctxt "model:ir.message,text:filter_parameters"
+msgid ""
+"Execution \"%(execution)s\" has filter parameters and you did not provide "
+"any of them. Please execute it from the menu."
+msgstr ""
+"Ausführung \"%(execution)s\" weist Filterparameter auf, es wurden aber keine"
+" angegeben. Bitte rufen Sie die Ausführung über das Menü aus."
+
+msgctxt "model:ir.message,text:no_dimensions"
+msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
+msgstr ""
+"Bericht \"%(report)s\" hat keine Dimensionen. Wenigstens eine wird benötigt."
+
+msgctxt "model:ir.message,text:no_execution"
+msgid ""
+"No execution found for current record. Execute the update data wizard in "
+"order to create one."
+msgstr ""
+"Keine Ausführung für den aktuellen Datensatz gefunden. Es muss eine über den"
+" Datenaktualisierungsassistenten erstellt werden."
+
+msgctxt "model:ir.message,text:no_measures"
+msgid "Report \"%(report)s\" has no measures. At least one is needed."
+msgstr ""
+"Bericht \"%(report)s\" hat keine Messgrößen definiert. Wenigstens eine wird "
+"benötigt."
+
+msgctxt "model:ir.message,text:no_menus"
+msgid ""
+"No menus found for report %(report)s. In order to view its data you must "
+"create menu entries."
+msgstr ""
+"Kein Menüeintrag für Bericht %(report)s gefunden. Um die Resultate ansehen "
+"zu können müssen Menüeinträge erstellt werden."
+
+msgctxt "model:ir.message,text:no_report"
+msgid "No report found for current execution"
+msgstr "Keine Bericht für aktuelle Ausführung gefunden"
+
+msgctxt "model:ir.message,text:one_measure_in_pie_charts"
+msgid "Only one measure can be used in pie charts"
+msgstr "Nur eine Messgrösse kann in Kuchendiagrammen verwendet werden."
+
+msgctxt "model:ir.message,text:parameter_not_found"
+msgid ""
+"Parameter \"%(parameter)s\" not found in Domain nor in Python Expression of "
+"filter \"%(filter)s\"."
+msgstr ""
+"Parameter \"%(parameter)s\" weder in Domain noch in Pythonausdruck von "
+"Filter \"%(filter)s\" gefunden."
+
+msgctxt "model:ir.message,text:report_modification_warning"
+msgid ""
+"Report \"%(report)s\" will be renamed, but if you want to also rename the "
+"menus you should create the menus again. Are you sure you want to continue "
+"with this action?"
+msgstr ""
+"Bericht \"%(report)s\" wird umbenannt, aber wenn die Menüs auch umbenannnt werden sollen müssen sie neu erstellt werden.\n"
+"Fortfahren?"
+
+msgctxt "model:ir.message,text:report_not_exists"
+msgid ""
+"Report \"%(report)s\" no longer exists or you do not have the rights to "
+"access it."
+msgstr ""
+"Bericht \"%(report)s\" existiert nicht mehr oder es fehlen die "
+"Leseberechtigungen dafür."
+
+msgctxt "model:ir.message,text:timeout_exception"
+msgid ""
+"Report \"%(report)s\" will be renamed, but if you want to also rename the "
+"menus you should create the menus again. Are you sure you want to continue "
+"with this action?"
+msgstr ""
+"Bericht \"%(report)s\" wird umbenannt, aber wenn die Menüs auch umbenannnt werden sollen müssen sie neu erstellt werden.\n"
+"Fortfahren?"
+
+msgctxt "model:ir.message,text:true"
+msgid "True"
+msgstr "Wahr"
+
+msgctxt "model:ir.model.button,string:babi_execution_cancel_button"
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgctxt "model:ir.model.button,string:babi_execution_open_button"
+msgid "Open"
+msgstr "Öffnen"
+
+msgctxt "model:ir.model.button,string:babi_report_calculate_button"
+msgid "Calculate"
+msgstr "Berechnen"
+
+msgctxt "model:ir.model.button,string:babi_report_create_menus_button"
+msgid "Create Menus"
+msgstr "Menüeintrag erstellen"
+
+msgctxt "model:ir.model.button,string:babi_report_remove_menus_button"
+msgid "Remove Menus"
+msgstr "Menüeinträge entfernen"
+
+msgctxt "model:ir.rule.group,name:rule_group_babi_execution"
+msgid "Babi Execution"
+msgstr "Babi Ausführung"
 
 msgctxt "model:ir.ui.menu,name:menu_babi"
 msgid "Business Intelligence"
@@ -2062,10 +1238,6 @@ msgstr "Business Intelligence"
 msgctxt "model:res.group,name:group_babi_admin"
 msgid "Business Intelligence Administration"
 msgstr "Business Intelligence Administration"
-
-msgctxt "model:res.user,name:user_clean_executions"
-msgid "Cron Clean Babi Executions"
-msgstr "Zeitplaner BI Ausführungen reinigen"
 
 msgctxt "selection:babi.expression,ttype:"
 msgid "Boolean"
@@ -2263,9 +1435,17 @@ msgctxt "selection:babi.report.execution.open.select,view_type:"
 msgid "Tree"
 msgstr "Baum"
 
+msgctxt "selection:ir.cron,method:"
+msgid "Calculate Babi Report"
+msgstr "BI Bericht berechnen"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Clean Babi Excutions"
+msgstr "Babi Ausführungen aufräumen"
+
 msgctxt "selection:ir.ui.menu,babi_type:"
 msgid ""
-msgstr " "
+msgstr ""
 
 msgctxt "selection:ir.ui.menu,babi_type:"
 msgid "History"
@@ -2282,10 +1462,6 @@ msgstr "Baum"
 msgctxt "selection:ir.ui.menu,babi_type:"
 msgid "Wizard"
 msgstr "Assistent"
-
-msgctxt "view:babi.clean_executions.start:"
-msgid "Clean Executions"
-msgstr "Ausführungen löschen"
 
 msgctxt "view:babi.clean_executions.start:"
 msgid "Clean babi execution data until"
@@ -2324,24 +1500,21 @@ msgid "Measure"
 msgstr "Messgrösse"
 
 msgctxt "view:babi.open_chart.start:"
-msgid "Adjust width on dimension and mesures."
-msgstr "Breite in Dimensionen und Messgrößen anpassen"
-
-msgctxt "view:babi.open_chart.start:"
-msgid "Not recomended when report has dimension columns."
-msgstr "Nicht empfohlen, wenn der Bericht Spaltendimensionen aufweist."
-
-msgctxt "view:babi.open_chart.start:"
-msgid "Report"
-msgstr "Bericht"
+msgid "Not recommended when report has dimension columns."
+msgstr "Nicht empfohlen wenn ein Bericht Dimensionsspalten aufweist."
 
 msgctxt "view:babi.open_chart.start:"
 msgid "This is an autogenerated report."
 msgstr "Dies ist ein automatisch erstellter Bericht."
 
 msgctxt "view:babi.open_chart.start:"
-msgid "This report could not fit correctly on a page."
-msgstr "Der Bericht passt nicht auf die Seite."
+msgid "This report may not fit correctly on a page."
+msgstr "Dieser Bericht pass möglicherweise nicht korrekt auf eine Seite."
+
+msgctxt "view:babi.open_chart.start:"
+msgid "You can adjust width on report dimensions and mesures."
+msgstr ""
+"Die Breite kann in den Berichtabmessungen und Messgrößen eingestellt werden."
 
 msgctxt "view:babi.order:"
 msgid "Order"
@@ -2352,32 +1525,12 @@ msgid "Open Execution"
 msgstr "Ausführung öffnen"
 
 msgctxt "view:babi.report.execution:"
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgctxt "view:babi.report.execution:"
-msgid "Execution"
-msgstr "Ausführung"
-
-msgctxt "view:babi.report.execution:"
-msgid "Open"
-msgstr "Öffnen"
-
-msgctxt "view:babi.report.execution:"
 msgid "Time"
 msgstr "Zeit"
 
 msgctxt "view:babi.report.execution:"
 msgid "s"
 msgstr "s"
-
-msgctxt "view:babi.report:"
-msgid "Calculate"
-msgstr "Berechnen"
-
-msgctxt "view:babi.report:"
-msgid "Create Menus"
-msgstr "Menüeinträge erstellen"
 
 msgctxt "view:babi.report:"
 msgid "Executions"
@@ -2392,20 +1545,8 @@ msgid "General"
 msgstr "Allgemein"
 
 msgctxt "view:babi.report:"
-msgid "Remove Menus"
-msgstr "Menüeinträge entfernen"
-
-msgctxt "view:babi.report:"
-msgid "Report"
-msgstr "Bericht"
-
-msgctxt "view:babi.report:"
 msgid "Schedulers"
 msgstr "Zeitplaner"
-
-msgctxt "view:babi.update_data.wizard.done:"
-msgid "Report Calculation Done"
-msgstr "Berichtsberechnung Start"
 
 msgctxt "view:babi.update_data.wizard.done:"
 msgid "The data for the report has been calculated"
@@ -2414,10 +1555,6 @@ msgstr "Die Berichtsdaten wurden berechnet."
 msgctxt "view:babi.update_data.wizard.start:"
 msgid "Note that this operation may take a few minutes."
 msgstr "Dieser Vorgang kann einige Zeit in Anspruch nehmen."
-
-msgctxt "view:babi.update_data.wizard.start:"
-msgid "Report Calculation"
-msgstr "Berichtsberechnung"
 
 msgctxt "view:babi.update_data.wizard.start:"
 msgid "The data for the report will be calculated"
@@ -2470,13 +1607,3 @@ msgstr "Abbrechen"
 msgctxt "wizard_button:babi.report.execution.open,update_start,update:"
 msgid "Ok"
 msgstr "OK"
-
-msgctxt "error:babi.report:"
-msgid ""
-"Report \"%s\" will be renamed, but if you want to also rename the menus you "
-"should create the menus again. Are you sure you want to continue with this "
-"action?"
-msgstr ""
-"Der Bericht \"%s\" wird umbenannt, aber wenn Sie auch die Menüs umbenennen "
-"möchten, sollten Sie die Menüs erneut erstellen. Sind Sie sicher, dass Sie "
-"mit dieser Aktion fortfahren möchten?"
