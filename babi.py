@@ -910,7 +910,8 @@ class Report(ModelSQL, ModelView):
         """Calculate reports and send email (from cron)"""
         HTMLReport = Pool().get('babi.report.html_report', type='report')
 
-        executions = cls.calculate(reports)
+        cls.calculate(reports)
+        executions = [r.last_execution for r in reports]
         for execution in executions:
             if not execution.report.email:
                 continue
@@ -977,7 +978,6 @@ class Report(ModelSQL, ModelView):
     def calculate(cls, reports):
         Execution = Pool().get('babi.report.execution')
 
-        executions = []
         for report in reports:
             if not report.measures:
                 raise UserError(gettext('babi.no_measures',
@@ -987,9 +987,7 @@ class Report(ModelSQL, ModelView):
                     report=report.rec_name))
             execution, = Execution.create([report.get_execution_data()])
             Transaction().commit()
-            executions.append(execution)
             report.execute(execution)
-        return executions
 
 
 class ReportExecution(ModelSQL, ModelView):
