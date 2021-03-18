@@ -3,13 +3,17 @@
 from trytond.model import fields, dualmethod
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
+from trytond.pyson import Eval
 
 __all__ = ['Cron']
 
 
 class Cron(metaclass=PoolMeta):
     __name__ = "ir.cron"
-    babi_report = fields.Many2One('babi.report', 'Babi Report')
+    babi_report = fields.Many2One('babi.report', 'Babi Report',
+        states={'invisible': Eval('method')
+            != 'babi.report|calculate_babi_report'},
+        depends=['method'])
 
     @classmethod
     def __setup__(cls):
@@ -31,6 +35,15 @@ class Cron(metaclass=PoolMeta):
             res['repeat_missed'] = False
             res['function'] = 'babi.report|calculate_babi_report'
         return res
+
+    @classmethod
+    def view_attributes(cls):
+        method = 'babi.report|calculate_babi_report'
+        return super().view_attributes() + [
+            ('//label[@name="babi_report"]', 'states', {
+                    'invisible': Eval('method') != method,
+                    }),
+            ]
 
     @dualmethod
     def run_once(cls, crons):

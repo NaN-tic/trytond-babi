@@ -3,6 +3,12 @@
 contains the full copyright notices and license terms. -->
 <tryton>
     <data>
+        <record model="ir.ui.view" id="cron_view_form">
+            <field name="model">ir.cron</field>
+            <field name="inherit" ref="ir.cron_view_form"/>
+            <field name="name">cron_form</field>
+        </record>
+
         <record model="ir.model.access" id="access_babi_cron">
             <field name="model" search="[('model', '=', 'ir.cron')]"/>
             <field name="group" ref="group_babi"/>
