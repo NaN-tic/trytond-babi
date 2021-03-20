@@ -663,17 +663,6 @@ contains the full copyright notices and license terms. -->
             <field name="name">Clean Executions</field>
             <field name="wiz_name">babi.clean_executions</field>
         </record>
-        <record model="res.user" id="user_clean_executions">
-            <field name="login">user_clean_executions</field>
-            <field name="name">Cron Clean Babi Executions</field>
-            <field name="signature"></field>
-            <field name="active" eval="False"/>
-        </record>
-        <record model="res.user-res.group"
-                id="user_clean_execution_group_babi_admin">
-            <field name="user" ref="user_clean_executions"/>
-            <field name="group" ref="group_babi_admin"/>
-        </record>
 
         <record model="ir.cron" id="cron_clean_executions">
             <field name="active" eval="True"/>
