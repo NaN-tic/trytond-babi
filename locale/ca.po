@@ -724,7 +724,7 @@ msgstr "Informe"
 
 msgctxt "model:ir.action,name:act_babi_report_cron_form"
 msgid "Crons"
-msgstr ""
+msgstr "Crons"
 
 msgctxt "model:ir.action,name:act_babi_report_execution_form"
 msgid "Executions"
@@ -1056,11 +1056,11 @@ msgstr "Barres verticals"
 
 msgctxt "selection:babi.open_chart.start,graph_type_report:"
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 msgctxt "selection:babi.open_chart.start,graph_type_report:"
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgctxt "selection:babi.open_chart.start,interpolation:"
 msgid "Constant Center"
