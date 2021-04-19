@@ -48,8 +48,5 @@ this repository contains the full copyright notices and license terms. -->
         <record model="ir.message" id="false">
             <field name="text">False</field>
         </record>
-        <record model="ir.message" id="invalid_measures_type">
-            <field name="text">Measures: Invalid field type "%(ttype)s" for expression "%(expression)s" for aggregate "%(aggregate)s".</field>
-        </record>
     </data>
 </tryton>

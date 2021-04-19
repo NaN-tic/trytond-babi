@@ -704,20 +704,6 @@ class Report(ModelSQL, ModelView):
                 if execution.state == 'calculated' and not execution.filtered:
                     return execution.id
 
-    @fields.depends('measures')
-    def on_change_measures(self):
-        field_types_dict = dict(FIELD_TYPES)
-        aggregate_types_dict = dict(AGGREGATE_TYPES)
-        for measure in self.measures:
-            if measure and measure.aggregate in ('sum', 'avg'):
-                if (measure.expression and measure.expression.ttype
-                        not in ('integer', 'float', 'numeric')):
-                    raise UserError(
-                        gettext('babi.invalid_measures_type',
-                        ttype=field_types_dict.get(measure.expression.ttype),
-                        expression=measure.expression.name,
-                        aggregate=aggregate_types_dict.get(measure.aggregate)))
-
     @classmethod
     def write(cls, *args):
         actions = iter(args)
@@ -2237,7 +2223,11 @@ class Measure(ModelSQL, ModelView):
     expression = fields.Many2One('babi.expression', 'Expression',
         required=True, domain=[
             ('model', '=', Eval('_parent_report', {}).get('model', 0)),
-            ])
+            If(Eval('aggregate').in_(['sum', 'avg']), [
+                    ('ttype', 'in', ['integer', 'float', 'numeric']),
+                    ],
+                [])
+            ], depends=['aggregate'])
     aggregate = fields.Selection(AGGREGATE_TYPES, 'Aggregate', required=True)
     internal_measures = fields.One2Many('babi.internal.measure',
         'measure', 'Internal Measures')
