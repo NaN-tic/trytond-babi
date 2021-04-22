@@ -9,6 +9,7 @@ import sys
 import time
 import unicodedata
 import json
+import re
 
 from sql import Null, Column
 from sql.operators import Or
@@ -434,6 +435,34 @@ class Filter(ModelSQL, ModelView):
         if not searches:
             return None
         return searches[0].id
+
+    @classmethod
+    def validate(cls, filters):
+        super().validate(filters)
+        for filter in filters:
+            filter.check_paramenters()
+
+    def check_paramenters(self):
+        parameters_list = []
+        if self.parameters:
+            parameters_list = [p.name for p in self.parameters]
+
+        if self. python_expression:
+            expression_list = re.findall(r"\{([A-Za-z0-9_]+)\}",
+                self.python_expression)
+            for name in expression_list:
+                if name not in parameters_list:
+                    raise UserError(
+                        gettext('babi.invalid_parameters',
+                        key=name))
+
+        if self.domain:
+            domain_list = re.findall(r"\{([A-Za-z0-9_]+)\}", self.domain)
+            for name in domain_list:
+                if name not in parameters_list:
+                    raise UserError(
+                        gettext('babi.invalid_parameters',
+                        key=name))
 
 
 class FilterParameter(ModelSQL, ModelView):
@@ -1394,7 +1423,14 @@ class ReportExecution(ModelSQL, ModelView):
                 return str(x)
 
         with transaction.set_context(_datetime=None):
-            records = Model.search(domain, offset=index * offset, limit=offset)
+            try:
+                records = Model.search(domain, offset=index * offset,
+                    limit=offset)
+            except Exception as message:
+                raise UserError(gettext(
+                    'babi.create_data_exception',
+                    error=repr(message)))
+
         while records:
             checker.check()
             logger.info('Calculated %s,  %s records in %s seconds'
