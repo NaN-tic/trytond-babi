@@ -10,6 +10,8 @@ contains the full copyright notices and license terms. -->
     <field name="parent_menu" colspan="3"/>
     <label name="filter"/>
     <field name="filter" colspan="3"/>
+    <label name="babi_raise_user_error"/>
+    <field name="babi_raise_user_error"/>
     <notebook>
         <page id="general" string="General">
             <group col="1" colspan="2" id="dimensions" yfill="1" yexpand="1">
