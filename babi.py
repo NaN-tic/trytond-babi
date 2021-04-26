@@ -1287,7 +1287,12 @@ class ReportExecution(ModelSQL, ModelView):
                 if not value or filter_name not in expression:
                     continue
                 values[filter_name] = value
-            expression = expression.format(**values)
+            try:
+                expression = expression.format(**values)
+            except KeyError as message:
+                raise UserError(
+                    gettext('babi.invalid_parameters',
+                    key=str(message)))
         return expression
 
     def get_python_filter(self):

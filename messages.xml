@@ -57,5 +57,8 @@ this repository contains the full copyright notices and license terms. -->
             On type %(_type)s, with %(expression)s on record %(record)s.
             Exception: %(error)s</field>
         </record>
+        <record model="ir.message" id="invalid_parameters">
+            <field name="text">Key "%(key)s" in domain or in python expression is not in the parameters from filter of report.</field>
+        </record>
     </data>
 </tryton>
