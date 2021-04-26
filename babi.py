@@ -9,7 +9,6 @@ import sys
 import time
 import unicodedata
 import json
-import re
 
 from sql import Null, Column
 from sql.operators import Or
@@ -1436,7 +1435,6 @@ class ReportExecution(ModelSQL, ModelView):
                     try:
                         vals.append(sanitanize(babi_eval(x, record,
                             convert_none='zero')))
-                        import pdb; pdb.set_trace()
                     except Exception as message:
                         if self.report.babi_raise_user_error:
                             raise UserError(gettext(
