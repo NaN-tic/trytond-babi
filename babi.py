@@ -1405,9 +1405,10 @@ class ReportExecution(ModelSQL, ModelView):
                 records = Model.search(domain, offset=index * offset,
                     limit=offset)
             except Exception as message:
-                raise UserError(gettext(
-                    'babi.create_data_exception',
-                    error=repr(message)))
+                if self.report.babi_raise_user_error:
+                    raise UserError(gettext(
+                        'babi.create_data_exception',
+                        error=repr(message)))
 
         while records:
             checker.check()
@@ -1431,10 +1432,9 @@ class ReportExecution(ModelSQL, ModelView):
                     except Exception as message:
                         if self.report.babi_raise_user_error:
                             raise UserError(gettext(
-                                'babi.create_data_exception',
-                                _type='Dimensions',
+                                'babi.create_data_exception_dimension',
                                 expression=x[0],
-                                record=str(record),
+                                record=record.id,
                                 error=repr(message)))
                 for x in measure_expressions:
                     try:
@@ -1443,10 +1443,9 @@ class ReportExecution(ModelSQL, ModelView):
                     except Exception as message:
                         if self.report.babi_raise_user_error:
                             raise UserError(gettext(
-                                'babi.create_data_exception',
-                                _type='Measures',
+                                'babi.create_data_exception_measures',
                                 expression=x,
-                                record=str(record),
+                                record=record.id,
                                 error=repr(message)))
 
                 record = '|'.join(vals).replace('\n', ' ')
