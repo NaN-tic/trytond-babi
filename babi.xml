@@ -672,7 +672,7 @@ contains the full copyright notices and license terms. -->
         </record>
 
         <!-- Menus -->
-        <menuitem id="menu_babi" name="Business Intelligence" sequence="1"
+        <menuitem id="menu_babi" name="Business Intelligence" sequence="100"
             icon="tryton-graph"/>
         <menuitem id="menu_configuration" name="Configuration"
             parent="menu_babi" sequence="10" icon="tryton-settings"/>
