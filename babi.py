@@ -1290,9 +1290,11 @@ class ReportExecution(ModelSQL, ModelView):
             try:
                 expression = expression.format(**values)
             except KeyError as message:
-                raise UserError(
-                    gettext('babi.invalid_parameters',
-                    key=str(message)))
+                if self.report.babi_raise_user_error:
+                    raise UserError(
+                        gettext('babi.invalid_parameters',
+                        key=str(message)))
+                raise
         return expression
 
     def get_python_filter(self):
@@ -1409,6 +1411,7 @@ class ReportExecution(ModelSQL, ModelView):
                     raise UserError(gettext(
                         'babi.create_data_exception',
                         error=repr(message)))
+                raise
 
         while records:
             checker.check()
@@ -1436,6 +1439,7 @@ class ReportExecution(ModelSQL, ModelView):
                                 expression=x[0],
                                 record=record.id,
                                 error=repr(message)))
+                        raise
                 for x in measure_expressions:
                     try:
                         vals.append(sanitanize(babi_eval(x, record,
@@ -1447,6 +1451,7 @@ class ReportExecution(ModelSQL, ModelView):
                                 expression=x,
                                 record=record.id,
                                 error=repr(message)))
+                        raise
 
                 record = '|'.join(vals).replace('\n', ' ')
                 record.replace('\\', '')

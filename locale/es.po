@@ -280,7 +280,7 @@ msgstr "Acciones"
 
 msgctxt "field:babi.report,babi_raise_user_error:"
 msgid "Raise User Error"
-msgstr "Mostrar error al usuario"
+msgstr "Mostrar el error al usuario"
 
 msgctxt "field:babi.report,columns:"
 msgid "Dimensions on Columns"
