@@ -669,6 +669,8 @@ class Report(ModelSQL, ModelView):
         'invisible': Bool(~Eval('email')),
         'required': Bool(Eval('email')),
         }, depends=['email'])
+    babi_raise_user_error = fields.Boolean('Raise User Error',
+        help='Will raise a UserError in case of error in report.')
 
     @classmethod
     def __setup__(cls):
@@ -1285,7 +1287,14 @@ class ReportExecution(ModelSQL, ModelView):
                 if not value or filter_name not in expression:
                     continue
                 values[filter_name] = value
-            expression = expression.format(**values)
+            try:
+                expression = expression.format(**values)
+            except KeyError as message:
+                if self.report.babi_raise_user_error:
+                    raise UserError(
+                        gettext('babi.invalid_parameters',
+                        key=str(message)))
+                raise
         return expression
 
     def get_python_filter(self):
@@ -1394,7 +1403,16 @@ class ReportExecution(ModelSQL, ModelView):
                 return str(x)
 
         with transaction.set_context(_datetime=None):
-            records = Model.search(domain, offset=index * offset, limit=offset)
+            try:
+                records = Model.search(domain, offset=index * offset,
+                    limit=offset)
+            except Exception as message:
+                if self.report.babi_raise_user_error:
+                    raise UserError(gettext(
+                        'babi.create_data_exception',
+                        error=repr(message)))
+                raise
+
         while records:
             checker.check()
             logger.info('Calculated %s,  %s records in %s seconds'
@@ -1410,10 +1428,31 @@ class ReportExecution(ModelSQL, ModelView):
                             convert_none=False):
                         continue
                 vals = ['now()', str(uid)]
-                vals += [sanitanize(babi_eval(x[0], record, convert_none=x[1]))
-                    for x in dimension_expressions]
-                vals += [sanitanize(babi_eval(x, record, convert_none='zero'))
-                    for x in measure_expressions]
+                for x in dimension_expressions:
+                    try:
+                        vals.append(sanitanize(babi_eval(x[0], record,
+                            convert_none=x[1])))
+                    except Exception as message:
+                        if self.report.babi_raise_user_error:
+                            raise UserError(gettext(
+                                'babi.create_data_exception_dimension',
+                                expression=x[0],
+                                record=record.id,
+                                error=repr(message)))
+                        raise
+                for x in measure_expressions:
+                    try:
+                        vals.append(sanitanize(babi_eval(x, record,
+                            convert_none='zero')))
+                    except Exception as message:
+                        if self.report.babi_raise_user_error:
+                            raise UserError(gettext(
+                                'babi.create_data_exception_measures',
+                                expression=x,
+                                record=record.id,
+                                error=repr(message)))
+                        raise
+
                 record = '|'.join(vals).replace('\n', ' ')
                 record.replace('\\', '')
                 record += '\n'
