@@ -49,14 +49,14 @@ this repository contains the full copyright notices and license terms. -->
             <field name="text">False</field>
         </record>
         <record model="ir.message" id="create_data_exception">
-            <field name="text">An Exception Ocurred: %(error)s</field>
+            <field name="text">An Exception Occurred: %(error)s</field>
         </record>
         <record model="ir.message" id="create_data_exception_measures">
-          <field name="text">An Exception Ocurred: On measures, with expression %(expression)s on record %(record)s.
+          <field name="text">An Exception Occurred: On measures, with expression %(expression)s on record %(record)s.
 Exception: %(error)s</field>
         </record>
         <record model="ir.message" id="create_data_exception_dimension">
-          <field name="text">An Exception Ocurred: On dimensions, with expression %(expression)s on record %(record)s.
+          <field name="text">An Exception Occurred: On dimensions, with expression %(expression)s on record %(record)s.
 Exception: %(error)s</field>
         </record>
         <record model="ir.message" id="invalid_parameters">
