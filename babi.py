@@ -1374,7 +1374,7 @@ class ReportExecution(ModelSQL, ModelView):
 
         columns = (['create_date', 'create_uid'] + dimension_names +
             measure_names)
-        columns = ['"%s"' % x for x in columns]
+        columns = ['%s' % x for x in columns]
         # Some older versions of psycopg do not allow column names
         # to be of type unicode
         columns = [str(x) for x in columns]
