@@ -2135,7 +2135,7 @@ class ReportGroup(ModelSQL):
 
 
 class DimensionMixin:
-
+    __slots__ = ()
     report = fields.Many2One('babi.report', 'Report', required=True,
         ondelete='CASCADE')
     sequence = fields.Integer('Sequence')
