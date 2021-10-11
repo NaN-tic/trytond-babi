@@ -4,8 +4,6 @@ from trytond.model import fields, dualmethod
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 
-__all__ = ['Cron']
-
 
 class Cron(metaclass=PoolMeta):
     __name__ = "ir.cron"
