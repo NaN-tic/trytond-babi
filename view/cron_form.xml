@@ -1,0 +1,7 @@
+<data>
+    <xpath expr="/form" position="inside">
+        <label name="babi_report"/>
+        <field name="babi_report"/>
+    </xpath>
+</data>
+
