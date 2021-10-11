@@ -6,4 +6,5 @@ contains the full copyright notices and license terms. -->
     <field name="model"/>
     <field name="domain"/>
     <field name="python_expression"/>
+    <field name="context"/>
 </tree>
