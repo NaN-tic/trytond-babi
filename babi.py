@@ -9,6 +9,7 @@ import sys
 import time
 import unicodedata
 import json
+from simpleeval import EvalWithCompoundTypes
 
 from sql import Null, Column
 from sql.operators import Or
@@ -400,6 +401,7 @@ class Filter(ModelSQL, ModelView):
         help='The python expression introduced will be evaluated. If the '
         'result is True the record will be included, it will be discarded '
         'otherwise.')
+    context = fields.Char('Context')
     parameters = fields.One2Many('babi.filter.parameter', 'filter',
         'Parameters',
         states={
@@ -1316,6 +1318,11 @@ class ReportExecution(ModelSQL, ModelView):
                 'true': True,
                 })
 
+    def get_context(self):
+        if self.report.filter and self.report.filter.context:
+            ev = EvalWithCompoundTypes(names={}, functions={})
+            return ev.eval(self.report.filter.context)
+
     def create_keywords(self):
         pool = Pool()
         Action = pool.get('ir.action.wizard')
@@ -1402,7 +1409,14 @@ class ReportExecution(ModelSQL, ModelView):
             else:
                 return str(x)
 
-        with transaction.set_context(_datetime=None):
+        context = self.get_context()
+        if not context:
+            context = {}
+        else:
+            assert isinstance(context, dict)
+        context['_datetime'] = None
+
+        with transaction.set_context(**context):
             try:
                 records = Model.search(domain, offset=index * offset,
                     limit=offset)
@@ -1481,7 +1495,7 @@ class ReportExecution(ModelSQL, ModelView):
                         cursor.execute(query)
 
             index += 1
-            with transaction.set_context(_datetime=None):
+            with transaction.set_context(**context):
                 records = Model.search(domain, offset=index * offset,
                     limit=offset)
 

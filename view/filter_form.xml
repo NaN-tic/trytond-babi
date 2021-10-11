@@ -13,6 +13,8 @@ contains the full copyright notices and license terms. -->
     <field name="domain" colspan="3"/>
     <label name="python_expression"/>
     <field name="python_expression" colspan="3"/>
+    <label name="context"/>
+    <field name="context" colspan="3"/>
     <field name="parameters" colspan="4"/>
     <field name="fields" colspan="4"/>
 </form>
