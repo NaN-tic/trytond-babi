@@ -2,8 +2,6 @@
 # copyright notices and license terms.
 from trytond.model import ModelSQL, ModelView, fields, ModelSingleton
 
-__all__ = ['Configuration']
-
 
 class Configuration(ModelSingleton, ModelSQL, ModelView):
     'Business Intelligence Configuration'
