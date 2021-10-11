@@ -10,8 +10,6 @@ from trytond.protocols.jsonrpc import JSONDecoder
 from trytond.report import Report
 from trytond.i18n import gettext
 
-__all__ = ['BabiHTMLReport']
-
 
 class BabiHTMLReport(Report):
     __name__ = 'babi.report.html_report'
