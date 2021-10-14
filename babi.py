@@ -2568,6 +2568,7 @@ class OpenChartStart(ModelView):
     graph_type_report = fields.Selection([
             ('pdf', 'PDF'),
             ('html', 'HTML'),
+            ('xls', 'Excel'),
         ], 'Report Format',
         states={
             'required': Eval('graph_type') == 'report',
