@@ -38,6 +38,7 @@ class Cron(metaclass=PoolMeta):
         for cron in babi_crons:
             # babi execution require company. Run calculate when has a company
             for company in cron.companies:
-                with Transaction().set_context(company=company.id):
+                with Transaction().set_context(company=company.id,
+                        queue_name='babi'):
                     BabiReport.calculate_reports([cron.babi_report])
         return super(Cron, cls).run_once(list(set(crons) - set(babi_crons)))

@@ -62,29 +62,8 @@ AGGREGATE_TYPES = [
 SRC_CHARS = """ .'"()/*-+?¿!&$[]{}@#`'^:;<>=~%,|\\"""
 DST_CHARS = """__________________________________"""
 
-BABI_CELERY = config_.getboolean('babi', 'celery', default=True)
 BABI_RETENTION_DAYS = config_.getint('babi', 'retention_days', default=30)
-BABI_CELERY_TASK = config_.get('babi', 'celery_task',
-    default='trytond.modules.babi.tasks.calculate_execution')
 BABI_MAX_BD_COLUMN = config_.getint('babi', 'max_db_column', default=60)
-
-try:
-    import celery
-except ImportError:
-    celery = None
-except AttributeError:
-    # If run from within frepple we will get
-    # AttributeError: 'module' object has no attribute 'argv'
-    pass
-CELERY_CONFIG = config_.get('celery', 'config',
-    default='trytond.modules.babi.celeryconfig')
-CELERY_BROKER = 'amqp://%(user)s:%(password)s@%(host)s:%(port)s/%(vhost)s' % {
-    'user': config_.get('celery', 'user', default='guest'),
-    'password': config_.get('celery', 'password', default='guest'),
-    'host': config_.get('celery', 'host', default='localhost'),
-    'port': config_.getint('celery', 'port', default=5672),
-    'vhost': config_.get('celery', 'vhost', default='/'),
-    }
 
 logger = logging.getLogger(__name__)
 
@@ -901,35 +880,14 @@ class Report(ModelSQL, ModelView):
             'company': Transaction().context.get('company'),
             }
 
-    def execute(self, execution):
-        Execution = Pool().get('babi.report.execution')
-
-        transaction = Transaction()
-        user = transaction.user
-        database_name = transaction.database.name
-
-        logger.info('Babi execution %s (report "%s")' % (
-            execution.id, self.rec_name))
-
-        if celery and BABI_CELERY:
-            os.system(
-                '%s/celery call %s '
-                '--broker=%s --args=[%d,%d] --config="%s" --queue=%s' % (
-                    os.path.dirname(sys.executable),
-                    BABI_CELERY_TASK,
-                    CELERY_BROKER,
-                    execution.id,
-                    user,
-                    CELERY_CONFIG,
-                    database_name))
-        else:
-            # Fallback to synchronous mode if celery is not available
-            Execution.calculate([execution])
-
-        Execution = Pool().get('babi.report.execution')
-
     @classmethod
     def calculate_reports(cls, reports):
+        '''
+        Creates an execution, calculates it and sends e-mail if necessary.
+
+        Better call this method with a single report so transaction does not
+        last for so long.
+        '''
         pool = Pool()
         Execution = pool.get('babi.report.execution')
         HTMLReport = pool.get('babi.report.html_report', type='report')
@@ -944,8 +902,8 @@ class Report(ModelSQL, ModelView):
                     report=report.rec_name))
             execution, = Execution.create([report.get_execution_data()])
             Transaction().commit()
+            Execution.calculate([execution])
             executions.append(execution)
-            report.execute(execution)
 
         for execution in executions:
             if not execution.report.email:
@@ -972,22 +930,27 @@ class Report(ModelSQL, ModelView):
                 part = MIMEBase('application', 'octet-stream')
                 part.set_payload(report[1])
                 encoders.encode_base64(part)
-                part.add_header('Content-Disposition', 'attachment; filename=report.pdf')
+                part.add_header('Content-Disposition',
+                    'attachment; filename=report.pdf')
                 msg.attach(part)
                 try:
                     server = execution.report.smtp
-                    to_addrs = [a for _, a in getaddresses([execution.report.to])]
+                    to_addrs = [a for _, a in
+                        getaddresses([execution.report.to])]
                     server.send_mail(msg['From'], to_addrs, msg.as_string())
-                    logger.info('Send email report: %s' % (execution.report.rec_name))
+                    logger.info('Send email report: %s'
+                        % execution.report.rec_name)
                 except Exception as exception:
                     logger.error('Unable to delivery email report: %s:\n %s' % (
                         execution.report.rec_name, exception))
-            return executions
+        return executions
 
     @classmethod
     @ModelView.button
     def calculate(cls, reports):
-        cls.calculate_reports(reports)
+        with Transaction().set_context(queue_name='babi'):
+            for report in reports:
+                cls.__queue__.calculate_reports([report])
 
 
 class ReportExecution(ModelSQL, ModelView):
