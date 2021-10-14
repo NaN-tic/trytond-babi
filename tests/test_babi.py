@@ -125,7 +125,7 @@ class BaBITestCase(ModuleTestCase):
                         'timeout': 30,
                         }])
             self.assertEqual(len(report.order), 0)
-            self.assertRaises(UserError, Report.calculate, [report])
+            self.assertRaises(UserError, Report.calculate_reports, [report])
 
             category, = Expression.search([('name', '=', 'Category')])
             category, = Dimension.create([{
@@ -134,7 +134,7 @@ class BaBITestCase(ModuleTestCase):
                         'expression': category.id,
                         }])
 
-            self.assertRaises(UserError, Report.calculate, [report])
+            self.assertRaises(UserError, Report.calculate_reports, [report])
 
             amount, = Expression.search([('name', '=', 'Amount')])
             amount, = Measure.create([{
@@ -162,7 +162,7 @@ class BaBITestCase(ModuleTestCase):
             self.assertIsNone(amount_this_month_order.dimension)
             self.assertIsNotNone(amount_this_month_order.measure)
 
-            Report.calculate([report])
+            Report.calculate_reports([report])
             report, = Report.search([])
 
             execution, = report.executions
@@ -221,7 +221,7 @@ class BaBITestCase(ModuleTestCase):
                         'expression': month.id,
                         }])
 
-            Report.calculate([report])
+            Report.calculate_reports([report])
             report, = Report.search([])
 
             self.assertEqual(len(report.executions), 2)
@@ -320,7 +320,7 @@ class BaBITestCase(ModuleTestCase):
                         'aggregate': 'count',
                         }])
 
-            Report.calculate([report])
+            Report.calculate_reports([report])
             report = Report(report.id)
 
             execution, = report.executions
@@ -387,7 +387,7 @@ class BaBITestCase(ModuleTestCase):
                         'name': 'Amount',
                         'aggregate': 'avg',
                         }])
-            Report.calculate([report])
+            Report.calculate_reports([report])
             report = Report(report.id)
 
             execution, = report.executions
@@ -462,7 +462,7 @@ class BaBITestCase(ModuleTestCase):
                         'aggregate': 'sum',
                         }])
 
-            Report.calculate([report])
+            Report.calculate_reports([report])
             report = Report(report.id)
 
             execution, = report.executions
@@ -513,7 +513,7 @@ class BaBITestCase(ModuleTestCase):
                         'aggregate': 'sum',
                         }])
 
-            Report.calculate([report])
+            Report.calculate_reports([report])
             report = Report(report.id)
 
             execution, = report.executions
@@ -575,7 +575,7 @@ class BaBITestCase(ModuleTestCase):
                         'aggregate': 'sum',
                         }])
 
-            Report.calculate([report])
+            Report.calculate_reports([report])
             report = Report(report.id)
 
             execution, = report.executions
