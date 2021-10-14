@@ -40,5 +40,5 @@ class Cron(metaclass=PoolMeta):
             for company in cron.companies:
                 with Transaction().set_context(company=company.id,
                         queue_name='babi'):
-                    BabiReport.calculate_babi_report([cron.babi_report])
+                    BabiReport.__queue__.compute(cron.babi_report)
         return super(Cron, cls).run_once(list(set(crons) - set(babi_crons)))
