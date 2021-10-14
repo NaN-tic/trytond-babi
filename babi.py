@@ -883,9 +883,6 @@ class Report(ModelSQL, ModelView):
     def compute(self):
         '''
         Creates an execution, calculates it and sends e-mail if necessary.
-
-        Better call this method with a single report so transaction does not
-        last for so long.
         '''
         pool = Pool()
         Execution = pool.get('babi.report.execution')
