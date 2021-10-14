@@ -880,36 +880,25 @@ class Report(ModelSQL, ModelView):
             'company': Transaction().context.get('company'),
             }
 
-    @classmethod
-    def calculate_babi_report(cls, reports):
+    def compute(self):
         '''
         Creates an execution, calculates it and sends e-mail if necessary.
-
-        Better call this method with a single report so transaction does not
-        last for so long.
         '''
         pool = Pool()
         Execution = pool.get('babi.report.execution')
         HTMLReport = pool.get('babi.report.html_report', type='report')
 
-        executions = []
-        for report in reports:
-            if not report.measures:
-                raise UserError(gettext('babi.no_measures',
-                    report=report.rec_name))
-            if not report.dimensions:
-                raise UserError(gettext('babi.no_dimensions',
-                    report=report.rec_name))
-            execution, = Execution.create([report.get_execution_data()])
-            Transaction().commit()
-            Execution.calculate([execution])
-            executions.append(execution)
+        if not self.measures:
+            raise UserError(gettext('babi.no_measures',
+                report=self.rec_name))
+        if not self.dimensions:
+            raise UserError(gettext('babi.no_dimensions',
+                report=self.rec_name))
+        execution, = Execution.create([self.get_execution_data()])
+        Transaction().commit()
+        Execution.calculate([execution])
 
-        executions = cls.calculate(reports)
-        for execution in executions:
-            if not execution.report.email:
-                continue
-
+        if execution.report.email:
             Model = Pool().get(execution.internal_name)
             records = Model.search([('parent', '=', None)])
 
@@ -944,12 +933,14 @@ class Report(ModelSQL, ModelView):
                 except Exception as exception:
                     logger.error('Unable to delivery email report: %s:\n %s' % (
                         execution.report.rec_name, exception))
+        return execution
+
     @classmethod
     @ModelView.button
     def calculate(cls, reports):
         with Transaction().set_context(queue_name='babi'):
             for report in reports:
-                cls.__queue__.calculate_reports([report])
+                cls.__queue__.compute(report)
 
 
 class ReportExecution(ModelSQL, ModelView):
