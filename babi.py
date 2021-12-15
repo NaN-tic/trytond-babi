@@ -153,9 +153,6 @@ class DynamicModel(ModelSQL, ModelView):
                 if view_type == 'tree' and context.get('babi_tree_view'):
                     result['field_childs'] = 'children'
             elif view_type == 'graph':
-                # TODO: Remove it on 3.6 as client autogenerates it
-                colors = ['#FF0000', '#0000FF', '#008000', '#FFFF00',
-                    '#800080', '#FF00FF', '#FFA500', '#C0C0C0', '#000000']
                 model_name = context.get('model_name')
                 graph_type = context.get('graph_type')
                 measure_ids = context.get('measures')
@@ -169,15 +166,14 @@ class DynamicModel(ModelSQL, ModelView):
                 y_xml = ''
                 for i, measure in enumerate(InternalMeasure.browse(
                             measure_ids)):
-                    color = colors[i % len(colors)]
-                    y_xml += ('<field name="%s" interpolation="%s" '
-                        'color="%s"/> \n') % (measure.internal_name,
-                            interpolation, color)
+                    y_xml += '''<field name="%(internal_name)s" interpolation="%(interpolation)s"/>\n''' % {
+                            'internal_name': measure.internal_name,
+                            'interpolation': interpolation,
+                        }
                     fields.append(measure.internal_name)
 
                 xml = '''<?xml version="1.0"?>
-                    <graph string="%(graph_name)s" type="%(graph_type)s"
-                        legend="%(legend)s" background="#FFFFFF">
+                    <graph string="%(graph_name)s" type="%(graph_type)s" legend="%(legend)s">
                         <x>
                             %(x_fields)s
                         </x>
