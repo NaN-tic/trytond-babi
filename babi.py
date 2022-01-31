@@ -2103,7 +2103,7 @@ class DimensionMixin:
     expression = fields.Many2One('babi.expression', 'Expression',
         required=True, domain=[
             ('model', '=', Eval('_parent_report', {}).get('model', 0)),
-            ])
+            ], depends=['report'])
     group_by = fields.Boolean('Group By This Dimension')
     width = fields.Integer('Width',
         help='Width report columns (%)')
@@ -2233,7 +2233,7 @@ class Measure(ModelSQL, ModelView):
                     ('ttype', 'in', ['integer', 'float', 'numeric']),
                     ],
                 [])
-            ], depends=['aggregate'])
+            ], depends=['aggregate', 'report'])
     aggregate = fields.Selection(AGGREGATE_TYPES, 'Aggregate', required=True)
     internal_measures = fields.One2Many('babi.internal.measure',
         'measure', 'Internal Measures')
