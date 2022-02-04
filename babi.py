@@ -5,7 +5,6 @@ import datetime as mdatetime
 import pytz
 import logging
 import os
-import sys
 import time
 import unicodedata
 import json

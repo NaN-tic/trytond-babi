@@ -9,6 +9,7 @@ from trytond.rpc import RPC
 from trytond.protocols.jsonrpc import JSONDecoder
 from trytond.report import Report
 from trytond.i18n import gettext
+from trytond.exceptions import UserError
 
 
 class BabiHTMLReport(Report):
@@ -105,6 +106,10 @@ class BabiHTMLReport(Report):
         execution = Execution(execution_id)
         filters = cls.format_filter(execution)
         report = execution.report
+
+        if report.columns:
+             raise UserError(gettext('babi.msg_render_report_columns',
+                    report=report.rec_name))
 
         headers = [{
                     'internal_name': d.internal_name,
