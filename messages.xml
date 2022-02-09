@@ -62,5 +62,8 @@ Exception: %(error)s</field>
         <record model="ir.message" id="invalid_parameters">
             <field name="text">Key "%(key)s" in domain or in python expression is not in the parameters from filter of report.</field>
         </record>
+        <record model="ir.message" id="msg_render_report_columns">
+            <field name="text">Print report "%(report)s" has dimensions in columns and is not supported.</field>
+        </record>
     </data>
 </tryton>
