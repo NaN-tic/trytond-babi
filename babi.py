@@ -471,8 +471,9 @@ class FilterParameter(ModelSQL, ModelView):
     @classmethod
     def create(cls, vlist):
         filters = super(FilterParameter, cls).create(vlist)
-        for filter in filters:
-            filter.create_keyword()
+        with Transaction().set_context(_check_access=False):
+            for filter in filters:
+                filter.create_keyword()
         return filters
 
     @classmethod
@@ -481,22 +482,24 @@ class FilterParameter(ModelSQL, ModelView):
         Keyword = pool.get('ir.action.keyword')
         super(FilterParameter, cls).write(*args)
         actions = iter(args)
-        for filters, values in zip(actions, actions):
-            if 'related_model' in values:
-                filter_ids = [f.id for f in filters]
-                Keyword.delete(Keyword.search([
-                            ('babi_filter_parameter', 'in', filter_ids),
-                        ]))
-                for filter in filters:
-                    filter.create_keyword()
+        with Transaction().set_context(_check_access=False):
+            for filters, values in zip(actions, actions):
+                if 'related_model' in values:
+                    filter_ids = [f.id for f in filters]
+                    Keyword.delete(Keyword.search([
+                                ('babi_filter_parameter', 'in', filter_ids),
+                            ]))
+                    for filter in filters:
+                        filter.create_keyword()
 
     @classmethod
     def delete(cls, filters):
         pool = Pool()
         Keyword = pool.get('ir.action.keyword')
-        Keyword.delete(Keyword.search([
-                    ('babi_filter_parameter', 'in', [f.id for f in filters]),
-                ]))
+        with Transaction().set_context(_check_access=False):
+            Keyword.delete(Keyword.search([
+                        ('babi_filter_parameter', 'in', [f.id for f in filters]),
+                    ]))
         super(FilterParameter, cls).delete(filters)
 
 
