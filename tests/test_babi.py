@@ -14,10 +14,11 @@ from trytond.exceptions import UserError
 from trytond.modules.babi.babi_eval import babi_eval
 from trytond.pyson import PYSONEncoder
 from dateutil.relativedelta import relativedelta
-from trytond.modules.company.tests import create_company, set_company
+from trytond.modules.company.tests import (CompanyTestMixin, create_company,
+    set_company)
 
 
-class BaBITestCase(ModuleTestCase):
+class BaBITestCase(CompanyTestMixin, ModuleTestCase):
     '''
     Test BaBI module.
     '''
