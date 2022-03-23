@@ -255,7 +255,8 @@ def create_class(name, description, dimensions, measures):
     return type(name, (DynamicModel, ), body)
 
 
-def register_class(internal_name, name, dimensions, measures, avoid_registration=False):
+def register_class(internal_name, name, dimensions, measures,
+        avoid_registration=False):
     "Register class an return model"
     pool = Pool()
     Model = pool.get('ir.model')
@@ -457,7 +458,7 @@ class FilterParameter(ModelSQL, ModelView):
             key = 'task_babi_check_parameter_in_filter.%d' % self.id
             if Warning.check(key):
                 raise UserWarning('babi_check_parameter_in_filter.{}'.format(
-                        self.name),gettext('babi.parameter_not_found',
+                        self.name), gettext('babi.parameter_not_found',
                             parameter=self.rec_name,
                             filter=self.filter.rec_name))
 
@@ -494,7 +495,8 @@ class FilterParameter(ModelSQL, ModelView):
         Keyword = pool.get('ir.action.keyword')
         with Transaction().set_context(_check_access=False):
             Keyword.delete(Keyword.search([
-                        ('babi_filter_parameter', 'in', [f.id for f in filters]),
+                        ('babi_filter_parameter', 'in',
+                            [f.id for f in filters]),
                     ]))
         super(FilterParameter, cls).delete(filters)
 
@@ -620,8 +622,6 @@ class Report(ModelSQL, ModelView):
             'invisible': Not(Eval('context', {}).get('groups', []).contains(
                 Id('babi', 'group_babi_admin'))),
             })
-    last_execution = fields.Function(fields.Many2One('babi.report.execution',
-        'Last Executions', readonly=True), 'get_last_execution')
     crons = fields.One2Many('ir.cron', 'babi_report', 'Schedulers')
     report_cell_level = fields.Integer('Cell Level',
         help='Start cell level that not has indentation')
@@ -671,12 +671,6 @@ class Report(ModelSQL, ModelView):
     def get_internal_name(self, name):
         return 'babi_report_%d' % self.id
 
-    def get_last_execution(self, name):
-        if self.executions:
-            for execution in self.executions:
-                if execution.state == 'calculated' and not execution.filtered:
-                    return execution.id
-
     @classmethod
     def write(cls, *args):
         actions = iter(args)
@@ -684,7 +678,7 @@ class Report(ModelSQL, ModelView):
         for reports, values in zip(actions, actions):
             if 'name' in values:
                 for report in reports:
-                    key ='report_modification_warning_%s' % report.id
+                    key = 'report_modification_warning_%s' % report.id
                     if report.name != values['name'] and Warning.check(key):
                         raise UserWarning(key,
                             gettext('babi.report_modification_warning',
@@ -929,8 +923,9 @@ class Report(ModelSQL, ModelView):
                     logger.info('Send email report: %s'
                         % execution.report.rec_name)
                 except Exception as exception:
-                    logger.error('Unable to delivery email report: %s:\n %s' % (
-                        execution.report.rec_name, exception))
+                    logger.error(
+                        'Unable to delivery email report: %s:\n %s' % (
+                            execution.report.rec_name, exception))
         return execution
 
     @classmethod
@@ -1369,6 +1364,9 @@ class ReportExecution(ModelSQL, ModelView):
         else:
             assert isinstance(context, dict)
         context['_datetime'] = None
+        # This is needed when execute the wizard to calculate the report, to
+        # ensure the company rule is used.
+        context['_check_access'] = True
 
         with transaction.set_context(**context):
             try:
@@ -1538,7 +1536,8 @@ class ReportExecution(ModelSQL, ModelView):
                 name = '/'.join(name)
                 # PSQL default column name max characters
                 if ((len(internal_names) > 1)
-                        and (len('_'.join(internal_names)) > BABI_MAX_BD_COLUMN)):
+                        and (len('_'.join(internal_names)) >
+                            BABI_MAX_BD_COLUMN)):
                     measure_len = len(measure.internal_name)
                     max_len = BABI_MAX_BD_COLUMN - measure_len
                     combination_name = internal_names.pop(0)[:max_len]
@@ -1863,7 +1862,7 @@ class OpenExecutionFiltered(StateView):
                 'readonly': False,
                 'required': True,
             }
-            if parameter.ttype in['many2one', 'many2many']:
+            if parameter.ttype in ['many2one', 'many2many']:
                 field_definition['relation'] = parameter.related_model.model
             if parameter2report:
                 field_definition['states'] = {
@@ -2045,7 +2044,14 @@ class OpenExecution(Wizard):
                 if 'filtered_execution' in context:
                     execution = Execution(context.get('filtered_execution'))
                 else:
-                    execution = report.last_execution
+                    company = transaction.context.get('company')
+                    executions = Execution.search([
+                            ('report', '=', report.id),
+                            ('state', '=', 'calculated'),
+                            ('filtered', '=', False),
+                            ('company', '=', company),
+                            ], limit=1, order=[('create_date', 'DESC')])
+                    execution = executions[0] if executions else None
                 view_type = menu.babi_type
         else:
             report = self.select.report
