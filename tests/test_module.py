@@ -1,13 +1,12 @@
-#!/usr/bin/env python
-# The COPYRIGHT file at the top level of this repository contains the full
-# copyright notices and license terms.
+
+# This file is part of Tryton.  The COPYRIGHT file at the top level of
+# this repository contains the full copyright notices and license terms.
+
 import datetime
 import random
-import unittest
 from decimal import Decimal
 
 from trytond.pool import Pool
-import trytond.tests.test_tryton
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
 from trytond.exceptions import UserError
@@ -18,10 +17,8 @@ from trytond.modules.company.tests import (CompanyTestMixin, create_company,
     set_company)
 
 
-class BaBITestCase(CompanyTestMixin, ModuleTestCase):
-    '''
-    Test BaBI module.
-    '''
+class BabiTestCase(CompanyTestMixin, ModuleTestCase):
+    'Test Babi module'
     module = 'babi'
 
     def create_data(self):
@@ -709,8 +706,4 @@ class BaBITestCase(CompanyTestMixin, ModuleTestCase):
         executions = Execution.search([])
         self.assertEqual(len(executions), 0)
 
-
-def suite():
-    suite = trytond.tests.test_tryton.suite()
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(BaBITestCase))
-    return suite
+del ModuleTestCase
