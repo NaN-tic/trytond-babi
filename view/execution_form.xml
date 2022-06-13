@@ -14,6 +14,8 @@ contains the full copyright notices and license terms. -->
     <field name="timeout"/>
     <label name="filtered"/>
     <field name="filtered"/>
+    <separator name="traceback" colspan="4"/>
+    <field name="traceback" colspan="4"/>
     <label name="state"/>
     <field name="state"/>
     <button name="open" colspan="4"/>

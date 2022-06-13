@@ -39,7 +39,7 @@ from email.mime.base import MIMEBase
 from email.header import Header
 from email.utils import getaddresses
 from email import encoders
-
+from trytond.bus import notify
 
 FIELD_TYPES = [
     ('char', 'Char'),
@@ -974,6 +974,8 @@ class ReportExecution(ModelSQL, ModelView):
                 Eval('context', {}).get('company', -1)),
             ],
         select=True)
+    traceback = fields.Text('Traceback', readonly=True)
+
 
     @classmethod
     def __setup__(cls):
@@ -1411,6 +1413,10 @@ class ReportExecution(ModelSQL, ModelView):
                         vals.append(sanitanize(babi_eval(x, record,
                             convert_none='zero')))
                     except Exception as message:
+                        with  Transaction() as new_transaction:
+                            self.traceback = x + repr(message)
+                            self.save()
+                        notify('Error on expression: %s' % x, priority=1)
                         if self.report.babi_raise_user_error:
                             raise UserError(gettext(
                                 'babi.create_data_exception_measures',
