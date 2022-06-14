@@ -39,7 +39,7 @@ from email.mime.base import MIMEBase
 from email.header import Header
 from email.utils import getaddresses
 from email import encoders
-
+from trytond.bus import notify
 
 FIELD_TYPES = [
     ('char', 'Char'),
@@ -86,6 +86,12 @@ def unaccent(text):
 def _replace(x):
     return x.replace("'", '')
 
+
+class DimensionError(UserError):
+    pass
+
+class MeasureError(UserError):
+    pass
 
 class DynamicModel(ModelSQL, ModelView):
     @classmethod
@@ -974,6 +980,8 @@ class ReportExecution(ModelSQL, ModelView):
                 Eval('context', {}).get('company', -1)),
             ],
         select=True)
+    traceback = fields.Text('Traceback', readonly=True)
+
 
     @classmethod
     def __setup__(cls):
@@ -1180,7 +1188,7 @@ class ReportExecution(ModelSQL, ModelView):
         raise TimeoutException
 
     @staticmethod
-    def save_state(execution_id, state, exception=False):
+    def save_state(execution_id, state, exception=False, traceback=None):
         " Save state in a new transaction"
         DatabaseOperationalError = backend.DatabaseOperationalError
         Transaction().rollback()
@@ -1191,6 +1199,8 @@ class ReportExecution(ModelSQL, ModelView):
                 Model = pool.get('ir.model')
                 new_instances = Execution.browse([execution_id])
                 to_write = {'state': state}
+                if traceback:
+                    to_write['traceback'] = traceback
                 if state == 'in_progress':
                     to_write['pid'] = os.getpid()
                 Execution.write(new_instances, to_write)
@@ -1217,11 +1227,18 @@ class ReportExecution(ModelSQL, ModelView):
                     execution.save_state(execution.id, 'timeout',
                         exception=True)
                     raise UserError(gettext('babi.timeout_exception'))
+                except MeasureError as message:
+                    execution.save_state(execution.id, 'failed',
+                        exception=True, traceback=repr(message))
+                except DimensionError as message:
+                    execution.save_state(execution.id, 'failed',
+                        exception=True, traceback=repr(message))
                 except Exception:
                     execution.save_state(execution.id, 'failed',
                         exception=True)
                     execution.save()
                     raise
+
 
     def replace_parameters(self, expression):
         if self.report.filter and self.report.filter.parameters:
@@ -1399,8 +1416,10 @@ class ReportExecution(ModelSQL, ModelView):
                         vals.append(sanitanize(babi_eval(x[0], record,
                             convert_none=x[1])))
                     except Exception as message:
+                        notify('Error on dimension: "%s" on report "%s"' % (x,
+                             self.report.name), priority=1)
                         if self.report.babi_raise_user_error:
-                            raise UserError(gettext(
+                            raise DimensionError(gettext(
                                 'babi.create_data_exception_dimension',
                                 expression=x[0],
                                 record=record.id,
@@ -1411,8 +1430,10 @@ class ReportExecution(ModelSQL, ModelView):
                         vals.append(sanitanize(babi_eval(x, record,
                             convert_none='zero')))
                     except Exception as message:
+                        notify('Error on expression: "%s" on report "%s"' % (x,
+                             self.report.name), priority=1)
                         if self.report.babi_raise_user_error:
-                            raise UserError(gettext(
+                            raise MeasureError(gettext(
                                 'babi.create_data_exception_measures',
                                 expression=x,
                                 record=record.id,
