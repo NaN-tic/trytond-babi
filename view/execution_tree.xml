@@ -8,6 +8,7 @@ contains the full copyright notices and license terms. -->
     <field name="duration">
         <suffix name="duration" string="s"/>
     </field>
+    <field name="traceback"/>
     <field name="state"/>
     <field name="filtered"/>
     <button name="open" tree_invisible="1"/>
