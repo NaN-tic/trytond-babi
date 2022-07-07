@@ -1256,7 +1256,10 @@ class ReportExecution(ModelSQL, ModelView):
                     continue
                 values[filter_name] = value
             try:
-                expression = expression.format(**values)
+                if '%(' in expression:
+                    expression = expression % values
+                else:
+                    expression = expression.format(**values)
             except KeyError as message:
                 if self.report.babi_raise_user_error:
                     raise UserError(
@@ -1286,8 +1289,13 @@ class ReportExecution(ModelSQL, ModelView):
 
     def get_context(self):
         if self.report.filter and self.report.filter.context:
-            ev = EvalWithCompoundTypes(names={}, functions={})
-            return ev.eval(self.report.filter.context)
+            context = self.replace_parameters(self.report.filter.context)
+            ev = EvalWithCompoundTypes(names={}, functions={
+                'date': lambda x: datetime.strptime(x, '%Y-%m-%d').date(),
+                'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d'),
+                })
+            context = ev.eval(context)
+            return context
 
     def create_keywords(self):
         pool = Pool()
