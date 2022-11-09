@@ -241,10 +241,10 @@ def create_columns(name, ffields):
 
     columns['babi_group'] = fields.Char('Group', size=500)
     columns['parent'] = fields.Many2One(name, 'Parent', ondelete='CASCADE',
-        select=True, left='parent_left', right='parent_right')
+        left='parent_left', right='parent_right')
     columns['children'] = fields.One2Many(name, 'parent', 'Children')
-    columns['parent_left'] = fields.Integer('Parent Left', select=True)
-    columns['parent_right'] = fields.Integer('Parent Right', select=True)
+    columns['parent_left'] = fields.Integer('Parent Left')
+    columns['parent_right'] = fields.Integer('Parent Right')
     return columns
 
 
@@ -978,8 +978,7 @@ class ReportExecution(ModelSQL, ModelView):
         domain=[
             ('id', If(Eval('context', {}).contains('company'), '=', '!='),
                 Eval('context', {}).get('company', -1)),
-            ],
-        select=True)
+            ])
     traceback = fields.Text('Traceback', readonly=True)
 
 
