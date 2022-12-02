@@ -9,6 +9,7 @@ import time
 import unicodedata
 import json
 from simpleeval import EvalWithCompoundTypes
+from psycopg2.errors import InvalidTextRepresentation
 
 from sql import Null, Column
 from sql.operators import Or
@@ -1233,9 +1234,12 @@ class ReportExecution(ModelSQL, ModelView):
                 except DimensionError as message:
                     execution.save_state(execution.id, 'failed',
                         exception=True, traceback=repr(message))
-                except Exception:
+                except InvalidTextRepresentation as message:
                     execution.save_state(execution.id, 'failed',
-                        exception=True)
+                        exception=True, traceback=repr(message))
+                except Exception as message:
+                    execution.save_state(execution.id, 'failed',
+                        exception=True, traceback=repr(message))
                     execution.save()
                     raise
 
