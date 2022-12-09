@@ -97,10 +97,6 @@ class BabiHTMLReport(Report):
     @classmethod
     def execute(cls, ids, data):
         Execution = Pool().get('babi.report.execution')
-        context = Transaction().context
-        context['report_lang'] = Transaction().language
-        context['report_translations'] = os.path.join(
-            os.path.dirname(__file__), 'report', 'translations')
 
         execution_id = data['model_name'].split('_')[-1]
         execution = Execution(execution_id)
@@ -132,7 +128,9 @@ class BabiHTMLReport(Report):
                     'decimal_digits': m.expression.decimal_digits,
                     } for m in report.measures]
 
-        with Transaction().set_context(**context):
+        with Transaction().set_context(report_lang=Transaction().language,
+                report_translations=os.path.join(os.path.dirname(__file__),
+                    'report', 'translations')):
             records, parameters = cls.prepare(ids, data)
             return super(BabiHTMLReport, cls).execute(data['records'], {
                     'name': 'babi.report.html_report',
