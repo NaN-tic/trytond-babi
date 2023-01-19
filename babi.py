@@ -1733,7 +1733,7 @@ class ReportExecution(ModelSQL, ModelView):
         group = None
         parent_id = query_inserts(table_name, measures, None, None)[0]
         # TODO: Translate '(all)'
-        if group_by_types[group_by[0]] != 'many2one':
+        if group_by_types[group_by[0]] == 'char':
             cursor.execute("UPDATE " + table_name + " SET \"" + group_by[0] +
                 "\"='" + '(all)' + "' WHERE id=%s" % parent_id)
         update_parent(table_name, parent_id, child_group, group_by_iterator,
