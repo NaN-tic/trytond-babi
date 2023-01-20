@@ -49,6 +49,8 @@ FIELD_TYPES = [
     ('numeric', 'Numeric'),
     ('boolean', 'Boolean'),
     ('many2one', 'Many To One'),
+    ('date', 'Date'),
+    ('datetime', 'Date & Time'),
     ]
 
 AGGREGATE_TYPES = [
@@ -232,6 +234,10 @@ def create_columns(name, ffields):
             columns[field_name] = fields.Numeric(fname, digits=(16, digits))
         elif ttype == 'char':
             columns[field_name] = fields.Char(fname)
+        elif ttype == 'date':
+            columns[field_name] = fields.Date(fname)
+        elif ttype == 'datetime':
+            columns[field_name] = fields.DateTime(fname)
         elif ttype == 'boolean':
             columns[field_name] = fields.Boolean(fname)
         elif ttype == 'many2one':
@@ -423,8 +429,8 @@ class FilterParameter(ModelSQL, ModelView):
     filter = fields.Many2One('babi.filter', 'Filter', required=True)
     name = fields.Char('Name', required=True, translate=True, help='Name used '
         'on the domain substitution')
-    ttype = fields.Selection(FIELD_TYPES + [('date', 'Date'),
-        ('many2many', 'Many To Many')], 'Field Type', required=True)
+    ttype = fields.Selection(FIELD_TYPES + [('many2many', 'Many To Many')],
+        'Field Type', required=True)
     related_model = fields.Many2One('ir.model', 'Related Model', states={
             'required': Eval('ttype').in_(['many2one', 'many2many']),
             'readonly': Not(Eval('ttype').in_(['many2one', 'many2many'])),

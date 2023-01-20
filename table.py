@@ -271,6 +271,8 @@ class Field(ModelSQL, ModelView):
             'numeric': 'NUMERIC',
             'boolean': 'BOOLEAN',
             'many2one': 'INTEGER',
+            'date': 'DATE',
+            'datetime': 'DATETIME',
             }
         return mapping[self.expression.ttype]
 
