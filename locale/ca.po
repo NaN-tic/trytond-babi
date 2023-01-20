@@ -98,6 +98,26 @@ msgctxt "field:babi.expression,ttype:"
 msgid "Field Type"
 msgstr "Tipus de camp"
 
+msgctxt "field:babi.field,expression:"
+msgid "Expression"
+msgstr "Expressió"
+
+msgctxt "field:babi.field,internal_name:"
+msgid "Internal Name"
+msgstr "Nom intern"
+
+msgctxt "field:babi.field,model:"
+msgid "Model"
+msgstr "Model"
+
+msgctxt "field:babi.field,name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:babi.field,table:"
+msgid "Table"
+msgstr ""
+
 msgctxt "field:babi.filter,context:"
 msgid "Context"
 msgstr "Context"
@@ -322,10 +342,6 @@ msgctxt "field:babi.report,keywords:"
 msgid "Keywords"
 msgstr "Accions de teclat"
 
-msgctxt "field:babi.report,last_execution:"
-msgid "Last Executions"
-msgstr "Ultimes execucions"
-
 msgctxt "field:babi.report,measures:"
 msgid "Measures"
 msgstr "Mesures"
@@ -368,7 +384,7 @@ msgstr "Assumpte"
 
 msgctxt "field:babi.report,timeout:"
 msgid "Timeout"
-msgstr "Temps d'espera"
+msgstr "Temps d'espera (s)"
 
 msgctxt "field:babi.report,to:"
 msgid "To"
@@ -434,6 +450,10 @@ msgctxt "field:babi.report.execution,timeout:"
 msgid "Timeout"
 msgstr "Temps esgotat"
 
+msgctxt "field:babi.report.execution,traceback:"
+msgid "Traceback"
+msgstr ""
+
 msgctxt "field:babi.report.execution.open.select,execution:"
 msgid "Execution"
 msgstr "Execució"
@@ -453,6 +473,38 @@ msgstr "Informe"
 msgctxt "field:babi.report.execution.open.select,view_type:"
 msgid "View type"
 msgstr "Tipus de vista"
+
+msgctxt "field:babi.table,babi_raise_user_error:"
+msgid "Raise User Error"
+msgstr "Mostrar l'error al usuari"
+
+msgctxt "field:babi.table,crons:"
+msgid "Schedulers"
+msgstr "Tasques planificades"
+
+msgctxt "field:babi.table,fields_:"
+msgid "Fields"
+msgstr "Camps"
+
+msgctxt "field:babi.table,filter:"
+msgid "Filter"
+msgstr "Filtre"
+
+msgctxt "field:babi.table,internal_name:"
+msgid "Internal Name"
+msgstr "Nom intern"
+
+msgctxt "field:babi.table,model:"
+msgid "Model"
+msgstr "Model"
+
+msgctxt "field:babi.table,name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:babi.table,timeout:"
+msgid "Timeout"
+msgstr "Timeout"
 
 msgctxt "field:babi.test,amount:"
 msgid "Amount"
@@ -481,6 +533,10 @@ msgstr "Informe BABI"
 msgctxt "field:ir.cron,babi_report:"
 msgid "Babi Report"
 msgstr "Informe Babi"
+
+msgctxt "field:ir.cron,babi_table:"
+msgid "Babi Table"
+msgstr ""
 
 msgctxt "field:ir.model,babi_enabled:"
 msgid "BI Enabled"
@@ -606,6 +662,16 @@ msgstr ""
 "Si el càlcul de l'informe ha de tardar més que el temps d'espera (en segons)"
 " indicat, el procés es pararà automàticament."
 
+msgctxt "help:babi.table,babi_raise_user_error:"
+msgid "Will raise a UserError in case of an error in the table."
+msgstr ""
+
+msgctxt "help:babi.table,timeout:"
+msgid ""
+"If table calculation should take more than the specified timeout (in "
+"seconds) the process will be stopped automatically."
+msgstr ""
+
 msgctxt "help:ir.model,babi_enabled:"
 msgid ""
 "Check if you want this model to be available in Business Intelligence "
@@ -633,6 +699,10 @@ msgstr "Dimensió de columna"
 msgctxt "model:babi.expression,name:"
 msgid "Expression"
 msgstr "Expressió"
+
+msgctxt "model:babi.field,name:"
+msgid "BABI Field"
+msgstr ""
 
 msgctxt "model:babi.filter,name:"
 msgid "Filter"
@@ -674,6 +744,10 @@ msgctxt "model:babi.report.execution.open.select,name:"
 msgid "Open Report Execution - Select Values"
 msgstr "Obre execució - Selecció de valors"
 
+msgctxt "model:babi.table,name:"
+msgid "BABI Table"
+msgstr ""
+
 msgctxt "model:babi.test,name:"
 msgid "Test BABI Model"
 msgstr "Model de proves BABI"
@@ -710,6 +784,10 @@ msgctxt "model:ir.action,name:act_babi_expression"
 msgid "Expression"
 msgstr "Expressió"
 
+msgctxt "model:ir.action,name:act_babi_field"
+msgid "Fields"
+msgstr "Camps"
+
 msgctxt "model:ir.action,name:act_babi_filter"
 msgid "Filter"
 msgstr "Filtre"
@@ -731,7 +809,7 @@ msgid "Order"
 msgstr "Ordre"
 
 msgctxt "model:ir.action,name:act_babi_report"
-msgid "Report"
+msgid "Reports"
 msgstr "Informe"
 
 msgctxt "model:ir.action,name:act_babi_report_cron_form"
@@ -741,6 +819,10 @@ msgstr "Crons"
 msgctxt "model:ir.action,name:act_babi_report_execution_form"
 msgid "Executions"
 msgstr "Execucions"
+
+msgctxt "model:ir.action,name:act_babi_table"
+msgid "Tables"
+msgstr ""
 
 msgctxt "model:ir.action,name:clear_executions_wizard"
 msgid "Clean Executions"
@@ -806,12 +888,49 @@ msgstr ""
 "La clau \"%(key)s\" al domini o a l'expressió de python no es troba als "
 "paràmetres del filtre de l'informe."
 
+msgctxt "model:ir.message,text:msg_compute_table_exception"
+msgid ""
+"An exception occurred while computing the value for field \"%(field)s\" in table \"%(table)s\", record \"%(record)s\". The error was:\n"
+"\n"
+"%(error)s"
+msgstr ""
+
+msgctxt "model:ir.message,text:msg_filter_with_parameters"
+msgid "Cannot use filters with parameters in table \"%(table)s\"."
+msgstr ""
+
+msgctxt "model:ir.message,text:msg_invalid_field_internal_name"
+msgid "Invalid internal name \"%(internal_name)s\" in field \"%(field)s\"."
+msgstr ""
+
+msgctxt ""
+"model:ir.message,text:msg_invalid_field_internal_name_first_character"
+msgid ""
+"Invalid first character in internal name \"%(internal_name)s\" in field "
+"\"%(field)s\"."
+msgstr ""
+
+msgctxt "model:ir.message,text:msg_invalid_table_internal_name"
+msgid "Invalid internal name \"%(internal_name)s\" in table \"%(table)s\"."
+msgstr ""
+
+msgctxt ""
+"model:ir.message,text:msg_invalid_table_internal_name_first_character"
+msgid ""
+"Invalid first character in internal name \"%(internal_name)s\" in table "
+"\"%(table)s\"."
+msgstr ""
+
 msgctxt "model:ir.message,text:msg_render_report_columns"
 msgid ""
 "Print report \"%(report)s\" has dimensions in columns and is not supported."
 msgstr ""
 "L'informe \"%(report)s\" té dimensions en columnas i no es soporta per "
 "imprimir."
+
+msgctxt "model:ir.message,text:msg_table_no_fields"
+msgid "Table \"%(table)s\" cannot be computed because it has no fields."
+msgstr ""
 
 msgctxt "model:ir.message,text:no_dimensions"
 msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
@@ -903,6 +1022,10 @@ msgctxt "model:ir.model.button,string:babi_report_remove_menus_button"
 msgid "Remove Menus"
 msgstr "Elimina menús"
 
+msgctxt "model:ir.model.button,string:babi_table_calculate_button"
+msgid "Compute"
+msgstr ""
+
 msgctxt "model:ir.rule.group,name:rule_group_babi_execution"
 msgid "Babi Execution"
 msgstr "Execució Babi"
@@ -927,6 +1050,10 @@ msgctxt "model:ir.ui.menu,name:menu_babi_expression"
 msgid "Expressions"
 msgstr "Expressió"
 
+msgctxt "model:ir.ui.menu,name:menu_babi_field"
+msgid "Fields"
+msgstr "Camps"
+
 msgctxt "model:ir.ui.menu,name:menu_babi_filter"
 msgid "Filters"
 msgstr "Filtre"
@@ -934,6 +1061,10 @@ msgstr "Filtre"
 msgctxt "model:ir.ui.menu,name:menu_babi_report"
 msgid "Reports"
 msgstr "Informe"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table"
+msgid "Tables"
+msgstr ""
 
 msgctxt "model:ir.ui.menu,name:menu_configuration"
 msgid "Configuration"
@@ -1168,6 +1299,10 @@ msgid "Calculate Babi Report"
 msgstr "Calcula l'informe Babi"
 
 msgctxt "selection:ir.cron,method:"
+msgid "Calculate Babi Table"
+msgstr ""
+
+msgctxt "selection:ir.cron,method:"
 msgid "Clean Babi Excutions"
 msgstr "Netejar execucions Babi"
 
@@ -1270,6 +1405,10 @@ msgstr "General"
 msgctxt "view:babi.report:"
 msgid "Schedulers"
 msgstr "Programacions"
+
+msgctxt "view:babi.table:"
+msgid "Configuration"
+msgstr "Configuració"
 
 msgctxt "view:babi.update_data.wizard.done:"
 msgid "The data for the report has been calculated"
