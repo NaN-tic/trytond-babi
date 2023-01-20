@@ -116,7 +116,7 @@ msgstr "Nombre"
 
 msgctxt "field:babi.field,table:"
 msgid "Table"
-msgstr ""
+msgstr "Tabla"
 
 msgctxt "field:babi.filter,context:"
 msgid "Context"
@@ -536,7 +536,7 @@ msgstr "Informe BABI"
 
 msgctxt "field:ir.cron,babi_table:"
 msgid "Babi Table"
-msgstr ""
+msgstr "Tabla BABI"
 
 msgctxt "field:ir.model,babi_enabled:"
 msgid "BI Enabled"
@@ -746,7 +746,7 @@ msgstr "Abrir ejecución - seleccionar valores"
 
 msgctxt "model:babi.table,name:"
 msgid "BABI Table"
-msgstr ""
+msgstr "Tabla BABI"
 
 msgctxt "model:babi.test,name:"
 msgid "Test BABI Model"
@@ -822,7 +822,7 @@ msgstr "Ejecuciones"
 
 msgctxt "model:ir.action,name:act_babi_table"
 msgid "Tables"
-msgstr ""
+msgstr "Tablas"
 
 msgctxt "model:ir.action,name:clear_executions_wizard"
 msgid "Clean Executions"
@@ -930,7 +930,7 @@ msgstr ""
 
 msgctxt "model:ir.message,text:msg_table_no_fields"
 msgid "Table \"%(table)s\" cannot be computed because it has no fields."
-msgstr ""
+msgstr "La tabla \"%(table)s\" no puede ser calculada porque no tiene campos."
 
 msgctxt "model:ir.message,text:no_dimensions"
 msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
@@ -1064,7 +1064,7 @@ msgstr "Informe"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_table"
 msgid "Tables"
-msgstr ""
+msgstr "Tablas"
 
 msgctxt "model:ir.ui.menu,name:menu_configuration"
 msgid "Configuration"
@@ -1300,7 +1300,7 @@ msgstr "Calcular informe Babi"
 
 msgctxt "selection:ir.cron,method:"
 msgid "Calculate Babi Table"
-msgstr ""
+msgstr "Calcular tabla BABI"
 
 msgctxt "selection:ir.cron,method:"
 msgid "Clean Babi Excutions"
