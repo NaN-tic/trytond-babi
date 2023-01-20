@@ -134,6 +134,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             for table in tables:
                 cls.__queue__._compute(table)
 
+    def timeout_exception(self):
+        raise TimeoutException
+
     def _compute(self):
         if not self.fields_:
             raise UserError(gettext('babi.msg_table_no_fields',
@@ -155,7 +158,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         cursor.execute('CREATE TABLE IF NOT EXISTS "%s" (%s);' % (
                 self.internal_name, ', '.join(fields)))
 
-        checker = TimeoutChecker(self.timeout, TimeoutException)
+        checker = TimeoutChecker(self.timeout, self.timeout_exception)
         domain = self.get_domain_filter()
 
         context = self.get_context()
