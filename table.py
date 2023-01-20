@@ -130,8 +130,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def compute(cls, tables):
-        for table in tables:
-            cls.__queue__._compute(table)
+        with Transaction().set_context(queue_name='babi'):
+            for table in tables:
+                cls.__queue__._compute(table)
 
     def _compute(self):
         if not self.fields_:
