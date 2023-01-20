@@ -459,7 +459,7 @@ contains the full copyright notices and license terms. -->
         </record>
 
         <record model="ir.action.act_window" id="act_babi_report">
-            <field name="name">Report</field>
+            <field name="name">Reports</field>
             <field name="res_model">babi.report</field>
             <field name="search_value"></field>
             <!-- <field name="domain">[]</field> -->

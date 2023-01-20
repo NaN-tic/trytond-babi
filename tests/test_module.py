@@ -706,4 +706,42 @@ class BabiTestCase(CompanyTestMixin, ModuleTestCase):
         executions = Execution.search([])
         self.assertEqual(len(executions), 0)
 
+    @with_transaction()
+    def test_table(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Field = pool.get('babi.field')
+        Model = pool.get('ir.model')
+        Expression = pool.get('babi.expression')
+
+        self.create_data()
+
+        table = Table()
+        table.name = 'Table'
+        table.on_change_name()
+        self.assertEqual(table.internal_name, 'table')
+        table.model, = Model.search([('model', '=', 'babi.test')])
+
+        fields = []
+        names = set([])
+        for expression in Expression.search([], order=[('name', 'ASC')]):
+            field = Field()
+            field.expression = expression
+            field.on_change_expression()
+            field.on_change_name()
+            if field.name in names:
+                continue
+            names.add(field.name)
+            fields.append(field)
+
+        table.fields_ = fields
+        table.save()
+        table._compute()
+
+        cursor = Transaction().connection.cursor()
+        cursor.execute('SELECT count(*) FROM "%s"' % table.internal_name)
+        count = cursor.fetchall()[0][0]
+        self.assertNotEqual(count, 0)
+
+
 del ModuleTestCase

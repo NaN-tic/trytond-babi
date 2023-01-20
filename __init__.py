@@ -6,6 +6,7 @@ from . import cron
 from . import babi
 from . import test_model
 from . import report
+from . import table
 
 def register():
     Pool.register(
@@ -32,6 +33,8 @@ def register():
         babi.UpdateDataWizardUpdated,
         babi.CleanExecutionsStart,
         test_model.TestBabiModel,
+        table.Table,
+        table.Field,
         module='babi', type_='model')
     Pool.register(
         babi.OpenChart,

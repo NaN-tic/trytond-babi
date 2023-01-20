@@ -1,0 +1,87 @@
+<tryton>
+    <data>
+        <!-- babi.table -->
+        <record model="ir.ui.view" id="babi_table_form_view">
+            <field name="model">babi.table</field>
+            <field name="type">form</field>
+            <field name="name">table_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="babi_table_tree_view">
+            <field name="model">babi.table</field>
+            <field name="type">tree</field>
+            <field name="name">table_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_babi_table">
+            <field name="name">Tables</field>
+            <field name="res_model">babi.table</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_table_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="babi_table_tree_view"/>
+            <field name="act_window" ref="act_babi_table"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_table_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="babi_table_form_view"/>
+            <field name="act_window" ref="act_babi_table"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_table">
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_table_babi">
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
+            <field name="group" ref="group_babi"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <!-- Create button -->
+        <record model="ir.model.button" id="babi_table_calculate_button">
+            <field name="name">compute</field>
+            <field name="string">Compute</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
+        </record>
+
+        <menuitem id="menu_babi_table" parent="menu_babi" action="act_babi_table" sequence="10"/>
+
+        <!-- babi.field -->
+        <record model="ir.ui.view" id="babi_field_form_view">
+            <field name="model">babi.field</field>
+            <field name="type">form</field>
+            <field name="name">field_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="babi_field_tree_view">
+            <field name="model">babi.field</field>
+            <field name="type">tree</field>
+            <field name="name">field_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_babi_field">
+            <field name="name">Fields</field>
+            <field name="res_model">babi.field</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_field_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="babi_field_tree_view"/>
+            <field name="act_window" ref="act_babi_field"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_field_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="babi_field_form_view"/>
+            <field name="act_window" ref="act_babi_field"/>
+        </record>
+
+        <menuitem id="menu_babi_field" parent="menu_babi_table" action="act_babi_field" sequence="10"/>
+    </data>
+</tryton>

@@ -65,5 +65,30 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_render_report_columns">
             <field name="text">Print report "%(report)s" has dimensions in columns and is not supported.</field>
         </record>
+
+        <record model="ir.message" id="msg_invalid_table_internal_name_first_character">
+            <field name="text">Invalid first character in internal name "%(internal_name)s" in table "%(table)s".</field>
+        </record>
+        <record model="ir.message" id="msg_invalid_table_internal_name">
+            <field name="text">Invalid internal name "%(internal_name)s" in table "%(table)s".</field>
+        </record>
+        <record model="ir.message" id="msg_invalid_field_internal_name_first_character">
+            <field name="text">Invalid first character in internal name "%(internal_name)s" in field "%(field)s".</field>
+        </record>
+        <record model="ir.message" id="msg_invalid_field_internal_name">
+            <field name="text">Invalid internal name "%(internal_name)s" in field "%(field)s".</field>
+        </record>
+        <record model="ir.message" id="msg_filter_with_parameters">
+            <field name="text">Cannot use filters with parameters in table "%(table)s".</field>
+        </record>
+        <record model="ir.message" id="msg_table_no_fields">
+            <field name="text">Table "%(table)s" cannot be computed because it has no fields.</field>
+        </record>
+
+        <record model="ir.message" id="msg_compute_table_exception">
+            <field name="text">An exception occurred while computing the value for field "%(field)s" in table "%(table)s", record "%(record)s". The error was:
+
+%(error)s</field>
+        </record>
     </data>
 </tryton>
