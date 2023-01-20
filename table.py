@@ -289,7 +289,7 @@ class Field(ModelSQL, ModelView):
             self.name = self.expression.name
             self.on_change_name()
 
-    @fields.depends('table')
+    @fields.depends('table', '_parent_table.id')
     def on_change_with_model(self, name=None):
         if self.table:
             return self.table.model.id
