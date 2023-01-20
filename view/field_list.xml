@@ -1,0 +1,6 @@
+<tree editable="1">
+    <field name="table"/>
+    <field name="expression"/>
+    <field name="name"/>
+    <field name="internal_name"/>
+</tree>

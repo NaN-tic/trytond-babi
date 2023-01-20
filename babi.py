@@ -323,9 +323,12 @@ class TimeoutChecker:
         self._callback = callback
         self._start = datetime.now()
 
+    @property
+    def elapsed(self):
+        return (datetime.now() - self._start).seconds
+
     def check(self):
-        elapsed = (datetime.now() - self._start).seconds
-        if elapsed > self._timeout:
+        if self.elapsed > self._timeout:
             self._callback()
 
 
@@ -663,7 +666,7 @@ class Report(ModelSQL, ModelView):
     def default_timeout():
         Config = Pool().get('babi.configuration')
         config = Config(1)
-        return config.default_timeout
+        return config.default_timeout or 30
 
     @staticmethod
     def default_report_cell_level():

@@ -1,5 +1,6 @@
 <data>
     <xpath expr="/tree" position="inside">
         <field name="babi_report"/>
+        <field name="babi_table"/>
     </xpath>
 </data>
