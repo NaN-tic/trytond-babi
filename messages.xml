@@ -90,5 +90,11 @@ Exception: %(error)s</field>
 
 %(error)s</field>
         </record>
+        <record model="ir.message" id="msg_invalid_aggregate">
+            <field name="text">Aggregates "Sum" and "Average" are not supported in non numeric fields in parameter "%(parameter)s" in widget "%(widget)s".</field>
+        </record>
+        <record model="ir.message" id="msg_invalid_parameter_type">
+            <field name="text">Parameter "%(parameter)s" is not valid in widget "%(widget)s". Only the following types can be used: "%(types)s".</field>
+        </record>
     </data>
 </tryton>

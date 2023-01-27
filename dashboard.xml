@@ -1,0 +1,171 @@
+<tryton>
+    <data>
+        <record model="ir.action.url" id="action_url">
+            <field name="name">Dashboard</field>
+            <field name="url">babi-board</field>
+        </record>
+
+        <menuitem id="menu_dashboard_open" name="Dashboard" parent="menu_babi" sequence="40" action="action_url"/>
+
+        <!-- babi.dashboard -->
+        <record model="ir.ui.view" id="babi_dashboard_form_view">
+            <field name="model">babi.dashboard</field>
+            <field name="type">form</field>
+            <field name="name">dashboard_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="babi_dashboard_tree_view">
+            <field name="model">babi.dashboard</field>
+            <field name="type">tree</field>
+            <field name="name">dashboard_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_babi_dashboard">
+            <field name="name">Dashboards</field>
+            <field name="res_model">babi.dashboard</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_dashboard_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="babi_dashboard_tree_view"/>
+            <field name="act_window" ref="act_babi_dashboard"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_dashboard_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="babi_dashboard_form_view"/>
+            <field name="act_window" ref="act_babi_dashboard"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_dashboard">
+            <field name="model" search="[('model', '=', 'babi.dashboard')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_dashboard_babi">
+            <field name="model" search="[('model', '=', 'babi.dashboard')]"/>
+            <field name="group" ref="group_babi"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.model.button" id="show_dashboard_button">
+            <field name="name">show</field>
+            <field name="string">Show</field>
+            <field name="model" search="[('model', '=', 'babi.dashboard')]"/>
+        </record>
+        <record model="ir.model.button-res.group" id="show_dashboard_button_group_babi">
+            <field name="button" ref="show_dashboard_button"/>
+            <field name="group" ref="group_babi"/>
+        </record>
+
+        <menuitem id="menu_dashboard" parent="menu_babi" sequence="1" action="act_babi_dashboard"/>
+
+        <!-- babi.dashboard.item -->
+        <record model="ir.ui.view" id="babi_dashboard_item_form_view">
+            <field name="model">babi.dashboard.item</field>
+            <field name="type">form</field>
+            <field name="name">dashboard_item_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="babi_dashboard_item_tree_view">
+            <field name="model">babi.dashboard.item</field>
+            <field name="type">tree</field>
+            <field name="name">dashboard_item_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_babi_dashboard_item">
+            <field name="name">Dashboard Items</field>
+            <field name="res_model">babi.dashboard.item</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_dashboard_item_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="babi_dashboard_item_tree_view"/>
+            <field name="act_window" ref="act_babi_dashboard_item"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_dashboard_item_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="babi_dashboard_item_form_view"/>
+            <field name="act_window" ref="act_babi_dashboard_item"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_dashboard_item">
+            <field name="model" search="[('model', '=', 'babi.dashboard.item')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_dashboard_item_babi">
+            <field name="model" search="[('model', '=', 'babi.dashboard.item')]"/>
+            <field name="group" ref="group_babi"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <!-- babi.widget -->
+        <record model="ir.ui.view" id="babi_widget_form_view">
+            <field name="model">babi.widget</field>
+            <field name="type">form</field>
+            <field name="name">widget_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="babi_widget_tree_view">
+            <field name="model">babi.widget</field>
+            <field name="type">tree</field>
+            <field name="name">widget_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_babi_widget">
+            <field name="name">Widgets</field>
+            <field name="res_model">babi.widget</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_widget_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="babi_widget_tree_view"/>
+            <field name="act_window" ref="act_babi_widget"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_widget_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="babi_widget_form_view"/>
+            <field name="act_window" ref="act_babi_widget"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_widget">
+            <field name="model" search="[('model', '=', 'babi.widget')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_widget_babi">
+            <field name="model" search="[('model', '=', 'babi.widget')]"/>
+            <field name="group" ref="group_babi"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <menuitem id="menu_widget" parent="menu_dashboard" sequence="1" action="act_babi_widget"/>
+
+        <!-- babi.widget.parameter -->
+        <record model="ir.ui.view" id="babi_widget_parameter_form_view">
+            <field name="model">babi.widget.parameter</field>
+            <field name="type">form</field>
+            <field name="name">widget_parameter_form</field>
+        </record>
+        <record model="ir.ui.view" id="babi_widget_parameter_tree_view">
+            <field name="model">babi.widget.parameter</field>
+            <field name="type">tree</field>
+            <field name="name">widget_parameter_list</field>
+        </record>
+    </data>
+</tryton>

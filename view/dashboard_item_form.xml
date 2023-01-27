@@ -1,0 +1,10 @@
+<form col="6">
+    <label name="dashboard"/>
+    <field name="dashboard"/>
+    <label name="widget"/>
+    <field name="widget"/>
+    <label name="sequence"/>
+    <field name="sequence"/>
+    <label name="colspan"/>
+    <field name="colspan"/>
+</form>

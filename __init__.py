@@ -7,6 +7,8 @@ from . import babi
 from . import test_model
 from . import report
 from . import table
+from . import dashboard
+from . import action
 
 def register():
     Pool.register(
@@ -32,6 +34,14 @@ def register():
         babi.UpdateDataWizardStart,
         babi.UpdateDataWizardUpdated,
         babi.CleanExecutionsStart,
+        dashboard.Dashboard,
+        dashboard.DashboardItem,
+        dashboard.Widget,
+        dashboard.WidgetParameter,
+        action.View,
+        action.Action,
+        action.ActionDashboard,
+        action.Menu,
         test_model.TestBabiModel,
         table.Table,
         table.Field,
