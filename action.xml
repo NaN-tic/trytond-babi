@@ -1,0 +1,36 @@
+<tryton>
+    <data>
+        <!-- babi.action.dashboard -->
+        <!---->
+        <record model="ir.ui.view" id="action_dashboard_view_form">
+            <field name="model">babi.action.dashboard</field>
+            <field name="type">form</field>
+            <field name="name">action_dashboard_form</field>
+        </record>
+        <record model="ir.ui.view" id="action_dashboard_view_tree">
+            <field name="model">babi.action.dashboard</field>
+            <field name="type">tree</field>
+            <field name="name">action_dashboard_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_action_dashboard_form">
+            <field name="name">Dashboards</field>
+            <field name="type">ir.action.act_window</field>
+            <field name="res_model">babi.action.dashboard</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_action_url_form_view1">
+            <field name="sequence" eval="1"/>
+            <field name="view" ref="action_dashboard_view_tree"/>
+            <field name="act_window" ref="act_action_dashboard_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_action_url_form_view2">
+            <field name="sequence" eval="2"/>
+            <field name="view" ref="action_dashboard_view_form"/>
+            <field name="act_window" ref="act_action_dashboard_form"/>
+        </record>
+        <menuitem
+            parent="ir.menu_action"
+            action="act_action_dashboard_form"
+            sequence="60"
+            id="menu_action_dashboard"/>
+    </data>
+</tryton>

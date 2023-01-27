@@ -672,51 +672,37 @@ contains the full copyright notices and license terms. -->
         </record>
 
         <!-- Menus -->
-        <menuitem id="menu_babi" name="Business Intelligence" sequence="100"
-            icon="tryton-graph"/>
-        <menuitem id="menu_configuration" name="Configuration"
-            parent="menu_babi" sequence="10" icon="tryton-settings"/>
-        <menuitem id="menu_update_data" name="Update data"
-            parent="menu_babi" sequence="10" active="0"/>
-        <menuitem id="menu_historical_data" name="View historical data"
-            parent="menu_babi" sequence="10" active="0"/>
+        <menuitem id="menu_babi" name="Business Intelligence" sequence="100" icon="tryton-graph"/>
+        <menuitem id="menu_configuration" name="Configuration" parent="menu_babi" sequence="10" icon="tryton-settings"/>
+        <menuitem id="menu_update_data" name="Update data" parent="menu_babi" sequence="10" active="0"/>
+        <menuitem id="menu_historical_data" name="View historical data" parent="menu_babi" sequence="10" active="0"/>
 
-        <record model="ir.ui.menu-res.group"
-            id="menu_babi_group_babi">
+        <record model="ir.ui.menu-res.group" id="menu_babi_group_babi">
             <field name="menu" ref="menu_babi"/>
             <field name="group" ref="group_babi"/>
         </record>
 
-        <record model="ir.ui.menu-res.group"
-            id="menu_configuration_group_babi_admin">
+        <record model="ir.ui.menu-res.group" id="menu_configuration_group_babi_admin">
             <field name="menu" ref="menu_configuration"/>
             <field name="group" ref="group_babi_admin"/>
         </record>
 
-        <menuitem action="act_babi_expression" id="menu_babi_expression"
-            parent="menu_configuration" sequence="10" name="Expressions"/>
-        <menuitem action="act_babi_filter" id="menu_babi_filter"
-            parent="menu_configuration" sequence="20" name="Filters"/>
-        <menuitem action="act_babi_report" id="menu_babi_report"
-            parent="menu_babi" sequence="20" name="Reports"/>
-        <record model="ir.ui.menu-res.group"
-            id="menu_report_group_babi">
+        <menuitem action="act_babi_expression" id="menu_babi_expression" parent="menu_configuration" sequence="10" name="Expressions"/>
+        <menuitem action="act_babi_filter" id="menu_babi_filter" parent="menu_configuration" sequence="20" name="Filters"/>
+
+        <menuitem action="act_babi_report" id="menu_babi_report" parent="menu_babi" sequence="20" name="Reports"/>
+        <record model="ir.ui.menu-res.group" id="menu_report_group_babi">
             <field name="menu" ref="menu_babi_report"/>
             <field name="group" ref="group_babi"/>
         </record>
-        <record model="ir.ui.menu-res.group"
-            id="menu_report_group_babi_admin">
+        <record model="ir.ui.menu-res.group" id="menu_report_group_babi_admin">
             <field name="menu" ref="menu_babi_report"/>
             <field name="group" ref="group_babi_admin"/>
         </record>
-        <menuitem action="act_babi_execution" id="menu_babi_execution"
-            parent="menu_babi_report" sequence="10" name="Executions"/>
-        <menuitem action="clear_executions_wizard"
-            id="menu_babi_clean_execution" parent="menu_babi_report"
-            sequence="20" name="Clean Executions"/>
+        <menuitem action="act_babi_execution" id="menu_babi_execution" parent="menu_babi_report" sequence="10" name="Executions"/>
+        <menuitem action="clear_executions_wizard" id="menu_babi_clean_execution" parent="menu_babi_report" sequence="20" name="Clean Executions"/>
 
-        <record model="ir.ui.menu-res.group"
-            id="menu_execution_group_babi_admin">
+        <record model="ir.ui.menu-res.group" id="menu_execution_group_babi_admin">
             <field name="menu" ref="menu_babi_execution"/>
             <field name="group" ref="group_babi_admin"/>
         </record>

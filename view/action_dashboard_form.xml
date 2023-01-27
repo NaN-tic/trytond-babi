@@ -1,0 +1,20 @@
+<form>
+    <label name="name"/>
+    <field name="name"/>
+    <label name="active"/>
+    <field name="active" xexpand="0" width="100"/>
+    <notebook colspan="4">
+        <page string="General" id="general">
+            <label name="dashboard"/>
+            <field name="dashboard"/>
+            <label name="icon"/>
+            <field name="icon"/>
+        </page>
+        <page name="keywords">
+            <field name="keywords" colspan="4"/>
+        </page>
+        <page name="groups">
+            <field name="groups" colspan="4"/>
+        </page>
+    </notebook>
+</form>

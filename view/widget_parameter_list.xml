@@ -1,0 +1,6 @@
+<tree editable="1">
+    <field name="widget"/>
+    <field name="type"/>
+    <field name="field" expand="1"/>
+    <field name="aggregate"/>
+</tree>

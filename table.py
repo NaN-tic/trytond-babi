@@ -7,16 +7,19 @@ from simpleeval import EvalWithCompoundTypes
 from trytond.bus import notify
 from trytond.transaction import Transaction
 from trytond.pool import Pool
-from trytond.model import ModelView, ModelSQL, fields, Unique, DeactivableMixin
+from trytond.model import (ModelView, ModelSQL, fields, Unique,
+    DeactivableMixin, sequence_ordered)
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
 from trytond.pyson import Eval, PYSONDecoder
-from .babi import TimeoutChecker, TimeoutException
+from trytond import backend
+from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES
 from .babi_eval import babi_eval
 
 VALID_FIRST_SYMBOLS = 'abcdefghijklmnopqrstuvwxyz'
 VALID_NEXT_SYMBOLS = '_0123456789'
 VALID_SYMBOLS = VALID_FIRST_SYMBOLS + VALID_NEXT_SYMBOLS
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +49,30 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     'BABI Table'
     __name__ = 'babi.table'
     name = fields.Char('Name', required=True)
+    type = fields.Selection([
+            (None, ''),
+            ('model', 'Model'),
+            ('table', 'Table'),
+            ('query', 'Query'),
+            ], 'Type', required=True)
     internal_name = fields.Char('Internal Name', required=True)
-    model = fields.Many2One('ir.model', 'Model', required=True,
-        domain=[('babi_enabled', '=', True)])
+    model = fields.Many2One('ir.model', 'Model', states={
+            'invisible': Eval('type') != 'model',
+            'required': Eval('type') == 'model',
+            }, domain=[('babi_enabled', '=', True)])
     filter = fields.Many2One('babi.filter', 'Filter', domain=[
             ('model', '=', Eval('model')),
-            ], depends=['model'])
+            ], states={
+            'invisible': Eval('type') != 'model',
+            }, depends=['model'])
     fields_ = fields.One2Many('babi.field', 'table', 'Fields')
-    timeout = fields.Integer('Timeout', required=True, help='If table '
+    query = fields.Text('Query', states={
+            'invisible': ~Eval('type').in_(['query', 'table']),
+            'required': Eval('type').in_(['query', 'table']),
+            }, depends=['type'])
+    timeout = fields.Integer('Timeout', required=True, states={
+            'invisible': ~Eval('type').in_(['model', 'table']),
+            }, help='If table '
         'calculation should take more than the specified timeout (in seconds) '
         'the process will be stopped automatically.')
     babi_raise_user_error = fields.Boolean('Raise User Error',
@@ -134,118 +153,242 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             for table in tables:
                 cls.__queue__._compute(table)
 
+    @property
+    def table_name(self):
+        # Add a suffix to the table name to prevent removing production tables
+        return '__' + self.internal_name
+
+    def get_query(self, fields=None, where=None, groupby=None, limit=None):
+        query = 'SELECT '
+        if fields:
+            query += ', '.join(fields) + ' '
+        else:
+            query += '* '
+
+        if self.type == 'query':
+            query += 'FROM (%s) AS a ' % self._stripped_query
+        else:
+            query += 'FROM %s ' % self.table_name
+        if where:
+            where = where.format(**Transaction().context)
+            query += 'WHERE %s ' % where
+
+        if groupby:
+            query += 'GROUP BY %s ' % ', '.join(groupby) + ' '
+
+        query += 'ORDER BY %s' % ', '.join(fields)
+        return query
+
+    def execute_query(self, fields=None, where=None, groupby=None, timeout=None,
+            limit=None):
+        if timeout is None:
+            timeout = 10
+        if not backend.TableHandler.table_exist(self.table_name):
+            return []
+        with Transaction().new_transaction() as transaction:
+            cursor = transaction.connection.cursor()
+            cursor.execute('SET statement_timeout TO %s;' % timeout * 1000)
+            query = self.get_query(fields, where=where, groupby=groupby,
+                limit=limit)
+            cursor.execute(query)
+            records = cursor.fetchall()
+        return records
+
     def timeout_exception(self):
         raise TimeoutException
 
     def _compute(self):
-        if not self.fields_:
-            raise UserError(gettext('babi.msg_table_no_fields',
-                    table=self.name))
+        if self.type == 'model':
+            if not self.fields_:
+                raise UserError(gettext('babi.msg_table_no_fields',
+                        table=self.name))
 
-        if self.filter and self.filter.parameters:
-            raise UserError(gettext('babi.msg_filter_with_parameters',
-                    table=self.rec_name))
+            if self.filter and self.filter.parameters:
+                raise UserError(gettext('babi.msg_filter_with_parameters',
+                        table=self.rec_name))
 
+        if self.type == 'model':
+            self._compute_model()
+        elif self.type == 'table':
+            self._compute_table()
+        elif self.type == 'query':
+            self._compute_query()
+
+    def update_fields(self, field_names):
+        pool = Pool()
+        Field = pool.get('babi.field')
+
+        # Update self.fields_
+        to_save = []
+        to_delete = []
+        existing_fields = set([])
+        for field in self.fields_:
+            if field.internal_name not in field_names:
+                to_delete.append(field)
+                continue
+            field.sequence = field_names.index(field.internal_name)
+            existing_fields.add(field.internal_name)
+            to_save.append(field)
+
+        for field_name in (set(field_names) - existing_fields):
+            field = Field()
+            field.table = self
+            field.name = field_name
+            field.internal_name = field_name
+            field.sequence = field_names.index(field.internal_name)
+            to_save.append(field)
+
+        Field.save(to_save)
+        Field.delete(to_delete)
+
+    @property
+    def _stripped_query(self):
+        if self.query:
+            return self.query.strip().rstrip(';')
+        else:
+            return ''
+
+    def _compute_query(self):
+        with Transaction().new_transaction() as transaction:
+            cursor = Transaction().connection.cursor()
+            cursor.execute('%s LIMIT 1' % self._stripped_query)
+
+        field_names = [x[0] for x in cursor.description]
+        self.update_fields(field_names)
+
+    def _compute_table(self):
+        with Transaction().new_transaction() as transaction:
+            cursor = Transaction().connection.cursor()
+            cursor.execute('DROP TABLE IF EXISTS "%s"' % self.table_name)
+            cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
+                    self._stripped_query))
+            cursor.execute('SELECT * FROM "%s" LIMIT 1' % self.table_name)
+
+        field_names = [x[0] for x in cursor.description]
+        self.update_fields(field_names)
+
+
+
+    def _compute_model(self):
         Model = Pool().get(self.model.model)
 
-        cursor = Transaction().connection.cursor()
+        with Transaction().new_transaction() as transaction:
+            cursor = Transaction().connection.cursor()
 
-        # Create table
-        cursor.execute('DROP TABLE IF EXISTS "%s"' % self.internal_name)
-        fields = []
-        for field in self.fields_:
-            fields.append('"%s" %s' % (field.internal_name, field.sql_type()))
-        cursor.execute('CREATE TABLE IF NOT EXISTS "%s" (%s);' % (
-                self.internal_name, ', '.join(fields)))
+            cursor.execute('DROP TABLE IF EXISTS "%s"' % self.table_name)
+            fields = []
+            for field in self.fields_:
+                fields.append('"%s" %s' % (field.internal_name, field.sql_type()))
+            cursor.execute('CREATE TABLE IF NOT EXISTS "%s" (%s);' % (
+                    self.table_name, ', '.join(fields)))
 
-        checker = TimeoutChecker(self.timeout, self.timeout_exception)
-        domain = self.get_domain_filter()
+            checker = TimeoutChecker(self.timeout, self.timeout_exception)
+            domain = self.get_domain_filter()
 
-        context = self.get_context()
-        if not context:
-            context = {}
-        else:
-            assert isinstance(context, dict)
-        context['_datetime'] = None
-        # This is needed when execute the wizard to calculate the report, to
-        # ensure the company rule is used.
-        context['_check_access'] = True
+            context = self.get_context()
+            if not context:
+                context = {}
+            else:
+                assert isinstance(context, dict)
+            context['_datetime'] = None
+            # This is needed when execute the wizard to calculate the report, to
+            # ensure the company rule is used.
+            context['_check_access'] = True
 
-        python_filter = self.get_python_filter()
+            python_filter = self.get_python_filter()
 
-        table = sql.Table(self.internal_name)
-        columns = [sql.Column(table, x.internal_name) for x in self.fields_]
-        expressions = [x.expression.expression for x in self.fields_]
-        index = 0
-        count = 0
-        offset = 2000
+            table = sql.Table(self.table_name)
+            columns = [sql.Column(table, x.internal_name) for x in self.fields_]
+            expressions = [x.expression.expression for x in self.fields_]
+            index = 0
+            count = 0
+            offset = 2000
 
-        with Transaction().set_context(**context):
-            try:
-                records = Model.search(domain, offset=index * offset,
-                    limit=offset)
-            except Exception as message:
-                if self.babi_raise_user_error:
-                    raise UserError(gettext(
-                        'babi.create_data_exception',
-                        error=repr(message)))
-                raise
-
-        while records:
-            checker.check()
-            logger.info('Calculated %s, %s records in %s seconds'
-                % (self.model.model, count, checker.elapsed))
-
-            to_insert = []
-            for record in records:
-                if python_filter:
-                    if not babi_eval(python_filter, record, convert_none=None):
-                        continue
-                values = []
-                for expression in expressions:
-                    try:
-                        values.append(babi_eval(expression, record,
-                                convert_none=None))
-                    except Exception as message:
-                        notify(gettext('babi.msg_compute_table_exception',
-                                table=self.name, field=field.name,
-                                record=record.id, error=repr(message)),
-                            priority=1)
-                        if self.babi_raise_user_error:
-                            raise UserError(gettext(
-                                'babi.msg_compute_table_exception',
-                                table=self.name,
-                                field=field.name,
-                                record=record.id,
-                                error=repr(message)))
-                        raise
-
-                to_insert.append(values)
-
-            cursor.execute(*table.insert(columns=columns, values=to_insert))
-
-            index += 1
-            count += len(records)
             with Transaction().set_context(**context):
-                records = Model.search(domain, offset=index * offset,
-                    limit=offset)
+                try:
+                    records = Model.search(domain, offset=index * offset,
+                        limit=offset)
+                except Exception as message:
+                    if self.babi_raise_user_error:
+                        raise UserError(gettext(
+                            'babi.create_data_exception',
+                            error=repr(message)))
+                    raise
+
+            while records:
+                checker.check()
+                logger.info('Calculated %s, %s records in %s seconds'
+                    % (self.model.model, count, checker.elapsed))
+
+                to_insert = []
+                for record in records:
+                    if python_filter:
+                        if not babi_eval(python_filter, record, convert_none=None):
+                            continue
+                    values = []
+                    for expression in expressions:
+                        try:
+                            values.append(babi_eval(expression, record,
+                                    convert_none=None))
+                        except Exception as message:
+                            notify(gettext('babi.msg_compute_table_exception',
+                                    table=self.name, field=field.name,
+                                    record=record.id, error=repr(message)),
+                                priority=1)
+                            if self.babi_raise_user_error:
+                                raise UserError(gettext(
+                                    'babi.msg_compute_table_exception',
+                                    table=self.name,
+                                    field=field.name,
+                                    record=record.id,
+                                    error=repr(message)))
+                            raise
+
+                    to_insert.append(values)
+
+                cursor.execute(*table.insert(columns=columns, values=to_insert))
+
+                index += 1
+                count += len(records)
+                with Transaction().set_context(**context):
+                    records = Model.search(domain, offset=index * offset,
+                        limit=offset)
 
         logger.info('Calculated %s, %s records in %s seconds'
             % (self.model.model, count, checker.elapsed))
 
 
-class Field(ModelSQL, ModelView):
+class Field(sequence_ordered(), ModelSQL, ModelView):
     'BABI Field'
     __name__ = 'babi.field'
     table = fields.Many2One('babi.table', 'Table', required=True)
     name = fields.Char('Name', required=True)
     internal_name = fields.Char('Internal Name', required=True)
-    expression = fields.Many2One('babi.expression', 'Expression', required=True,
-        domain=[
+    expression = fields.Many2One('babi.expression', 'Expression', states={
+            'invisible': Eval('table_type') != 'model',
+            'required': Eval('table_type') == 'model'
+            }, domain=[
             ('model', '=', Eval('model')),
             ], depends=['model'])
     model = fields.Function(fields.Many2One('ir.model', 'Model'),
         'on_change_with_model')
+    type = fields.Function(fields.Selection(FIELD_TYPES, 'Type'),
+        'on_change_with_type')
+    table_type = fields.Function(fields.Selection([
+            ('model', 'Model'),
+            ('table', 'Table'),
+            ('query', 'Query'),
+            ], 'Table Type'), 'on_change_with_table_type')
+
+    @fields.depends('expression')
+    def on_change_with_type(self, name=None):
+        if self.expression:
+            return self.expression.ttype
+
+    @fields.depends('table', '_parent_table.type')
+    def on_change_with_table_type(self, name=None):
+        if self.table:
+            return self.table.type
 
     @classmethod
     def __setup__(cls):
@@ -295,7 +438,7 @@ class Field(ModelSQL, ModelView):
             self.name = self.expression.name
             self.on_change_name()
 
-    @fields.depends('table', '_parent_table.id')
+    @fields.depends('table', '_parent_table.model')
     def on_change_with_model(self, name=None):
-        if self.table:
+        if self.table and self.table.model:
             return self.table.model.id

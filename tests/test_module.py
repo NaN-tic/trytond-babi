@@ -717,9 +717,10 @@ class BabiTestCase(CompanyTestMixin, ModuleTestCase):
         self.create_data()
 
         table = Table()
-        table.name = 'Table'
+        table.type = 'model'
+        table.name = 'Table 1'
         table.on_change_name()
-        self.assertEqual(table.internal_name, 'table')
+        self.assertEqual(table.internal_name, 'table_1')
         table.model, = Model.search([('model', '=', 'babi.test')])
 
         fields = []
@@ -739,9 +740,25 @@ class BabiTestCase(CompanyTestMixin, ModuleTestCase):
         table._compute()
 
         cursor = Transaction().connection.cursor()
-        cursor.execute('SELECT count(*) FROM "%s"' % table.internal_name)
+        cursor.execute('SELECT count(*) FROM "%s"' % table.table_name)
         count = cursor.fetchall()[0][0]
         self.assertNotEqual(count, 0)
+
+        table = Table()
+        table.type = 'table'
+        table.name = 'Table 2'
+        table.on_change_name()
+        table.query = 'SELECT amount, category FROM babi_test'
+        table.save()
+        table._compute()
+        fields = [x.internal_name for x in table.fields_]
+        self.assertEqual(fields, ['amount', 'category'])
+
+        table.query = 'SELECT date, amount FROM babi_test'
+        table.save()
+        table._compute()
+        fields = [x.internal_name for x in table.fields_]
+        self.assertEqual(fields, ['date', 'amount'])
 
 
 del ModuleTestCase

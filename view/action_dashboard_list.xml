@@ -1,0 +1,5 @@
+<tree>
+    <field name="name" expand="2"/>
+    <field name="type" expand="1"/>
+    <field name="dashboard" expand="1"/>
+</tree>

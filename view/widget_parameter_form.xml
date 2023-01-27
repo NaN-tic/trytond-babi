@@ -1,0 +1,11 @@
+<form col="6">
+    <label name="widget"/>
+    <field name="widget"/>
+    <newline/>
+    <label name="type"/>
+    <field name="type"/>
+    <label name="field"/>
+    <field name="field"/>
+    <label name="aggregate"/>
+    <field name="aggregate"/>
+</form>

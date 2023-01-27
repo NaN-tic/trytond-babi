@@ -52,7 +52,7 @@
             <field name="model" search="[('model', '=', 'babi.table')]"/>
         </record>
 
-        <menuitem id="menu_babi_table" parent="menu_babi" action="act_babi_table" sequence="10"/>
+        <menuitem id="menu_babi_table" parent="menu_configuration" action="act_babi_table" sequence="30"/>
 
         <!-- babi.field -->
         <record model="ir.ui.view" id="babi_field_form_view">

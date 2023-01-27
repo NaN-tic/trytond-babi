@@ -1,0 +1,23 @@
+<form col="6">
+    <label name="name"/>
+    <field name="name"/>
+    <label name="type"/>
+    <field name="type"/>
+    <label name="table"/>
+    <field name="table"/>
+    <label name="where"/>
+    <field name="where" colspan="5"/>
+    <label name="timeout"/>
+    <field name="timeout"/>
+    <newline/>
+    <notebook colspan="4">
+        <page name="parameters">
+            <field name="parameters" colspan="4"/>
+        </page>
+        <page id="settings" string="Settings">
+            <label name="show_legend"/>
+            <field name="show_legend"/>
+        </page>
+    </notebook>
+    <field name="chart" widget="chart" colspan="2"/>
+</form>

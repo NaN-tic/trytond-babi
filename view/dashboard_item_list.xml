@@ -1,0 +1,5 @@
+<tree sequence="sequence" editable="1">
+    <field name="dashboard"/>
+    <field name="widget"/>
+    <field name="colspan"/>
+</tree>

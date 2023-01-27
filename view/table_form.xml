@@ -3,11 +3,16 @@
     <field name="name"/>
     <label name="internal_name"/>
     <field name="internal_name"/>
+    <label name="type"/>
+    <field name="type"/>
     <label name="model"/>
     <field name="model"/>
     <label name="filter"/>
-    <field name="filter" colspan="3"/>
+    <field name="filter"/>
     <button name="compute" colspan="2"/>
+    <newline/>
+    <separator name="query" colspan="6"/>
+    <field name="query" colspan="6"/>
     <notebook colspan="6">
         <page name="fields_">
             <field name="fields_" colspan="4"/>
