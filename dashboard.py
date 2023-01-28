@@ -84,6 +84,7 @@ class Widget(ModelSQL, ModelView):
             ('line', 'Line'),
             ('pie', 'Pie'),
             ('scatter', 'Scatter'),
+            ('scatter-map', 'Scatter Map'),
             ('table', 'Table'),
             ('value', 'Value'),
             ], 'Type')
@@ -181,6 +182,29 @@ class Widget(ModelSQL, ModelView):
                 chart['type'] = 'scatter'
                 chart.update(self.get_values())
                 chart['mode'] = 'markers'
+            elif self.type == 'scatter-map':
+                values = self.get_values()
+                chart['text'] = values.get('labels', [])
+                chart['lat'] = values.get('latitude', [])
+                chart['lon'] = values.get('longitude', [])
+                chart['type'] = 'scattermapbox'
+                if chart['lat']:
+                    # Latitude median:
+                    center_latitude = sum(chart['lat']) / len(chart['lat'])
+                    # Longitude median:
+                    center_longitude = sum(chart['lon']) / len(chart['lon'])
+                else:
+                    center_latitude = 0
+                    center_longitude = 0
+                layout['mapbox'] = {
+                    'style': 'open-street-map',
+                    'dragmode': 'zoom',
+                    'center': {
+                        'lat': center_latitude,
+                        'lon': center_longitude,
+                        },
+                    'zoom': 1,
+                    }
             elif self.type == 'table':
                 values = self.get_values()
                 chart['type'] = 'table'
@@ -403,6 +427,24 @@ class Widget(ModelSQL, ModelView):
                     'aggregate': 'forbidden',
                     },
                 }
+        elif self.type == 'scatter-map':
+            return {
+                'labels': {
+                    'min': 1,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
+                'latitude': {
+                    'min': 1,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
+                'longitude': {
+                    'min': 1,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
+                }
         elif self.type == 'table':
             return {
                 'labels': {
@@ -439,6 +481,8 @@ class WidgetParameter(ModelSQL, ModelView):
     type = fields.Selection([
             ('delta', 'Delta'),
             ('labels', 'Labels'),
+            ('latitude', 'Latitude'),
+            ('longitude', 'Longitude'),
             ('minimum', 'Minimum'),
             ('maximum', 'Maximum'),
             ('sizes', 'Sizes'),
