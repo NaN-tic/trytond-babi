@@ -245,6 +245,16 @@ class Widget(ModelSQL, ModelView):
                 else:
                     center_latitude = 0
                     center_longitude = 0
+                sizes = values.get('sizes', [])
+                if sizes:
+                    chart['marker'] = {
+                        'size': sizes,
+                        }
+                colors = values.get('colors', [])
+                if colors:
+                    chart['marker'] = {
+                        'color': colors,
+                        }
                 layout['dragmode'] = 'zoom'
                 layout['mapbox'] = {
                     'style': 'open-street-map',
@@ -494,6 +504,16 @@ class Widget(ModelSQL, ModelView):
                     'max': 1,
                     'aggregate': 'forbidden',
                     },
+                'colors': {
+                    'min': 0,
+                    'max': 1,
+                    'aggregate': 'required',
+                    },
+                'sizes': {
+                    'min': 0,
+                    'max': 1,
+                    'aggregate': 'required',
+                    },
                 }
         elif self.type == 'table':
             return {
@@ -529,6 +549,7 @@ class WidgetParameter(ModelSQL, ModelView):
     widget = fields.Many2One('babi.widget', 'Widget', required=True,
         ondelete='CASCADE')
     type = fields.Selection([
+            ('colors', 'Colors'),
             ('delta', 'Delta'),
             ('labels', 'Labels'),
             ('latitude', 'Latitude'),
