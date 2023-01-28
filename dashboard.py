@@ -165,21 +165,20 @@ class Widget(ModelSQL, ModelView):
         if self.show_toolbox != 'on-hover':
             config['displayModeBar'] = self.show_toolbox == 'always'
 
+        values = self.get_values()
+
         try:
             chart = {
                 'type': self.type,
             }
             data.append(chart)
             if self.type == 'area':
-                chart.update(self.get_values())
+                chart.update(values)
                 chart['type'] = 'scatter'
                 chart['fill'] = 'tonexty'
             elif self.type == 'bar':
-                chart.update(self.get_values())
-            elif self.type == 'pie':
-                chart.update(self.get_values())
+                chart.update(values)
             elif self.type == 'bubble':
-                values = self.get_values()
                 chart['type'] = 'scatter'
                 chart.update({
                         'x': values.get('x', []),
@@ -190,11 +189,10 @@ class Widget(ModelSQL, ModelView):
                         'size': values.get('sizes', []),
                         }
             elif self.type == 'doughnut':
-                chart.update(self.get_values())
+                chart.update(values)
                 chart['type'] = 'pie'
                 chart['hole'] = 0.4
             elif self.type == 'funnel':
-                values = self.get_values()
                 chart['type'] = 'funnelarea'
                 chart['values'] = values.get('values', [])
                 chart['text'] = values.get('labels', [])
@@ -202,7 +200,6 @@ class Widget(ModelSQL, ModelView):
                         'funnelmode': 'stack',
                         })
             elif self.type == 'gauge':
-                values = self.get_values()
                 value = values.get('value', [])
                 chart['value'] = value and value[0] or '-'
                 chart['mode'] = 'gauge'
@@ -226,13 +223,14 @@ class Widget(ModelSQL, ModelView):
                 print(chart)
             elif self.type == 'line':
                 chart['type'] = 'scatter'
-                chart.update(self.get_values())
+                chart.update(values)
+            elif self.type == 'pie':
+                chart.update(values)
             elif self.type == 'scatter':
                 chart['type'] = 'scatter'
-                chart.update(self.get_values())
+                chart.update(values)
                 chart['mode'] = 'markers'
             elif self.type == 'scatter-map':
-                values = self.get_values()
                 chart['text'] = values.get('labels', [])
                 chart['lat'] = values.get('latitude', [])
                 chart['lon'] = values.get('longitude', [])
@@ -265,11 +263,10 @@ class Widget(ModelSQL, ModelView):
                     'zoom': self.zoom or 1,
                     }
             elif self.type == 'table':
-                values = self.get_values()
                 chart['type'] = 'table'
                 header = []
                 columns = []
-                for key, vals in self.get_values().items():
+                for key, vals in values.items():
                     header.append(key)
                     columns.append(vals)
                 chart['header'] = {
@@ -279,7 +276,6 @@ class Widget(ModelSQL, ModelView):
                     'values': columns,
                     }
             elif self.type == 'value':
-                values = self.get_values()
                 value = values.get('value', [])
                 chart['value'] = value and value[0] or '-'
                 chart['mode'] = 'number'
