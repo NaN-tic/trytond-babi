@@ -14,9 +14,19 @@
         <page name="parameters">
             <field name="parameters" colspan="4"/>
         </page>
-        <page id="settings" string="Settings">
+        <page id="settings" string="Settings" col="6">
+            <label name="show_title"/>
+            <field name="show_title"/>
             <label name="show_legend"/>
             <field name="show_legend"/>
+            <label name="static"/>
+            <field name="static"/>
+            <label name="show_toolbox"/>
+            <field name="show_toolbox"/>
+            <label name="image_format"/>
+            <field name="image_format"/>
+            <label name="zoom"/>
+            <field name="zoom"/>
         </page>
     </notebook>
     <field name="chart" widget="chart" colspan="2"/>
