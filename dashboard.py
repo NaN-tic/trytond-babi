@@ -84,6 +84,7 @@ class Widget(ModelSQL, ModelView):
             ('funnel', 'Funnel'),
             ('gauge', 'Gauge'),
             ('line', 'Line'),
+            ('country-map', 'Country Map'),
             ('pie', 'Pie'),
             ('scatter', 'Scatter'),
             ('scatter-map', 'Scatter Map'),
@@ -187,6 +188,21 @@ class Widget(ModelSQL, ModelView):
                 chart['mode'] = 'markers'
                 chart['marker'] = {
                         'size': values.get('sizes', []),
+                        }
+            elif self.type == 'country-map':
+                chart['type'] = 'scattergeo'
+                chart['mode'] = 'markers'
+                chart['text'] = values.get('labels', [])
+                chart['locations'] = values.get('locations', [])
+                sizes = values.get('sizes', [])
+                if sizes:
+                    chart['marker'] = {
+                        'size': values.get('sizes', []),
+                        }
+                colors = values.get('colors', [])
+                if colors:
+                    chart['marker'] = {
+                        'color': values.get('colors', []),
                         }
             elif self.type == 'doughnut':
                 chart.update(values)
@@ -408,6 +424,29 @@ class Widget(ModelSQL, ModelView):
                     'aggregate': 'required',
                     },
                 }
+        elif self.type == 'country-map':
+            return {
+                'labels': {
+                    'min': 1,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
+                'locations': {
+                    'min': 1,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
+                'colors': {
+                    'min': 0,
+                    'max': 1,
+                    'aggregate': 'required',
+                    },
+                'sizes': {
+                    'min': 0,
+                    'max': 1,
+                    'aggregate': 'required',
+                    },
+                }
         elif self.type == 'doughnut':
             return {
                 'labels': {
@@ -549,6 +588,7 @@ class WidgetParameter(ModelSQL, ModelView):
             ('delta', 'Delta'),
             ('labels', 'Labels'),
             ('latitude', 'Latitude'),
+            ('locations', 'Locations'),
             ('longitude', 'Longitude'),
             ('minimum', 'Minimum'),
             ('maximum', 'Maximum'),
