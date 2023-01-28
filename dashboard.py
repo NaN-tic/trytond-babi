@@ -6,6 +6,7 @@ from trytond.pyson import Eval, Bool
 from trytond.transaction import Transaction
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
+from .table import convert_to_symbol
 
 
 class Dashboard(ModelSQL, ModelView):
@@ -99,7 +100,27 @@ class Widget(ModelSQL, ModelView):
         'Parameters')
     chart = fields.Function(fields.Text('Chart'), 'on_change_with_chart')
     timeout = fields.Integer('Timeout (s)', required=True)
+    show_title = fields.Boolean('Show Title')
     show_legend = fields.Boolean('Show Legend')
+    static = fields.Boolean('Static')
+    show_toolbox = fields.Selection([
+            ('on-hover', 'On Hover'),
+            ('always', 'Always'),
+            ('never', 'Never'),
+            ], 'Show Toolbox', required=True, states={
+            'invisible': Bool(Eval('static')),
+            })
+    image_format = fields.Selection([
+            ('svg', 'SVG'),
+            ('png', 'PNG'),
+            ('jpeg', 'JPEG'),
+            ('webp', 'WebP'),
+            ], 'Image Format', required=True, states={
+            'invisible': Bool(Eval('static')),
+            })
+    zoom = fields.Integer('Zoom', states={
+            'invisible': Eval('type') != 'scatter-map',
+            }, depends=['type'])
 
     @staticmethod
     def default_timeout():
@@ -107,15 +128,42 @@ class Widget(ModelSQL, ModelView):
         config = Config(1)
         return config.default_timeout or 30
 
-    @fields.depends('type', 'where', 'parameters', 'timeout', 'show_legend',
-        methods=['get_values'])
+    @staticmethod
+    def default_show_title():
+        return True
+
+    @staticmethod
+    def default_show_toolbox():
+        return 'on-hover'
+
+    @staticmethod
+    def default_image_format():
+        return 'svg'
+
+    @fields.depends('type', 'where', 'parameters', 'timeout', 'show_title',
+        'show_toolbox', 'show_legend', 'static', 'name', 'image_format',
+        'zoom', methods=['get_values'])
     def on_change_with_chart(self, name=None):
         data = []
         layout = {
+            'title': self.show_title and self.name or '',
             # None should become false, not null in JS
             'showlegend': bool(self.show_legend),
             }
-        config = {}
+        config = {
+            'staticPlot': bool(self.static),
+            'locale': Transaction().language,
+            'displaylogo': False,
+            'toImageButtonOptions': {
+                'format': self.image_format,
+                'filename': convert_to_symbol(self.name or 'tryton'),
+                }
+            }
+
+        # By default modebar is shown on-hover
+        if self.show_toolbox != 'on-hover':
+            config['displayModeBar'] = self.show_toolbox == 'always'
+
         try:
             chart = {
                 'type': self.type,
@@ -196,14 +244,14 @@ class Widget(ModelSQL, ModelView):
                 else:
                     center_latitude = 0
                     center_longitude = 0
+                layout['dragmode'] = 'zoom'
                 layout['mapbox'] = {
                     'style': 'open-street-map',
-                    'dragmode': 'zoom',
                     'center': {
                         'lat': center_latitude,
                         'lon': center_longitude,
                         },
-                    'zoom': 1,
+                    'zoom': self.zoom or 1,
                     }
             elif self.type == 'table':
                 values = self.get_values()
