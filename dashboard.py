@@ -79,6 +79,7 @@ class Widget(ModelSQL, ModelView):
             (None, ''),
             ('area', 'Area'),
             ('bar', 'Bar'),
+            ('box', 'Box'),
             ('bubble', 'Bubble'),
             ('doughnut', 'Doughnut'),
             ('funnel', 'Funnel'),
@@ -123,6 +124,14 @@ class Widget(ModelSQL, ModelView):
     zoom = fields.Integer('Zoom', states={
             'invisible': Eval('type') != 'scatter-map',
             }, depends=['type'])
+    box_points = fields.Selection([
+            (None, 'None'),
+            ('all', 'All'),
+            ('outliers', 'Outliers'),
+            ('suspectedoutliers', 'Suspected Outliers'),
+            ], 'Box Points', states={
+            'invisible': Eval('type') != 'box',
+            }, depends=['type'])
 
     @staticmethod
     def default_timeout():
@@ -144,7 +153,7 @@ class Widget(ModelSQL, ModelView):
 
     @fields.depends('type', 'where', 'parameters', 'timeout', 'show_title',
         'show_toolbox', 'show_legend', 'static', 'name', 'image_format',
-        'zoom', methods=['get_values'])
+        'zoom', 'box_points', methods=['get_values'])
     def on_change_with_chart(self, name=None):
         data = []
         layout = {
@@ -179,6 +188,15 @@ class Widget(ModelSQL, ModelView):
                 chart['fill'] = 'tonexty'
             elif self.type == 'bar':
                 chart.update(values)
+            elif self.type == 'box':
+                x = values.get('x', [])
+                if x:
+                    chart['x'] = x
+                y = values.get('y', [])
+                if y:
+                    chart['y'] = y
+                chart['type'] = 'box'
+                chart['boxpoints'] = self.box_points or False
             elif self.type == 'bubble':
                 chart['type'] = 'scatter'
                 chart.update({
@@ -392,6 +410,19 @@ class Widget(ModelSQL, ModelView):
                     'max': 10,
                     'aggregate': 'required',
                      },
+                }
+        elif self.type == 'box':
+            return {
+                'x': {
+                    'min': 0,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
+                'y': {
+                    'min': 0,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
                 }
         elif self.type == 'pie':
             return {
