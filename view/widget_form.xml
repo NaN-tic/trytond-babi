@@ -27,6 +27,8 @@
             <field name="image_format"/>
             <label name="zoom"/>
             <field name="zoom"/>
+            <label name="box_points"/>
+            <field name="box_points"/>
         </page>
     </notebook>
     <field name="chart" widget="chart" colspan="2"/>
