@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 from trytond.pool import Pool, PoolMeta
 from trytond.backend import DatabaseOperationalError
@@ -338,7 +339,8 @@ class Widget(ModelSQL, ModelView):
         # Transpose records and fields
         transposed = list(map(list, zip(*records)))
         for type, values in zip(types, transposed):
-            res[type] = values
+            res[type] = [float(x) if isinstance(x, Decimal) else x
+                for x in values]
         return res
 
     @fields.depends('type')
