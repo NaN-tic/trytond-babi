@@ -89,6 +89,7 @@ class Widget(ModelSQL, ModelView):
             ('pie', 'Pie'),
             ('scatter', 'Scatter'),
             ('scatter-map', 'Scatter Map'),
+            ('sunburst', 'Sunburst'),
             ('table', 'Table'),
             ('value', 'Value'),
             ], 'Type')
@@ -103,6 +104,8 @@ class Widget(ModelSQL, ModelView):
         'Parameters')
     chart = fields.Function(fields.Text('Chart'), 'on_change_with_chart')
     timeout = fields.Integer('Timeout (s)', required=True)
+    limit = fields.Integer('Limit', required=True,
+        help='Limit the number of rows')
     show_title = fields.Boolean('Show Title')
     show_legend = fields.Boolean('Show Legend')
     static = fields.Boolean('Static')
@@ -132,12 +135,17 @@ class Widget(ModelSQL, ModelView):
             ], 'Box Points', states={
             'invisible': Eval('type') != 'box',
             }, depends=['type'])
+    total_branch_values = fields.Boolean('Total Branch Values')
 
     @staticmethod
     def default_timeout():
         Config = Pool().get('babi.configuration')
         config = Config(1)
         return config.default_timeout or 30
+
+    @staticmethod
+    def default_limit():
+        return 1000
 
     @staticmethod
     def default_show_title():
@@ -151,9 +159,9 @@ class Widget(ModelSQL, ModelView):
     def default_image_format():
         return 'svg'
 
-    @fields.depends('type', 'where', 'parameters', 'timeout', 'show_title',
-        'show_toolbox', 'show_legend', 'static', 'name', 'image_format',
-        'zoom', 'box_points', methods=['get_values'])
+    @fields.depends('type', 'where', 'parameters', 'timeout', 'limit',
+        'show_title', 'show_toolbox', 'show_legend', 'static', 'name',
+        'image_format', 'zoom', 'box_points', methods=['get_values'])
     def on_change_with_chart(self, name=None):
         data = []
         layout = {
@@ -175,161 +183,173 @@ class Widget(ModelSQL, ModelView):
         if self.show_toolbox != 'on-hover':
             config['displayModeBar'] = self.show_toolbox == 'always'
 
-        values = self.get_values()
-
         try:
-            chart = {
-                'type': self.type,
-            }
-            data.append(chart)
-            if self.type == 'area':
-                chart.update(values)
-                chart['type'] = 'scatter'
-                chart['fill'] = 'tonexty'
-            elif self.type == 'bar':
-                chart.update(values)
-            elif self.type == 'box':
-                x = values.get('x', [])
-                if x:
-                    chart['x'] = x
-                y = values.get('y', [])
-                if y:
-                    chart['y'] = y
-                chart['type'] = 'box'
-                chart['boxpoints'] = self.box_points or False
-            elif self.type == 'bubble':
-                chart['type'] = 'scatter'
-                chart.update({
-                        'x': values.get('x', []),
-                        'y': values.get('y', []),
-                        })
-                chart['mode'] = 'markers'
-                chart['marker'] = {
-                        'size': values.get('sizes', []),
-                        }
-            elif self.type == 'country-map':
-                chart['type'] = 'scattergeo'
-                chart['mode'] = 'markers'
-                chart['text'] = values.get('labels', [])
-                chart['locations'] = values.get('locations', [])
-                sizes = values.get('sizes', [])
-                if sizes:
-                    chart['marker'] = {
-                        'size': values.get('sizes', []),
-                        }
-                colors = values.get('colors', [])
-                if colors:
-                    chart['marker'] = {
-                        'color': values.get('colors', []),
-                        }
-            elif self.type == 'doughnut':
-                chart.update(values)
-                chart['type'] = 'pie'
-                chart['hole'] = 0.4
-            elif self.type == 'funnel':
-                chart['type'] = 'funnelarea'
-                chart['values'] = values.get('values', [])
-                chart['text'] = values.get('labels', [])
-                layout.update({
-                        'funnelmode': 'stack',
-                        })
-            elif self.type == 'gauge':
-                value = values.get('value', [])
-                chart['value'] = value and value[0] or '-'
-                chart['mode'] = 'gauge'
-                if 'delta' in values:
-                    chart['mode'] += '+delta'
-                    delta = values['delta']
-                    chart['delta'] = {
-                        'reference': delta and delta[0] or '-',
-                        }
-                min = values.get('min', [])
-                min = min and min[0] or 0
-                max = values.get('max', [])
-                max = max and max[0] or 100
-                chart['type'] = 'indicator'
-                chart['gauge'] = {
-                    'axis': {
-                        'visible': False,
-                        'range': [min, max],
-                        },
-                    }
-                print(chart)
-            elif self.type == 'line':
-                chart['type'] = 'scatter'
-                chart.update(values)
-            elif self.type == 'pie':
-                chart.update(values)
-            elif self.type == 'scatter':
-                chart['type'] = 'scatter'
-                chart.update(values)
-                chart['mode'] = 'markers'
-            elif self.type == 'scatter-map':
-                chart['text'] = values.get('labels', [])
-                chart['lat'] = values.get('latitude', [])
-                chart['lon'] = values.get('longitude', [])
-                chart['type'] = 'scattermapbox'
-                if chart['lat']:
-                    # Latitude median:
-                    center_latitude = sum(chart['lat']) / len(chart['lat'])
-                    # Longitude median:
-                    center_longitude = sum(chart['lon']) / len(chart['lon'])
-                else:
-                    center_latitude = 0
-                    center_longitude = 0
-                sizes = values.get('sizes', [])
-                if sizes:
-                    chart['marker'] = {
-                        'size': sizes,
-                        }
-                colors = values.get('colors', [])
-                if colors:
-                    chart['marker'] = {
-                        'color': colors,
-                        }
-                layout['dragmode'] = 'zoom'
-                layout['mapbox'] = {
-                    'style': 'open-street-map',
-                    'center': {
-                        'lat': center_latitude,
-                        'lon': center_longitude,
-                        },
-                    'zoom': self.zoom or 1,
-                    }
-            elif self.type == 'table':
-                chart['type'] = 'table'
-                header = []
-                columns = []
-                for key, vals in values.items():
-                    header.append(key)
-                    columns.append(vals)
-                chart['header'] = {
-                    'values': header,
-                    }
-                chart['cells'] = {
-                    'values': columns,
-                    }
-            elif self.type == 'value':
-                value = values.get('value', [])
-                chart['value'] = value and value[0] or '-'
-                chart['mode'] = 'number'
-                if 'delta' in values:
-                    chart['mode'] += '+delta'
-                    delta = values['delta']
-                    chart['delta'] = {
-                        'reference': delta and delta[0] or '-',
-                        }
-                chart['type'] = 'indicator'
-                chart['gauge'] = {
-                    'axis': {
-                        'visible': False,
-                        },
-                    }
+            values = self.get_values()
         except Exception as e:
             data = [{
                'type': 'error',
                'message': str(e),
             }]
+            return json.dumps({
+                    'data': data,
+                    'layout': layout,
+                    'config': config,
+                    })
+
+        chart = {
+            'type': self.type,
+        }
+        data.append(chart)
+        if self.type == 'area':
+            chart.update(values)
+            chart['type'] = 'scatter'
+            chart['fill'] = 'tonexty'
+        elif self.type == 'bar':
+            chart.update(values)
+        elif self.type == 'box':
+            x = values.get('x', [])
+            if x:
+                chart['x'] = x
+            y = values.get('y', [])
+            if y:
+                chart['y'] = y
+            chart['type'] = 'box'
+            chart['boxpoints'] = self.box_points or False
+        elif self.type == 'bubble':
+            chart['type'] = 'scatter'
+            chart.update({
+                    'x': values.get('x', []),
+                    'y': values.get('y', []),
+                    })
+            chart['mode'] = 'markers'
+            chart['marker'] = {
+                    'size': values.get('sizes', []),
+                    }
+        elif self.type == 'country-map':
+            chart['type'] = 'scattergeo'
+            chart['mode'] = 'markers'
+            chart['text'] = values.get('labels', [])
+            chart['locations'] = values.get('locations', [])
+            sizes = values.get('sizes', [])
+            if sizes:
+                chart['marker'] = {
+                    'size': values.get('sizes', []),
+                    }
+            colors = values.get('colors', [])
+            if colors:
+                chart['marker'] = {
+                    'color': values.get('colors', []),
+                    }
+        elif self.type == 'doughnut':
+            chart.update(values)
+            chart['type'] = 'pie'
+            chart['hole'] = 0.4
+        elif self.type == 'funnel':
+            chart['type'] = 'funnelarea'
+            chart['values'] = values.get('values', [])
+            chart['text'] = values.get('labels', [])
+            layout.update({
+                    'funnelmode': 'stack',
+                    })
+        elif self.type == 'gauge':
+            value = values.get('value', [])
+            chart['value'] = value and value[0] or '-'
+            chart['mode'] = 'gauge'
+            if 'delta' in values:
+                chart['mode'] += '+delta'
+                delta = values['delta']
+                chart['delta'] = {
+                    'reference': delta and delta[0] or '-',
+                    }
+            min = values.get('min', [])
+            min = min and min[0] or 0
+            max = values.get('max', [])
+            max = max and max[0] or 100
+            chart['type'] = 'indicator'
+            chart['gauge'] = {
+                'axis': {
+                    'visible': False,
+                    'range': [min, max],
+                    },
+                }
+            print(chart)
+        elif self.type == 'line':
+            chart['type'] = 'scatter'
+            chart.update(values)
+        elif self.type == 'pie':
+            chart.update(values)
+        elif self.type == 'scatter':
+            chart['type'] = 'scatter'
+            chart.update(values)
+            chart['mode'] = 'markers'
+        elif self.type == 'scatter-map':
+            chart['text'] = values.get('labels', [])
+            chart['lat'] = values.get('latitude', [])
+            chart['lon'] = values.get('longitude', [])
+            chart['type'] = 'scattermapbox'
+            if chart['lat']:
+                # Latitude median:
+                center_latitude = sum(chart['lat']) / len(chart['lat'])
+                # Longitude median:
+                center_longitude = sum(chart['lon']) / len(chart['lon'])
+            else:
+                center_latitude = 0
+                center_longitude = 0
+            sizes = values.get('sizes', [])
+            if sizes:
+                chart['marker'] = {
+                    'size': sizes,
+                    }
+            colors = values.get('colors', [])
+            if colors:
+                chart['marker'] = {
+                    'color': colors,
+                    }
+            layout['dragmode'] = 'zoom'
+            layout['mapbox'] = {
+                'style': 'open-street-map',
+                'center': {
+                    'lat': center_latitude,
+                    'lon': center_longitude,
+                    },
+                'zoom': self.zoom or 1,
+                }
+        elif self.type == 'sunburst':
+            chart['type'] = 'sunburst'
+            chart['labels'] = values.get('labels', [])
+            chart['parents'] = values.get('parents', [])
+            chart['values'] = values.get('values', [])
+            chart['branchvalues'] = ('total' if self.total_branch_values
+                else 'relative')
+        elif self.type == 'table':
+            chart['type'] = 'table'
+            header = []
+            columns = []
+            for key, vals in values.items():
+                header.append(key)
+                columns.append(vals)
+            chart['header'] = {
+                'values': header,
+                }
+            chart['cells'] = {
+                'values': columns,
+                }
+        elif self.type == 'value':
+            value = values.get('value', [])
+            chart['value'] = value and value[0] or '-'
+            chart['mode'] = 'number'
+            if 'delta' in values:
+                chart['mode'] += '+delta'
+                delta = values['delta']
+                chart['delta'] = {
+                    'reference': delta and delta[0] or '-',
+                    }
+            chart['type'] = 'indicator'
+            chart['gauge'] = {
+                'axis': {
+                    'visible': False,
+                    },
+                }
         return json.dumps({
                 'data': data,
                 'layout': layout,
@@ -373,6 +393,10 @@ class Widget(ModelSQL, ModelView):
             if x.groupby_expression]
         records = self.table.execute_query(fields, self.where, groupby,
             self.timeout)
+
+        if len(records) > self.limit:
+            raise UserError(gettext('babi.msg_chart_limit',
+                    widget=self.rec_name, count=len(records), limit=self.limit))
 
         res = {}
         types = [x.type for x in self.parameters]
@@ -581,6 +605,24 @@ class Widget(ModelSQL, ModelView):
                     'aggregate': 'required',
                     },
                 }
+        elif self.type == 'sunburst':
+            return {
+                'labels': {
+                    'min': 1,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
+                'parents': {
+                    'min': 1,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                    },
+                'values': {
+                    'min': 1,
+                    'max': 1,
+                    'aggregate': 'required',
+                    },
+                }
         elif self.type == 'table':
             return {
                 'labels': {
@@ -623,6 +665,7 @@ class WidgetParameter(ModelSQL, ModelView):
             ('longitude', 'Longitude'),
             ('minimum', 'Minimum'),
             ('maximum', 'Maximum'),
+            ('parents', 'Parents'),
             ('sizes', 'Sizes'),
             ('value', 'Value'),
             ('values', 'Values'),
