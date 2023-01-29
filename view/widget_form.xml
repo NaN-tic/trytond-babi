@@ -7,8 +7,6 @@
     <field name="table"/>
     <label name="where"/>
     <field name="where" colspan="5"/>
-    <label name="timeout"/>
-    <field name="timeout"/>
     <newline/>
     <notebook colspan="4">
         <page name="parameters">
@@ -29,6 +27,13 @@
             <field name="zoom"/>
             <label name="box_points"/>
             <field name="box_points"/>
+            <label name="total_branch_values"/>
+            <field name="total_branch_values"/>
+            <newline/>
+            <label name="timeout"/>
+            <field name="timeout"/>
+            <label name="limit"/>
+            <field name="limit"/>
         </page>
     </notebook>
     <field name="chart" widget="chart" colspan="2"/>

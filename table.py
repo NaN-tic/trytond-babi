@@ -183,15 +183,17 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             limit=None):
         if timeout is None:
             timeout = 10
-        if not backend.TableHandler.table_exist(self.table_name):
+        if (self.type != 'query'
+                and not backend.TableHandler.table_exist(self.table_name)):
             return []
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-            cursor.execute('SET statement_timeout TO %s;' % timeout * 1000)
+            cursor.execute('SET statement_timeout TO %s;' % int(timeout * 1000))
             query = self.get_query(fields, where=where, groupby=groupby,
                 limit=limit)
             cursor.execute(query)
             records = cursor.fetchall()
+            cursor.execute('SET statement_timeout TO 0;')
         return records
 
     def timeout_exception(self):
@@ -251,7 +253,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def _compute_query(self):
         with Transaction().new_transaction() as transaction:
             cursor = Transaction().connection.cursor()
-            cursor.execute('%s LIMIT 1' % self._stripped_query)
+            # We must use a subquery because the _stripped_query may contain a
+            # LIMIT clause
+            cursor.execute('SELECT * FROM (%s) AS subquery LIMIT 1' %
+                self._stripped_query)
 
         field_names = [x[0] for x in cursor.description]
         self.update_fields(field_names)

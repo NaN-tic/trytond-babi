@@ -96,5 +96,8 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_invalid_parameter_type">
             <field name="text">Parameter "%(parameter)s" is not valid in widget "%(widget)s". Only the following types can be used: "%(types)s".</field>
         </record>
+        <record model="ir.message" id="msg_chart_limit">
+            <field name="text">The number of records "%(count)s" exceeds the limit "%(limit)s" for chart "%(widget)s". You must either narrow the query or increase the limit.</field>
+        </record>
     </data>
 </tryton>
