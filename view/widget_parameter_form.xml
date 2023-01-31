@@ -8,4 +8,6 @@
     <field name="field"/>
     <label name="aggregate"/>
     <field name="aggregate"/>
+    <label name="sequence"/>
+    <field name="sequence"/>
 </form>

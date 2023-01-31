@@ -1,7 +1,7 @@
+from collections import OrderedDict
 from decimal import Decimal
 import json
-from trytond.pool import Pool, PoolMeta
-from trytond.backend import DatabaseOperationalError
+from trytond.pool import Pool
 from trytond.model import ModelSQL, ModelView, sequence_ordered, fields
 from trytond.pyson import Eval, Bool
 from trytond.transaction import Transaction
@@ -71,12 +71,117 @@ class DashboardItem(sequence_ordered(), ModelSQL, ModelView):
         return res
 
 
+class Result:
+    def __init__(self, type=None, name=None, values=None):
+        if values is None:
+            values = []
+        self.type = type
+        self.name = name
+        self.values = values
+
+    def single(self, default=None):
+        return self.values and self.values[0] or default
+
+    def __bool__(self):
+        return bool(self.values)
+
+
+class ResultSet:
+    def __init__(self, parameters=None, records=None):
+        # parameters must be a list of tuples in the form:
+        # [(type, name), ...]
+        if parameters is None:
+            parameters = []
+        if records is None:
+            records = []
+        # Copy so that we do not modify the original records
+        self.records = records[:]
+        for record in records:
+            for i, value in enumerate(record):
+                if isinstance(value, Decimal):
+                    # Ensure we do not try to send Decimal to the client
+                    record[i] = float(value)
+        #self.parameters = parameters
+        self.transposed = list(map(list, zip(*self.records)))
+        self.results = []
+        for parameter, values in zip(parameters, self.transposed):
+            self.results.append(Result(parameter[0], parameter[1], values))
+
+    def count(self, type):
+        return len([x for x in self.results if x.type == type])
+
+    def values_by_type(self, type):
+        for result in self.results:
+            if result.type == type:
+                return result
+        return Result()
+
+    def value_list_by_type(self, type):
+        res = []
+        for result in self.results:
+            if result.type == type:
+                res.append(result)
+        return res
+
+    def z_values_on_y(self):
+        ys = self.values_by_type('y')
+        zs = self.values_by_type('z')
+
+        indexed = OrderedDict()
+        for pos in range(len(ys.values)):
+            y = ys.values[pos]
+            z = zs.values[pos]
+            indexed.setdefault(z, []).append(y)
+
+        records = []
+        for x, data in indexed.items():
+            record = []
+            for y in data:
+                record.append(y)
+            records.append(record)
+
+        parameters = []
+        for z in indexed.keys():
+            parameters.append((ys.type, z))
+        return ResultSet(parameters, records)
+
+    def z_values_on_x_y(self):
+        xs = self.values_by_type('x')
+        ys = self.values_by_type('y')
+        zs = self.values_by_type('z')
+        zz = OrderedDict()
+        for z in zs.values:
+            zz.setdefault(z)
+
+        indexed = OrderedDict()
+        for pos in range(len(xs.values)):
+            x = xs.values[pos]
+            y = ys.values[pos]
+            z = zs.values[pos]
+            if x not in indexed:
+                indexed[x] = zz.copy()
+            indexed[x][z] = y
+
+        records = []
+        for x, data in indexed.items():
+            record = []
+            record.append(x)
+            for y in data.values():
+                record.append(y)
+            records.append(record)
+
+        parameters = []
+        parameters.append((xs.type, xs.name))
+        for z in zz.keys():
+            parameters.append((ys.type, z))
+        return ResultSet(parameters, records)
+
+
 class Widget(ModelSQL, ModelView):
     'Widget'
     __name__ = 'babi.widget'
     name = fields.Char('Name', required=True)
     type = fields.Selection([
-            (None, ''),
             ('area', 'Area'),
             ('bar', 'Bar'),
             ('box', 'Box'),
@@ -92,7 +197,7 @@ class Widget(ModelSQL, ModelView):
             ('sunburst', 'Sunburst'),
             ('table', 'Table'),
             ('value', 'Value'),
-            ], 'Type')
+            ], 'Type', required=True)
     table = fields.Many2One('babi.table', 'Table', states={
             'invisible': ~Bool(Eval('type')),
             'required': Bool(Eval('type')),
@@ -159,6 +264,28 @@ class Widget(ModelSQL, ModelView):
     def default_image_format():
         return 'svg'
 
+    @classmethod
+    def validate(cls, widgets):
+        super().validate(widgets)
+        for widget in widgets:
+            widget.check_parameters()
+
+    def check_parameters(self):
+        settings = self.parameter_settings()
+        counter = {}
+        for parameter in self.parameters:
+            counter.setdefault(parameter.type, 0)
+            counter[parameter.type] += 1
+        for key, count in counter.items():
+            setting = settings.get(key)
+            if setting:
+                if count > setting['max']:
+                    raise UserError(gettext('babi.msg_too_many_parameters',
+                            widget=self.rec_name, type=key, max=setting['max']))
+                if count < setting['min']:
+                    raise UserError(gettext('babi.msg_not_enough_parameters',
+                            widget=self.rec_name, type=key, min=setting['min']))
+
     @fields.depends('type', 'where', 'parameters', 'timeout', 'limit',
         'show_title', 'show_toolbox', 'show_legend', 'static', 'name',
         'image_format', 'zoom', 'box_points', methods=['get_values'])
@@ -201,70 +328,108 @@ class Widget(ModelSQL, ModelView):
         }
         data.append(chart)
         if self.type == 'area':
-            chart.update(values)
-            chart['type'] = 'scatter'
-            chart['fill'] = 'tonexty'
+            if values.count('z'):
+                values = values.z_values_on_x_y()
+
+            data = []
+            x = values.values_by_type('x')
+            for y in values.value_list_by_type('y'):
+                chart = {}
+                chart['x'] = x.values
+                chart['y'] = y.values
+                chart['type'] = 'scatter'
+                chart['fill'] = 'tonexty'
+                chart['name'] = y.name
+                data.append(chart)
         elif self.type == 'bar':
-            chart.update(values)
+            if values.count('z'):
+                values = values.z_values_on_x_y()
+
+            data = []
+            x = values.values_by_type('x')
+            for y in values.value_list_by_type('y'):
+                chart = {}
+                chart['x'] = x.values
+                chart['y'] = y.values
+                chart['type'] = 'bar'
+                chart['name'] = y.name
+                data.append(chart)
         elif self.type == 'box':
-            x = values.get('x', [])
-            if x:
-                chart['x'] = x
-            y = values.get('y', [])
-            if y:
-                chart['y'] = y
-            chart['type'] = 'box'
-            chart['boxpoints'] = self.box_points or False
+            if values.count('z'):
+                values = values.z_values_on_y()
+
+            data = []
+            for y in values.value_list_by_type('y'):
+                chart = {}
+                chart['y'] = y.values
+                chart['type'] = 'box'
+                chart['name'] = y.name
+                chart['boxpoints'] = self.box_points or False
+                data.append(chart)
         elif self.type == 'bubble':
             chart['type'] = 'scatter'
-            chart.update({
-                    'x': values.get('x', []),
-                    'y': values.get('y', []),
-                    })
+            x = values.values_by_type('x')
+            chart['x'] = x.values
+            y = values.values_by_type('y')
+            chart['y'] = y.values
             chart['mode'] = 'markers'
             chart['marker'] = {
-                    'size': values.get('sizes', []),
+                    'size': values.values_by_type('sizes').values,
                     }
         elif self.type == 'country-map':
             chart['type'] = 'scattergeo'
             chart['mode'] = 'markers'
-            chart['text'] = values.get('labels', [])
-            chart['locations'] = values.get('locations', [])
-            sizes = values.get('sizes', [])
+            chart['text'] = values.values_by_type('values').values
+            chart['locations'] = values.values_by_type('locations').values
+            sizes = values.values_by_type('sizes')
             if sizes:
                 chart['marker'] = {
-                    'size': values.get('sizes', []),
+                    'size': sizes.values,
                     }
-            colors = values.get('colors', [])
+            colors = values.values_by_type('colors')
             if colors:
                 chart['marker'] = {
-                    'color': values.get('colors', []),
+                    'color': colors.values,
                     }
         elif self.type == 'doughnut':
-            chart.update(values)
+            labels = values.values_by_type('labels')
+            if labels:
+                chart['labels'] = labels.values
+            vals = values.values_by_type('values')
+            if vals:
+                chart['values'] = vals.values
             chart['type'] = 'pie'
             chart['hole'] = 0.4
         elif self.type == 'funnel':
             chart['type'] = 'funnelarea'
-            chart['values'] = values.get('values', [])
-            chart['text'] = values.get('labels', [])
+            vals = values.values_by_type('values')
+            if vals:
+                chart['values'] = vals.values
+            labels = values.values_by_type('labels')
+            if labels:
+                chart['text'] = labels.values
             layout.update({
                     'funnelmode': 'stack',
                     })
         elif self.type == 'gauge':
-            value = values.get('value', [])
-            chart['value'] = value and value[0] or '-'
+            chart['value'] = values.values_by_type('value').single('-')
             chart['mode'] = 'gauge'
-            if 'delta' in values:
+            reference = values.values_by_type('reference')
+            if reference:
                 chart['mode'] += '+delta'
-                delta = values['delta']
                 chart['delta'] = {
-                    'reference': delta and delta[0] or '-',
+                    'reference': reference.single('-'),
                     }
-            min = values.get('min', [])
-            min = min and min[0] or 0
-            max = values.get('max', [])
-            max = max and max[0] or 100
+            min = values.values_by_type('min')
+            if min:
+                min = min.single(default=0)
+            else:
+                min = 0
+            max = values.values_by_type('max')
+            if max:
+                max = max.single(default=100)
+            else:
+                max = 100
             chart['type'] = 'indicator'
             chart['gauge'] = {
                 'axis': {
@@ -272,20 +437,31 @@ class Widget(ModelSQL, ModelView):
                     'range': [min, max],
                     },
                 }
-            print(chart)
         elif self.type == 'line':
-            chart['type'] = 'scatter'
-            chart.update(values)
+            if values.count('z'):
+                values = values.z_values_on_x_y()
+
+            data = []
+            x = values.values_by_type('x')
+            for y in values.value_list_by_type('y'):
+                chart = {}
+                chart['x'] = x.values
+                chart['y'] = y.values
+                chart['type'] = 'scatter'
+                chart['name'] = y.name
+                data.append(chart)
         elif self.type == 'pie':
-            chart.update(values)
+            chart['labels'] = values.values_by_type('labels').values
+            chart['values'] = values.values_by_type('values').values
         elif self.type == 'scatter':
             chart['type'] = 'scatter'
-            chart.update(values)
+            chart['x'] = values.values_by_type('x').values
+            chart['y'] = values.values_by_type('y').values
             chart['mode'] = 'markers'
         elif self.type == 'scatter-map':
-            chart['text'] = values.get('labels', [])
-            chart['lat'] = values.get('latitude', [])
-            chart['lon'] = values.get('longitude', [])
+            chart['text'] = values.values_by_type('values').values
+            chart['lat'] = values.values_by_type('latitude').values
+            chart['lon'] = values.values_by_type('longitude').values
             chart['type'] = 'scattermapbox'
             if chart['lat']:
                 # Latitude median:
@@ -295,12 +471,12 @@ class Widget(ModelSQL, ModelView):
             else:
                 center_latitude = 0
                 center_longitude = 0
-            sizes = values.get('sizes', [])
+            sizes = values.values_by_type('sizes').values
             if sizes:
                 chart['marker'] = {
                     'size': sizes,
                     }
-            colors = values.get('colors', [])
+            colors = values.values_by_type('colors').values
             if colors:
                 chart['marker'] = {
                     'color': colors,
@@ -316,18 +492,18 @@ class Widget(ModelSQL, ModelView):
                 }
         elif self.type == 'sunburst':
             chart['type'] = 'sunburst'
-            chart['labels'] = values.get('labels', [])
-            chart['parents'] = values.get('parents', [])
-            chart['values'] = values.get('values', [])
+            chart['labels'] = values.values_by_type('labels').values
+            chart['parents'] = values.values_by_type('parents').values
+            chart['values'] = values.values_by_type('values').values
             chart['branchvalues'] = ('total' if self.total_branch_values
                 else 'relative')
         elif self.type == 'table':
             chart['type'] = 'table'
             header = []
             columns = []
-            for key, vals in values.items():
-                header.append(key)
-                columns.append(vals)
+            for result in values.results:
+                header.append(result.name)
+                columns.append(result.values)
             chart['header'] = {
                 'values': header,
                 }
@@ -335,14 +511,13 @@ class Widget(ModelSQL, ModelView):
                 'values': columns,
                 }
         elif self.type == 'value':
-            value = values.get('value', [])
-            chart['value'] = value and value[0] or '-'
+            chart['value'] = values.values_by_type('value').single('-')
             chart['mode'] = 'number'
-            if 'delta' in values:
+            reference = values.values_by_type('reference')
+            if reference:
                 chart['mode'] += '+delta'
-                delta = values['delta']
                 chart['delta'] = {
-                    'reference': delta and delta[0] or '-',
+                    'reference': reference.single('-'),
                     }
             chart['type'] = 'indicator'
             chart['gauge'] = {
@@ -384,11 +559,11 @@ class Widget(ModelSQL, ModelView):
 
     @fields.depends('table', 'parameters', 'where', 'timeout')
     def get_values(self):
-        if not self.table:
-            return {}
+        if not self.table or not self.parameters:
+            return ResultSet()
         fields = [x.select_expression for x in self.parameters]
         if None in fields:
-            return {}
+            return ResultSet()
         groupby = [x.groupby_expression for x in self.parameters
             if x.groupby_expression]
         records = self.table.execute_query(fields, self.where, groupby,
@@ -397,15 +572,7 @@ class Widget(ModelSQL, ModelView):
         if len(records) > self.limit:
             raise UserError(gettext('babi.msg_chart_limit',
                     widget=self.rec_name, count=len(records), limit=self.limit))
-
-        res = {}
-        types = [x.type for x in self.parameters]
-        # Transpose records and fields
-        transposed = list(map(list, zip(*records)))
-        for type, values in zip(types, transposed):
-            res[type] = [float(x) if isinstance(x, Decimal) else x
-                for x in values]
-        return res
+        return ResultSet([(x.type, x.field.name) for x in self.parameters], records)
 
     @fields.depends('type')
     def parameter_settings(self):
@@ -421,6 +588,11 @@ class Widget(ModelSQL, ModelView):
                     'max': 10,
                     'aggregate': 'required',
                      },
+                'z': {
+                    'min': 0,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                     },
                 }
         elif self.type == 'bar':
             return {
@@ -434,15 +606,20 @@ class Widget(ModelSQL, ModelView):
                     'max': 10,
                     'aggregate': 'required',
                      },
-                }
-        elif self.type == 'box':
-            return {
-                'x': {
+                'z': {
                     'min': 0,
                     'max': 1,
                     'aggregate': 'forbidden',
-                    },
+                     },
+                }
+        elif self.type == 'box':
+            return {
                 'y': {
+                    'min': 1,
+                    'max': 10,
+                    'aggregate': 'forbidden',
+                    },
+                'z': {
                     'min': 0,
                     'max': 1,
                     'aggregate': 'forbidden',
@@ -530,7 +707,7 @@ class Widget(ModelSQL, ModelView):
                 }
         elif self.type == 'gauge':
             return {
-                'delta': {
+                'reference': {
                     'min': 0,
                     'max': 1,
                     'aggregate': 'required',
@@ -563,6 +740,11 @@ class Widget(ModelSQL, ModelView):
                     'max': 10,
                     'aggregate': 'required',
                     },
+                'z': {
+                    'min': 0,
+                    'max': 1,
+                    'aggregate': 'forbidden',
+                     },
                 }
         elif self.type == 'scatter':
             return {
@@ -638,7 +820,7 @@ class Widget(ModelSQL, ModelView):
                 }
         elif self.type == 'value':
             return {
-                'delta': {
+                'reference': {
                     'min': 0,
                     'max': 1,
                     'aggregate': 'required',
@@ -651,14 +833,14 @@ class Widget(ModelSQL, ModelView):
                 }
 
 
-class WidgetParameter(ModelSQL, ModelView):
+class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
     'Widget Parameter'
     __name__ = 'babi.widget.parameter'
     widget = fields.Many2One('babi.widget', 'Widget', required=True,
         ondelete='CASCADE')
     type = fields.Selection([
             ('colors', 'Colors'),
-            ('delta', 'Delta'),
+            ('reference', 'Reference'),
             ('labels', 'Labels'),
             ('latitude', 'Latitude'),
             ('locations', 'Locations'),
@@ -671,6 +853,7 @@ class WidgetParameter(ModelSQL, ModelView):
             ('values', 'Values'),
             ('x', 'X'),
             ('y', 'Y'),
+            ('z', 'Z'),
             ], 'Type', required=True)
     field = fields.Many2One('babi.field', 'Field', domain=[
             ('table', '=', Eval('_parent_widget', {}).get('table', -1)),
@@ -726,12 +909,10 @@ class WidgetParameter(ModelSQL, ModelView):
     def check_aggregate(self):
         if not self.aggregate or not self.field:
             return
-
         if self.aggregate in ('sum', 'avg'):
             if self.field.type not in ('integer', 'float', 'numeric'):
                 raise UserError(gettext('babi.msg_invalid_aggregate',
                     parameter=self.rec_name, widget=self.widget.rec_name))
-        settings = self.widget.parameter_settings()
 
     def check_type(self):
         settings = self.widget.parameter_settings()

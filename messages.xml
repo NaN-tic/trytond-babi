@@ -99,5 +99,11 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_chart_limit">
             <field name="text">The number of records "%(count)s" exceeds the limit "%(limit)s" for chart "%(widget)s". You must either narrow the query or increase the limit.</field>
         </record>
+        <record model="ir.message" id="msg_too_many_parameters">
+            <field name="text">There can not be more than "%(max)s" parameters of type "%(type)s" in "%(widget)s".</field>
+        </record>
+        <record model="ir.message" id="msg_not_enough_parameters">
+            <field name="text">There must be at least "%(min)s" parameters of type "%(type)s" in "%(widget)s".</field>
+        </record>
     </data>
 </tryton>
