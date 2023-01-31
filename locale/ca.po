@@ -8,7 +8,7 @@ msgstr "Acció"
 
 msgctxt "field:babi.action.dashboard,dashboard:"
 msgid "Dashboard"
-msgstr ""
+msgstr "Tauler de control"
 
 msgctxt "field:babi.action.dashboard,groups:"
 msgid "Groups"
@@ -60,7 +60,7 @@ msgstr "Vista"
 
 msgctxt "field:babi.dashboard,widgets:"
 msgid "Widgets"
-msgstr ""
+msgstr "Gràfiques"
 
 msgctxt "field:babi.dashboard.item,children:"
 msgid "Children"
@@ -68,11 +68,11 @@ msgstr "Fills"
 
 msgctxt "field:babi.dashboard.item,colspan:"
 msgid "Columns"
-msgstr ""
+msgstr "Columnes"
 
 msgctxt "field:babi.dashboard.item,dashboard:"
 msgid "Dashboard"
-msgstr ""
+msgstr "Tauler de control"
 
 msgctxt "field:babi.dashboard.item,parent:"
 msgid "Parent"
@@ -80,7 +80,7 @@ msgstr "Pare"
 
 msgctxt "field:babi.dashboard.item,widget:"
 msgid "Widget"
-msgstr ""
+msgstr "Gràfica"
 
 msgctxt "field:babi.dimension,expression:"
 msgid "Expression"
@@ -188,7 +188,7 @@ msgstr "Taula"
 
 msgctxt "field:babi.field,table_type:"
 msgid "Table Type"
-msgstr ""
+msgstr "Tipus de taula"
 
 msgctxt "field:babi.field,type:"
 msgid "Type"
@@ -528,7 +528,7 @@ msgstr "Temps esgotat"
 
 msgctxt "field:babi.report.execution,traceback:"
 msgid "Traceback"
-msgstr ""
+msgstr "Traça enrere"
 
 msgctxt "field:babi.report.execution.open.select,execution:"
 msgid "Execution"
@@ -580,7 +580,7 @@ msgstr "Nom"
 
 msgctxt "field:babi.table,query:"
 msgid "Query"
-msgstr ""
+msgstr "Consulta"
 
 msgctxt "field:babi.table,timeout:"
 msgid "Timeout"
@@ -604,11 +604,11 @@ msgstr "Data"
 
 msgctxt "field:babi.widget,box_points:"
 msgid "Box Points"
-msgstr ""
+msgstr "Punts"
 
 msgctxt "field:babi.widget,chart:"
 msgid "Chart"
-msgstr ""
+msgstr "Gràfica"
 
 msgctxt "field:babi.widget,help:"
 msgid "Help"
@@ -616,7 +616,7 @@ msgstr "Ajuda"
 
 msgctxt "field:babi.widget,image_format:"
 msgid "Image Format"
-msgstr ""
+msgstr "Format d'imatge"
 
 msgctxt "field:babi.widget,limit:"
 msgid "Limit"
@@ -636,15 +636,15 @@ msgstr "Mostra la llegenda"
 
 msgctxt "field:babi.widget,show_title:"
 msgid "Show Title"
-msgstr ""
+msgstr "Mostra el títol"
 
 msgctxt "field:babi.widget,show_toolbox:"
 msgid "Show Toolbox"
-msgstr ""
+msgstr "Mostra la caixa d'eines"
 
 msgctxt "field:babi.widget,static:"
 msgid "Static"
-msgstr ""
+msgstr "Estàtica"
 
 msgctxt "field:babi.widget,table:"
 msgid "Table"
@@ -656,7 +656,7 @@ msgstr "Temps d'espera (s)"
 
 msgctxt "field:babi.widget,total_branch_values:"
 msgid "Total Branch Values"
-msgstr ""
+msgstr "Valors totals de la branca"
 
 msgctxt "field:babi.widget,type:"
 msgid "Type"
@@ -664,11 +664,11 @@ msgstr "Tipus"
 
 msgctxt "field:babi.widget,where:"
 msgid "Where"
-msgstr ""
+msgstr "On (where)"
 
 msgctxt "field:babi.widget,zoom:"
 msgid "Zoom"
-msgstr ""
+msgstr "Zoom"
 
 msgctxt "field:babi.widget.parameter,aggregate:"
 msgid "Aggregate"
@@ -676,11 +676,11 @@ msgstr "Agregat"
 
 msgctxt "field:babi.widget.parameter,aggregate_invisible:"
 msgid "Aggregate Invisible"
-msgstr ""
+msgstr "Agregat Invisible"
 
 msgctxt "field:babi.widget.parameter,aggregate_required:"
 msgid "Aggregate Required"
-msgstr ""
+msgstr "Agregat obligatori"
 
 msgctxt "field:babi.widget.parameter,field:"
 msgid "Field"
@@ -692,7 +692,7 @@ msgstr "Tipus"
 
 msgctxt "field:babi.widget.parameter,widget:"
 msgid "Widget"
-msgstr ""
+msgstr "Gràfica"
 
 msgctxt "field:ir.action.act_window,babi_report:"
 msgid "BABI Report"
@@ -844,17 +844,19 @@ msgstr ""
 
 msgctxt "help:babi.table,babi_raise_user_error:"
 msgid "Will raise a UserError in case of an error in the table."
-msgstr ""
+msgstr "Generarà un error d'usuari en cas d'error a la taula."
 
 msgctxt "help:babi.table,timeout:"
 msgid ""
 "If table calculation should take more than the specified timeout (in "
 "seconds) the process will be stopped automatically."
 msgstr ""
+"Si el càlcul de la taula triga més del temps d'espera especificat (en "
+"segons), el procés s'aturarà automàticament."
 
 msgctxt "help:babi.widget,limit:"
 msgid "Limit the number of rows"
-msgstr ""
+msgstr "Límit del nombre de files"
 
 msgctxt "help:ir.model,babi_enabled:"
 msgid ""
@@ -866,7 +868,7 @@ msgstr ""
 
 msgctxt "model:babi.action.dashboard,name:"
 msgid "Action Act Dashboard"
-msgstr ""
+msgstr "Acció de tauler de control"
 
 msgctxt "model:babi.clean_executions.start,name:"
 msgid "Clean Execution Start"
@@ -878,11 +880,11 @@ msgstr "Configuració Business Intelligence"
 
 msgctxt "model:babi.dashboard,name:"
 msgid "Dashboard"
-msgstr ""
+msgstr "Panell de control"
 
 msgctxt "model:babi.dashboard.item,name:"
 msgid "Dashboard Item"
-msgstr ""
+msgstr "Element del tauler de control"
 
 msgctxt "model:babi.dimension,name:"
 msgid "Dimension"
@@ -898,7 +900,7 @@ msgstr "Expressió"
 
 msgctxt "model:babi.field,name:"
 msgid "BABI Field"
-msgstr ""
+msgstr "Camp BABI"
 
 msgctxt "model:babi.filter,name:"
 msgid "Filter"
@@ -958,11 +960,11 @@ msgstr "Inici Actualitza la informació d'un informe"
 
 msgctxt "model:babi.widget,name:"
 msgid "Widget"
-msgstr ""
+msgstr "Gràfica"
 
 msgctxt "model:babi.widget.parameter,name:"
 msgid "Widget Parameter"
-msgstr ""
+msgstr "Paràmetre de la gràfica"
 
 msgctxt "model:ir.action,name:"
 msgid "Babi Report"
@@ -970,7 +972,7 @@ msgstr "Informe Babi"
 
 msgctxt "model:ir.action,name:act_action_dashboard_form"
 msgid "Dashboards"
-msgstr ""
+msgstr "Taulers de control"
 
 msgctxt "model:ir.action,name:act_babi_configuration_form"
 msgid "Business Intelligence Configuration"
@@ -978,11 +980,11 @@ msgstr "Configuració Business Intelligence"
 
 msgctxt "model:ir.action,name:act_babi_dashboard"
 msgid "Dashboards"
-msgstr ""
+msgstr "Taulers de control"
 
 msgctxt "model:ir.action,name:act_babi_dashboard_item"
 msgid "Dashboard Items"
-msgstr ""
+msgstr "Elements del tauler de control"
 
 msgctxt "model:ir.action,name:act_babi_dimension"
 msgid "Dimension"
@@ -1042,11 +1044,11 @@ msgstr "Taules"
 
 msgctxt "model:ir.action,name:act_babi_widget"
 msgid "Widgets"
-msgstr ""
+msgstr "Gràfics"
 
 msgctxt "model:ir.action,name:action_url"
 msgid "Dashboard"
-msgstr ""
+msgstr "Panell"
 
 msgctxt "model:ir.action,name:clear_executions_wizard"
 msgid "Clean Executions"
@@ -1118,6 +1120,8 @@ msgid ""
 "chart \"%(widget)s\". You must either narrow the query or increase the "
 "limit."
 msgstr ""
+"El nombre de registres \"%(count)s\" supera el límit \"%(limit)s\" per al "
+"gràfic \"%(widget)s\". Heu de restringir la consulta o augmentar el límit."
 
 msgctxt "model:ir.message,text:msg_compute_table_exception"
 msgid ""
@@ -1125,20 +1129,24 @@ msgid ""
 "\n"
 "%(error)s"
 msgstr ""
+"S'ha produït una excepció en calcular el valor del camp \"%(field)s\" a la "
+"taula \"%(table)s\", registre \"%(record)s\". L'error ha estat: %(error)s"
 
 msgctxt "model:ir.message,text:msg_filter_with_parameters"
 msgid "Cannot use filters with parameters in table \"%(table)s\"."
-msgstr ""
+msgstr "No es poden utilitzar filtres amb paràmetres a la taula \"%(table)s\"."
 
 msgctxt "model:ir.message,text:msg_invalid_aggregate"
 msgid ""
 "Aggregates \"Sum\" and \"Average\" are not supported in non numeric fields "
 "in parameter \"%(parameter)s\" in widget \"%(widget)s\"."
 msgstr ""
+"Els agregats \"Suma\" i \"Mitjana\" no s'admeten als camps no numèrics del "
+"paràmetre \"%(parameter)s\" a la gràfica \"%(widget)s\"."
 
 msgctxt "model:ir.message,text:msg_invalid_field_internal_name"
 msgid "Invalid internal name \"%(internal_name)s\" in field \"%(field)s\"."
-msgstr ""
+msgstr "El nom intern \"%(internal_name)s\" no és vàlid al camp \"%(field)s\"."
 
 msgctxt ""
 "model:ir.message,text:msg_invalid_field_internal_name_first_character"
@@ -1146,16 +1154,20 @@ msgid ""
 "Invalid first character in internal name \"%(internal_name)s\" in field "
 "\"%(field)s\"."
 msgstr ""
+"El primer caràcter del nom intern \"%(internal_name)s\" no és vàlid al camp "
+"\"%(field)s\"."
 
 msgctxt "model:ir.message,text:msg_invalid_parameter_type"
 msgid ""
 "Parameter \"%(parameter)s\" is not valid in widget \"%(widget)s\". Only the "
 "following types can be used: \"%(types)s\"."
 msgstr ""
+"El paràmetre \"%(parameter)s\" no és vàlid a la gràfica \"%(widget)s\". "
+"Només es poden utilitzar els tipus següents: \"%(types)s\"."
 
 msgctxt "model:ir.message,text:msg_invalid_table_internal_name"
 msgid "Invalid internal name \"%(internal_name)s\" in table \"%(table)s\"."
-msgstr ""
+msgstr "El nom intern \"%(internal_name)s\" no és vàlid a la taula \"%(table)s\"."
 
 msgctxt ""
 "model:ir.message,text:msg_invalid_table_internal_name_first_character"
@@ -1163,12 +1175,16 @@ msgid ""
 "Invalid first character in internal name \"%(internal_name)s\" in table "
 "\"%(table)s\"."
 msgstr ""
+"El primer caràcter del nom intern \"%(internal_name)s\" no és vàlid a la "
+"taula \"%(table)s\"."
 
 msgctxt "model:ir.message,text:msg_not_enough_parameters"
 msgid ""
 "There must be at least \"%(min)s\" parameters of type \"%(type)s\" in "
 "\"%(widget)s\"."
 msgstr ""
+"Hi ha d'haver almenys \"%(min)s\" paràmetres del tipus \"%(type)s\" a "
+"\"%(widget)s\"."
 
 msgctxt "model:ir.message,text:msg_render_report_columns"
 msgid ""
@@ -1186,6 +1202,8 @@ msgid ""
 "There can not be more than \"%(max)s\" parameters of type \"%(type)s\" in "
 "\"%(widget)s\"."
 msgstr ""
+"No pot haver-hi més de \"%(max)s\" paràmetres del tipus \"%(type)s\" a "
+"\"%(widget)s\"."
 
 msgctxt "model:ir.message,text:msg_widget_help"
 msgid ""
@@ -1193,6 +1211,8 @@ msgid ""
 "\n"
 "%(list)s"
 msgstr ""
+"A continuació teniu la llista de tipus de paràmetres vàlids amb el nombre "
+"d'ocurrències mínim i màxim permesos: %(list)s"
 
 msgctxt "model:ir.message,text:no_dimensions"
 msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
@@ -1286,7 +1306,7 @@ msgstr "Elimina menús"
 
 msgctxt "model:ir.model.button,string:babi_table_calculate_button"
 msgid "Compute"
-msgstr ""
+msgstr "Calcular"
 
 msgctxt "model:ir.model.button,string:show_dashboard_button"
 msgid "Show"
@@ -1298,7 +1318,7 @@ msgstr "Execució Babi"
 
 msgctxt "model:ir.ui.menu,name:menu_action_dashboard"
 msgid "Dashboards"
-msgstr ""
+msgstr "Taulers de control"
 
 msgctxt "model:ir.ui.menu,name:menu_babi"
 msgid "Business Intelligence"
@@ -1342,11 +1362,11 @@ msgstr "Configuració"
 
 msgctxt "model:ir.ui.menu,name:menu_dashboard"
 msgid "Dashboards"
-msgstr ""
+msgstr "Taulers de control"
 
 msgctxt "model:ir.ui.menu,name:menu_dashboard_open"
 msgid "Dashboard"
-msgstr ""
+msgstr "Tauler de control"
 
 msgctxt "model:ir.ui.menu,name:menu_historical_data"
 msgid "View historical data"
@@ -1358,7 +1378,7 @@ msgstr "Actualitza informació"
 
 msgctxt "model:ir.ui.menu,name:menu_widget"
 msgid "Widgets"
-msgstr ""
+msgstr "Gràfiques"
 
 msgctxt "model:res.group,name:group_babi"
 msgid "Business Intelligence"
@@ -1390,7 +1410,7 @@ msgstr "Data"
 
 msgctxt "selection:babi.expression,ttype:"
 msgid "Date & Time"
-msgstr ""
+msgstr "Data i hora"
 
 msgctxt "selection:babi.expression,ttype:"
 msgid "Float"
@@ -1414,7 +1434,7 @@ msgstr "Model"
 
 msgctxt "selection:babi.field,table_type:"
 msgid "Query"
-msgstr ""
+msgstr "Consulta"
 
 msgctxt "selection:babi.field,table_type:"
 msgid "Table"
@@ -1434,7 +1454,7 @@ msgstr "Data"
 
 msgctxt "selection:babi.field,type:"
 msgid "Date & Time"
-msgstr ""
+msgstr "Data i hora"
 
 msgctxt "selection:babi.field,type:"
 msgid "Float"
@@ -1466,7 +1486,7 @@ msgstr "Data"
 
 msgctxt "selection:babi.filter.parameter,ttype:"
 msgid "Date & Time"
-msgstr ""
+msgstr "Data i hora"
 
 msgctxt "selection:babi.filter.parameter,ttype:"
 msgid "Float"
@@ -1522,7 +1542,7 @@ msgstr "Data"
 
 msgctxt "selection:babi.internal.measure,ttype:"
 msgid "Date & Time"
-msgstr ""
+msgstr "Data i hora"
 
 msgctxt "selection:babi.internal.measure,ttype:"
 msgid "Float"
@@ -1654,7 +1674,7 @@ msgstr "Model"
 
 msgctxt "selection:babi.table,type:"
 msgid "Query"
-msgstr ""
+msgstr "Consulta"
 
 msgctxt "selection:babi.table,type:"
 msgid "Table"
@@ -1666,31 +1686,31 @@ msgstr "Totes"
 
 msgctxt "selection:babi.widget,box_points:"
 msgid "None"
-msgstr ""
+msgstr "Cap"
 
 msgctxt "selection:babi.widget,box_points:"
 msgid "Outliers"
-msgstr ""
+msgstr "Atípics"
 
 msgctxt "selection:babi.widget,box_points:"
 msgid "Suspected Outliers"
-msgstr ""
+msgstr "Sospitosos de ser atípics"
 
 msgctxt "selection:babi.widget,image_format:"
 msgid "JPEG"
-msgstr ""
+msgstr "JPEG"
 
 msgctxt "selection:babi.widget,image_format:"
 msgid "PNG"
-msgstr ""
+msgstr "PNG"
 
 msgctxt "selection:babi.widget,image_format:"
 msgid "SVG"
-msgstr ""
+msgstr "SVG"
 
 msgctxt "selection:babi.widget,image_format:"
 msgid "WebP"
-msgstr ""
+msgstr "WebP"
 
 msgctxt "selection:babi.widget,show_toolbox:"
 msgid "Always"
@@ -1698,11 +1718,11 @@ msgstr "Sempre"
 
 msgctxt "selection:babi.widget,show_toolbox:"
 msgid "Never"
-msgstr ""
+msgstr "Mai"
 
 msgctxt "selection:babi.widget,show_toolbox:"
 msgid "On Hover"
-msgstr ""
+msgstr "Al passar per sobre"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Area"
@@ -1710,31 +1730,31 @@ msgstr "Àrea"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Bar"
-msgstr ""
+msgstr "Barres"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Box"
-msgstr ""
+msgstr "Caixa"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Bubble"
-msgstr ""
+msgstr "Bombolla"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Country Map"
-msgstr ""
+msgstr "Mapa de països"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Doughnut"
-msgstr ""
+msgstr "Donut"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Funnel"
-msgstr ""
+msgstr "Embut"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Gauge"
-msgstr ""
+msgstr "Calibre"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Line"
@@ -1746,15 +1766,15 @@ msgstr "Formatge"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Scatter"
-msgstr ""
+msgstr "Dispersió"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Scatter Map"
-msgstr ""
+msgstr "Mapa de dispersió"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Sunburst"
-msgstr ""
+msgstr "Esclat de sol"
 
 msgctxt "selection:babi.widget,type:"
 msgid "Table"
@@ -1774,11 +1794,11 @@ msgstr "Comptador"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Maximum"
-msgstr ""
+msgstr "Màxim"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Minimum"
-msgstr ""
+msgstr "Mínim"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Sum"
@@ -1786,7 +1806,7 @@ msgstr "Suma"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Colors"
-msgstr ""
+msgstr "Colors"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Labels"
@@ -1794,23 +1814,23 @@ msgstr "Etiquetes"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Latitude"
-msgstr ""
+msgstr "Latitud"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Locations"
-msgstr ""
+msgstr "Ubicacions"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Longitude"
-msgstr ""
+msgstr "Longitud"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Maximum"
-msgstr ""
+msgstr "Màxim"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Minimum"
-msgstr ""
+msgstr "Mínim"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Parents"
@@ -1818,11 +1838,11 @@ msgstr "Pares"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Reference"
-msgstr ""
+msgstr "Referència"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Sizes"
-msgstr ""
+msgstr "Mides"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Value"
@@ -1834,7 +1854,7 @@ msgstr "Valors"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "X"
-msgstr ""
+msgstr "X"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Y"
@@ -1842,7 +1862,7 @@ msgstr "Y"
 
 msgctxt "selection:babi.widget.parameter,type:"
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 msgctxt "selection:ir.cron,method:"
 msgid "Calculate Babi Report"
@@ -1978,7 +1998,7 @@ msgstr "Es calcularà la informació d'aquest informe."
 
 msgctxt "view:babi.widget:"
 msgid "Settings"
-msgstr ""
+msgstr "Configuració"
 
 msgctxt "wizard_button:babi.clean_executions,start,clean:"
 msgid "Ok"
