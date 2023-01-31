@@ -106,7 +106,7 @@ Exception: %(error)s</field>
             <field name="text">There must be at least "%(min)s" parameters of type "%(type)s" in "%(widget)s".</field>
         </record>
         <record model="ir.message" id="msg_widget_help">
-            <field name="text">The following is the list of valid parameter types the following list of valid parameter types with the number of minimum and maximum occurrences allowed:
+            <field name="text">The following is the list of valid parameter types wth the number of minimum and maximum occurrences allowed:
 
 %(list)s</field>
         </record>
