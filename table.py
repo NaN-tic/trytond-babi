@@ -252,7 +252,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def _compute_query(self):
         with Transaction().new_transaction() as transaction:
-            cursor = Transaction().connection.cursor()
+            cursor = transaction.connection.cursor()
             # We must use a subquery because the _stripped_query may contain a
             # LIMIT clause
             cursor.execute('SELECT * FROM (%s) AS subquery LIMIT 1' %
@@ -263,7 +263,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def _compute_table(self):
         with Transaction().new_transaction() as transaction:
-            cursor = Transaction().connection.cursor()
+            cursor = transaction.connection.cursor()
             cursor.execute('DROP TABLE IF EXISTS "%s"' % self.table_name)
             cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
                     self._stripped_query))
@@ -278,7 +278,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         Model = Pool().get(self.model.model)
 
         with Transaction().new_transaction() as transaction:
-            cursor = Transaction().connection.cursor()
+            cursor = transaction.connection.cursor()
 
             cursor.execute('DROP TABLE IF EXISTS "%s"' % self.table_name)
             fields = []
