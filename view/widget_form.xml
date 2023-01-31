@@ -35,6 +35,9 @@
             <label name="limit"/>
             <field name="limit"/>
         </page>
+        <page name="help">
+            <field name="help" colspan="4"/>
+        </page>
     </notebook>
     <field name="chart" widget="chart" colspan="2"/>
 </form>
