@@ -1,12 +1,5 @@
 <tryton>
     <data>
-        <record model="ir.action.url" id="action_url">
-            <field name="name">Dashboard</field>
-            <field name="url">babi-board</field>
-        </record>
-
-        <menuitem id="menu_dashboard_open" name="Dashboard" parent="menu_babi" sequence="40" action="action_url"/>
-
         <!-- babi.dashboard -->
         <record model="ir.ui.view" id="babi_dashboard_form_view">
             <field name="model">babi.dashboard</field>
@@ -62,7 +55,7 @@
             <field name="group" ref="group_babi"/>
         </record>
 
-        <menuitem id="menu_dashboard" parent="menu_babi" sequence="1" action="act_babi_dashboard"/>
+        <menuitem id="menu_dashboard" parent="menu_babi" sequence="30" action="act_babi_dashboard"/>
 
         <!-- babi.dashboard.item -->
         <record model="ir.ui.view" id="babi_dashboard_item_form_view">
