@@ -777,6 +777,7 @@ class Report(ModelSQL, ModelView):
         menu.icon = 'tryton-tree'
         menu.groups = self.groups
         menu.babi_type = 'tree'
+        menu.sequence = 100
         menu.save()
         if langs:
             for lang in langs:
