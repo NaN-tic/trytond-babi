@@ -241,6 +241,7 @@ class Widget(ModelSQL, ModelView):
             'invisible': Eval('type') != 'box',
             }, depends=['type'])
     total_branch_values = fields.Boolean('Total Branch Values')
+    help = fields.Function(fields.Text('Help'), 'on_change_with_help')
 
     @staticmethod
     def default_timeout():
@@ -285,6 +286,17 @@ class Widget(ModelSQL, ModelView):
                 if count < setting['min']:
                     raise UserError(gettext('babi.msg_not_enough_parameters',
                             widget=self.rec_name, type=key, min=setting['min']))
+
+    @fields.depends('type')
+    def on_change_with_help(self, name=None):
+        settings = self.parameter_settings()
+        if not settings:
+            return
+        help_list = []
+        for key, value in settings.items():
+            help_list.append('- %s (%s - %s)' % (key, value['min'],
+                value['max']))
+        return gettext('babi.msg_widget_help', list='\n'.join(help_list))
 
     @fields.depends('type', 'where', 'parameters', 'timeout', 'limit',
         'show_title', 'show_toolbox', 'show_legend', 'static', 'name',
