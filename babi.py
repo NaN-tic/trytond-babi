@@ -1207,16 +1207,25 @@ class ReportExecution(ModelSQL, ModelView):
                 pool = Pool()
                 Execution = pool.get('babi.report.execution')
                 Model = pool.get('ir.model')
-                new_instances = Execution.browse([execution_id])
+                execution = Execution(execution_id)
                 to_write = {'state': state}
                 if traceback:
                     to_write['traceback'] = traceback
                 if state == 'in_progress':
                     to_write['pid'] = os.getpid()
-                Execution.write(new_instances, to_write)
+                Execution.write([execution], to_write)
                 if exception:
-                    Execution.remove_data(new_instances)
-                    Model.delete([e.babi_model for e in new_instances])
+                    Execution.remove_data([execution])
+                    Model.delete([execution.babi_model])
+
+                report = execution.report
+                if state == 'calculated':
+                    notify('babi.msg_report_successful', report=report.name)
+                elif state == 'failed':
+                    notify('babi.msg_report_failed', report=report.name)
+                elif state == 'timeout':
+                    notify('babi.msg_report_timeout', report=report.name,
+                           seconds=report.timeout)
                 new_transaction.commit()
             except DatabaseOperationalError:
                 new_transaction.rollback()

@@ -110,5 +110,14 @@ Exception: %(error)s</field>
 
 %(list)s</field>
         </record>
+        <record model="ir.message" id="msg_report_successful">
+            <field name="text">Report "%(report)s" successfully calculated.</field>
+        </record>
+        <record model="ir.message" id="msg_report_failed">
+            <field name="text">Calculation of report "%(report)s" failed.</field>
+        </record>
+        <record model="ir.message" id="msg_report_timeout">
+            <field name="text">Calculation of report "%(report)s" aborted because it took more thant %(seconds)s to compute.</field>
+        </record>
     </data>
 </tryton>
