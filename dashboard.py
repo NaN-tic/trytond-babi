@@ -922,7 +922,8 @@ class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
         if not self.aggregate or not self.field:
             return
         if self.aggregate in ('sum', 'avg'):
-            if self.field and self.field.type not in ('integer', 'float', 'numeric'):
+            if (self.field and self.field.type
+                    and self.field.type not in ('integer', 'float', 'numeric')):
                 raise UserError(gettext('babi.msg_invalid_aggregate',
                     parameter=self.rec_name, widget=self.widget.rec_name))
 
