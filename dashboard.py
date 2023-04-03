@@ -879,6 +879,7 @@ class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
             ('avg', 'Average'),
             ('min', 'Minimum'),
             ('max', 'Maximum'),
+            ('median', 'Median'),
             ], 'Aggregate', states={
             'required': Bool(Eval('aggregate_required')),
             'invisible': Bool(Eval('aggregate_invisible')),
@@ -923,7 +924,7 @@ class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
     def check_aggregate(self):
         if not self.aggregate or not self.field:
             return
-        if self.aggregate in ('sum', 'avg'):
+        if self.aggregate in ('sum', 'avg', 'median'):
             if (self.field and self.field.type
                     and self.field.type not in ('integer', 'float', 'numeric')):
                 raise UserError(gettext('babi.msg_invalid_aggregate',
@@ -949,7 +950,12 @@ class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
         if not self.field:
             return
         if self.aggregate:
-            return '%s(%s)' % (self.aggregate.upper(), self.field.internal_name)
+            if self.aggregate == 'median':
+                return ('percentile_cont(0.5) WITHIN GROUP (ORDER BY "%s")' %
+                    self.field.internal_name)
+            else:
+                return '%s("%s")' % (self.aggregate.upper(),
+                    self.field.internal_name)
         else:
             settings = self.widget.parameter_settings()
             if settings.get(self.type, {}).get('aggregate') == 'required':
