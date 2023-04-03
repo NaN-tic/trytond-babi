@@ -94,9 +94,11 @@ class ResultSet:
             parameters = []
         if records is None:
             records = []
-        # Copy so that we do not modify the original records
-        self.records = records[:]
+        self.records = []
         for record in records:
+            # Copy so that we do not modify the original records
+            record = record[:]
+            self.records.append(record)
             for i, value in enumerate(record):
                 if isinstance(value, Decimal):
                     # Ensure we do not try to send Decimal to the client
