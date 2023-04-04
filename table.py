@@ -1,3 +1,4 @@
+import time
 import datetime as mdatetime
 from datetime import datetime
 import logging
@@ -44,6 +45,32 @@ def convert_to_symbol(text):
         symbol = symbol[:-1]
     return symbol
 
+def generate_html_table(records):
+    table = "<table>"
+    tag = 'th'
+    for row in records:
+        table += "<tr>"
+        for cell in row:
+            align = 'right'
+            if cell is None:
+                cell = '<i>NULL</i>'
+            elif isinstance(cell, datetime):
+                cell = cell.strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(cell, mdatetime.date):
+                cell = cell.strftime('%Y-%m-%d')
+            elif isinstance(cell, mdatetime.time):
+                cell = cell.strftime('%H:%M:%S')
+            elif isinstance(cell, (float, int)):
+                cell = str(cell)
+            else:
+                cell = str(cell)
+                align = 'left'
+            table += f"<{tag} align='{align}'>{cell}</{tag}>"
+        tag = 'td'
+        table += "</tr>"
+    table += "</table>"
+    return table
+
 
 class Table(DeactivableMixin, ModelSQL, ModelView):
     'BABI Table'
@@ -75,6 +102,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             }, help='If table '
         'calculation should take more than the specified timeout (in seconds) '
         'the process will be stopped automatically.')
+    preview_limit = fields.Integer('Preview Limit', required=True)
+    preview = fields.Function(fields.Binary('Preview',
+        filename='preview_filename'), 'get_preview')
+    preview_filename = fields.Function(fields.Char('Preview Filename'),
+        'get_preview_filename')
     babi_raise_user_error = fields.Boolean('Raise User Error',
         help='Will raise a UserError in case of an error in the table.')
     crons = fields.One2Many('ir.cron', 'babi_table', 'Schedulers', context={
@@ -86,6 +118,52 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         Config = Pool().get('babi.configuration')
         config = Config(1)
         return config.default_timeout or 30
+
+    @staticmethod
+    def default_preview_limit():
+        return 10
+
+    def get_preview(self, name):
+        start = time.time()
+        content = None
+        try:
+            records = self.execute_query(limit=self.preview_limit)
+        except Exception as e:
+            content = str(e).encode('utf-8')
+
+        elapsed = time.time() - start
+
+        if not content:
+            table = []
+            row = [x.internal_name for x in self.fields_]
+            table.append(row)
+            for record in records:
+                table.append(record)
+            content = '%(table)s<br/>%(elapsed).2fms' % {
+                'table': generate_html_table(table),
+                'elapsed': elapsed * 1000,
+                }
+
+        preview = '''<!DOCTYPE html>
+             <html>
+             <head>
+             <style>
+             table, th, td {
+                border: 1px solid black;
+                border-collapse: collapse;
+                padding: 5px;
+             }
+             * {
+                font-family: monospace;
+             }
+             </style>
+             </head>
+             <body>%s</body></html>
+        ''' % content
+        return preview.encode()
+
+    def get_preview_filename(self, name):
+        return self.internal_name + '.html'
 
     @classmethod
     def __setup__(cls):
