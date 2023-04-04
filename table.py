@@ -349,6 +349,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         field_names = [x[0] for x in cursor.description]
         self.update_fields(field_names)
 
+        cursor = Transaction().connection.cursor()
+        cursor.execute('DROP VIEW IF EXISTS %s;' % self.table_name)
+        cursor.execute('CREATE VIEW %s AS %s' % (self.table_name, self._stripped_query))
+
     def _compute_table(self):
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
@@ -359,8 +363,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
         field_names = [x[0] for x in cursor.description]
         self.update_fields(field_names)
-
-
 
     def _compute_model(self):
         Model = Pool().get(self.model.model)
