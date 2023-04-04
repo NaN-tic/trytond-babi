@@ -23,6 +23,9 @@
         <page name="crons">
             <field name="crons" colspan="4"/>
         </page>
+        <page name="compute_error">
+            <field name="compute_error" colspan="4"/>
+        </page>
         <page id="configuration" string="Configuration" col="6">
             <label name="preview_limit"/>
             <field name="preview_limit"/>
