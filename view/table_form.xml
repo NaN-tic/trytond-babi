@@ -17,14 +17,19 @@
         <page name="fields_">
             <field name="fields_" colspan="4"/>
         </page>
+        <page name="preview">
+            <field name="preview" colspan="4" widget="document"/>
+        </page>
         <page name="crons">
             <field name="crons" colspan="4"/>
         </page>
-        <page id="configuration" string="Configuration">
-            <label name="timeout"/>
-            <field name="timeout"/>
+        <page id="configuration" string="Configuration" col="6">
+            <label name="preview_limit"/>
+            <field name="preview_limit"/>
             <label name="babi_raise_user_error"/>
             <field name="babi_raise_user_error"/>
+            <label name="timeout"/>
+            <field name="timeout"/>
         </page>
     </notebook>
 </form>
