@@ -176,7 +176,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         if groupby:
             query += 'GROUP BY %s ' % ', '.join(groupby) + ' '
 
-        query += 'ORDER BY %s' % ', '.join(fields)
+        if fields:
+            query += 'ORDER BY %s' % ', '.join(fields)
+
+        if limit:
+            query += 'LIMIT %d' % limit
         return query
 
     def execute_query(self, fields=None, where=None, groupby=None, timeout=None,
