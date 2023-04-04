@@ -12,7 +12,7 @@ from trytond.model import (ModelView, ModelSQL, fields, Unique,
     DeactivableMixin, sequence_ordered)
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
-from trytond.pyson import Eval, PYSONDecoder
+from trytond.pyson import Bool, Eval, PYSONDecoder
 from trytond import backend
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES
 from .babi_eval import babi_eval
@@ -109,6 +109,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         'get_preview_filename')
     babi_raise_user_error = fields.Boolean('Raise User Error',
         help='Will raise a UserError in case of an error in the table.')
+    compute_error = fields.Text('Compute Error', states={
+            'invisible': ~Bool(Eval('compute_error')),
+            }, readonly=True)
     crons = fields.One2Many('ir.cron', 'babi_table', 'Schedulers', context={
             'babi_table': Eval('id'),
             }, depends=['id'])
@@ -298,10 +301,13 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 self._compute_table()
             elif self.type == 'query':
                 self._compute_query()
-        except:
+        except Exception as e:
             notify(gettext('babi.msg_table_failed', table=self.rec_name))
-            raise
-
+            self.compute_error = str(e)
+            self.save()
+            return
+        self.compute_error = None
+        self.save()
         notify(gettext('babi.msg_table_successful', table=self.rec_name))
 
     def update_fields(self, field_names):
