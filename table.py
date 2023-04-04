@@ -282,21 +282,27 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         raise TimeoutException
 
     def _compute(self):
-        if self.type == 'model':
-            if not self.fields_:
-                raise UserError(gettext('babi.msg_table_no_fields',
-                        table=self.name))
+        try:
+            if self.type == 'model':
+                if not self.fields_:
+                    raise UserError(gettext('babi.msg_table_no_fields',
+                            table=self.name))
 
-            if self.filter and self.filter.parameters:
-                raise UserError(gettext('babi.msg_filter_with_parameters',
-                        table=self.rec_name))
+                if self.filter and self.filter.parameters:
+                    raise UserError(gettext('babi.msg_filter_with_parameters',
+                            table=self.rec_name))
 
-        if self.type == 'model':
-            self._compute_model()
-        elif self.type == 'table':
-            self._compute_table()
-        elif self.type == 'query':
-            self._compute_query()
+            if self.type == 'model':
+                self._compute_model()
+            elif self.type == 'table':
+                self._compute_table()
+            elif self.type == 'query':
+                self._compute_query()
+        except:
+            notify(gettext('babi.msg_table_failed', table=self.rec_name))
+            raise
+
+        notify(gettext('babi.msg_table_successful', table=self.rec_name))
 
     def update_fields(self, field_names):
         pool = Pool()
