@@ -7,4 +7,6 @@
     <field name="sequence"/>
     <label name="colspan"/>
     <field name="colspan"/>
+    <label name="height"/>
+    <field name="height"/>
 </form>
