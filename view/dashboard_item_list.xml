@@ -2,4 +2,5 @@
     <field name="dashboard"/>
     <field name="widget"/>
     <field name="colspan"/>
+    <field name="height"/>
 </tree>
