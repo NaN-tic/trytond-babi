@@ -356,7 +356,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         self.update_fields(field_names)
 
         cursor = Transaction().connection.cursor()
-        cursor.execute('DROP VIEW IF EXISTS %s;' % self.table_name)
+        cursor.execute('DROP VIEW IF EXISTS %s CASCADE;' % self.table_name)
         cursor.execute('CREATE VIEW %s AS %s' % (self.table_name, self._stripped_query))
 
     def _compute_table(self):
