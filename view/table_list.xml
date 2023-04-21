@@ -4,6 +4,6 @@
     <field name="type"/>
     <field name="model"/>
     <field name="filter"/>
-    <field name="query" invisible="1"/>
+    <field name="query" tree_invisible="1"/>
     <button name="compute"/>
 </tree>
