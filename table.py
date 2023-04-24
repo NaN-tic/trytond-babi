@@ -5,6 +5,7 @@ import logging
 import sql
 import unidecode
 from simpleeval import EvalWithCompoundTypes
+from trytond import backend
 from trytond.bus import notify
 from trytond.transaction import Transaction
 from trytond.pool import Pool
@@ -356,13 +357,21 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         self.update_fields(field_names)
 
         cursor = Transaction().connection.cursor()
-        cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE;' % self.table_name)
+        if backend.name == 'postgresql':
+            cascade = 'CASCADE'
+        else:
+            cascade = ''
+        cursor.execute('DROP VIEW IF EXISTS "%s" %s;' % (self.table_name, cascade))
         cursor.execute('CREATE VIEW "%s" AS %s' % (self.table_name, self._stripped_query))
 
     def _compute_table(self):
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-            cursor.execute('DROP TABLE IF EXISTS "%s" CASCADE;' % self.table_name)
+            if backend.name == 'postgresql':
+                cascade = 'CASCADE'
+            else:
+                cascade = ''
+            cursor.execute('DROP TABLE IF EXISTS "%s" %s;' % (self.table_name, cascade))
             cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
                     self._stripped_query))
             cursor.execute('SELECT * FROM "%s" LIMIT 1' % self.table_name)
