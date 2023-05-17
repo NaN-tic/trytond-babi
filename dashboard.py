@@ -1,3 +1,4 @@
+from datetime import date, datetime, timedelta
 from collections import OrderedDict
 from decimal import Decimal
 import json
@@ -105,6 +106,13 @@ class ResultSet:
                 if isinstance(value, Decimal):
                     # Ensure we do not try to send Decimal to the client
                     record[i] = float(value)
+                elif isinstance(value, date):
+                    record[i] = value.strftime('%Y-%m-%d')
+                elif isinstance(value, datetime):
+                    record[i] = value.strftime('%Y-%m-%d %H:%M:%S')
+                elif isinstance(value, timedelta):
+                    record[i] = round(value.total_seconds() / 3600, 2)
+
         #self.parameters = parameters
         self.transposed = list(map(list, zip(*self.records)))
         self.results = []
