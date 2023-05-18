@@ -21,6 +21,7 @@ class Dashboard(ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super().__setup__()
+        cls._order.insert(0, ('name', 'ASC'))
         cls._buttons.update({
                 'show': {
                     'icon': 'tryton-board',
@@ -276,6 +277,11 @@ class Widget(ModelSQL, ModelView):
     @staticmethod
     def default_image_format():
         return 'svg'
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._order.insert(0, ('name', 'ASC'))
 
     @classmethod
     def validate(cls, widgets):
