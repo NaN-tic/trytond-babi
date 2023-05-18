@@ -1,5 +1,5 @@
 <tree>
-    <field name="name"/>
+    <field name="name" expand="1"/>
     <field name="type"/>
     <field name="table"/>
     <field name="where"/>
