@@ -471,7 +471,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 class Field(sequence_ordered(), ModelSQL, ModelView):
     'BABI Field'
     __name__ = 'babi.field'
-    table = fields.Many2One('babi.table', 'Table', required=True)
+    table = fields.Many2One('babi.table', 'Table', required=True,
+        ondelete='CASCADE')
     name = fields.Char('Name', required=True)
     internal_name = fields.Char('Internal Name', required=True)
     expression = fields.Many2One('babi.expression', 'Expression', states={
