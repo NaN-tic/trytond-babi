@@ -390,7 +390,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
 
-            cursor.execute('DROP TABLE IF EXISTS "%s"' % self.table_name)
+            if backend.name == 'postgresql':
+                cascade = 'CASCADE'
+            else:
+                cascade = ''
+            cursor.execute('DROP TABLE IF EXISTS "%s" %s' % (self.table_name, cascade))
             fields = []
             for field in self.fields_:
                 fields.append('"%s" %s' % (field.internal_name, field.sql_type()))
