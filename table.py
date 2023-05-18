@@ -127,6 +127,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def default_preview_limit():
         return 10
 
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._order.insert(0, ('name', 'ASC'))
+
     def get_preview(self, name):
         start = time.time()
         content = None
