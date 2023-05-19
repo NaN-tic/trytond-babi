@@ -173,7 +173,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         Dependency.delete(self.requires)
         Dependency.delete(self.required_by)
 
-        import pdb; pdb.set_trace()
         tables = {x.table_name: x for x in self.search([])}
         to_save = []
 
