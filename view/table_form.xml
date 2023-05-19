@@ -11,14 +11,15 @@
     <field name="filter"/>
     <button name="compute" colspan="2"/>
     <newline/>
-    <separator name="query" colspan="6"/>
-    <field name="query" colspan="6"/>
     <notebook colspan="6">
+        <page name="query">
+            <field name="query" colspan="4" height="550"/>
+        </page>
         <page name="fields_">
-            <field name="fields_" colspan="4"/>
+            <field name="fields_" colspan="4" height="550"/>
         </page>
         <page name="preview">
-            <field name="preview" colspan="4" widget="document"/>
+            <field name="preview" colspan="4" widget="document" height="550"/>
         </page>
         <page name="crons">
             <field name="crons" colspan="4"/>
@@ -33,6 +34,10 @@
             <field name="babi_raise_user_error"/>
             <label name="timeout"/>
             <field name="timeout"/>
+	</page>
+        <page id="dependencies" string="Dependencies">
+            <field name="requires" colspan="2" height="550"/>
+            <field name="required_by" colspan="2" height="550"/>
         </page>
     </notebook>
 </form>

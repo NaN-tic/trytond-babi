@@ -1,0 +1,9 @@
+<form>
+    <label name="required_by"/>
+    <field name="required_by"/>
+    <newline/>
+    <label name="name"/>
+    <field name="name"/>
+    <label name="table"/>
+    <field name="table"/>
+</form>
