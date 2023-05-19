@@ -116,6 +116,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     crons = fields.One2Many('ir.cron', 'babi_table', 'Schedulers', context={
             'babi_table': Eval('id'),
             }, depends=['id'])
+    requires = fields.One2Many('babi.table.dependency', 'required_by',
+        'Requires', readonly=True)
+    required_by = fields.One2Many('babi.table.dependency', 'table',
+        'Required By', readonly=True)
 
     @staticmethod
     def default_timeout():
@@ -131,6 +135,83 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls._order.insert(0, ('name', 'ASC'))
+
+    @classmethod
+    def create(cls, vlist):
+        tables = super().create(vlist)
+        for table in tables:
+            table.update_table_dependencies()
+        return tables
+
+    @classmethod
+    def write(cls, *args):
+        actions = iter(args)
+        for tables, values in zip(actions, actions):
+            if 'internal_name' not in values:
+                continue
+            for table in tables:
+                table._drop()
+
+        super().write(*args)
+
+        actions = iter(args)
+        for tables, values in zip(actions, actions):
+            for table in tables:
+                table.update_table_dependencies()
+                if 'internal_name' in values:
+                    table._drop()
+
+    def delete(cls, tables):
+        for table in tables:
+            table._drop()
+        super().delete(tables)
+
+    def update_table_dependencies(self):
+        pool = Pool()
+        Dependency = pool.get('babi.table.dependency')
+
+        Dependency.delete(self.requires)
+        Dependency.delete(self.required_by)
+
+        import pdb; pdb.set_trace()
+        tables = {x.table_name: x for x in self.search([])}
+        to_save = []
+
+        required_tables = self.get_required_table_names()
+        for name in required_tables:
+            dependency = Dependency()
+            dependency.required_by = self
+            dependency.name = name
+            dependency.table = tables.get(name)
+            to_save.append(dependency)
+
+        requiredby_tables = self.get_required_by_table_names() - required_tables
+        for name in requiredby_tables:
+            dependency = Dependency()
+            dependency.required_by = tables.get(name)
+            dependency.name = self.table_name
+            dependency.table = self
+            to_save.append(dependency)
+
+        Dependency.save(to_save)
+
+    def get_required_table_names(self):
+        if self.type and self.type == 'model':
+            return set()
+        query = self.query or ''
+        tables = {x for x in query.split() if x.startswith('__')}
+        return tables
+
+    def get_required_by_table_names(self):
+        tables = self.search([
+                ('type', 'in', ['table', 'query']),
+                ('query', 'ilike', '%' + self.table_name + '%'),
+                ])
+        res = set()
+        for table in tables:
+            if self.table_name in table.get_required_table_names():
+                res.add(table.table_name)
+        return res
 
     def get_preview(self, name):
         start = time.time()
@@ -290,7 +371,14 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def timeout_exception(self):
         raise TimeoutException
 
-    def _compute(self):
+    def _compute(self, processed=None):
+        if processed is None:
+            processed = []
+        if self in processed:
+            seq = ' > '.join([x.rec_name for x in processed] + [self.rec_name])
+            raise UserError(gettext('babi.msg_circular_dependency',
+                    sequence=seq))
+        print('Computing %s.... ' % self.rec_name)
         try:
             if self.type == 'model':
                 if not self.fields_:
@@ -307,6 +395,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 self._compute_table()
             elif self.type == 'query':
                 self._compute_query()
+
+            for dependency in self.required_by:
+                dependency.required_by._compute(processed + [self])
         except Exception as e:
             notify(gettext('babi.msg_table_failed', table=self.rec_name))
             self.compute_error = str(e)
@@ -350,6 +441,21 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         else:
             return ''
 
+    def _drop(self):
+        if backend.name == 'postgresql':
+            cascade = 'CASCADE'
+        else:
+            cascade = ''
+        cursor = Transaction().connection.cursor()
+        cursor.execute('SELECT * FROM information_schema.tables '
+            'WHERE table_name=%s', (self.table_name,))
+        if cursor.fetchone():
+            cursor.execute('DROP TABLE %s %s' % (self.table_name, cascade))
+        cursor.execute('SELECT * FROM information_schema.views '
+            'WHERE table_name=%s', (self.table_name,))
+        if cursor.fetchone():
+            cursor.execute('DROP VIEW IF EXISTS "%s" %s;' % (self.table_name, cascade))
+
     def _compute_query(self):
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
@@ -362,11 +468,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         self.update_fields(field_names)
 
         cursor = Transaction().connection.cursor()
-        if backend.name == 'postgresql':
-            cascade = 'CASCADE'
-        else:
-            cascade = ''
-        cursor.execute('DROP VIEW IF EXISTS "%s" %s;' % (self.table_name, cascade))
+        self._drop()
         cursor.execute('CREATE VIEW "%s" AS %s' % (self.table_name, self._stripped_query))
 
     def _compute_table(self):
@@ -377,6 +479,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             else:
                 cascade = ''
             cursor.execute('DROP TABLE IF EXISTS "%s" %s;' % (self.table_name, cascade))
+            self._drop()
             cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
                     self._stripped_query))
             cursor.execute('SELECT * FROM "%s" LIMIT 1' % self.table_name)
@@ -562,3 +665,17 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
     def on_change_with_model(self, name=None):
         if self.table and self.table.model:
             return self.table.model.id
+
+
+class TableDependency(ModelSQL, ModelView):
+    'BABI Table Dependency'
+    __name__ = 'babi.table.dependency'
+    required_by = fields.Many2One('babi.table', 'Required By', required=True,
+        ondelete='CASCADE')
+    name = fields.Char('Name')
+    table = fields.Many2One('babi.table', 'Requires', ondelete='SET NULL')
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__access__.add('table')
