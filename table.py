@@ -441,19 +441,18 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return ''
 
     def _drop(self):
-        if backend.name == 'postgresql':
-            cascade = 'CASCADE'
-        else:
-            cascade = ''
         cursor = Transaction().connection.cursor()
+        if backend.name != 'postgresql':
+            cursor.execute('DROP TABLE IF EXISTS %s' % self.table_name)
+            return
         cursor.execute('SELECT * FROM information_schema.tables '
             'WHERE table_name=%s', (self.table_name,))
         if cursor.fetchone():
-            cursor.execute('DROP TABLE %s %s' % (self.table_name, cascade))
+            cursor.execute('DROP TABLE IF EXISTS %s CASCADE' % self.table_name)
         cursor.execute('SELECT * FROM information_schema.views '
             'WHERE table_name=%s', (self.table_name,))
         if cursor.fetchone():
-            cursor.execute('DROP VIEW IF EXISTS "%s" %s;' % (self.table_name, cascade))
+            cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE' % self.table_name)
 
     def _compute_query(self):
         with Transaction().new_transaction() as transaction:
