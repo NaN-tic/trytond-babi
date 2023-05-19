@@ -83,5 +83,17 @@
         </record>
 
         <menuitem id="menu_babi_field" parent="menu_babi_table" action="act_babi_field" sequence="10"/>
+
+        <!-- babi.table.dependency -->
+        <record model="ir.ui.view" id="babi_table_dependency_form_view">
+            <field name="model">babi.table.dependency</field>
+            <field name="type">form</field>
+            <field name="name">table_dependency_form</field>
+        </record>
+        <record model="ir.ui.view" id="babi_table_dependency_tree_view">
+            <field name="model">babi.table.dependency</field>
+            <field name="type">tree</field>
+            <field name="name">table_dependency_list</field>
+        </record>
     </data>
 </tryton>

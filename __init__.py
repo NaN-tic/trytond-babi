@@ -45,6 +45,7 @@ def register():
         test_model.TestBabiModel,
         table.Table,
         table.Field,
+        table.TableDependency,
         module='babi', type_='model')
     Pool.register(
         babi.OpenChart,

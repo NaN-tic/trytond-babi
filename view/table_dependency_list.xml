@@ -1,0 +1,5 @@
+<tree>
+    <field name="required_by"/>
+    <field name="name"/>
+    <field name="table"/>
+</tree>
