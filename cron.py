@@ -16,6 +16,17 @@ class Cron(metaclass=PoolMeta):
             }, depends=['method'])
 
     @classmethod
+    def __register__(cls, module_name):
+        cursor = Transaction().connection.cursor()
+        babi = cls.__table__()
+
+        super().__register__(module_name)
+        cursor.execute(*babi.update(
+                [babi.method], ['babi.report|calculate_babi_report'],
+                where=(babi.method == 'babi.report|calculate_reports')
+                ))
+
+    @classmethod
     def __setup__(cls):
         super(Cron, cls).__setup__()
         cls.method.selection.extend([
