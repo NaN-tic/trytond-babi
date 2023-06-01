@@ -638,7 +638,10 @@ class Report(ModelSQL, ModelView):
             'invisible': Not(Eval('context', {}).get('groups', []).contains(
                 Id('babi', 'group_babi_admin'))),
             })
-    crons = fields.One2Many('ir.cron', 'babi_report', 'Schedulers')
+    crons = fields.One2Many('ir.cron', 'babi_report', 'Schedulers',
+        domain=[
+            ('method', '=', 'babi.report|calculate_babi_report')
+            ])
     report_cell_level = fields.Integer('Cell Level',
         help='Start cell level that not has indentation')
     email = fields.Boolean('E-mail',
