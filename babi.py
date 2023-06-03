@@ -66,7 +66,7 @@ DST_CHARS = """__________________________________"""
 
 RETENTION_DAYS = config_.getint('babi', 'retention_days', default=30)
 MAX_BD_COLUMN = config_.getint('babi', 'max_db_column', default=60)
-QUEUE_NAME = config.get('babi', 'queue_name', default='default')
+QUEUE_NAME = config_.get('babi', 'queue_name', default='default')
 
 logger = logging.getLogger(__name__)
 
