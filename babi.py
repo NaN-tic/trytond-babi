@@ -64,8 +64,9 @@ AGGREGATE_TYPES = [
 SRC_CHARS = """ .'"()/*-+?¿!&$[]{}@#`'^:;<>=~%,|\\"""
 DST_CHARS = """__________________________________"""
 
-BABI_RETENTION_DAYS = config_.getint('babi', 'retention_days', default=30)
-BABI_MAX_BD_COLUMN = config_.getint('babi', 'max_db_column', default=60)
+RETENTION_DAYS = config_.getint('babi', 'retention_days', default=30)
+MAX_BD_COLUMN = config_.getint('babi', 'max_db_column', default=60)
+QUEUE_NAME = config.get('babi', 'queue_name', default='default')
 
 logger = logging.getLogger(__name__)
 
@@ -951,7 +952,7 @@ class Report(ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def calculate(cls, reports):
-        with Transaction().set_context(queue_name='babi'):
+        with Transaction().set_context(queue_name=QUEUE_NAME):
             for report in reports:
                 cls.__queue__.compute(report)
 
@@ -1136,7 +1137,7 @@ class ReportExecution(ModelSQL, ModelView):
         pool = Pool()
         Date = pool.get('ir.date')
         if date is None:
-            date = Date.today() - timedelta(days=BABI_RETENTION_DAYS)
+            date = Date.today() - timedelta(days=RETENTION_DAYS)
 
         date = datetime.combine(date, mdatetime.time.min)
         executions = cls.search([('date', '<', date)])
@@ -1592,9 +1593,9 @@ class ReportExecution(ModelSQL, ModelView):
                 # PSQL default column name max characters
                 if ((len(internal_names) > 1)
                         and (len('_'.join(internal_names)) >
-                            BABI_MAX_BD_COLUMN)):
+                            MAX_BD_COLUMN)):
                     measure_len = len(measure.internal_name)
-                    max_len = BABI_MAX_BD_COLUMN - measure_len
+                    max_len = MAX_BD_COLUMN - measure_len
                     combination_name = internal_names.pop(0)[:max_len]
                     internal_names.insert(0, combination_name)
                 to_create.append({

@@ -15,7 +15,7 @@ from trytond.exceptions import UserError
 from trytond.i18n import gettext
 from trytond.pyson import Bool, Eval, PYSONDecoder
 from trytond import backend
-from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES
+from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
 
 VALID_FIRST_SYMBOLS = 'abcdefghijklmnopqrstuvwxyz'
@@ -316,7 +316,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def compute(cls, tables):
-        with Transaction().set_context(queue_name='babi'):
+        with Transaction().set_context(queue_name=QUEUE_NAME):
             for table in tables:
                 cls.__queue__._compute(table)
 

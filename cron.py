@@ -4,6 +4,7 @@ from trytond.model import fields, dualmethod
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.pyson import Eval
+from .babi import QUEUE_NAME
 
 
 class Cron(metaclass=PoolMeta):
@@ -64,7 +65,7 @@ class Cron(metaclass=PoolMeta):
             # babi execution require company. Run calculate when has a company
             for company in cron.companies:
                 with Transaction().set_context(company=company.id,
-                        queue_name='babi'):
+                        queue_name=QUEUE_NAME):
                     BabiReport.__queue__.compute(cron.babi_report)
 
         table_crons = [cron for cron in crons if cron.babi_table]
