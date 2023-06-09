@@ -1225,12 +1225,14 @@ class ReportExecution(ModelSQL, ModelView):
 
                 report = execution.report
                 if state == 'calculated':
-                    notify('babi.msg_report_successful', report=report.name)
+                    notify(gettext('babi.msg_report_successful',
+                            report=report.name))
                 elif state == 'failed':
-                    notify('babi.msg_report_failed', report=report.name)
+                    notify(gettext('babi.msg_report_failed',
+                            report=report.name))
                 elif state == 'timeout':
-                    notify('babi.msg_report_timeout', report=report.name,
-                           seconds=report.timeout)
+                    notify(gettext('babi.msg_report_timeout',
+                            report=report.name, seconds=report.timeout))
                 new_transaction.commit()
             except DatabaseOperationalError:
                 new_transaction.rollback()
