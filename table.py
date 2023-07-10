@@ -377,7 +377,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             seq = ' > '.join([x.rec_name for x in processed] + [self.rec_name])
             raise UserError(gettext('babi.msg_circular_dependency',
                     sequence=seq))
-        print('Computing %s.... ' % self.rec_name)
+        # print('Computing %s.... ' % self.rec_name)
         try:
             if self.type == 'model':
                 if not self.fields_:
