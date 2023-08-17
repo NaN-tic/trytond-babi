@@ -19,8 +19,8 @@ from io import BytesIO
 
 from trytond.wizard import (Wizard, StateView, StateAction, StateTransition,
     StateReport, Button)
-from trytond.model import (ModelSQL, ModelView, fields, Unique, Check,
-    sequence_ordered)
+from trytond.model import (DeactivableMixin, ModelSQL, ModelView, fields,
+    Unique, Check, sequence_ordered)
 from trytond.model.fields import depends
 from trytond.pyson import (Bool, Eval, Id, If, In, Not, Or as pysonOr,
     PYSONDecoder, PYSONEncoder)
@@ -367,7 +367,7 @@ class DimensionIterator:
         return self.current
 
 
-class Filter(ModelSQL, ModelView):
+class Filter(DeactivableMixin, ModelSQL, ModelView):
     "Filter"
     __name__ = 'babi.filter'
     _history = True
@@ -518,7 +518,7 @@ class FilterParameter(ModelSQL, ModelView):
         super(FilterParameter, cls).delete(filters)
 
 
-class Expression(ModelSQL, ModelView):
+class Expression(DeactivableMixin, ModelSQL, ModelView):
     "Expression"
     __name__ = 'babi.expression'
     _history = True
@@ -575,7 +575,7 @@ class Expression(ModelSQL, ModelView):
         return [x.id for x in self.model.fields]
 
 
-class Report(ModelSQL, ModelView):
+class Report(DeactivableMixin, ModelSQL, ModelView):
     "Report"
     __name__ = 'babi.report'
     _history = True

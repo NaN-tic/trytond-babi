@@ -8,7 +8,8 @@ contains the full copyright notices and license terms. -->
     <field name="model"/>
     <label name="view_search"/>
     <field name="view_search"/>
-    <newline/>
+    <label name="active"/>
+    <field name="active"/>
     <label name="domain"/>
     <field name="domain" colspan="3"/>
     <label name="python_expression"/>

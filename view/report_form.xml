@@ -12,6 +12,8 @@ contains the full copyright notices and license terms. -->
     <field name="filter" colspan="3"/>
     <label name="babi_raise_user_error"/>
     <field name="babi_raise_user_error"/>
+    <label name="active"/>
+    <field name="active"/>
     <notebook>
         <page id="general" string="General">
             <group col="1" colspan="2" id="dimensions" yfill="1" yexpand="1">
