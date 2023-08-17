@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <!--The COPYRIGHT file at the top level of this repository
 contains the full copyright notices and license terms. -->
-<form col="4">
+<form col="6">
     <label name="name"/>
     <field name="name"/>
     <label name="model"/>
     <field name="model"/>
+    <label name="active"/>
+    <field name="active"/>
     <label name="expression"/>
-    <field name="expression" colspan="3"/>
+    <field name="expression" colspan="5"/>
     <label name="ttype"/>
     <field name="ttype"/>
     <group colspan="2" id="extra">
@@ -16,5 +18,5 @@ contains the full copyright notices and license terms. -->
         <label name="decimal_digits"/>
         <field name="decimal_digits"/>
     </group>
-    <field name="fields" colspan="4"/>
+    <field name="fields" colspan="6"/>
 </form>
