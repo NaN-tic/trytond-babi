@@ -9,6 +9,7 @@ from . import report
 from . import table
 from . import dashboard
 from . import action
+from . import ir
 
 def register():
     Pool.register(
@@ -42,6 +43,7 @@ def register():
         action.Action,
         action.ActionDashboard,
         action.Menu,
+        ir.ModelAccess,
         test_model.TestBabiModel,
         table.Table,
         table.Field,
