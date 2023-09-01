@@ -445,14 +445,15 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         if backend.name != 'postgresql':
             cursor.execute('DROP TABLE IF EXISTS %s' % self.table_name)
             return
-        cursor.execute('SELECT * FROM information_schema.tables '
-            'WHERE table_name=%s', (self.table_name,))
-        if cursor.fetchone():
-            cursor.execute('DROP TABLE IF EXISTS %s CASCADE' % self.table_name)
-        cursor.execute('SELECT * FROM information_schema.views '
-            'WHERE table_name=%s', (self.table_name,))
-        if cursor.fetchone():
+        cursor.execute("SELECT table_type FROM information_schema.tables "
+            "WHERE table_name=%s AND table_schema='public'", (self.table_name,))
+        record = cursor.fetchone():
+        if not record:
+            return
+        if record[0] == 'VIEW':
             cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE' % self.table_name)
+        else:
+            cursor.execute('DROP TABLE IF EXISTS %s CASCADE' % self.table_name)
 
     def _compute_query(self):
         with Transaction().new_transaction() as transaction:
