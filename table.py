@@ -14,7 +14,6 @@ from trytond.model import (ModelView, ModelSQL, fields, Unique,
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
 from trytond.pyson import Bool, Eval, PYSONDecoder
-from trytond import backend
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
 
@@ -135,6 +134,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls._order.insert(0, ('name', 'ASC'))
+        cls._buttons.update({
+                'compute': {},
+                })
 
     @classmethod
     def create(cls, vlist):
@@ -253,13 +255,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def get_preview_filename(self, name):
         return self.internal_name + '.html'
-
-    @classmethod
-    def __setup__(cls):
-        super(Table, cls).__setup__()
-        cls._buttons.update({
-                'compute': {},
-                })
 
     @classmethod
     def validate(cls, tables):
@@ -447,7 +442,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return
         cursor.execute("SELECT table_type FROM information_schema.tables "
             "WHERE table_name=%s AND table_schema='public'", (self.table_name,))
-        record = cursor.fetchone():
+        record = cursor.fetchone()
         if not record:
             return
         if record[0] == 'VIEW':
