@@ -51,6 +51,11 @@
             <field name="string">Compute</field>
             <field name="model" search="[('model', '=', 'babi.table')]"/>
         </record>
+        <record model="ir.model.button" id="babi_table_ai_button">
+            <field name="name">ai</field>
+            <field name="string">AI</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
+        </record>
 
         <menuitem id="menu_babi_table" parent="menu_configuration" action="act_babi_table" sequence="30"/>
 
