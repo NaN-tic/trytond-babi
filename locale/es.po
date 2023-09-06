@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Last-Translator: Albert Cervera i Areny <albert@nan-tic.com>\n"
-"PO-Revision-Date: 2023-09-02 13:29+0200\n"
+"PO-Revision-Date: 2023-09-06 02:40+0200\n"
 "Project-Id-Version: \n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca_ES\n"
@@ -564,6 +564,14 @@ msgstr "Informe sólo lectura"
 msgctxt "field:babi.report.execution.open.select,view_type:"
 msgid "View type"
 msgstr "Tipo de vista"
+
+msgctxt "field:babi.table,ai_request:"
+msgid "AI Request"
+msgstr "Solicitud de IA"
+
+msgctxt "field:babi.table,ai_response:"
+msgid "AI Response"
+msgstr "Respuesta de la IA"
 
 msgctxt "field:babi.table,babi_raise_user_error:"
 msgid "Raise User Error"
@@ -1378,6 +1386,10 @@ msgctxt "model:ir.model.button,string:babi_report_remove_menus_button"
 msgid "Remove Menus"
 msgstr "Borrar menús"
 
+msgctxt "model:ir.model.button,string:babi_table_ai_button"
+msgid "AI"
+msgstr "IA"
+
 msgctxt "model:ir.model.button,string:babi_table_calculate_button"
 msgid "Compute"
 msgstr "Calcular"
@@ -2075,12 +2087,28 @@ msgid "Schedulers"
 msgstr "Programaciones"
 
 msgctxt "view:babi.table:"
+msgid "AI"
+msgstr "IA"
+
+msgctxt "view:babi.table:"
+msgid "AI >>"
+msgstr "IA >>"
+
+msgctxt "view:babi.table:"
+msgid "AI Response:"
+msgstr "Respuesta de la IA:"
+
+msgctxt "view:babi.table:"
 msgid "Configuration"
 msgstr "Configuración"
 
 msgctxt "view:babi.table:"
 msgid "Dependencies"
 msgstr "Dependencias"
+
+msgctxt "view:babi.table:"
+msgid "What do you want to show?"
+msgstr "¿Qué quieres mostrar?"
 
 msgctxt "view:babi.update_data.wizard.done:"
 msgid "The data for the report has been calculated"
