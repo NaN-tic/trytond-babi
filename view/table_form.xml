@@ -41,7 +41,7 @@
         </page>
         <page name="ai_request" string="AI" col="3">
             <separator name="ai_request" string="What do you want to show?" colspan="2"/>
-            <separator name="ai_reponse" string="AI Response:"/>
+            <separator name="ai_response" string="AI Response:"/>
             <field name="ai_request" height="450"/>
             <button name="ai" string="AI >>"/>
             <field name="ai_response" height="450"/>
