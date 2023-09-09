@@ -126,7 +126,7 @@ Exception: %(error)s</field>
             <field name="text">Computation of "%(table)s" failed.</field>
         </record>
         <record model="ir.message" id="msg_circular_dependency">
-		<field name="text">Circular dependency with the following table sequence:
+            <field name="text">Circular dependency with the following table sequence:
 
 "%(sequence)s"</field>
         </record>

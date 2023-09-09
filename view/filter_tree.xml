@@ -2,9 +2,12 @@
 <!--The COPYRIGHT file at the top level of this repository
 contains the full copyright notices and license terms. -->
 <tree>
-    <field name="name"/>
+    <field name="rec_name"/>
     <field name="model"/>
     <field name="domain"/>
     <field name="python_expression"/>
     <field name="context"/>
+    <field name="domain_error" tree_invisible="1"/>
+    <field name="expression_error" tree_invisible="1"/>
+    <button name="check" tree_invisible="1"/>
 </tree>

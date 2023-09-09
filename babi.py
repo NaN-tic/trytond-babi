@@ -8,6 +8,8 @@ import os
 import time
 import unicodedata
 import json
+import itertools
+import html
 from simpleeval import EvalWithCompoundTypes
 from psycopg2.errors import InvalidTextRepresentation
 
@@ -61,6 +63,12 @@ AGGREGATE_TYPES = [
     ('min', 'Min'),
     ]
 
+# Red Circle Emoji
+FIRE_HTML = '&#x1F525;'
+FIRE = html.unescape(FIRE_HTML)
+TICK_HTML = '&#x2705;'
+TICK = html.unescape(TICK_HTML)
+
 SRC_CHARS = """ .'"()/*-+?¿!&$[]{}@#`'^:;<>=~%,|\\"""
 DST_CHARS = """__________________________________"""
 
@@ -89,6 +97,17 @@ def unaccent(text):
 
 def _replace(x):
     return x.replace("'", '')
+
+
+def sanitanize(x):
+    if (isinstance(x, str) or isinstance(x, str)
+            or isinstance(x, str)):
+        x = x.replace('|', '-')
+    if not isinstance(x, str) and isinstance(x, str):
+        return str(x.decode('utf-8'))
+    else:
+        return str(x)
+
 
 
 class DimensionError(UserError):
@@ -380,11 +399,18 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
     view_search = fields.Many2One('ir.ui.view_search', 'Search',
         domain=[('model', '=', Eval('model_name'))],
         depends=['model_name'])
+    checked = fields.Boolean('Checked', readonly=True)
     domain = fields.Char('Domain')
+    domain_error = fields.Char('Domain Error', readonly=True, states={
+            'invisible': ~Bool(Eval('domain_error')),
+            })
     python_expression = fields.Char('Python Expression',
         help='The python expression introduced will be evaluated. If the '
         'result is True the record will be included, it will be discarded '
         'otherwise.')
+    expression_error = fields.Char('Expression Error', readonly=True, states={
+            'invisible': ~Bool(Eval('expression_error')),
+            })
     context = fields.Char('Context')
     parameters = fields.One2Many('babi.filter.parameter', 'filter',
         'Parameters',
@@ -420,6 +446,90 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
         if not searches:
             return None
         return searches[0].id
+
+    def get_rec_name(self, name):
+        name = ''
+        if self.checked:
+            if self.domain_error or self.expression_error:
+                name = FIRE
+            else:
+                name = TICK
+        name += ' ' + self.name
+        return name
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._buttons.update({
+                'check': {},
+                })
+
+    @classmethod
+    def write(cls, *args):
+        args = [x.copy() for x in args]
+        actions = iter(args)
+        for filters, values in zip(actions, actions):
+            if 'python_expression' in values:
+                values.setdefault('checked', False)
+                values.setdefault('expression_error')
+            if 'domain' in values:
+                values.setdefault('checked', False)
+                values.setdefault('domain_error')
+        super().write(*args)
+
+    @classmethod
+    @ModelView.button
+    def check(cls, filters=None):
+        if not filters:
+            filters = cls.search([])
+        for filter in filters:
+            filter.single_check()
+        cls.save(filters)
+
+    def single_check(self, cumulate=False):
+        pool = Pool()
+
+        self.checked = True
+        self.domain_error = None
+        self.expression_error = None
+
+        if self.parameters:
+            return True
+
+        Model = pool.get(self.model.model)
+        records = None
+
+        if self.domain:
+            domain = self.domain
+            if '__' in domain:
+                domain = str(PYSONDecoder().decode(domain))
+            try:
+                domain = eval(domain, {
+                        'datetime': mdatetime,
+                        'false': False,
+                        'true': True,
+                        })
+                records = Model.search(domain, limit=100,
+                    order=[('id', 'DESC')])
+            except Exception as e:
+                self.domain_error = str(e)
+
+        expression = self.python_expression
+        if not expression:
+            return
+
+        records = Model.search([], limit=100, order=[('id', 'DESC')])
+        records += Model.search([], limit=100, order=[('id', 'ASC')])
+        start = time.time()
+        for record in records:
+            try:
+                babi_eval(expression, record, convert_none=False)
+            except Exception as e:
+                self.expression_error = str(e)
+            if time.time() - start > 5:
+                logger.info('Waited too much for expression: %s',
+                    expression)
+                break
 
 
 class FilterParameter(ModelSQL, ModelView):
@@ -526,6 +636,10 @@ class Expression(DeactivableMixin, ModelSQL, ModelView):
     name = fields.Char('Name', required=True, translate=True)
     model = fields.Many2One('ir.model', 'Model', required=True,
         domain=[('babi_enabled', '=', True)])
+    checked = fields.Boolean('Checked', readonly=True)
+    error = fields.Char('Error', readonly=True, states={
+            'invisible': ~Bool(Eval('error')),
+            })
     expression = fields.Char('Expression', required=True,
         help='Python expression that will return the value to be used.\n'
             'The expression can include the following variables:\n\n'
@@ -555,6 +669,23 @@ class Expression(DeactivableMixin, ModelSQL, ModelView):
     def default_decimal_digits(cls):
         return 2
 
+    def get_rec_name(self, name):
+        name = ''
+        if self.checked:
+            if self.error:
+                name = FIRE
+            else:
+                name = TICK
+        name += ' ' + self.name
+        return name
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._buttons.update({
+                'check': {},
+                })
+
     @classmethod
     def __register__(cls, module_name):
         super(Expression, cls).__register__(module_name)
@@ -568,11 +699,63 @@ class Expression(DeactivableMixin, ModelSQL, ModelView):
         cursor.execute(*sql_table.update([Column(sql_table, 'ttype')],
                 ['boolean'], where=sql_table.ttype == 'bool'))
 
+    @classmethod
+    def write(cls, *args):
+        args = [x.copy() for x in args]
+        actions = iter(args)
+        for filters, values in zip(actions, actions):
+            if 'expression' in values:
+                values.setdefault('checked', False)
+                values.setdefault('error')
+        super().write(*args)
+
     @depends('model')
     def on_change_with_fields(self, name=None):
         if not self.model:
             return []
         return [x.id for x in self.model.fields]
+
+    @classmethod
+    @ModelView.button
+    def check(cls, expressions=None):
+        pool = Pool()
+
+        if not expressions:
+            expressions = cls.search([], order=[('model', 'ASC')])
+        else:
+            # Ensure the right order
+            expressions = cls.search([('id', 'in', expressions)],
+                order=[('model', 'ASC')])
+
+        issues = []
+        count = 0
+        for key, group in itertools.groupby(expressions, key=lambda x: x.model):
+            Model = pool.get(key.model)
+
+            group = list(group)
+            count += len(list(group))
+            records = Model.search([], limit=100, order=[('id', 'ASC')])
+            records += Model.search([], limit=100, order=[('id', 'DESC')])
+            for expression in group:
+                expression.error = None
+                expression.checked = False
+                start = time.time()
+                for record in records:
+                    expression.checked = True
+                    try:
+                        babi_eval(expression.expression, record)
+                    except Exception as e:
+                        expression.error = str(e)
+                        break
+
+                    # We will not spend more than five seconds to test an
+                    # expression. We do not want to wait unlimitedly for
+                    # complex expressions
+                    if time.time() - start > 5:
+                        logger.info('Waited too much for expression: %s',
+                            expression.expression)
+                        break
+                expression.save()
 
 
 class Report(DeactivableMixin, ModelSQL, ModelView):
@@ -1359,34 +1542,29 @@ class ReportExecution(ModelSQL, ModelView):
             raise UserError(gettext('babi.no_dimensions',
                     report=self.rec_name))
 
-        domain = self.get_domain_filter()
         start = datetime.today()
         self.update_internal_measures()
         with_columns = len(self.report.columns) > 0
         self.validate_model(with_columns=with_columns)
 
+        measure_names = [x.internal_name for x in self.internal_measures]
         dimension_names = [x.internal_name for x in self.report.dimensions]
+        if self.report.columns:
+            dimension_names.extend([x.internal_name for x in
+                    self.report.columns])
+
+        columns = ['create_date', 'create_uid']
+        columns += dimension_names + measure_names
+
+        measure_expressions = [x.expression for x in self.internal_measures]
         dimension_expressions = [(x.expression.expression,
                         '' if x.expression.ttype == 'many2one'
                         else 'empty') for x in
             self.report.dimensions]
-        measure_names = [x.internal_name for x in
-            self.internal_measures]
-        measure_expressions = [x.expression for x in
-            self.internal_measures]
         if self.report.columns:
-            dimension_names.extend([x.internal_name for x in
-                    self.report.columns])
             dimension_expressions.extend([(x.expression.expression,
                         '' if x.expression.ttype == 'many2one'
                         else 'empty') for x in self.report.columns])
-
-        columns = (['create_date', 'create_uid'] + dimension_names +
-            measure_names)
-        columns = ['%s' % x for x in columns]
-        # Some older versions of psycopg do not allow column names
-        # to be of type unicode
-        columns = [str(x) for x in columns]
 
         uid = transaction.user
         python_filter = self.get_python_filter()
@@ -1402,15 +1580,6 @@ class ReportExecution(ModelSQL, ModelView):
         offset = 2000
         index = 0
 
-        def sanitanize(x):
-            if (isinstance(x, str) or isinstance(x, str)
-                    or isinstance(x, str)):
-                x = x.replace('|', '-')
-            if not isinstance(x, str) and isinstance(x, str):
-                return str(x.decode('utf-8'))
-            else:
-                return str(x)
-
         context = self.get_context()
         if not context:
             context = {}
@@ -1421,6 +1590,7 @@ class ReportExecution(ModelSQL, ModelView):
         # ensure the company rule is used.
         context['_check_access'] = True
 
+        domain = self.get_domain_filter()
         with transaction.set_context(**context):
             try:
                 records = Model.search(domain, offset=index * offset,

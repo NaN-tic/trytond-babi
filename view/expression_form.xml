@@ -6,10 +6,17 @@ contains the full copyright notices and license terms. -->
     <field name="name"/>
     <label name="model"/>
     <field name="model"/>
-    <label name="active"/>
-    <field name="active"/>
+    <group id="active" colspan="2" col="6">
+        <label name="active"/>
+        <field name="active"/>
+        <label name="checked"/>
+        <field name="checked"/>
+        <button name="check" colspan="2"/>
+    </group>
     <label name="expression"/>
     <field name="expression" colspan="5"/>
+    <label name="error"/>
+    <field name="error" colspan="5"/>
     <label name="ttype"/>
     <field name="ttype"/>
     <group colspan="2" id="extra">
