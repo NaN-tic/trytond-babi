@@ -8,12 +8,21 @@ contains the full copyright notices and license terms. -->
     <field name="model"/>
     <label name="view_search"/>
     <field name="view_search"/>
-    <label name="active"/>
-    <field name="active"/>
+    <group id="active" colspan="2" col="6">
+        <label name="active"/>
+        <field name="active"/>
+        <label name="checked"/>
+        <field name="checked"/>
+        <button name="check" colspan="2"/>
+    </group>
     <label name="domain"/>
     <field name="domain" colspan="3"/>
+    <label name="domain_error"/>
+    <field name="domain_error" colspan="3"/>
     <label name="python_expression"/>
     <field name="python_expression" colspan="3"/>
+    <label name="expression_error"/>
+    <field name="expression_error" colspan="3"/>
     <label name="context"/>
     <field name="context" colspan="3"/>
     <field name="parameters" colspan="4"/>
