@@ -125,6 +125,12 @@ contains the full copyright notices and license terms. -->
             <field name="act_window" ref="act_babi_expression"/>
         </record>
 
+        <record model="ir.model.button" id="babi_expression_check_button">
+            <field name="name">check</field>
+            <field name="string">Check</field>
+            <field name="model" search="[('model', '=', 'babi.expression')]"/>
+        </record>
+
         <record model="ir.model.access" id="access_babi_expression">
             <field name="model" search="[('model', '=', 'babi.expression')]"/>
             <field name="perm_read" eval="True"/>
@@ -169,6 +175,12 @@ contains the full copyright notices and license terms. -->
             <field name="sequence" eval="20"/>
             <field name="view" ref="babi_filter_form_view"/>
             <field name="act_window" ref="act_babi_filter"/>
+        </record>
+
+        <record model="ir.model.button" id="babi_filter_check_button">
+            <field name="name">check</field>
+            <field name="string">Check</field>
+            <field name="model" search="[('model', '=', 'babi.filter')]"/>
         </record>
 
         <record model="ir.model.access" id="access_babi_filter">
