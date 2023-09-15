@@ -174,6 +174,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 if 'internal_name' in values:
                     table._drop()
 
+    @classmethod
     def delete(cls, tables):
         for table in tables:
             table._drop()
