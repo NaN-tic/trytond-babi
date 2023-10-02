@@ -6,6 +6,7 @@ import sql
 import unidecode
 import json
 from simpleeval import EvalWithCompoundTypes
+from psycopg2.errors import SyntaxError, DuplicateColumn, WrongObjectType
 from trytond import backend
 from trytond.bus import notify
 from trytond.transaction import Transaction
@@ -274,6 +275,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         for table in tables:
             table.check_internal_name()
             table.check_filter()
+            table.check_query()
 
     def check_internal_name(self):
         if not self.internal_name[0] in VALID_FIRST_SYMBOLS:
@@ -289,6 +291,19 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         if self.filter and self.filter.parameters:
             raise UserError(gettext('babi.msg_filter_with_parameters',
                     table=self.rec_name))
+
+    def check_query(self):
+        if not self._stripped_query:
+            return
+
+        message = gettext('babi.msg_table_sql_error', table=self.rec_name)
+
+        cursor = Transaction().connection.cursor()
+        try:
+            cursor.execute('SELECT * FROM (%s) AS subquery LIMIT 1' %
+                self._stripped_query)
+        except SyntaxError as e:
+            raise UserError('%s\n%s' % (message, str(e)))
 
     @fields.depends('name')
     def on_change_name(self):
@@ -377,8 +392,19 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def compute(cls, tables):
-        with Transaction().set_context(queue_name=QUEUE_NAME):
+        transaction = Transaction()
+        cursor = transaction.connection.cursor()
+
+        with transaction.set_context(queue_name=QUEUE_NAME):
             for table in tables:
+                message = gettext('babi.msg_table_sql_error', table=table.rec_name)
+
+                if table.type == 'query':
+                    table._drop()
+                    try:
+                        cursor.execute('CREATE VIEW "%s" AS %s' % (table.table_name, table._stripped_query))
+                    except DuplicateColumn as e:
+                        raise UserError('%s\n%s' % (message, str(e)))
                 cls.__queue__._compute(table)
 
     @property
@@ -684,10 +710,10 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
         cls.__access__.add('table')
 
     @classmethod
-    def validate(cls, tables):
-        super().validate(tables)
-        for table in tables:
-            table.check_internal_name()
+    def validate(cls, babi_fields):
+        super().validate(babi_fields)
+        for babi_field in babi_fields:
+            babi_field.check_internal_name()
 
     def sql_type(self):
         mapping = {

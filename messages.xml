@@ -130,5 +130,8 @@ Exception: %(error)s</field>
 
 "%(sequence)s"</field>
         </record>
+        <record model="ir.message" id="msg_table_sql_error">
+            <field name="text">Computation of "%(table)s" failed:</field>
+        </record>
     </data>
 </tryton>
