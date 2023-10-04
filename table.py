@@ -275,7 +275,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         for table in tables:
             table.check_internal_name()
             table.check_filter()
-            table.check_query()
 
     def check_internal_name(self):
         if not self.internal_name[0] in VALID_FIRST_SYMBOLS:
@@ -400,6 +399,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 message = gettext('babi.msg_table_sql_error', table=table.rec_name)
 
                 if table.type == 'query':
+                    # try valid query
+                    table.check_query()
+
                     table._drop()
                     try:
                         cursor.execute('CREATE VIEW "%s" AS %s' % (table.table_name, table._stripped_query))
