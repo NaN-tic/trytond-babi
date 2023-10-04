@@ -6,7 +6,6 @@ import sql
 import unidecode
 import json
 from simpleeval import EvalWithCompoundTypes
-from psycopg2.errors import SyntaxError, DuplicateColumn, WrongObjectType
 from trytond import backend
 from trytond.bus import notify
 from trytond.transaction import Transaction
