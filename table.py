@@ -291,19 +291,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             raise UserError(gettext('babi.msg_filter_with_parameters',
                     table=self.rec_name))
 
-    def check_query(self):
-        if not self._stripped_query:
-            return
-
-        message = gettext('babi.msg_table_sql_error', table=self.rec_name)
-
-        cursor = Transaction().connection.cursor()
-        try:
-            cursor.execute('SELECT * FROM (%s) AS subquery LIMIT 1' %
-                self._stripped_query)
-        except SyntaxError as e:
-            raise UserError('%s\n%s' % (message, str(e)))
-
     @fields.depends('name')
     def on_change_name(self):
         self.internal_name = convert_to_symbol(self.name)
@@ -391,22 +378,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def compute(cls, tables):
-        transaction = Transaction()
-        cursor = transaction.connection.cursor()
-
-        with transaction.set_context(queue_name=QUEUE_NAME):
+        with Transaction().set_context(queue_name=QUEUE_NAME):
             for table in tables:
-                message = gettext('babi.msg_table_sql_error', table=table.rec_name)
-
-                if table.type == 'query':
-                    # try valid query
-                    table.check_query()
-
-                    table._drop()
-                    try:
-                        cursor.execute('CREATE VIEW "%s" AS %s' % (table.table_name, table._stripped_query))
-                    except DuplicateColumn as e:
-                        raise UserError('%s\n%s' % (message, str(e)))
                 cls.__queue__._compute(table)
 
     @property
@@ -487,10 +460,14 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             for dependency in self.required_by:
                 dependency.required_by._compute(processed + [self])
         except Exception as e:
+            # In case there is a create view error or SQL typo,
+            # we do rollback to obtain a value from the gettext()
+            Transaction().connection.rollback()
             notify(gettext('babi.msg_table_failed', table=self.rec_name))
             self.compute_error = str(e)
             self.save()
             return
+
         self.compute_error = None
         self.save()
         notify(gettext('babi.msg_table_successful', table=self.rec_name))
