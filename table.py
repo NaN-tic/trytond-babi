@@ -459,10 +459,14 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             for dependency in self.required_by:
                 dependency.required_by._compute(processed + [self])
         except Exception as e:
+            # In case there is a create view error or SQL typo,
+            # we do rollback to obtain a value from the gettext()
+            Transaction().connection.rollback()
             notify(gettext('babi.msg_table_failed', table=self.rec_name))
             self.compute_error = str(e)
             self.save()
             return
+
         self.compute_error = None
         self.save()
         notify(gettext('babi.msg_table_successful', table=self.rec_name))
@@ -684,10 +688,10 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
         cls.__access__.add('table')
 
     @classmethod
-    def validate(cls, tables):
-        super().validate(tables)
-        for table in tables:
-            table.check_internal_name()
+    def validate(cls, babi_fields):
+        super().validate(babi_fields)
+        for babi_field in babi_fields:
+            babi_field.check_internal_name()
 
     def sql_type(self):
         mapping = {
