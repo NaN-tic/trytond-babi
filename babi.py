@@ -727,7 +727,6 @@ class Expression(DeactivableMixin, ModelSQL, ModelView):
             expressions = cls.search([('id', 'in', expressions)],
                 order=[('model', 'ASC')])
 
-        issues = []
         count = 0
         for key, group in itertools.groupby(expressions, key=lambda x: x.model):
             Model = pool.get(key.model)
