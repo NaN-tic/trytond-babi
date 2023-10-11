@@ -327,9 +327,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def ai(cls, tables):
-        pool = Pool()
-        Model = pool.get('ir.model')
-
         cursor = Transaction().connection.cursor()
 
         import openai
