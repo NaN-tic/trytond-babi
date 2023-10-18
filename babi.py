@@ -1105,11 +1105,11 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
                 }
             report = HTMLReport.execute(records, data)
 
-            if report:
+            if report and report[1]:
                 msg = MIMEMultipart()
                 msg['To'] = execution.report.to
                 msg['From'] = execution.report.smtp.smtp_email
-                msg['Subject'] = Header(execution.report.subject, 'utf-8')
+                msg['Subject'] = Header(execution.report.subject, 'utf-8').encode()
                 msg.attach(MIMEText('Business Intelligence', 'plain'))
 
                 part = MIMEBase('application', 'octet-stream')
