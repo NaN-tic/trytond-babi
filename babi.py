@@ -172,9 +172,15 @@ class DynamicModel(ModelSQL, ModelView):
                     # Avoid duplicated fields
                     if field.internal_name in fields:
                         continue
-                    if view_type == 'form':
-                        xml += '<label name="%s"/>\n' % (field.internal_name)
-                    xml += '<field name="%s"/>\n' % (field.internal_name)
+
+                    attributes = ''
+                    if view_type == 'tree':
+                        attributes += 'optional="0" '
+                        if field.expand:
+                            attributes += f'expand="{field.expand}" '
+                    elif view_type == 'form':
+                        xml += f'<label name="{field.internal_name}"/>\n'
+                    xml += f'<field name="{field.internal_name}" {attributes} />\n'
                     fields.append(field.internal_name)
                 xml += '</%s>\n' % (view_type)
                 result['arch'] = xml
@@ -2341,6 +2347,8 @@ class DimensionMixin:
     group_by = fields.Boolean('Group By This Dimension')
     width = fields.Integer('Width',
         help='Width report columns (%)')
+    expand = fields.Integer('Expand',
+        help="Column expand attribute for tree view")
 
     def get_internal_name(self, name):
         return 'babi_dimension_%d' % self.id
@@ -2473,6 +2481,8 @@ class Measure(ModelSQL, ModelView):
         'measure', 'Internal Measures')
     width = fields.Integer('Width',
         help='Width report columns (%)')
+    expand = fields.Integer('Expand',
+        help="Column expand attribute for tree view")
 
     @classmethod
     def __setup__(cls):
@@ -2584,6 +2594,10 @@ class InternalMeasure(ModelSQL, ModelView):
     related_model = fields.Many2One('ir.model', 'Related Model')
     decimal_digits = fields.Integer('Decimal Digits')
     width = fields.Integer('Width')
+    expand = fields.Function(fields.Integer('Expand'), 'get_expand')
+
+    def get_expand(self, name):
+        return self.measure.expand
 
     @classmethod
     def __setup__(cls):

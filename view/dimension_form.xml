@@ -14,4 +14,6 @@ contains the full copyright notices and license terms. -->
     <field name="sequence"/>
     <label name="width"/>
     <field name="width"/>
+    <label name="expand"/>
+    <field name="expand"/>
 </form>
