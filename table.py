@@ -329,9 +329,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def ai(cls, tables):
         cursor = Transaction().connection.cursor()
 
-        import openai
-        openai.organization = config.get('openai', 'organization')
-        openai.api_key = config.get('openai', 'api_key')
+        from openai import OpenAI
+        client = OpenAI(
+            organization=config.get('openai', 'organization'),
+            api_key=config.get('openai', 'api_key')
+            )
         for table in tables:
             sqltables = dict.fromkeys(table.ai_sql_tables)
 
@@ -361,9 +363,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 'role': 'user',
                 'content': request,
                 }]
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=messages)
+            response = client.chat.completions.create(model="gpt-3.5-turbo",
+            messages=messages)
             if response.choices:
                 query = response.choices[0].message.content
                 if not table.query:
