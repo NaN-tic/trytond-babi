@@ -2641,8 +2641,10 @@ class Order(ModelSQL, ModelView, sequence_ordered()):
 
     report = fields.Many2One('babi.report', 'Report', required=True,
         ondelete='CASCADE')
-    dimension = fields.Many2One('babi.dimension', 'Dimension', readonly=True)
-    measure = fields.Many2One('babi.measure', 'Measure', readonly=True)
+    dimension = fields.Many2One('babi.dimension', 'Dimension', readonly=True,
+        ondelete='CASCADE')
+    measure = fields.Many2One('babi.measure', 'Measure', readonly=True,
+        ondelete='CASCADE')
     order = fields.Selection([
             ('ASC', 'Ascending'),
             ('DESC', 'Descending'),
