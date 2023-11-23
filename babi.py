@@ -417,7 +417,14 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
     expression_error = fields.Char('Expression Error', readonly=True, states={
             'invisible': ~Bool(Eval('expression_error')),
             })
-    context = fields.Char('Context')
+    context = fields.Char('Context',
+        help="A dict to eval context:\n"
+        "- date: eval string to date. Format: %Y-%m-%d.\n"
+        "  Example: {'stock_date_end': date('2023-12-01')}\n"
+        "- datetime: eval string to date time. Format %Y-%m-%d %H:%M:%S.\n"
+        "  Example: {'name': datetime('2023-12-01 10:00:00')}\n"
+        "- today: eval current date\n"
+        "  Example: {'stock_date_end': today}")
     parameters = fields.One2Many('babi.filter.parameter', 'filter',
         'Parameters',
         states={
@@ -1504,11 +1511,15 @@ class ReportExecution(ModelSQL, ModelView):
                 })
 
     def get_context(self):
+        pool = Pool()
+        Date = pool.get('ir.date')
+
         if self.report.filter and self.report.filter.context:
             context = self.replace_parameters(self.report.filter.context)
             ev = EvalWithCompoundTypes(names={}, functions={
                 'date': lambda x: datetime.strptime(x, '%Y-%m-%d').date(),
-                'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d'),
+                'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'),
+                'today': Date.today(),
                 })
             context = ev.eval(context)
             return context
