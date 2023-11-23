@@ -415,8 +415,8 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
         help="A dict to eval context:\n"
         "- date: eval string to date. Format: %Y-%m-%d.\n"
         "  Example: {'stock_date_end': date('2023-12-01')}\n"
-        "- datetime: eval string to date time. Format %Y-%m-%d.\n"
-        "  Example: {'name': datetime('2023-12-01')}\n"
+        "- datetime: eval string to date time. Format %Y-%m-%d %H:%M:%S.\n"
+        "  Example: {'name': datetime('2023-12-01 10:00:00')}\n"
         "- today: eval current date\n"
         "  Example: {'stock_date_end': today}")
     parameters = fields.One2Many('babi.filter.parameter', 'filter',
@@ -1514,7 +1514,7 @@ class ReportExecution(ModelSQL, ModelView):
             context = self.replace_parameters(self.report.filter.context)
             ev = EvalWithCompoundTypes(names={}, functions={
                 'date': lambda x: datetime.strptime(x, '%Y-%m-%d').date(),
-                'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d'),
+                'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'),
                 'today': Date.today(),
                 })
             context = ev.eval(context)
