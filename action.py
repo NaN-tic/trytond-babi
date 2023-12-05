@@ -25,7 +25,7 @@ class Action(metaclass=PoolMeta):
     __name__ = 'ir.action'
 
     @classmethod
-    def get_action_values(self, type_, action_ids, columns=None):
+    def get_action_values(cls, type_, action_ids, columns=None):
         pool = Pool()
         ActionDashboard = pool.get('babi.action.dashboard')
 
