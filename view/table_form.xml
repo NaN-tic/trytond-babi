@@ -13,7 +13,7 @@
     <newline/>
     <notebook colspan="6">
         <page name="query">
-            <field name="query" colspan="4" height="550"/>
+            <field name="query" colspan="4" height="550" widget="code"/>
         </page>
         <page name="fields_">
             <field name="fields_" colspan="4" height="550"/>
