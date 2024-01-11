@@ -403,8 +403,7 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
     model_name = fields.Function(fields.Char('Model Name'),
         'on_change_with_model_name')
     view_search = fields.Many2One('ir.ui.view_search', 'Search',
-        domain=[('model', '=', Eval('model_name'))],
-        depends=['model_name'])
+        domain=[('model', '=', Eval('model_name'))])
     checked = fields.Boolean('Checked', readonly=True)
     domain = fields.Char('Domain')
     domain_error = fields.Char('Domain Error', readonly=True, states={
@@ -432,8 +431,7 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
                 Id('babi', 'group_babi_admin'))),
             })
     fields = fields.Function(fields.Many2Many('ir.model.field', None, None,
-            'Model Fields', depends=['model']),
-        'on_change_with_fields')
+            'Model Fields'), 'on_change_with_fields')
 
     @depends('model')
     def on_change_with_model_name(self, name=None):
@@ -558,7 +556,7 @@ class FilterParameter(ModelSQL, ModelView):
     related_model = fields.Many2One('ir.model', 'Related Model', states={
             'required': Eval('ttype').in_(['many2one', 'many2many']),
             'readonly': Not(Eval('ttype').in_(['many2one', 'many2many'])),
-            }, depends=['ttype'])
+            })
 
     def create_keyword(self):
         pool = Pool()
@@ -670,7 +668,7 @@ class Expression(DeactivableMixin, ModelSQL, ModelView):
             'required': Eval('ttype') == 'many2one',
             'readonly': Eval('ttype') != 'many2one',
             'invisible': Eval('ttype') != 'many2one',
-            }, depends=['ttype'])
+            })
     decimal_digits = fields.Integer('Decimal Digits', states={
             'invisible': ~Eval('ttype').in_(['float', 'numeric']),
             'required': Eval('ttype').in_(['float', 'numeric']),
@@ -794,7 +792,7 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
                 }),
         'get_internal_name')
     filter = fields.Many2One('babi.filter', 'Filter',
-        domain=[('model', '=', Eval('model'))], depends=['model'])
+        domain=[('model', '=', Eval('model'))])
     dimensions = fields.One2Many('babi.dimension', 'report',
         'Dimensions')
     columns = fields.One2Many('babi.dimension.column', 'report',
@@ -846,15 +844,15 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
     to = fields.Char('To', states={
         'invisible': Bool(~Eval('email')),
         'required': Bool(Eval('email')),
-        }, depends=['email'])
+        })
     subject = fields.Char('Subject', states={
         'invisible': Bool(~Eval('email')),
         'required': Bool(Eval('email')),
-        }, depends=['email'])
+        })
     smtp = fields.Many2One('smtp.server', 'SMTP', states={
         'invisible': Bool(~Eval('email')),
         'required': Bool(Eval('email')),
-        }, depends=['email'])
+        })
     babi_raise_user_error = fields.Boolean('Raise User Error',
         help='Will raise a UserError in case of error in report.')
 
@@ -1962,7 +1960,7 @@ class OpenExecutionSelect(ModelView):
     report = fields.Many2One('babi.report', 'Report', required=True,
         states={
             'readonly': Bool(Eval('report_readonly')),
-            }, depends=['report_readonly'])
+            })
     execution = fields.Many2One('babi.report.execution', 'Execution',
         required=True, domain=[
             ('report', '=', Eval('report')),
@@ -1970,7 +1968,7 @@ class OpenExecutionSelect(ModelView):
             ],
         states={
             'readonly': Bool(Eval('execution_readonly')),
-            }, depends=['report', 'execution_readonly'])
+            })
     view_type = fields.Selection([
             ('tree', 'Tree'),
             ('list', 'List'),
@@ -2354,7 +2352,7 @@ class DimensionMixin:
     expression = fields.Many2One('babi.expression', 'Expression',
         required=True, domain=[
             ('model', '=', Eval('_parent_report', {}).get('model', 0)),
-            ], depends=['report'])
+            ])
     group_by = fields.Boolean('Group By This Dimension')
     width = fields.Integer('Width',
         help='Width report columns (%)')
@@ -2486,7 +2484,7 @@ class Measure(ModelSQL, ModelView):
                     ('ttype', 'in', ['integer', 'float', 'numeric']),
                     ],
                 [])
-            ], depends=['aggregate', 'report'])
+            ])
     aggregate = fields.Selection(AGGREGATE_TYPES, 'Aggregate', required=True)
     internal_measures = fields.One2Many('babi.internal.measure',
         'measure', 'Internal Measures')
@@ -2748,23 +2746,23 @@ class OpenChartStart(ModelView):
         states={
             'required': Eval('graph_type') == 'line',
             'invisible': Eval('graph_type') != 'line',
-            }, depends=['graph_type'], sort=False)
+            }, sort=False)
     show_legend = fields.Boolean('Show Legend',
         states={
             'invisible': (Eval('graph_type') == 'report'),
-        }, depends=['graph_type'])
+        })
     report = fields.Many2One('babi.report', 'Report',
         states={
             'invisible': (Eval('graph_type') == 'report'),
-        }, depends=['graph_type'])
+        })
     execution = fields.Many2One('babi.report.execution', 'Execution',
         states={
             'invisible': (Eval('graph_type') == 'report'),
-        }, depends=['graph_type'])
+        })
     execution_date = fields.DateTime('Execution Time',
         states={
             'invisible': (Eval('graph_type') == 'report'),
-        }, depends=['graph_type'])
+        })
     dimension = fields.Many2One('babi.dimension', 'Dimension',
         domain=[
             ('report', '=', Eval('report')),
@@ -2775,7 +2773,7 @@ class OpenChartStart(ModelView):
         states={
             'required': Eval('graph_type') != 'report',
             'invisible': Eval('graph_type') == 'report',
-        }, depends=['report', 'execution_date', 'graph_type'])
+        }, depends=['execution_date'])
     measures = fields.Many2Many('babi.internal.measure', None, None,
         'Measures', required=True,
         domain=[
@@ -2784,7 +2782,7 @@ class OpenChartStart(ModelView):
         states={
             'required': Eval('graph_type') != 'report',
             'invisible': Eval('graph_type') == 'report',
-        }, depends=['execution', 'graph_type'])
+        })
     graph_type_report = fields.Selection([
             ('pdf', 'PDF'),
             ('html', 'HTML'),
@@ -2793,7 +2791,7 @@ class OpenChartStart(ModelView):
         states={
             'required': Eval('graph_type') == 'report',
             'invisible': Eval('graph_type') != 'report',
-        }, depends=['graph_type'])
+        })
 
     @classmethod
     def default_get(cls, fields, with_rec_name=True):

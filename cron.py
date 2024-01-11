@@ -11,10 +11,10 @@ class Cron(metaclass=PoolMeta):
     __name__ = "ir.cron"
     babi_report = fields.Many2One('babi.report', 'Babi Report', states={
             'invisible': Eval('method') != 'babi.report|calculate_babi_report',
-            }, depends=['method'])
+            })
     babi_table = fields.Many2One('babi.table', 'Babi Table', states={
             'invisible': Eval('method') != 'babi.table|calculate_babi_table',
-            }, depends=['method'])
+            })
 
     @classmethod
     def __register__(cls, module_name):

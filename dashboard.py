@@ -54,7 +54,7 @@ class DashboardItem(sequence_ordered(), ModelSQL, ModelView):
     height = fields.Integer('Height', help='The default is 450px')
     parent = fields.Many2One('babi.dashboard.item', 'Parent', domain=[
             ('dashboard', '=', Eval('dashboard')),
-            ], depends=['dashboard'])
+            ])
     children = fields.One2Many('babi.dashboard.item', 'parent', 'Children')
 
     @classmethod
@@ -214,10 +214,10 @@ class Widget(ModelSQL, ModelView):
     table = fields.Many2One('babi.table', 'Table', states={
             'invisible': ~Bool(Eval('type')),
             'required': Bool(Eval('type')),
-            }, depends=['type'])
+            })
     where = fields.Char('Where', states={
             'invisible': ~Bool(Eval('type')),
-            }, depends=['type'])
+            })
     parameters = fields.One2Many('babi.widget.parameter', 'widget',
         'Parameters')
     chart = fields.Function(fields.Text('Chart'), 'on_change_with_chart')
@@ -244,7 +244,7 @@ class Widget(ModelSQL, ModelView):
             })
     zoom = fields.Integer('Zoom', states={
             'invisible': Eval('type') != 'scatter-map',
-            }, depends=['type'])
+            })
     box_points = fields.Selection([
             (None, 'None'),
             ('all', 'All'),
@@ -252,7 +252,7 @@ class Widget(ModelSQL, ModelView):
             ('suspectedoutliers', 'Suspected Outliers'),
             ], 'Box Points', states={
             'invisible': Eval('type') != 'box',
-            }, depends=['type'])
+            })
     total_branch_values = fields.Boolean('Total Branch Values')
     help = fields.Function(fields.Text('Help'), 'on_change_with_help')
 
@@ -899,7 +899,7 @@ class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
             ], 'Aggregate', states={
             'required': Bool(Eval('aggregate_required')),
             'invisible': Bool(Eval('aggregate_invisible')),
-            }, depends=['type', 'aggregate_required', 'aggregate_invisible'])
+            })
     aggregate_required = fields.Function(fields.Boolean('Aggregate Required'),
         'on_change_with_aggregate_required')
     aggregate_invisible = fields.Function(fields.Boolean('Aggregate Invisible'),

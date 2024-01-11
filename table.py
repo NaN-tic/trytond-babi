@@ -93,11 +93,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ('model', '=', Eval('model')),
             ], states={
             'invisible': Eval('type') != 'model',
-            }, depends=['model'])
+            })
     fields_ = fields.One2Many('babi.field', 'table', 'Fields')
     query = fields.Text('Query', states={
             'invisible': ~Eval('type').in_(['query', 'table']),
-            }, depends=['type'])
+            })
     timeout = fields.Integer('Timeout', required=True, states={
             'invisible': ~Eval('type').in_(['model', 'table']),
             }, help='If table '
@@ -654,7 +654,7 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
             'required': Eval('table_type') == 'model'
             }, domain=[
             ('model', '=', Eval('model')),
-            ], depends=['model'])
+            ])
     model = fields.Function(fields.Many2One('ir.model', 'Model'),
         'on_change_with_model')
     type = fields.Function(fields.Selection(FIELD_TYPES, 'Type'),
