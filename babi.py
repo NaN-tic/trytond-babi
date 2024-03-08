@@ -1306,7 +1306,7 @@ class ReportExecution(ModelSQL, ModelView):
         # We should remove the classes from the pool so when removing related
         # records it doesn't fail checking unexisting models
         pool = Pool()
-        with pool.lock:
+        with Pool._lock:
             for name in to_delete:
                 try:
                     del pool._pool[pool.database_name]['model'][name]
