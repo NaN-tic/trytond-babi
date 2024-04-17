@@ -29,7 +29,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_table">
-            <field name="model" search="[('model', '=', 'babi.table')]"/>
+            <field name="model">babi.table</field>
             <field name="perm_read" eval="False"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -37,7 +37,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_table_babi">
-            <field name="model" search="[('model', '=', 'babi.table')]"/>
+            <field name="model">babi.table</field>
             <field name="group" ref="group_babi"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
@@ -49,12 +49,12 @@
         <record model="ir.model.button" id="babi_table_calculate_button">
             <field name="name">compute</field>
             <field name="string">Compute</field>
-            <field name="model" search="[('model', '=', 'babi.table')]"/>
+            <field name="model">babi.table</field>
         </record>
         <record model="ir.model.button" id="babi_table_ai_button">
             <field name="name">ai</field>
             <field name="string">AI</field>
-            <field name="model" search="[('model', '=', 'babi.table')]"/>
+            <field name="model">babi.table</field>
         </record>
 
         <menuitem id="menu_babi_table" parent="menu_configuration" action="act_babi_table" sequence="30"/>
