@@ -224,12 +224,12 @@
         </record>
         <record model="ir.rule" id="rule_user_warning">
             <field name="domain"
-                eval="[('OR',
-                            [('OR', ('user.id', '=', Eval('user', {}).get('id')), ('user', '=', None)),
-                            ('OR', ('company.id', 'in', Eval('companies', [])), ('company', '=', None)),
-                            ('OR', ('group', 'in', Eval('groups', [])), ('group', '=', None))
-                            ]
-                        )]"
+                eval="[
+                        ['OR', ('user.id', '=', Eval('user', {}).get('id')), ('user', '=', None)],
+                        ['OR', ('employee.id', '=', Eval('employee', {}).get('id')), ('employee', '=', None)],
+                        ['OR', ('company.id', 'in', Eval('companies', [])), ('company', '=', None)],
+                        ['OR', ('group', 'in', Eval('groups', [])), ('group', '=', None)],
+                    ]"
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_user_warning"/>
         </record>

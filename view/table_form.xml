@@ -73,6 +73,11 @@
             <label name="user_field"/>
             <field name="user_field"/>
             <newline/>
+            <label name="employee"/>
+            <field name="employee"/>
+            <label name="employee_field"/>
+            <field name="employee_field"/>
+            <newline/>
             <label name="company"/>
             <field name="company"/>
             <label name="company_field"/>
