@@ -16,6 +16,10 @@ contains the full copyright notices and license terms. -->
     <field name="company"/>
     <label name="employee"/>
     <field name="employee"/>
+    <label name="done_by"/>
+    <field name="done_by"/>
+    <label name="ignored_by"/>
+    <field name="ignored_by"/>
     <separator name="description" colspan="6"/>
     <field name="description" colspan="6"/>
     <label name="state"/>

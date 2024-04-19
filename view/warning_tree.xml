@@ -4,11 +4,13 @@
     <field name="table" expand="1"/>
     <field name="count"/>
     <field name="state"/>
-    <field name="company" optional="1"/>
+    <field name="user" optional="1"/>
+    <field name="group" optional="1"/>
     <field name="employee" optional="1"/>
-    <field name="description" optional="0"/>
+    <field name="company" optional="1"/>
+    <field name="description" expand="2" optional="0"/>
     <button name="open"/>
-    <button name="pending" tree_invisible="1"/>
     <button name="do"/>
     <button name="ignore"/>
+    <button name="pending" tree_invisible="1"/>
 </tree>

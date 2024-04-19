@@ -16,6 +16,8 @@ from trytond.exceptions import UserError
 from trytond.i18n import gettext
 from trytond.pyson import Bool, Eval, PYSONDecoder
 from trytond.config import config
+from trytond.modules.company.model import (
+    employee_field, reset_employee, set_employee)
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
 
@@ -134,54 +136,63 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ('records', 'Records Found'),
             ('no-records', 'No Records Found'),
             ('always', 'Always'),
-            ], 'Warn',)
+            ], 'Warn')
     email_template = fields.Many2One('electronic.mail.template',
-            'Email Template', domain=[('model.model', '=', 'babi.warning')],
-            states = {
-                'invisible': ~Bool(Eval('warn')),
+        'Email Template', domain=[('model.model', '=', 'babi.warning')],
+        states={
+            'invisible': ~Bool(Eval('warn')),
             })
-    warning_description = fields.Text('Description', states = {
-                'invisible': ~Bool(Eval('warn')),
+    warning_description = fields.Text('Description', states={
+            'invisible': ~Bool(Eval('warn')),
             })
     calculation_date = fields.DateTime('Date of calculation', readonly=True,
-            states = {
-                'invisible': ~Bool(Eval('warn')),
+        states={
+            'invisible': ~Bool(Eval('warn')),
             })
     calculation_time = fields.Float('Time taken to calculate (in seconds)',
-                readonly=True, states = {
-                'invisible': ~Bool(Eval('warn')),
+        readonly=True, states={
+            'invisible': ~Bool(Eval('warn')),
             })
     last_warning_execution = fields.DateTime('Last Warning Execution',
         readonly=True)
     related_field = fields.Many2One('babi.field', 'Related Field', domain=[
-        ('table.id', '=', Eval('id', -1)),
-    ], states={
+            ('table.id', '=', Eval('id', -1)),
+            ], states={
             'invisible': ~Bool(Eval('warn'))
-        },ondelete='SET NULL')
+            },ondelete='SET NULL')
     related_model = fields.Many2One('ir.model', 'Related Model', states={
-        'required': Bool(Eval('related_field')),
-        'invisible': ~Bool(Eval('warn'))
-    },)
+            'required': Bool(Eval('related_field')),
+            'invisible': ~Bool(Eval('warn'))
+            })
     group = fields.Many2One('res.group', 'Group', ondelete='SET NULL', states={
-        'invisible': ~Bool(Eval('warn'))
-    })
+            'invisible': ~Bool(Eval('warn'))
+            })
     user = fields.Many2One('res.user', 'User', ondelete='SET NULL', states={
-        'invisible': Bool(Eval('user_field')) | ~Bool(Eval('warn')),
-    })
+            'invisible': Bool(Eval('user_field')) | ~Bool(Eval('warn')),
+            })
     user_field = fields.Many2One('babi.field', 'User Field', domain=[
-        ('table.id', '=', Eval('id', -1)),
-    ], ondelete='SET NULL', states={
-        'invisible': Bool(Eval('user')) | ~Bool(Eval('warn')),
-    })
+            ('table.id', '=', Eval('id', -1)),
+            ], ondelete='SET NULL', states={
+            'invisible': Bool(Eval('user')) | ~Bool(Eval('warn')),
+            })
+    employee = fields.Many2One('company.employee', 'Employee',
+        ondelete='SET NULL', states={
+            'invisible': Bool(Eval('employee_field')) | ~Bool(Eval('warn')),
+            })
+    employee_field = fields.Many2One('babi.field', 'Employee Field', domain=[
+            ('table.id', '=', Eval('id', -1)),
+            ], ondelete='SET NULL', states={
+            'invisible': Bool(Eval('employee')) | ~Bool(Eval('warn')),
+            })
     company = fields.Many2One('company.company', 'Company', ondelete='SET NULL',
         states={
         'invisible': Bool(Eval('company_field')) | ~Bool(Eval('warn')),
         })
     company_field = fields.Many2One('babi.field', 'Company Field', domain=[
-                ('table.id', '=', Eval('id', -1)),
+            ('table.id', '=', Eval('id', -1)),
             ], ondelete='SET NULL', states={
             'invisible': Bool(Eval('company')) | ~Bool(Eval('warn')),
-    })
+            })
 
     @staticmethod
     def default_timeout():
@@ -252,6 +263,21 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         if self.user_field:
             self.user = None
 
+    @fields.depends('user')
+    def on_change_user_field(self):
+        if self.user:
+            self.user_field = None
+
+    @fields.depends('employee_field')
+    def on_change_employee(self):
+        if self.employee_field:
+            self.employee = None
+
+    @fields.depends('employee')
+    def on_change_employee_field(self):
+        if self.employee:
+            self.employee_field = None
+
     @fields.depends('company_field')
     def on_change_company(self):
         if self.company_field:
@@ -261,11 +287,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def on_change_company_field(self):
         if self.company:
             self.company_field = None
-
-    @fields.depends('user')
-    def on_change_user_field(self):
-        if self.user:
-            self.user_field = None
 
     def update_table_dependencies(self):
         pool = Pool()
@@ -582,6 +603,14 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             else:
                 user_id = 'NULL'
 
+            employee_id = None
+            if self.employee_field:
+                employee_id = self.employee_field.internal_name
+            elif self.employee:
+                employee_id = str(self.employee.id)
+            else:
+                employee_id = 'NULL'
+
             company_id = None
             if self.company_field:
                 company_id = self.company_field.internal_name
@@ -591,15 +620,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 company_id = 'NULL'
 
             query_full = 'SELECT '
-            query_full += f'  {user_id} AS user_id, {company_id} as company_id,'
-            query_full +=' count(*) '
-            query_full += 'FROM (%s) AS subquery ' % query
-            if user_id != 'NULL' and company_id != 'NULL':
-                query_full += 'GROUP BY user_id, company_id'
-            elif user_id != 'NULL':
-                query_full += 'GROUP BY user_id'
-            elif company_id != 'NULL':
-                query_full += 'GROUP BY company_id'
+            query_full += '   count(*), '
+            query_full += f'  {user_id} AS user_id, '
+            query_full += f'  {employee_id} as employee_id, '
+            query_full += f'  {company_id} as company_id '
+            query_full += 'FROM (%s) AS compute_warnings_subquery ' % query
+
+            group_by = [user_id, employee_id, company_id]
+            group_by = [x for x in group_by if x != 'NULL']
+            if group_by:
+                query_full += 'GROUP BY ' + ', '.join(group_by)
 
         to_create = []
         self.last_warning_execution = datetime.now()
@@ -607,17 +637,18 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         cursor.execute(query_full)
         query_last = cursor.fetchall()
         for x in query_last:
-            count = x[2]
+            count = x[0]
             if (self.warn == 'always'
                     or (self.warn == 'records' and count)
-                    or (self.warn == 'no-records' and count)):
+                    or (self.warn == 'no-records' and not count)):
                 to_create.append({
                         'timestamp': self.last_warning_execution,
                         'table': self.id,
-                        'count': x[2],
-                        'company': x[1],
-                        'user': x[0],
-                        'group': (self.group if self.group else None),
+                        'count': count,
+                        'user': x[1],
+                        'employee': x[2],
+                        'company': x[3],
+                        'group': self.group,
                         })
 
         if to_create:
@@ -927,6 +958,8 @@ class Warning(Workflow, ModelSQL, ModelView):
             ondelete='CASCADE')
     group = fields.Many2One('res.group', 'Group', ondelete='CASCADE',
             readonly=True)
+    done_by = employee_field("Done By", states=['done', 'ignored'])
+    ignored_by = employee_field("Ignored By", states=['done', 'ignored'])
 
     @classmethod
     def __setup__(cls):
@@ -969,28 +1002,21 @@ class Warning(Workflow, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     @Workflow.transition('pending')
+    @reset_employee('done_by', 'ignored_by')
     def pending(cls, warnings):
-        for warning in warnings:
-            warning.employee = None
-        cls.save(warnings)
+        pass
 
     @classmethod
     @ModelView.button
     @Workflow.transition('done')
+    @set_employee('done_by')
     def do(cls, warnings):
-        pool = Pool()
-        User = pool.get('res.user')
-
-        user = User(Transaction().user)
-        if not user.employee:
-            return
-        for warning in warnings:
-            warning.employee = user.employee
-        cls.save(warnings)
+        pass
 
     @classmethod
     @ModelView.button
     @Workflow.transition('ignored')
+    @set_employee('ignored_by')
     def ignore(cls, warnings):
         pass
 
