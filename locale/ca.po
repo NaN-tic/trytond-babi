@@ -1,10 +1,10 @@
 #
-# Albert Cervera i Areny <albert@nan-tic.com>, 2023.
+# Albert Cervera i Areny <albert@nan-tic.com>, 2024.
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Last-Translator: Albert Cervera i Areny <albert@nan-tic.com>\n"
-"PO-Revision-Date: 2023-11-01 23:57+0100\n"
+"PO-Revision-Date: 2024-04-19 15:31+0200\n"
 "Project-Id-Version: \n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca_ES\n"
@@ -613,13 +613,37 @@ msgctxt "field:babi.table,babi_raise_user_error:"
 msgid "Raise User Error"
 msgstr "Mostrar l'error al usuari"
 
+msgctxt "field:babi.table,calculation_date:"
+msgid "Date of calculation"
+msgstr "Data de càlcul"
+
+msgctxt "field:babi.table,calculation_time:"
+msgid "Time taken to calculate (in seconds)"
+msgstr "Temps necessari per calcular (en segons)"
+
+msgctxt "field:babi.table,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:babi.table,company_field:"
+msgid "Company Field"
+msgstr "Camp empresa"
+
 msgctxt "field:babi.table,compute_error:"
 msgid "Compute Error"
 msgstr "Error de càlcul"
 
+msgctxt "field:babi.table,compute_warning_error:"
+msgid "Compute Warning Error"
+msgstr "Error en el càlcul de l'avís"
+
 msgctxt "field:babi.table,crons:"
 msgid "Schedulers"
 msgstr "Tasques planificades"
+
+msgctxt "field:babi.table,email_template:"
+msgid "Email Template"
+msgstr "Plantilla de correu electrònic"
 
 msgctxt "field:babi.table,fields_:"
 msgid "Fields"
@@ -629,9 +653,17 @@ msgctxt "field:babi.table,filter:"
 msgid "Filter"
 msgstr "Filtre"
 
+msgctxt "field:babi.table,group:"
+msgid "Group"
+msgstr "Grup"
+
 msgctxt "field:babi.table,internal_name:"
 msgid "Internal Name"
 msgstr "Nom intern"
+
+msgctxt "field:babi.table,last_warning_execution:"
+msgid "Last Warning Execution"
+msgstr "Darrera execució d'avís"
 
 msgctxt "field:babi.table,model:"
 msgid "Model"
@@ -657,6 +689,14 @@ msgctxt "field:babi.table,query:"
 msgid "Query"
 msgstr "Consulta"
 
+msgctxt "field:babi.table,related_field:"
+msgid "Related Field"
+msgstr "Camp relacionat"
+
+msgctxt "field:babi.table,related_model:"
+msgid "Related Model"
+msgstr "Model relacionat"
+
 msgctxt "field:babi.table,required_by:"
 msgid "Required By"
 msgstr "Requerit per"
@@ -672,6 +712,22 @@ msgstr "Timeout"
 msgctxt "field:babi.table,type:"
 msgid "Type"
 msgstr "Tipus"
+
+msgctxt "field:babi.table,user:"
+msgid "User"
+msgstr "Usuari"
+
+msgctxt "field:babi.table,user_field:"
+msgid "User Field"
+msgstr "Camp d'usuari"
+
+msgctxt "field:babi.table,warn:"
+msgid "Warn"
+msgstr "Avisar"
+
+msgctxt "field:babi.table,warning_description:"
+msgid "Description"
+msgstr "Descripció"
 
 msgctxt "field:babi.table.dependency,name:"
 msgid "Name"
@@ -696,6 +752,46 @@ msgstr "Categoria"
 msgctxt "field:babi.test,date:"
 msgid "Date"
 msgstr "Data"
+
+msgctxt "field:babi.warning,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:babi.warning,count:"
+msgid "Records found"
+msgstr "Registres trobats"
+
+msgctxt "field:babi.warning,description:"
+msgid "Description"
+msgstr "Descripció"
+
+msgctxt "field:babi.warning,employee:"
+msgid "Employee"
+msgstr "Empleat"
+
+msgctxt "field:babi.warning,group:"
+msgid "Group"
+msgstr "Grup"
+
+msgctxt "field:babi.warning,has_related_records:"
+msgid "Has Related Field"
+msgstr "Té un camp relacionat"
+
+msgctxt "field:babi.warning,state:"
+msgid "State"
+msgstr "Estat"
+
+msgctxt "field:babi.warning,table:"
+msgid "Table"
+msgstr "Taula"
+
+msgctxt "field:babi.warning,timestamp:"
+msgid "Timestamp"
+msgstr "Marca de temps"
+
+msgctxt "field:babi.warning,user:"
+msgid "User"
+msgstr "Usuari"
 
 msgctxt "field:babi.widget,box_points:"
 msgid "Box Points"
@@ -800,6 +896,10 @@ msgstr "Paràmetres de filtre del BABI"
 msgctxt "field:ir.action.keyword,babi_report:"
 msgid "BABI Report"
 msgstr "Informe BABI"
+
+msgctxt "field:ir.cron,babi_calculate_warnings:"
+msgid "Calculate Warnings"
+msgstr "Calcula els avisos"
 
 msgctxt "field:ir.cron,babi_report:"
 msgid "Babi Report"
@@ -1093,6 +1193,10 @@ msgctxt "model:babi.update_data.wizard.start,name:"
 msgid "Update Data Wizard Start"
 msgstr "Inici Actualitza la informació d'un informe"
 
+msgctxt "model:babi.warning,name:"
+msgid "BABI Warning"
+msgstr "Avís BABI"
+
 msgctxt "model:babi.widget,name:"
 msgid "Widget"
 msgstr "Gràfica"
@@ -1153,9 +1257,17 @@ msgctxt "model:ir.action,name:act_babi_table"
 msgid "Tables"
 msgstr "Taules"
 
+msgctxt "model:ir.action,name:act_babi_warning"
+msgid "Warnings"
+msgstr "Avisos"
+
 msgctxt "model:ir.action,name:act_babi_widget"
 msgid "Widgets"
 msgstr "Gràfics"
+
+msgctxt "model:ir.action,name:act_warning_relate"
+msgid "Warnings"
+msgstr "Avisos"
 
 msgctxt "model:ir.action,name:clear_executions_wizard"
 msgid "Clean Executions"
@@ -1172,6 +1284,26 @@ msgstr "Informe de Business Intelligence"
 msgctxt "model:ir.action,name:report_babi_html_report"
 msgid "Report"
 msgstr "Informe"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_all"
+msgid "All"
+msgstr "Totes"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_no_warn"
+msgid "Without Warning"
+msgstr "Sense avís"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_warn"
+msgid "With Warning"
+msgstr "Amb Avís"
+
+msgctxt "model:ir.action.act_window.domain,name:act_warning_domain_all"
+msgid "All"
+msgstr "Tots"
+
+msgctxt "model:ir.action.act_window.domain,name:act_warning_domain_pending"
+msgid "Pending"
+msgstr "Pendents"
 
 msgctxt "model:ir.message,text:cannot_create_order_entry"
 msgid "Order entries are created automatically"
@@ -1297,6 +1429,14 @@ msgstr ""
 "El primer caràcter del nom intern \"%(internal_name)s\" no és vàlid a la "
 "taula \"%(table)s\"."
 
+msgctxt "model:ir.message,text:msg_not_converted"
+msgid ""
+"Some field of the field %(field)s is not numeric and cannot be converted. "
+"Please check the query."
+msgstr ""
+"Alguns valors del camp %(field)s no són numèrics i no es poden convertir. Si"
+" us plau, comproveu la consulta."
+
 msgctxt "model:ir.message,text:msg_not_enough_parameters"
 msgid ""
 "There must be at least \"%(min)s\" parameters of type \"%(type)s\" in "
@@ -1304,6 +1444,10 @@ msgid ""
 msgstr ""
 "Hi ha d'haver almenys \"%(min)s\" paràmetres del tipus \"%(type)s\" a "
 "\"%(widget)s\"."
+
+msgctxt "model:ir.message,text:msg_open_warning_single"
+msgid "You can only open records for a single warning."
+msgstr "Només podeu obrir registres per a un sol avís."
 
 msgctxt "model:ir.message,text:msg_render_report_columns"
 msgid ""
@@ -1340,6 +1484,11 @@ msgctxt "model:ir.message,text:msg_table_successful"
 msgid "Computation of \"%(table)s\" finished successfully."
 msgstr "El càlcul de \"%(table)s\" ha finalitzat correctament."
 
+msgctxt "model:ir.message,text:msg_tables_not_created"
+msgid "Warning: tables could not be created. Please check your query."
+msgstr ""
+"Avís: no s'han pogut crear taules. Si us plau, comproveu la vostra consulta."
+
 msgctxt "model:ir.message,text:msg_too_many_parameters"
 msgid ""
 "There can not be more than \"%(max)s\" parameters of type \"%(type)s\" in "
@@ -1359,6 +1508,19 @@ msgstr ""
 " d'ocurrències mínim i màxim permesos:\n"
 "\n"
 "%(list)s"
+
+msgctxt "model:ir.message,text:msg_wrong_info"
+msgid ""
+"The information returned from the field %(field)s is not correct or you don't"
+" have enough permissions to access it.             Records found by query: "
+"%(query_count)s\n"
+"            Records found by Model: %(model_query_count)s\n"
+"            "
+msgstr ""
+"La informació retornada del camp %(field)s no és correcta o no teniu prou"
+" permisos per accedir-hi. Registres trobats per la consulta: %(query_count)s"
+" Registres trobats pel model: %(model_query_count)s\n"
+"            "
 
 msgctxt "model:ir.message,text:no_dimensions"
 msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
@@ -1467,6 +1629,26 @@ msgctxt "model:ir.model.button,string:babi_table_calculate_button"
 msgid "Compute"
 msgstr "Calcular"
 
+msgctxt "model:ir.model.button,string:babi_table_calculate_warning_button"
+msgid "Compute Warning"
+msgstr "Calcular l'avís"
+
+msgctxt "model:ir.model.button,string:done_button"
+msgid "Do"
+msgstr "Finalitza"
+
+msgctxt "model:ir.model.button,string:ignored_button"
+msgid "Ignore"
+msgstr "Ignora"
+
+msgctxt "model:ir.model.button,string:open_button"
+msgid "Open Records"
+msgstr "Obre registres"
+
+msgctxt "model:ir.model.button,string:pending_button"
+msgid "Pending"
+msgstr "Pendents"
+
 msgctxt "model:ir.model.button,string:show_dashboard_button"
 msgid "Show"
 msgstr "Mostra"
@@ -1474,6 +1656,10 @@ msgstr "Mostra"
 msgctxt "model:ir.rule.group,name:rule_group_babi_execution"
 msgid "Babi Execution"
 msgstr "Execució Babi"
+
+msgctxt "model:ir.rule.group,name:rule_group_user_warning"
+msgid "User in Warning"
+msgstr "Usuari en avís"
 
 msgctxt "model:ir.ui.menu,name:"
 msgid "Dashboard"
@@ -1518,6 +1704,10 @@ msgstr "Informes"
 msgctxt "model:ir.ui.menu,name:menu_babi_table"
 msgid "Tables"
 msgstr "Taules"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_warning"
+msgid "Warnings"
+msgstr "Avisos"
 
 msgctxt "model:ir.ui.menu,name:menu_configuration"
 msgid "Configuration"
@@ -1855,6 +2045,34 @@ msgctxt "selection:babi.table,type:"
 msgid "Table"
 msgstr "Taula"
 
+msgctxt "selection:babi.table,warn:"
+msgid "Always"
+msgstr "Sempre"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Never"
+msgstr "Mai"
+
+msgctxt "selection:babi.table,warn:"
+msgid "No Records Found"
+msgstr "Quan no hi ha registres"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Records Found"
+msgstr "Quan hi ha registres"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Done"
+msgstr "Finalitzat"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Ignored"
+msgstr "Ignorat"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Pending"
+msgstr "Pendents"
+
 msgctxt "selection:babi.widget,box_points:"
 msgid "All"
 msgstr "Totes"
@@ -2178,6 +2396,14 @@ msgstr "Configuració"
 msgctxt "view:babi.table:"
 msgid "Dependencies"
 msgstr "Dependències"
+
+msgctxt "view:babi.table:"
+msgid "Last Execution"
+msgstr "Última Execució"
+
+msgctxt "view:babi.table:"
+msgid "Warning"
+msgstr "Avís"
 
 msgctxt "view:babi.table:"
 msgid "What do you want to show?"
