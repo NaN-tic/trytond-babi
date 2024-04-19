@@ -17,7 +17,7 @@ from trytond.modules.company.tests import (CompanyTestMixin, create_company,
     set_company)
 
 
-class BabiTestCase(CompanyTestMixin, ModuleTestCase):
+class BabiTestCase(ModuleTestCase):
     'Test Babi module'
     module = 'babi'
 

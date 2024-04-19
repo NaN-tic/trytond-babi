@@ -11,7 +11,7 @@ from trytond.bus import notify
 from trytond.transaction import Transaction
 from trytond.pool import Pool
 from trytond.model import (ModelView, ModelSQL, fields, Unique,
-    DeactivableMixin, sequence_ordered)
+    DeactivableMixin, sequence_ordered, Workflow)
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
 from trytond.pyson import Bool, Eval, PYSONDecoder
@@ -113,8 +113,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     compute_error = fields.Text('Compute Error', states={
             'invisible': ~Bool(Eval('compute_error')),
             }, readonly=True)
+    compute_warning_error = fields.Text('Compute Warning Error', states={
+            'invisible': ~Bool(Eval('compute_warning_error')),
+            }, readonly=True,)
     crons = fields.One2Many('ir.cron', 'babi_table', 'Schedulers', context={
-            'babi_table': Eval('id'),
+            'babi_table': Eval('id', -1),
             }, depends=['id'])
     requires = fields.One2Many('babi.table.dependency', 'required_by',
         'Requires', readonly=True)
@@ -126,6 +129,59 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     ai_response = fields.Text('AI Response', readonly=True, states={
             'invisible': Eval('type') == 'model',
             })
+    warn = fields.Selection([
+            (None, "Don't warn"),
+            ('records', 'Records Found'),
+            ('no-records', 'No Records Found'),
+            ('always', 'Always'),
+            ], 'Warn',)
+    email_template = fields.Many2One('electronic.mail.template',
+            'Email Template', domain=[('model.model', '=', 'babi.warning')],
+            states = {
+                'invisible': ~Bool(Eval('warn')),
+            })
+    warning_description = fields.Text('Description', states = {
+                'invisible': ~Bool(Eval('warn')),
+            })
+    calculation_date = fields.DateTime('Date of calculation', readonly=True,
+            states = {
+                'invisible': ~Bool(Eval('warn')),
+            })
+    calculation_time = fields.Float('Time taken to calculate (in seconds)',
+                readonly=True, states = {
+                'invisible': ~Bool(Eval('warn')),
+            })
+    last_warning_execution = fields.DateTime('Last Warning Execution',
+        readonly=True)
+    related_field = fields.Many2One('babi.field', 'Related Field', domain=[
+        ('table.id', '=', Eval('id', -1)),
+    ], states={
+            'invisible': ~Bool(Eval('warn'))
+        },ondelete='SET NULL')
+    related_model = fields.Many2One('ir.model', 'Related Model', states={
+        'required': Bool(Eval('related_field')),
+        'invisible': ~Bool(Eval('warn'))
+    },)
+    group = fields.Many2One('res.group', 'Group', ondelete='SET NULL', states={
+        'invisible': ~Bool(Eval('warn'))
+    })
+    user = fields.Many2One('res.user', 'User', ondelete='SET NULL', states={
+        'invisible': Bool(Eval('user_field')) | ~Bool(Eval('warn')),
+    })
+    user_field = fields.Many2One('babi.field', 'User Field', domain=[
+        ('table.id', '=', Eval('id', -1)),
+    ], ondelete='SET NULL', states={
+        'invisible': Bool(Eval('user')) | ~Bool(Eval('warn')),
+    })
+    company = fields.Many2One('company.company', 'Company', ondelete='SET NULL',
+        states={
+        'invisible': Bool(Eval('company_field')) | ~Bool(Eval('warn')),
+        })
+    company_field = fields.Many2One('babi.field', 'Company Field', domain=[
+                ('table.id', '=', Eval('id', -1)),
+            ], ondelete='SET NULL', states={
+            'invisible': Bool(Eval('company')) | ~Bool(Eval('warn')),
+    })
 
     @staticmethod
     def default_timeout():
@@ -144,7 +200,18 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         cls._buttons.update({
                 'ai': {},
                 'compute': {},
+                'compute_warning': {
+                    'invisible': ~Bool(Eval('warn')),
+                    },
                 })
+
+    @classmethod
+    def view_attributes(cls):
+        return super().view_attributes() + [
+            ('//page[@id="warning"]', 'states', {
+                    'invisible': ~Bool(Eval('warn')),
+                    })
+            ]
 
     @classmethod
     def create(cls, vlist):
@@ -179,6 +246,26 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         for table in tables:
             table._drop()
         super().delete(tables)
+
+    @fields.depends('user_field')
+    def on_change_user(self):
+        if self.user_field:
+            self.user = None
+
+    @fields.depends('company_field')
+    def on_change_company(self):
+        if self.company_field:
+            self.company = None
+
+    @fields.depends('company')
+    def on_change_company_field(self):
+        if self.company:
+            self.company_field = None
+
+    @fields.depends('user')
+    def on_change_user_field(self):
+        if self.user:
+            self.user_field = None
 
     def update_table_dependencies(self):
         pool = Pool()
@@ -378,6 +465,12 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         with Transaction().set_context(queue_name=QUEUE_NAME):
             for table in tables:
                 cls.__queue__._compute(table)
+    @classmethod
+    @ModelView.button
+    def compute_warning(cls, tables):
+        with Transaction().set_context(queue_name=QUEUE_NAME):
+            for table in tables:
+                cls.__queue__.compute_warnings(table)
 
     @property
     def table_name(self):
@@ -406,7 +499,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             query += 'ORDER BY %s' % ', '.join(fields)
 
         if limit:
-            query += 'LIMIT %d' % limit
+            query += ' LIMIT %d' % limit
         return query
 
     def execute_query(self, fields=None, where=None, groupby=None, timeout=None,
@@ -429,7 +522,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def timeout_exception(self):
         raise TimeoutException
 
-    def _compute(self, processed=None):
+    def _compute(self, processed=None, compute_warnings=False):
+        start_time = time.time()
         if processed is None:
             processed = []
         if self in processed:
@@ -466,8 +560,75 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return
 
         self.compute_error = None
+        end_time = time.time()
         self.save()
         notify(gettext('babi.msg_table_successful', table=self.rec_name))
+        self.calculation_date = datetime.now()
+        self.calculation_time = end_time - start_time
+        self.save()
+        if compute_warnings:
+            self.__queue__.compute_warnings()
+
+    def compute_warnings(self):
+        self.compute_warning_error = None
+        self.save()
+        query = self.get_query()
+        if query:
+            user_id = None
+            if self.user_field:
+                user_id = self.user_field.internal_name
+            elif self.user:
+                user_id = str(self.user.id)
+            else:
+                user_id = 'NULL'
+
+            company_id = None
+            if self.company_field:
+                company_id = self.company_field.internal_name
+            elif self.company:
+                company_id = str(self.company.id)
+            else:
+                company_id = 'NULL'
+
+            query_full = 'SELECT '
+            query_full += f'  {user_id} AS user_id, {company_id} as company_id,'
+            query_full +=' count(*) '
+            query_full += 'FROM (%s) AS subquery ' % query
+            if user_id != 'NULL' and company_id != 'NULL':
+                query_full += 'GROUP BY user_id, company_id'
+            elif user_id != 'NULL':
+                query_full += 'GROUP BY user_id'
+            elif company_id != 'NULL':
+                query_full += 'GROUP BY company_id'
+
+        to_create = []
+        self.last_warning_execution = datetime.now()
+        cursor = Transaction().connection.cursor()
+        cursor.execute(query_full)
+        query_last = cursor.fetchall()
+        for x in query_last:
+            count = x[2]
+            if (self.warn == 'always'
+                    or (self.warn == 'records' and count)
+                    or (self.warn == 'no-records' and count)):
+                to_create.append({
+                        'timestamp': self.last_warning_execution,
+                        'table': self.id,
+                        'count': x[2],
+                        'company': x[1],
+                        'user': x[0],
+                        'group': (self.group if self.group else None),
+                        })
+
+        if to_create:
+            try:
+                warnings = Warning.create(to_create)
+                for warning in warnings:
+                    warning.send()
+            except Exception as e:
+                Transaction().connection.rollback()
+                self.compute_warning_error = str(e)
+                self.save()
 
     def update_fields(self, field_names):
         pool = Pool()
@@ -741,3 +902,161 @@ class TableDependency(ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls.__access__.add('table')
+
+
+class Warning(Workflow, ModelSQL, ModelView):
+    'Warnings BABI'
+    __name__ = 'babi.warning'
+
+    timestamp = fields.DateTime('Timestamp', required=True, readonly=True)
+    table = fields.Many2One('babi.table', 'Table', required=True, readonly=True)
+    has_related_records = fields.Function(fields.Boolean('Has Related Field'),
+            'get_has_related_records')
+    count = fields.Integer('Records found', readonly=True, required=True)
+    state = fields.Selection([
+            ('pending', 'Pending'),
+            ('done', 'Done'),
+            ('ignored', 'Ignored'),
+            ], 'State', readonly=True)
+    company = fields.Many2One('company.company', 'Company', readonly=True,
+            ondelete='CASCADE')
+    employee = fields.Many2One('company.employee', 'Employee', readonly=True)
+    description = fields.Function(fields.Text('Description', readonly=True),
+            'get_description',)
+    user = fields.Many2One('res.user', 'User', readonly=True,
+            ondelete='CASCADE')
+    group = fields.Many2One('res.group', 'Group', ondelete='CASCADE',
+            readonly=True)
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._transitions |= set((
+                ('pending', 'done'),
+                ('pending', 'ignored'),
+                ('done', 'ignored'),
+                ('ignored', 'pending'),
+                ))
+        cls._buttons.update({
+                'pending': {
+                    'invisible': ((Eval('state') == 'done')
+                        | (Eval('state') == 'pending')),
+                    'depends': ['state'],
+                    'icon': 'tryton-back'
+                    },
+                'do': {
+                    'invisible': Eval('state') != 'pending',
+                    'depends': ['state'],
+                    'icon': 'tryton-ok',
+                    },
+                'ignore': {
+                    'invisible': Eval('state') == 'ignored',
+                    'depends': ['state'],
+                    'icon': 'tryton-cancel',
+                    },
+                'open': {
+                    'invisible': ~Bool(Eval('has_related_records')),
+                    'depends': ['has_related_records'],
+                    'icon': 'tryton-add',
+                    },
+                })
+
+    def get_has_related_records(self, name):
+        if not self.table.related_field:
+            return False
+        return bool(self.count)
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('pending')
+    def pending(cls, warnings):
+        for warning in warnings:
+            warning.employee = None
+        cls.save(warnings)
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('done')
+    def do(cls, warnings):
+        pool = Pool()
+        User = pool.get('res.user')
+
+        user = User(Transaction().user)
+        if not user.employee:
+            return
+        for warning in warnings:
+            warning.employee = user.employee
+        cls.save(warnings)
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('ignored')
+    def ignore(cls, warnings):
+        pass
+
+    @staticmethod
+    def default_state():
+        return 'pending'
+
+    def get_description(self, name):
+        return self.table.warning_description
+
+    @classmethod
+    @ModelView.button
+    def open(cls, warnings):
+        pool = Pool()
+        Table = pool.get('babi.table')
+
+        if len(warnings) != 1:
+            raise UserError(gettext('babi.msg_open_warning_single'))
+
+        warning, = warnings
+
+        user_index = 1
+        fields = [warning.table.related_field.internal_name]
+        if warning.table.company_field:
+            user_index += 1
+            fields.append(warning.table.company_field.internal_name)
+        if warning.table.user_field:
+            fields.append(warning.table.user_field.internal_name)
+        records = Table.execute_query(warning.table,
+            fields=fields)
+
+        if warning.table.company_field:
+            if warning.company:
+                records = [x for x in records if x[1] == warning.company.id]
+        if warning.table.user_field:
+            if warning.user:
+                records = [x for x in records if x[user_index] == warning.user.id]
+
+        try:
+            ids = list(set([int(x[0]) for x in records if not x[0] is None]))
+        except:
+            raise UserError(gettext('babi.msg_not_converted',
+            field=warning.table.related_field.rec_name))
+
+        Model = pool.get(warning.table.related_model.model)
+
+        count = Model.search([('id', 'in', ids)], count=True)
+
+        if count != len(ids):
+            raise UserError(gettext('babi.msg_wrong_info',
+                field=warning.table.related_field.rec_name,
+                query_count=str(len(ids)),
+                model_query_count=str(count)))
+
+        return {
+            'res_model': warning.table.related_model.model,
+            'type': 'ir.action.act_window',
+            'res_id': ids,
+            'name': warning.table.related_model.name,
+            'pyson_domain': '[]',
+            'pyson_context': '[]',
+            'pyson_order': '[]',
+            'domains': [],
+            }
+
+    def send(self):
+        if self.table.warn and self.table.email_template:
+            self.table.email_template.render_and_send(
+                self.table.email_template.id, [self.table.email_template])

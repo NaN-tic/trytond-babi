@@ -1,17 +1,19 @@
-<form col="6">
+<form col="8">
     <label name="name"/>
     <field name="name"/>
     <label name="internal_name"/>
     <field name="internal_name"/>
     <label name="type"/>
     <field name="type"/>
+    <button name="compute" colspan="2"/>
+    <label name="warn"/>
+    <field name="warn"/>
     <label name="model"/>
     <field name="model"/>
     <label name="filter"/>
     <field name="filter"/>
-    <button name="compute" colspan="2"/>
     <newline/>
-    <notebook colspan="6">
+    <notebook colspan="8">
         <page name="query">
             <field name="query" colspan="4" height="550" widget="code"/>
         </page>
@@ -27,6 +29,9 @@
         <page name="compute_error">
             <field name="compute_error" colspan="4"/>
         </page>
+        <page name="compute_warning_error">
+            <field name="compute_warning_error" colspan="4"/>
+        </page>
         <page id="configuration" string="Configuration" col="6">
             <label name="preview_limit"/>
             <field name="preview_limit"/>
@@ -34,6 +39,13 @@
             <field name="babi_raise_user_error"/>
             <label name="timeout"/>
             <field name="timeout"/>
+            <separator id="last_execution" colspan="6" string="Last Execution"/>
+            <label name="calculation_date"/>
+            <field name="calculation_date"/>
+            <label name="calculation_time"/>
+            <field name="calculation_time"/>
+            <label name="last_warning_execution"/>
+            <field name="last_warning_execution"/>
         </page>
         <page id="dependencies" string="Dependencies">
             <field name="requires" colspan="2" height="550"/>
@@ -45,6 +57,28 @@
             <field name="ai_request" height="450"/>
             <button name="ai" string="AI >>"/>
             <field name="ai_response" height="450"/>
+        </page>
+        <page id="warning" string="Warning" col="8">
+            <label name="related_field"/>
+            <field name="related_field"/>
+            <label name="related_model"/>
+            <field name="related_model"/>
+            <label name="email_template"/>
+            <field name="email_template"/>
+            <button name="compute_warning" colspan="2"/>
+            <label name="group"/>
+            <field name="group"/>
+            <label name="user"/>
+            <field name="user"/>
+            <label name="user_field"/>
+            <field name="user_field"/>
+            <newline/>
+            <label name="company"/>
+            <field name="company"/>
+            <label name="company_field"/>
+            <field name="company_field"/>
+            <separator name="warning_description" colspan="8"/>
+            <field name="warning_description" colspan="8"/>
         </page>
     </notebook>
 </form>

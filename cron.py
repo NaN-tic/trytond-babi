@@ -15,6 +15,9 @@ class Cron(metaclass=PoolMeta):
     babi_table = fields.Many2One('babi.table', 'Babi Table', states={
             'invisible': Eval('method') != 'babi.table|calculate_babi_table',
             })
+    babi_calculate_warnings = fields.Boolean('Calculate Warnings', states={
+        'invisible': Eval('method') != 'babi.table|calculate_babi_table',
+            })
 
     @classmethod
     def __register__(cls, module_name):
@@ -74,6 +77,16 @@ class Cron(metaclass=PoolMeta):
             for company in cron.companies:
                 with Transaction().set_context(company=company.id,
                         queue_name='babi'):
-                    BabiTable.__queue__._compute(cron.babi_table)
+                    if cron.babi_table.type == 'query':
+                        BabiTable.__queue__.compute_warnings(cron.babi_table)
+                    else:
+                        BabiTable.__queue__._compute(cron.babi_table,
+                            create_warnings=cron.babi_calculate_warnings)
         return super(Cron, cls).run_once(list(
                 set(crons) - set(report_crons) - set(table_crons)))
+
+    @fields.depends('method')
+    def on_change_with_babi_calculate_warnings(self, name=None):
+        if self.method != 'babi.table|calculate_babi_table':
+            return False
+        return self.babi_calculate_warnings

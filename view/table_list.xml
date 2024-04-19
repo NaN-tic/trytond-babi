@@ -5,5 +5,8 @@
     <field name="model"/>
     <field name="filter"/>
     <field name="query" tree_invisible="1"/>
-    <button name="compute"/>
+    <button name="compute" tree_invisible="1"/>
+    <field name="warn" optional="1"/>
+    <field name="related_model" optional="1"/>
+    <field name="email_template" optional="1"/>
 </tree>
