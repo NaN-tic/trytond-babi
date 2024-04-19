@@ -7,6 +7,9 @@
         <label name="babi_table"/>
         <field name="babi_table"/>
         <newline/>
+        <label name="babi_calculate_warnings"/>
+        <field name="babi_calculate_warnings"/>
+        <newline/>
     </xpath>
 </data>
 

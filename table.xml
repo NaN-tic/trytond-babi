@@ -28,6 +28,30 @@
             <field name="act_window" ref="act_babi_table"/>
         </record>
 
+        <record model="ir.action.act_window.domain" id="act_show_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain" eval="[]" pyson="1"/>
+            <field name="count" eval="True"/>
+            <field name="act_window" ref="act_babi_table"/>
+        </record>
+
+        <record model="ir.action.act_window.domain" id="act_show_warn">
+            <field name="name">With Warning</field>
+            <field name="sequence" eval="20"/>
+            <field name="domain" eval="[('warn', '!=', None)]" pyson="1"/>
+            <field name="count" eval="True"/>
+            <field name="act_window" ref="act_babi_table"/>
+        </record>
+
+        <record model="ir.action.act_window.domain" id="act_show_no_warn">
+            <field name="name">Without Warning</field>
+            <field name="sequence" eval="30"/>
+            <field name="domain" eval="[('warn', '=', None)]" pyson="1"/>
+            <field name="count" eval="True"/>
+            <field name="act_window" ref="act_babi_table"/>
+        </record>
+
         <record model="ir.model.access" id="access_babi_table">
             <field name="model" search="[('model', '=', 'babi.table')]"/>
             <field name="perm_read" eval="False"/>
@@ -49,6 +73,11 @@
         <record model="ir.model.button" id="babi_table_calculate_button">
             <field name="name">compute</field>
             <field name="string">Compute</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
+        </record>
+        <record model="ir.model.button" id="babi_table_calculate_warning_button">
+            <field name="name">compute_warning</field>
+            <field name="string">Compute Warning</field>
             <field name="model" search="[('model', '=', 'babi.table')]"/>
         </record>
         <record model="ir.model.button" id="babi_table_ai_button">
@@ -99,6 +128,111 @@
             <field name="model">babi.table.dependency</field>
             <field name="type">tree</field>
             <field name="name">table_dependency_list</field>
+        </record>
+
+        <!-- babi.warning -->
+        <record model="ir.ui.view" id="babi_warning_tree_view">
+            <field name="model">babi.warning</field>
+            <field name="type">tree</field>
+            <field name="name">warning_tree</field>
+        </record>
+        <record model="ir.ui.view" id="babi_warning_form_view">
+            <field name="model">babi.warning</field>
+            <field name="type">form</field>
+            <field name="name">warning_form</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_babi_warning">
+            <field name="name">Warnings</field>
+            <field name="res_model">babi.warning</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_warning_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="babi_warning_tree_view"/>
+            <field name="act_window" ref="act_babi_warning"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_warning_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="babi_warning_form_view"/>
+            <field name="act_window" ref="act_babi_warning"/>
+        </record>
+
+        <record model="ir.model.button" id="pending_button">
+            <field name="name">pending</field>
+            <field name="string">Pending</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
+        </record>
+        <record model="ir.model.button" id="done_button">
+            <field name="name">do</field>
+            <field name="string">Do</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
+        </record>
+        <record model="ir.model.button" id="ignored_button">
+            <field name="name">ignore</field>
+            <field name="string">Ignore</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
+        </record>
+
+        <record model="ir.model.button" id="open_button">
+            <field name="name">open</field>
+            <field name="string">Open Records</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
+        </record>
+
+        <record model="ir.action.act_window.domain" id="act_warning_domain_pending">
+            <field name="name">Pending</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain" eval="[('state', '=', 'pending')]" pyson="1"/>
+            <field name="count" eval="True"/>
+            <field name="act_window" ref="act_babi_warning"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_warning_domain_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="20"/>
+            <field name="domain" eval="[]" pyson="1"/>
+            <field name="count" eval="False"/>
+            <field name="act_window" ref="act_babi_warning"/>
+        </record>
+
+        <menuitem id="menu_babi_warning" parent="menu_babi" action="act_babi_warning" sequence="30"/>
+
+        <record model="ir.action.act_window" id="act_warning_relate">
+            <field name="name">Warnings</field>
+            <field name="res_model">babi.warning</field>
+            <field name="domain"
+                eval="[If(Eval('active_ids', []) == [Eval('active_id')], ('table', '=', Eval('active_id')), ('table', 'in', Eval('active_ids')))]"
+                pyson="1"/>
+        </record>
+        <record model="ir.action.keyword" id="act_warning_relate_keyword">
+            <field name="keyword">form_relate</field>
+            <field name="model">babi.table,-1</field>
+            <field name="action" ref="act_warning_relate"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_warning">
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.rule.group" id="rule_group_user_warning">
+            <field name="name">User in Warning</field>
+            <field name="model"
+                search="[('model', '=', 'babi.warning')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_user_warning">
+            <field name="domain"
+                eval="[('OR',
+                            [('OR', ('user.id', '=', Eval('user', {}).get('id')), ('user', '=', None)),
+                            ('OR', ('company.id', 'in', Eval('companies', [])), ('company', '=', None)),
+                            ('OR', ('group', 'in', Eval('groups', [])), ('group', '=', None))
+                            ]
+                        )]"
+                pyson="1"/>
+            <field name="rule_group" ref="rule_group_user_warning"/>
         </record>
     </data>
 </tryton>

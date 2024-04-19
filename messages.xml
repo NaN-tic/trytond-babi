@@ -130,5 +130,19 @@ Exception: %(error)s</field>
 
 "%(sequence)s"</field>
         </record>
+        <record model="ir.message" id="msg_not_converted">
+            <field name="text">Some field of the field %(field)s is not numeric and cannot be converted. Please check the query.</field>
+        </record>
+        <record model="ir.message" id="msg_wrong_info">
+            <field name="text">The information returned from the field %(field)s is not correct or you don't have enough permissions to access it.             Records found by query: %(query_count)s
+            Records found by Model: %(model_query_count)s
+            </field>
+        </record>
+        <record model="ir.message" id="msg_tables_not_created">
+            <field name="text">Warning: tables could not be created. Please check your query.</field>
+        </record>
+        <record model="ir.message" id="msg_open_warning_single">
+            <field name="text">You can only open records for a single warning.</field>
+        </record>
     </data>
 </tryton>
