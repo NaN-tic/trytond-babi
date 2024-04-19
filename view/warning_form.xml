@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--The COPYRIGHT file at the top level of this repository
+contains the full copyright notices and license terms. -->
+<form col="6">
+    <label name="timestamp"/>
+    <field name="timestamp"/>
+    <label name="table"/>
+    <field name="table"/>
+    <label name="count"/>
+    <field name="count"/>
+    <label name="group"/>
+    <field name="group"/>
+    <label name="user"/>
+    <field name="user"/>
+    <label name="company"/>
+    <field name="company"/>
+    <label name="employee"/>
+    <field name="employee"/>
+    <separator name="description" colspan="6"/>
+    <field name="description" colspan="6"/>
+    <label name="state"/>
+    <field name="state"/>
+    <group colspan="4" id="state">
+        <button name="pending"/>
+        <button name="do"/>
+        <button name="ignore"/>
+        <button name="open"/>
+    </group>
+</form>
