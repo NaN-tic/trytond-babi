@@ -130,7 +130,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             'invisible': Eval('type') == 'model',
             })
     warn = fields.Selection([
-            (None, "Don't warn"),
+            (None, 'Never'),
             ('records', 'Records Found'),
             ('no-records', 'No Records Found'),
             ('always', 'Always'),
@@ -905,7 +905,7 @@ class TableDependency(ModelSQL, ModelView):
 
 
 class Warning(Workflow, ModelSQL, ModelView):
-    'Warnings BABI'
+    'BABI Warning'
     __name__ = 'babi.warning'
 
     timestamp = fields.DateTime('Timestamp', required=True, readonly=True)
