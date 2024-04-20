@@ -16,8 +16,17 @@ from dateutil.relativedelta import relativedelta
 from trytond.modules.company.tests import (CompanyTestMixin, create_company,
     set_company)
 
+class BabiCompanyTestMixin(CompanyTestMixin):
 
-class BabiTestCase(ModuleTestCase):
+    @property
+    def _skip_company_rule(self):
+        return super()._skip_company_rule | {
+            ('babi.table', 'company'),
+            ('babi.warning', 'company'),
+            }
+
+
+class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
     'Test Babi module'
     module = 'babi'
 
