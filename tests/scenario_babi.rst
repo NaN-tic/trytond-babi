@@ -65,7 +65,7 @@ Check warnings::
     >>> table.save()
     >>> table.click('compute_warning')
     >>> Warning = Model.get('babi.warning')
-    >>> warnings = Warning.find()
+    >>> warnings = Warning.find([])
     >>> len(warnings)
     1
     >>> warning, = warnings
