@@ -225,9 +225,9 @@
         <record model="ir.rule" id="rule_user_warning">
             <field name="domain"
                 eval="[
-                        ['OR', ('user.id', '=', Eval('user', {}).get('id', -1)), ('user', '=', None)],
-                        ['OR', ('employee.id', '=', Eval('employee', {}).get('id', -1)), ('employee', '=', None)],
-                        ['OR', ('company.id', 'in', Eval('companies', [])), ('company', '=', None)],
+                        ['OR', ('user', '=', Eval('user', {}).get('id', -1)), ('user', '=', None)],
+                        ['OR', ('employee', '=', Eval('employee', {}).get('id', -1)), ('employee', '=', None)],
+                        ['OR', ('company', 'in', Eval('companies', [])), ('company', '=', None)],
                         ['OR', ('group', 'in', Eval('groups', [])), ('group', '=', None)],
                     ]"
                 pyson="1"/>
