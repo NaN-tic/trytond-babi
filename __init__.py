@@ -9,6 +9,7 @@ from . import report
 from . import table
 from . import dashboard
 from . import action
+from . import ir
 
 def register():
     Pool.register(
@@ -47,6 +48,7 @@ def register():
         table.Field,
         table.TableDependency,
         table.Warning,
+        ir.Rule,
         module='babi', type_='model')
     Pool.register(
         babi.OpenChart,

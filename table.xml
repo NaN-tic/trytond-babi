@@ -225,8 +225,8 @@
         <record model="ir.rule" id="rule_user_warning">
             <field name="domain"
                 eval="[
-                        ['OR', ('user', '=', Eval('user', {}).get('id', -1)), ('user', '=', None)],
-                        ['OR', ('employee', '=', Eval('employee', {}).get('id', -1)), ('employee', '=', None)],
+                        ['OR', ('user', '=', Eval('user_id', -1)), ('user', '=', None)],
+                        ['OR', ('employee', 'in', Eval('employees', [])), ('employee', '=', None)],
                         ['OR', ('company', 'in', Eval('companies', [])), ('company', '=', None)],
                         ['OR', ('group', 'in', Eval('groups', [])), ('group', '=', None)],
                     ]"

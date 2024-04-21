@@ -38,7 +38,7 @@ Set employee::
     >>> user.company = company
     >>> user.groups.append(group)
     >>> user.save()
-    >>> set_user(user.id)
+    >>> set_user(user)
 
 Create table::
 
