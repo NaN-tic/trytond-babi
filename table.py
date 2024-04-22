@@ -940,7 +940,8 @@ class Warning(Workflow, ModelSQL, ModelView):
     __name__ = 'babi.warning'
 
     timestamp = fields.DateTime('Timestamp', required=True, readonly=True)
-    table = fields.Many2One('babi.table', 'Table', required=True, readonly=True)
+    table = fields.Many2One('babi.table', 'Table', required=True, readonly=True,
+        ondelete='CASCADE')
     has_related_records = fields.Function(fields.Boolean('Has Related Field'),
             'get_has_related_records')
     count = fields.Integer('Records found', readonly=True, required=True)
