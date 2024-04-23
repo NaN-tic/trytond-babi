@@ -81,7 +81,7 @@ class Cron(metaclass=PoolMeta):
                         BabiTable.__queue__.compute_warnings(cron.babi_table)
                     else:
                         BabiTable.__queue__._compute(cron.babi_table,
-                            create_warnings=cron.babi_calculate_warnings)
+                            compute_warnings=cron.babi_calculate_warnings)
         return super(Cron, cls).run_once(list(
                 set(crons) - set(report_crons) - set(table_crons)))
 
