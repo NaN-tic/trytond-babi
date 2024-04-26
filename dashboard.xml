@@ -29,7 +29,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_dashboard">
-            <field name="model">babi.dashboard</field>
+            <field name="model" search="[('model', '=', 'babi.dashboard')]"/>
             <field name="perm_read" eval="False"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -37,7 +37,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_dashboard_babi">
-            <field name="model">babi.dashboard</field>
+            <field name="model" search="[('model', '=', 'babi.dashboard')]"/>
             <field name="group" ref="group_babi"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
@@ -48,7 +48,7 @@
         <record model="ir.model.button" id="show_dashboard_button">
             <field name="name">show</field>
             <field name="string">Show</field>
-            <field name="model">babi.dashboard</field>
+            <field name="model" search="[('model', '=', 'babi.dashboard')]"/>
         </record>
         <record model="ir.model.button-res.group" id="show_dashboard_button_group_babi">
             <field name="button" ref="show_dashboard_button"/>
@@ -86,7 +86,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_dashboard_item">
-            <field name="model">babi.dashboard.item</field>
+            <field name="model" search="[('model', '=', 'babi.dashboard.item')]"/>
             <field name="perm_read" eval="False"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -94,7 +94,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_dashboard_item_babi">
-            <field name="model">babi.dashboard.item</field>
+            <field name="model" search="[('model', '=', 'babi.dashboard.item')]"/>
             <field name="group" ref="group_babi"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
@@ -131,7 +131,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_widget">
-            <field name="model">babi.widget</field>
+            <field name="model" search="[('model', '=', 'babi.widget')]"/>
             <field name="perm_read" eval="False"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -139,7 +139,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_widget_babi">
-            <field name="model">babi.widget</field>
+            <field name="model" search="[('model', '=', 'babi.widget')]"/>
             <field name="group" ref="group_babi"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>

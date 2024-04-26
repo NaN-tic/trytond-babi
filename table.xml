@@ -53,7 +53,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_table">
-            <field name="model">babi.table</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
             <field name="perm_read" eval="False"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -61,7 +61,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_table_babi">
-            <field name="model">babi.table</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
             <field name="group" ref="group_babi"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
@@ -73,17 +73,17 @@
         <record model="ir.model.button" id="babi_table_calculate_button">
             <field name="name">compute</field>
             <field name="string">Compute</field>
-            <field name="model">babi.table</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
         </record>
         <record model="ir.model.button" id="babi_table_calculate_warning_button">
             <field name="name">compute_warning</field>
             <field name="string">Compute Warning</field>
-            <field name="model">babi.table</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
         </record>
         <record model="ir.model.button" id="babi_table_ai_button">
             <field name="name">ai</field>
             <field name="string">AI</field>
-            <field name="model">babi.table</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
         </record>
 
         <menuitem id="menu_babi_table" parent="menu_configuration" action="act_babi_table" sequence="30"/>
@@ -160,23 +160,23 @@
         <record model="ir.model.button" id="pending_button">
             <field name="name">pending</field>
             <field name="string">Pending</field>
-            <field name="model">babi.warning</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
         </record>
         <record model="ir.model.button" id="done_button">
             <field name="name">do</field>
             <field name="string">Do</field>
-            <field name="model">babi.warning</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
         </record>
         <record model="ir.model.button" id="ignored_button">
             <field name="name">ignore</field>
             <field name="string">Ignore</field>
-            <field name="model">babi.warning</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
         </record>
 
         <record model="ir.model.button" id="open_button">
             <field name="name">open</field>
             <field name="string">Open Records</field>
-            <field name="model">babi.warning</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
         </record>
 
         <record model="ir.action.act_window.domain" id="act_warning_domain_pending">
@@ -210,7 +210,7 @@
         </record>
 
         <record model="ir.model.access" id="access_babi_warning">
-            <field name="model">babi.warning</field>
+            <field name="model" search="[('model', '=', 'babi.warning')]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="False"/>
@@ -219,7 +219,8 @@
 
         <record model="ir.rule.group" id="rule_group_user_warning">
             <field name="name">User in Warning</field>
-            <field name="model">babi.warning</field>
+            <field name="model"
+                search="[('model', '=', 'babi.warning')]"/>
             <field name="global_p" eval="True"/>
         </record>
         <record model="ir.rule" id="rule_user_warning">
