@@ -599,7 +599,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             if self.user_field:
                 user_id = self.user_field.internal_name
             elif self.user:
-                user_id = str(self.user.id)
+                user_id = self.user.id
             else:
                 user_id = 'NULL'
 
@@ -607,7 +607,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             if self.employee_field:
                 employee_id = self.employee_field.internal_name
             elif self.employee:
-                employee_id = str(self.employee.id)
+                employee_id = self.employee.id
             else:
                 employee_id = 'NULL'
 
@@ -615,7 +615,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             if self.company_field:
                 company_id = self.company_field.internal_name
             elif self.company:
-                company_id = str(self.company.id)
+                company_id = self.company.id
             else:
                 company_id = 'NULL'
 
@@ -627,7 +627,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             query_full += 'FROM (%s) AS compute_warnings_subquery ' % query
 
             group_by = [user_id, employee_id, company_id]
-            group_by = [x for x in group_by if x != 'NULL']
+            group_by = [x for x in group_by
+                if isinstance(x, str) and x != 'NULL']
             if group_by:
                 query_full += 'GROUP BY ' + ', '.join(group_by)
 
