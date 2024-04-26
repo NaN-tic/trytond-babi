@@ -1647,7 +1647,7 @@ msgstr "Obre registres"
 
 msgctxt "model:ir.model.button,string:pending_button"
 msgid "Pending"
-msgstr "Pendents"
+msgstr "Pendent"
 
 msgctxt "model:ir.model.button,string:show_dashboard_button"
 msgid "Show"
@@ -2071,7 +2071,7 @@ msgstr "Ignorat"
 
 msgctxt "selection:babi.warning,state:"
 msgid "Pending"
-msgstr "Pendents"
+msgstr "Pendent"
 
 msgctxt "selection:babi.widget,box_points:"
 msgid "All"
