@@ -960,6 +960,8 @@ class Warning(Workflow, ModelSQL, ModelView):
             ondelete='CASCADE')
     group = fields.Many2One('res.group', 'Group', ondelete='CASCADE',
             readonly=True)
+    users = fields.Function(fields.Many2Many('res.user', None, None, 'Users'),
+        'get_users')
     done_by = employee_field("Done By", states=['done', 'ignored'])
     ignored_by = employee_field("Ignored By", states=['done', 'ignored'])
 
@@ -996,10 +998,32 @@ class Warning(Workflow, ModelSQL, ModelView):
                     },
                 })
 
+    @staticmethod
+    def default_state():
+        return 'pending'
+
     def get_has_related_records(self, name):
         if not self.table.related_field:
             return False
         return bool(self.count)
+
+    def get_users(self, name):
+        pool = Pool()
+        User = pool.get('res.user')
+
+        if self.user:
+            return [self.user]
+        if self.employee:
+            return User.search([
+                    ('employee.id', '=', self.employee.id),
+                    ])
+        if self.group:
+            return self.group.users
+        if self.company:
+            return User.search([
+                    ('companies.id', '=', self.company.id),
+                    ])
+        return User.search([])
 
     @classmethod
     @ModelView.button
@@ -1021,10 +1045,6 @@ class Warning(Workflow, ModelSQL, ModelView):
     @set_employee('ignored_by')
     def ignore(cls, warnings):
         pass
-
-    @staticmethod
-    def default_state():
-        return 'pending'
 
     def get_description(self, name):
         return self.table.warning_description
