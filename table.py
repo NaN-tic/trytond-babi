@@ -962,6 +962,7 @@ class Warning(Workflow, ModelSQL, ModelView):
             readonly=True)
     users = fields.Function(fields.Many2Many('res.user', None, None, 'Users'),
         'get_users')
+    emails = fields.Function(fields.Char('E-mails'), 'get_emails')
     done_by = employee_field("Done By", states=['pending', 'done', 'ignored'])
     ignored_by = employee_field("Ignored By",
         states=['pending', 'done', 'ignored'])
@@ -1026,12 +1027,31 @@ class Warning(Workflow, ModelSQL, ModelView):
                     ('employee.id', '=', self.employee.id),
                     ])
         if self.group:
-            return self.group.users
+            return [x for x in self.group.users if x.active]
         if self.company:
             return User.search([
                     ('companies.id', '=', self.company.id),
                     ])
         return User.search([])
+
+    def get_emails(self, name):
+        User = Pool().get('res.user')
+
+        emails = []
+        if self.user:
+            emails = [self.user.email]
+        elif self.employee:
+            emails = [self.employee.party.email]
+        elif self.group:
+            users = User.search([('groups.id', '=', self.group.id)])
+            emails = [user.email for user in users]
+        elif self.company:
+            users = User.search([('companies.id', '=', self.company.id)])
+            emails = [user.email for user in users]
+        else:
+            users = User.search([])
+            emails = [user.email for user in users]
+        return ', '.join(sorted(list({x for x in emails if x})))
 
     @classmethod
     @ModelView.button
