@@ -27,7 +27,7 @@
             <field name="crons" colspan="4"/>
         </page>
         <page name="compute_error">
-            <field name="compute_error" colspan="4"/>
+            <field name="compute_error" colspan="4" height="550" widget="code"/>
         </page>
         <page name="compute_warning_error">
             <field name="compute_warning_error" colspan="4"/>
