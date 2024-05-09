@@ -1113,10 +1113,10 @@ class Warning(Workflow, ModelSQL, ModelView):
         return {
             'res_model': warning.table.related_model.model,
             'type': 'ir.action.act_window',
-            'res_id': ids,
             'name': warning.table.related_model.name,
             'pyson_domain': '[]',
-            'pyson_context': '[]',
+            'pyson_domain': f'[["id", "in", {ids}]]',
+            'pyson_context': '{}',
             'pyson_order': '[]',
             'domains': [],
             }
