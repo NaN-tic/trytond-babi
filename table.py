@@ -965,6 +965,13 @@ class Warning(Workflow, ModelSQL, ModelView):
     done_by = employee_field("Done By", states=['done', 'ignored'])
     ignored_by = employee_field("Ignored By", states=['done', 'ignored'])
 
+    def get_rec_name(self, name):
+        return f'{self.count} - {self.table.name}'
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return [('table.name',) + tuple(clause[1:])]
+
     @classmethod
     def __setup__(cls):
         super().__setup__()
