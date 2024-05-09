@@ -962,8 +962,9 @@ class Warning(Workflow, ModelSQL, ModelView):
             readonly=True)
     users = fields.Function(fields.Many2Many('res.user', None, None, 'Users'),
         'get_users')
-    done_by = employee_field("Done By", states=['done', 'ignored'])
-    ignored_by = employee_field("Ignored By", states=['done', 'ignored'])
+    done_by = employee_field("Done By", states=['pending', 'done', 'ignored'])
+    ignored_by = employee_field("Ignored By",
+        states=['pending', 'done', 'ignored'])
 
     def get_rec_name(self, name):
         return f'{self.count} - {self.table.name}'
