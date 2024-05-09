@@ -1085,10 +1085,20 @@ class Warning(Workflow, ModelSQL, ModelView):
                 records = [x for x in records if x[user_index] == warning.user.id]
 
         try:
-            ids = list(set([int(x[0]) for x in records if not x[0] is None]))
+            ids = []
+            for record in records:
+                value = record[0]
+                if value is None:
+                    continue
+                # Allow using arrays (using array_agg) of ids or
+                # just ids
+                if isinstance(value, (tuple, list)):
+                    ids += list([int(x) for x in value])
+                else:
+                    ids.append(int(value))
         except:
             raise UserError(gettext('babi.msg_not_converted',
-            field=warning.table.related_field.rec_name))
+                field=warning.table.related_field.rec_name))
 
         Model = pool.get(warning.table.related_model.model)
 
