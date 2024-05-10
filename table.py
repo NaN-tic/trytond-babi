@@ -1144,4 +1144,4 @@ class Warning(Workflow, ModelSQL, ModelView):
     def send(self):
         if self.table.warn and self.table.email_template:
             self.table.email_template.render_and_send(
-                self.table.email_template.id, [self.table.email_template])
+                self.table.email_template.id, [self])
