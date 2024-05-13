@@ -150,7 +150,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             'invisible': ~Bool(Eval('warn')),
             })
     calculation_time = fields.Float('Time taken to calculate (in seconds)',
-        readonly=True, states={
+        digits=(16, 6), readonly=True, states={
             'invisible': ~Bool(Eval('warn')),
             })
     last_warning_execution = fields.DateTime('Last Warning Execution',
@@ -585,7 +585,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         self.save()
         notify(gettext('babi.msg_table_successful', table=self.rec_name))
         self.calculation_date = datetime.now()
-        self.calculation_time = end_time - start_time
+        self.calculation_time = round(end_time - start_time,
+            self.__class__.calculation_time.digits[1])
         self.save()
         if compute_warnings:
             self.__queue__.compute_warnings()
