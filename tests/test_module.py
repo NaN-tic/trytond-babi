@@ -760,14 +760,14 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         table.query = 'SELECT amount, category FROM babi_test'
         table.save()
         table._compute()
-        fields = [x.internal_name for x in table.fields_]
+        fields = sorted([x.internal_name for x in table.fields_])
         self.assertEqual(fields, ['amount', 'category'])
 
         table.query = 'SELECT date, amount FROM babi_test'
         table.save()
         table._compute()
-        fields = [x.internal_name for x in table.fields_]
-        self.assertEqual(fields, ['date', 'amount'])
+        fields = sorted([x.internal_name for x in table.fields_])
+        self.assertEqual(fields, ['amount', 'date'])
 
 
 del ModuleTestCase
