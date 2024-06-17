@@ -136,7 +136,7 @@ class DynamicModel(ModelSQL, ModelView):
             pass
 
     @classmethod
-    def fields_view_get(cls, view_id=None, view_type='form'):
+    def fields_view_get(cls, view_id=None, view_type='form', level=None):
         pool = Pool()
         Execution = pool.get('babi.report.execution')
         Dimension = pool.get('babi.dimension')
