@@ -1486,7 +1486,7 @@ msgid ""
 "%(seconds)s to compute."
 msgstr ""
 "El càlcul de l'informe \"%(report)s\" s'ha avortat perquè ha trigat més de "
-"%(segons)s a calcular-se."
+"%(seconds)s a calcular-se."
 
 msgctxt "model:ir.message,text:msg_table_failed"
 msgid "Computation of \"%(table)s\" failed."
