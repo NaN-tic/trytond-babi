@@ -56,6 +56,7 @@ def register():
         pivot.Site,
         pivot.Layout,
         pivot.Index,
+        pivot.PivotHeader,
         pivot.PivotTable,
         module='babi', type_='model')
     Pool.register(

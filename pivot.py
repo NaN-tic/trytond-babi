@@ -1,4 +1,5 @@
 import datetime
+import ast
 from werkzeug.routing import Rule
 from werkzeug.utils import redirect, send_from_directory
 from dominate.tags import (div, h1, h2, p, a, form, button, span, table, thead,
@@ -336,9 +337,7 @@ class Operation:
                             row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                 table_to_show.append(row)
                 continue
-            print(f'TABLE STRUCUTRE COLUMNS: {table_structure.columns}')
             for table_structure_column in table_structure.columns:
-                print(f'TABLE STRUCUTRE COLUMN: {table_structure_column.name} | {table_structure_column.hierarchy} | {hierarchy_column}')
                 if table_structure_column.hierarchy == hierarchy_column:
                     if hierarchy_column != hierarchy_columns[0] and first_column:
                         first_column = False
@@ -456,7 +455,7 @@ class Operation:
                         table_to_show += child_rows
             index += 1
         #print(tabulate(table_to_show, tablefmt='fancy_grid'))
-        pivot_table = table(cls="w-full text-sm text-left rtl:text-right text-gray-600")
+        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
         for row in table_to_show:
             pivot_table.add(row)
         pivot_div = div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8")
@@ -491,11 +490,7 @@ class Operation:
                     new_grouping_field.open_records = grouping_field.open_records
                     #new_grouping_field = grouping_field
 
-        print(f'{parent} CELL STATE: {cell.name} | {cell.state} | {cell.state  == "closed"} ')
-        print(f'    GROUPING STATE: {new_grouping_field.name} | {new_grouping_field.state} | {new_grouping_field.state == "closed" } ')
-
         if not new_grouping_field:
-            print('NOT NET GROUPING FIELD')
             #TODO: we need to serach what we do in this case
             raise
         if new_grouping_field.state == 'closed':
@@ -515,13 +510,11 @@ class Operation:
                 new_grouping_field.state = 'open'
         else:
             if new_grouping_field and parent:
-                #print(f'REMOVE OPEN RECORS :{new_grouping_field.open_records} | NAME: {new_grouping_field.name}')
                 if new_grouping_field.open_records:
                     new_grouping_field.open_records.remove(cell.name)
             else:
                 new_grouping_field.state = 'closed'
 
-        print(f'    GROUPING STATE2: {new_grouping_field.name} | {new_grouping_field.state} | {new_grouping_field.state == "closed" } ')
         # Adapt to the url format
         grouping_fields = ''
         new_record_added = False
@@ -639,10 +632,6 @@ class Layout(Component):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        pool = Pool()
-        #Header = pool.get('www.header')
-        #Footer = pool.get('www.footer')
-
         # Prepare the head with all the scripts
         site = self.context['site']
 
@@ -686,101 +675,61 @@ class Index(Component):
 
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
 
     @classmethod
     def get_url_map(cls):
         return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>')
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>')
         ]
 
     def render(self):
         pool = Pool()
         Layout = pool.get('www.layout')
         Pivot = pool.get('www.pivot_table')
+        PivotHeader = pool.get('www.pivot_header')
+        BabiTable = pool.get('babi.table')
 
-        # TODO: search a way to get all the column names form the table
-        fields = ['employee', 'year', 'month', 'duration']
+        # Get the table name
+        # If table name starts with "__" we need to remove this part to search the table name
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        babi_tables = BabiTable.search([
+            ('internal_name', '=', table_name)], limit=1)
+        if babi_tables:
+            table_name = babi_tables[0].name
+
+        # We cant sent an empty value, the routes dont detect correctly the
+        # field and fails
+        if not hasattr(self, 'table_properties'):
+            table_properties = 'null'
+        else:
+            table_properties = self.table_properties
+
+        print(f'>>> HEADER TABLE PROPERTIES: {table_properties}')
 
         with main() as index_section:
-            # Show all the fields avaialble in the table
-            with div():
-                with ul(role="list", cls="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"):
-                    for field in fields:
-                        with li(cls="col-span-1 flex rounded-md shadow-sm"):
-                            with div(cls="flex flex-1 items-center justify-between truncate rounded-r-md rounded-l-md border-b border-r border-t border-l border-gray-200 bg-white"):
-                                with div(cls="flex-1 truncate px-4 py-2 text-sm"):
-                                    a(field, href="#", cls="font-medium text-gray-900 hover:text-gray-600")
-
+            with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-2"):
+                div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
+                with div(cls="col-span-1"):
+                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
+                        cls="absolute right-6").add(
+                            raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>'))
             with div(cls="grid grid-cols-12"):
-                with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4"):
-                    with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                        with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
-                            with table(cls="min-w-full divide-y divide-gray-300"):
-                                with thead():
-                                    with tr():
-                                        th('X axis', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                        th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Remove', cls="sr-only"))
-                                        th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Up', cls="sr-only"))
-                                        with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
-                                            span('Down', cls="sr-only")
-                                with tbody(cls="divide-y divide-gray-200") :
-                                    #TODO: Loop trough the fields
-                                    with tr():
-                                        td('Year', cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                        with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
-                                        with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
-                                        with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
-                with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4"):
-                    with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                        with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
-                            with table(cls="min-w-full divide-y divide-gray-300"):
-                                with thead():
-                                    with tr():
-                                        th('Y axis', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                        th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Remove', cls="sr-only"))
-                                        th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Up', cls="sr-only"))
-                                        with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
-                                            span('Down', cls="sr-only")
-                                with tbody(cls="divide-y divide-gray-200") :
-                                    #TODO: Loop trough the fields
-                                    with tr():
-                                        td('Employee', cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                        with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
-                                        with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
-                                        with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
-                with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4"):
-                    with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                        with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
-                            with table(cls="min-w-full divide-y divide-gray-300"):
-                                with thead():
-                                    with tr():
-                                        th('Aggregation fields', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                        th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Remove', cls="sr-only"))
-                                        with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
-                                            span('Aggregation type', cls="sr-only")
-                                with tbody(cls="divide-y divide-gray-200") :
-                                    #TODO: Loop trough the fields
-                                    with tr():
-                                        td('Duration', cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                        with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                            a(href="#", cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
-                                        with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                            with div():
-                                                with select(id="aggregation", name="aggregation", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
-                                                    option('Sum')
-                                                    option('Average')
-                                                    option('Max')
-                                                    option('Min')
-                                                    option('Count')
+                PivotHeader(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=table_properties,
+                    render=False).header_x()
+                PivotHeader(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=table_properties,
+                    render=False).header_y()
+                PivotHeader(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=table_properties,
+                    render=False).header_aggregation()
 
             '''
             grouping_fields = []
@@ -792,27 +741,632 @@ class Index(Component):
             grouping_fields.append(gf3)
             '''
 
-            # Format the values in a string (this way we dont need to difference
-            # between a normal call and the first call)
-            #TODO: set the default values based om the fields pickied by the user
-            grouping_fields = f'name={fields[0]}&position=column&hierarchy=0&state=closed&open_records=&__name={fields[1]}&position=row&hierarchy=0&state=closed&open_records=&'
-            #__name={fields[2]}&position=row&hierarchy=1&state=closed&open_records=&
+            show_error = True
+            grouping_fields = ''
+            result_fields = ''
 
-            result_fields = f'name={fields[3]}&operation=sum'
-            #Pivot(database_name=self.database_name, table_name=self.table_name,
-            #    grouping_fields=grouping_fields, result_fields=result_fields).render()
+            if table_properties != 'null':
+                x_fields = []
+                y_fields = []
+                aggregation_fields = []
 
-            #pivot_table = self.pivot_table(self.table_name, grouping_fields, result_fields)
+                for table_property in table_properties.split('__'):
+                    if table_property:
+                        tp = {}
+                        position = ''
+                        for field in table_property.split('&'):
+                            if field:
+                                tp[field.split('=')[0]] = field.split('=')[1]
+
+                        match tp['position']:
+                            case 'x':
+                                x_fields.append(tp)
+                            case 'y':
+                                y_fields.append(tp)
+                            case 'aggregation':
+                                aggregation_fields.append(tp)
+                # Sort each list using the "hierarchy" field
+                if x_fields:
+                    x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
+                if y_fields:
+                    y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
+                if aggregation_fields:
+                    aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
+
+                if len(x_fields) >= 1 and len(y_fields) >= 1 and len(aggregation_fields) >= 1:
+                    show_error = False
+                    # Prepare the group fields
+                    print(f'X FIELDS: {x_fields} \nY FIELDS: {y_fields} \nAGGREGATION FIELDS: {aggregation_fields}')
+                    for grouping_field in x_fields + y_fields:
+                        #TODO: what we do with open_records={grouping_field["open_records"]}??
+                        position = grouping_field["position"]
+                        if position == 'x':
+                            position = 'row'
+                        elif position == 'y':
+                            position = 'column'
+                        grouping_fields += f'name={grouping_field["name"]}&position={position}&hierarchy={grouping_field["hierarchy"]}&state=closed&open_records=&__'
+
+                    # Prepare the result fields
+                    for result_field in aggregation_fields:
+                        result_fields += f'name={result_field["name"]}&operation={result_field["aggregation"]}&__'
+
+
             with div(cls="mt-8 flow-root"):
                 with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                    #with div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
-                    Pivot(database_name=self.database_name, table_name=self.table_name,
-                        grouping_fields=grouping_fields, result_fields=result_fields)
-                    #self.pivot_table(self.table_name, grouping_fields, result_fields)
-        layout = Layout(title='PIVOT TEST')
+                    if show_error == True:
+                        div(cls="text-center").add(p('You need to select at least one field in each column to show a table', cls="mt-1 text-sm text-gray-500"))
+                    else:
+                        Pivot(database_name=self.database_name, table_name=self.table_name,
+                            grouping_fields=grouping_fields, result_fields=result_fields)
+
+        layout = Layout(title=f'{table_name} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
 
+
+class PivotHeader(Component):
+    'Pivot Header'
+    __name__ = 'www.pivot_header'
+    _path = None
+
+    header = fields.Char('Header')
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+
+    field = fields.Char('Field')
+    aggregation = fields.Char('Aggregation')
+
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_x/<string:table_properties>', endpoint='header_x'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_y/<string:table_properties>', endpoint='header_y'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_aggregation/<string:table_properties>', endpoint='header_aggregation'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/open_field_selection/<string:header>/<string:table_properties>', endpoint='open_field_selection'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/close_field_selection/<string:header>/<string:table_properties>', endpoint='close_field_selection'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/add_field_selection/<string:header>/<string:table_properties>', endpoint='add_field_selection'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/remove_field/<string:header>/<string:field>/<string:table_properties>', endpoint='remove_field'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/level_up_field/<string:header>/<string:field>/<string:table_properties>', endpoint='level_up_field'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/level_down_field/<string:header>/<string:field>/<string:table_properties>', endpoint='level_down_field'),
+        ]
+
+    def render(self):
+        pass
+
+    def header_x(self):
+        pool = Pool()
+        PivotHeader = pool.get('www.pivot_header')
+
+        fields = []
+        if self.table_properties != 'null':
+            for table_property in self.table_properties.split('__'):
+                if table_property:
+                    tp = {}
+                    for field in table_property.split('&'):
+                        if field:
+                            tp[field.split('=')[0]] = field.split('=')[1]
+                    if tp['position'] == 'x':
+                        fields.append(tp)
+
+            if fields:
+                fields = sorted(fields, key=lambda x: x['hierarchy'])
+
+        self.header = 'x'
+        print(f'self.table_properties: {self.table_properties}')
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4", id='header_x') as header_x:
+            div(id='field_selection_x')
+            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
+                    with table(cls="min-w-full divide-y divide-gray-300"):
+                        with thead():
+                            with tr():
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(
+                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>'))
+                                th('X axis', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Up', cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Down', cls="sr-only"))
+                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
+                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
+                                        hx_target="#field_selection_x",
+                                        hx_post=PivotHeader(header='x', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
+                                        hx_trigger="click", hx_swap="outerHTML").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
+                                    span('Remove', cls="sr-only")
+                        with tbody(cls="divide-y divide-gray-200") :
+                            for field in fields:
+                                with tr():
+                                    td(field['name'].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(
+                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(
+                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(
+                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
+        return header_x
+
+    def header_y(self):
+        pool = Pool()
+        PivotHeader = pool.get('www.pivot_header')
+
+        fields = []
+        if self.table_properties != 'null':
+            for table_property in self.table_properties.split('__'):
+                if table_property:
+                    tp = {}
+                    for field in table_property.split('&'):
+                        if field:
+                            tp[field.split('=')[0]] = field.split('=')[1]
+                    if tp['position'] == 'y':
+                        fields.append(tp)
+
+            if fields:
+                fields = sorted(fields, key=lambda x: x['hierarchy'])
+
+        self.header = 'y'
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4", id='header_y') as header_y:
+            div(id='field_selection_y')
+            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
+                    with table(cls="min-w-full divide-y divide-gray-300"):
+                        with thead():
+                            with tr():
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(
+                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>'))
+                                th('Y axis', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Up', cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Down', cls="sr-only"))
+                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
+                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
+                                        hx_target="#field_selection_y",
+                                        hx_post=PivotHeader(header='y', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
+                                        hx_trigger="click", hx_swap="outerHTML").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
+                                    span('Remove', cls="sr-only")
+                        with tbody(cls="divide-y divide-gray-200") :
+                            #TODO: Loop trough the fields
+                            for field in fields:
+                                with tr():
+                                    td(field['name'].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(
+                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
+        return header_y
+
+    def header_aggregation(self):
+        pool = Pool()
+        PivotHeader = pool.get('www.pivot_header')
+
+        fields = []
+        if self.table_properties != 'null':
+            for table_property in self.table_properties.split('__'):
+                if table_property:
+                    tp = {}
+                    for field in table_property.split('&'):
+                        if field:
+                            tp[field.split('=')[0]] = field.split('=')[1]
+                    if tp['position'] == 'aggregation':
+                        fields.append(tp)
+
+            if fields:
+                fields = sorted(fields, key=lambda x: x['hierarchy'])
+
+        self.header = 'aggregation'
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4", id='header_aggregation') as header_aggregation:
+            div(id='field_selection_aggregation')
+            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
+                    with table(cls="min-w-full divide-y divide-gray-300"):
+                        with thead():
+                            with tr():
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(
+                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>'))
+                                th('Aggregation fields', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Aggregation type', cls="sr-only"))
+                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
+                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
+                                        hx_target="#field_selection_aggregation",
+                                        hx_post=PivotHeader(header='aggregation', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
+                                        hx_trigger="click", hx_swap="outerHTML").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
+                                    span('Remove', cls="sr-only")
+                        with tbody(cls="divide-y divide-gray-200") :
+                            #TODO: Loop trough the fields
+                            for field in fields:
+                                with tr():
+                                    td(field['name'].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        with div():
+                                            with select(id="aggregation", name="aggregation", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6", disabled=True):
+                                                option(field['aggregation'].capitalize(), value=field['aggregation'])
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(
+                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
+        return header_aggregation
+
+    def open_field_selection(self):
+        pool = Pool()
+        PivotHeader = pool.get('www.pivot_header')
+
+        #print(f'=====\nOPEN FIElD SELECTION: {self.header} | {self.table_properties} \n=====')
+        name = None
+        match self.header:
+            case 'x':
+                name = 'field_selection_x'
+            case 'y':
+                name = 'field_selection_y'
+            case 'aggregation':
+                name = 'field_selection_aggregation'
+
+        #TODO: only show fields that are not selected
+        fields_used = []
+        if self.table_properties != 'null':
+            for table_property in self.table_properties.split('__'):
+                if table_property:
+                    for field in table_property.split('&'):
+                        if field and field.split('=')[0] == 'name':
+                            fields_used.append(field.split('=')[1])
+
+
+        cursor = Transaction().connection.cursor()
+        cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{self.table_name}';")
+        fields = cursor.fetchall()
+
+        with div(id=name, cls="relative z-10", aria_labelledby="modal-title", role="dialog", aria_modal="true") as field_slection:
+            div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
+            with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
+                with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
+                    with form(action=self.url('add_field_selection') ,method="POST", cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
+                        with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
+                            #TODO: replace with a link (a) and add htmx trigger
+
+                            with a(href="#",
+                                    hx_target=f"#{name}",
+                                    hx_post=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, table_properties=self.table_properties, render=False).url('close_field_selection'),
+                                    hx_trigger="click", hx_swap="outerHTML",
+                                    cls="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"):
+                                span('Close', cls="sr-only")
+                                raw('<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
+                        with div(cls="sm:flex sm:items-start"):
+                            with div(cls="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left"):
+                                h3('Select a field to add:', cls="text-base font-semibold leading-6 text-gray-900", id="modal-title")
+                                with div(cls="mt-2"):
+                                    with select(id="field", name="field", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
+                                        for field in fields:
+                                            if field[0] not in fields_used:
+                                                option(field[0].capitalize(), value=field[0])
+                                    if self.header == 'aggregation':
+                                        with select(id="aggregation", name="aggregation", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
+                                            option('Sum')
+                                            option('Average')
+                                            option('Max')
+                                            option('Min')
+                                            option('Count')
+                        with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
+                            button('Add', type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
+                            a('Cancel', href="#",
+                                hx_target=f"#{name}",
+                                hx_post=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, table_properties=self.table_properties, render=False).url('close_field_selection'),
+                                hx_trigger="click", hx_swap="outerHTML",
+                                cls="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto")
+        return field_slection
+
+    def close_field_selection(self):
+        name = None
+        match self.header:
+            case 'x':
+                name = 'field_selection_x'
+            case 'y':
+                name = 'field_selection_y'
+            case 'aggregation':
+                name = 'field_selection_aggregation'
+
+        field_selection = div(id=name)
+        return field_selection
+
+    def add_field_selection(self):
+        pool = Pool()
+        Index = pool.get('www.index')
+        # If we have 'null" as value, is like is empty
+        table_properties = 'null'
+        if self.table_properties == 'null':
+            # If we dont have any element we can add the field without check anything
+            table_properties = f'name={self.field}&position={self.header}&hierarchy=0&__'
+        else:
+            x_fields = []
+            y_fields = []
+            aggregation_fields = []
+
+            # Transform the string into a list of dictionaries for each property
+            for table_property in self.table_properties.split('__'):
+                if table_property:
+                    tp = {}
+                    for field in table_property.split('&'):
+                        if field:
+                            tp[field.split('=')[0]] = field.split('=')[1]
+
+                    match tp['position']:
+                        case 'x':
+                            x_fields.append(tp)
+                        case 'y':
+                            y_fields.append(tp)
+                        case 'aggregation':
+                            aggregation_fields.append(tp)
+
+            # Sort each list using the "hierarchy" field
+            if x_fields:
+                x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
+            if y_fields:
+                y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
+            if aggregation_fields:
+                aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
+
+            # Add the new field to the list
+            new_field = {}
+            new_field['name'] = self.field
+            new_field['position'] = self.header
+            new_field['hierarchy'] = 0
+
+            match self.header:
+                case 'x':
+                    if x_fields and x_fields[-1] and x_fields[-1]['hierarchy']:
+                        new_field['hierarchy'] = int(x_fields[-1]['hierarchy']) + 1
+                    x_fields.append(new_field)
+                case 'y':
+                    if y_fields and y_fields[-1] and y_fields[-1]['hierarchy']:
+                        new_field['hierarchy'] = int(y_fields[-1]['hierarchy']) + 1
+                    y_fields.append(new_field)
+                case 'aggregation':
+                    new_field['aggregation'] = self.aggregation
+                    if aggregation_fields and aggregation_fields[-1] and aggregation_fields[-1]['hierarchy']:
+                        new_field['hierarchy'] = int(aggregation_fields[-1]['hierarchy']) + 1
+                    aggregation_fields.append(new_field)
+
+            # Transform again to string
+            table_properties = ''
+            for field in x_fields:
+                table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
+            for field in y_fields:
+                table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
+            for field in aggregation_fields:
+                table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
+
+        print(f'TABLE PROPERTIES: {table_properties}')
+        # Redirect to the index table
+        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
+
+    def remove_field(self):
+        # In this case we assume that we always have table_properties
+        pool = Pool()
+        Index = pool.get('www.index')
+        print(f'REMOVE FIELD: {self.field}')
+
+        x_fields = []
+        y_fields = []
+        aggregation_fields = []
+
+        # Transform the string into a list of dictionaries for each property
+        # and remove the field
+        hierarchy = None
+        for table_property in self.table_properties.split('__'):
+            remove_field = False
+            if table_property:
+                tp = {}
+                for field in table_property.split('&'):
+                    if field:
+                        if field.split('=')[0] == 'hierarchy':
+                            tp[field.split('=')[0]] = int(field.split('=')[1])
+                        else:
+                            tp[field.split('=')[0]] = field.split('=')[1]
+                        if (field.split('=')[0] == 'name' and
+                                field.split('=')[1] == self.field):
+                            remove_field = True
+                if remove_field:
+                    hierarchy = tp['hierarchy']
+
+                if not remove_field:
+                    match tp['position']:
+                        case 'x':
+                            x_fields.append(tp)
+                        case 'y':
+                            y_fields.append(tp)
+                        case 'aggregation':
+                            aggregation_fields.append(tp)
+
+        # Sort each list using the "hierarchy" field
+        if x_fields:
+            if self.header == 'x':
+                for x_field in x_fields:
+                    if x_field['hierarchy'] > hierarchy:
+                        x_field['hierarchy'] -= 1
+            x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
+        if y_fields:
+            if self.header == 'y':
+                for y_field in y_fields:
+                    if y_field['hierarchy'] > hierarchy:
+                        y_field['hierarchy'] -= 1
+            y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
+        if aggregation_fields:
+            if self.header == 'y':
+                for aggregation_field in aggregation_fields:
+                    if aggregation_field['hierarchy'] > hierarchy:
+                        aggregation_field['hierarchy'] -= 1
+            aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
+
+        # Transform again to string
+        table_properties = ''
+        for field in x_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
+        for field in y_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
+        for field in aggregation_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
+
+        # In case we delete all the fields
+        if table_properties == '':
+            table_properties = 'null'
+        # Send the new table properties (redirect to index)
+        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
+
+    def level_up_field(self):
+        pool = Pool()
+        Index = pool.get('www.index')
+
+        x_fields = []
+        y_fields = []
+        aggregation_fields = []
+
+        # Transform the string into a list of dictionaries for each property
+        # and remove the field
+        hierarchy = None
+        for table_property in self.table_properties.split('__'):
+            if table_property:
+                tp = {}
+                for field in table_property.split('&'):
+                    if field:
+                        if (field.split('=')[0] == 'hierarchy' and
+                                field.split('=')[1]):
+                            tp[field.split('=')[0]] = int(field.split('=')[1])
+                        else:
+                            tp[field.split('=')[0]] = field.split('=')[1]
+                if (tp['name'] == self.field):
+                    hierarchy = tp['hierarchy']-1
+                match tp['position']:
+                    case 'x':
+                        x_fields.append(tp)
+                    case 'y':
+                        y_fields.append(tp)
+                    case 'aggregation':
+                        aggregation_fields.append(tp)
+        # Get the property to modify using self.header
+        #TODO: search a better way of do this
+        match self.header:
+            case 'x':
+                for field in x_fields:
+                    #import pdb; pdb.set_trace()
+                    if (field['hierarchy'] == hierarchy and
+                            field['name'] != self.field):
+                        field['hierarchy'] += 1
+                    if field['name'] == self.field:
+                        field['hierarchy'] -= 1
+            case 'y':
+                for field in y_fields:
+                    if (field['hierarchy'] == hierarchy and
+                            field['name'] != self.field):
+                        field['hierarchy'] += 1
+                    if field['name'] == self.field:
+                        field['hierarchy'] -= 1
+            case 'aggregation':
+                for field in aggregation_fields:
+                    if (field['hierarchy'] == hierarchy and
+                            field['name'] != self.field):
+                        field['hierarchy'] += 1
+                    if field['name'] == self.field:
+                        field['hierarchy'] -= 1
+
+        # Sort each list using the "hierarchy" field
+        if x_fields:
+                x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
+        if y_fields:
+            y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
+        if aggregation_fields:
+            aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
+
+        # Transform again to string
+        table_properties = ''
+        for field in x_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
+        for field in y_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
+        for field in aggregation_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
+        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
+
+    def level_down_field(self):
+        pool = Pool()
+        Index = pool.get('www.index')
+
+        x_fields = []
+        y_fields = []
+        aggregation_fields = []
+
+        # Transform the string into a list of dictionaries for each property
+        # and remove the field
+        hierarchy = None
+        for table_property in self.table_properties.split('__'):
+            if table_property:
+                tp = {}
+                for field in table_property.split('&'):
+                    if field:
+                        if (field.split('=')[0] == 'hierarchy' and
+                                field.split('=')[1]):
+                            tp[field.split('=')[0]] = int(field.split('=')[1])
+                        else:
+                            tp[field.split('=')[0]] = field.split('=')[1]
+                if (tp['name'] == self.field):
+                    hierarchy = tp['hierarchy']+1
+                match tp['position']:
+                    case 'x':
+                        x_fields.append(tp)
+                    case 'y':
+                        y_fields.append(tp)
+                    case 'aggregation':
+                        aggregation_fields.append(tp)
+        # Get the property to modify using self.header
+        #TODO: search a better way of do this
+        match self.header:
+            case 'x':
+                for field in x_fields:
+                    #import pdb; pdb.set_trace()
+                    if (field['hierarchy'] == hierarchy and
+                            field['name'] != self.field):
+                        field['hierarchy'] -= 1
+                    if field['name'] == self.field:
+                        field['hierarchy'] += 1
+            case 'y':
+                for field in y_fields:
+                    if (field['hierarchy'] == hierarchy and
+                            field['name'] != self.field):
+                        field['hierarchy'] -= 1
+                    if field['name'] == self.field:
+                        field['hierarchy'] += 1
+            case 'aggregation':
+                for field in aggregation_fields:
+                    if (field['hierarchy'] == hierarchy and
+                            field['name'] != self.field):
+                        field['hierarchy'] -= 1
+                    if field['name'] == self.field:
+                        field['hierarchy'] += 1
+
+        # Sort each list using the "hierarchy" field
+        if x_fields:
+                x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
+        if y_fields:
+            y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
+        if aggregation_fields:
+            aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
+
+        # Transform again to string
+        table_properties = ''
+        for field in x_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
+        for field in y_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
+        for field in aggregation_fields:
+            table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
+        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
 
 class PivotTable(Component):
     'Pivot Table'
@@ -831,9 +1385,6 @@ class PivotTable(Component):
         ]
 
     def render(self):
-        #parse values
-        print(f'\nGROUPING FIELDS: {self.grouping_fields}')
-
         grouping_fields = []
         for grouping_field in self.grouping_fields.split('__'):
             if grouping_field:
@@ -857,9 +1408,6 @@ class PivotTable(Component):
 
         table_structure = TableStrucutre([], [], {})
         operations = deque()
-
-        for grouping_field in grouping_fields:
-            print(f'GROUPING FIELD: {grouping_field.name} | {grouping_field.position} | {grouping_field.hierarchy} | {grouping_field.state} | {grouping_field.open_records}')
 
         for grouping_field in grouping_fields:
             operations.append(
