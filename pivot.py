@@ -4,7 +4,7 @@ from werkzeug.routing import Rule
 from werkzeug.utils import redirect, send_from_directory
 from dominate.tags import (div, h1, h2, p, a, form, button, span, table, thead,
     tbody, tr, td, input_, br, head, html, body, meta, link, title, script, h3,
-    comment, section, header, nav, ul, li, img, footer, label, ol, dl, dt, dd,
+    comment, section, nav, ul, li, img, footer, label, ol, dl, dt, dd,
     select, option, main, th, fieldset, legend, h4, time_, h5, aside)
 from dominate.util import raw
 from trytond.model import fields
@@ -72,8 +72,16 @@ class Operation:
         # Calculate only the total (like using a sum)
         if self.position == 'row':
             table_structure.rows.append(h)
+            for row in table_structure.rows:
+                # TODO: for now this works with two levels, we need to makit work with infinite levels
+                if row.hierarchy == self.hierarchy and not row.parent and self.name != row.name:
+                    row.hierarchy += 1
         elif self.position == 'column':
             table_structure.columns.append(h)
+            for column in table_structure.columns:
+                # TODO: for now this works with two levels, we need to makit work with infinite levels
+                if column.hierarchy == self.hierarchy and not column.parent and self.name != column.name:
+                    column.hierarchy += 1
         else:
             raise
 
@@ -81,10 +89,10 @@ class Operation:
 
     def select_open(self, table_structure):
         # We need to get the child level
-        print('SELECT OPEN')
         cursor = Transaction().connection.cursor()
         cursor.execute(f'SELECT {self.name} FROM {self.table} GROUP BY {self.name} ORDER BY {self.name};')
 
+        print('SELECT OPEN')
         h = Header(self.name, None, self.hierarchy, self.position, [], self.record_state)
         if self.position == 'row':
             table_structure.table_rows.append(h)
@@ -96,6 +104,9 @@ class Operation:
             # Only add as row the first level of the table
             if self.hierarchy == 0:
                 table_structure.columns.append(h)
+
+        #TODO: if we open a record, we need to search if thers any other column
+        # in that level and aguemt the level in 1 for this column
 
         results = cursor.fetchall()
         new_operations = []
@@ -180,10 +191,15 @@ class Operation:
                         # Get the list of each parent
                         cursor.execute(f'SELECT {",".join(table_strucutre_columns)}, {aggregate_fields} FROM {self.table} GROUP BY {",".join(table_strucutre_columns)} ORDER BY {",".join(table_strucutre_columns)};')
                         results = cursor.fetchall()
-                        #if results:
-                        #    for result in results:
-
-
+                        if results:
+                            for result in results:
+                                coordinates = list(result[:-1])
+                                coordinates.append(None)
+                                if tuple(coordinates) not in values.keys():
+                                    values[tuple(coordinates)] = {}
+                                if aggregation not in values[tuple(coordinates)].keys():
+                                    values[tuple(coordinates)][aggregation] = {}
+                                values[tuple(coordinates)][aggregation] = result[-1]
                     else:
                         continue
                 for hierarchy_row in hierarchy_rows:
@@ -222,7 +238,6 @@ class Operation:
                                 results = cursor.fetchall()
                                 if results:
                                     for result in results:
-                                        test = (result[:len(table_strucutre_rows)])
                                         if (result[:len(table_strucutre_rows)]) not in values.keys():
                                             values[(result[:len(table_strucutre_rows)])] = {}
                                         if aggregation not in values[(result[:len(table_strucutre_rows)])].keys():
@@ -251,6 +266,7 @@ class Operation:
         # calculate all the values of each row
         # The column list (the first row of the table) contain all the columns + a space for each row
         # Get the hierarchy levels of the columns and rows
+        print([(t.name, t.hierarchy) for t in table_structure.columns])
         hierarchy_columns = [t.hierarchy for t in table_structure.columns]
         hierarchy_columns.sort()
         hierarchy_columns = list(set(hierarchy_columns))
@@ -266,15 +282,31 @@ class Operation:
             index_child = index + 1
 
             lines_to_add = []
+            last_row_open = None
+            specific_record_column_open = None
             while create_childs_rows:
                 create_childs_rows = False
                 for table_structure_child_row in table_structure.rows:
                     row = tr()
-                    table_value_row_cordinates = [] + table_value_row_cordinates_
+                    table_value_row_cordinates = []
+
                     if table_structure_child_row.hierarchy == hierarchy_row_child:
+                        # Any sublevel show the original table name, only the
+                        # record name, the only columns where we see the column
+                        # name are the level 0 columns
                         for i in range(index_child):
                             row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                        row.add(td(str(table_structure_child_row.name), cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                        #print(f'\n<<<< NAME4: {table_structure_child_row.name} | {table_structure_child_row.hierarchy}')
+
+                        #TODO: close sublevel dont work
+                        grouping_fields, result_fields = self.create_url(table_structure_child_row)
+                        row.add(td(a(str(table_structure_child_row.name), href="#",
+                                hx_target="#pivot_table",
+                                hx_post=Pivot(database_name=self.database_name,
+                                    table_name=self.table, grouping_fields=grouping_fields,
+                                    result_fields=result_fields, render=False).url(),
+                                hx_trigger="click", hx_swap="outerHTML"),
+                            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
 
                         for i in range(len(hierarchy_rows)-(index_child+1)):
                             row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
@@ -282,6 +314,15 @@ class Operation:
                         table_value_row_cordinates.append(table_structure_child_row.name)
 
                         for table_structure_column in table_structure.columns:
+                            if (table_structure_column.hierarchy != hierarchy_columns[0] and
+                                    table_structure_column.parent == None and
+                                    table_structure_column.state == 'closed'):
+                                continue
+                            if table_structure_column.state == 'closed' and specific_record_column_open and specific_record_column_open < table_structure_column.hierarchy:
+                                continue
+                            if table_structure_column.hierarchy != hierarchy_columns[0] and not table_structure_column.record_parents:
+                                continue
+                            #TODO: use the record_childs / record_parents to know if we need to show a specific collumn
                             for aggregation in table_structure.aggregations:
                                 table_value_column_cordinates = []
                                 value = '0'
@@ -291,8 +332,14 @@ class Operation:
                                     table_value_column_cordinate = None
                                 table_value_column_cordinates.append(table_value_column_cordinate)
 
-                                coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
+                                coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates_ + table_value_row_cordinates)
+                                if coordinates in table_structure.values.keys():
+                                    if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
+                                        value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
+                                        if value == {}:
+                                            value = '0'
 
+                                coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
                                 if coordinates in table_structure.values.keys():
                                     if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
                                         value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
@@ -301,16 +348,84 @@ class Operation:
 
                                 # If we have value = '0' we need to check if any of the coordinates is "None" and try to search again without this coordinate:
                                 if value == '0':
+                                    last_none = False
+                                    new_coordinates = []
+                                    for coordinate in coordinates:
+                                        if not coordinate:
+                                            if last_none:
+                                                last_none = False
+                                                continue
+                                            else:
+                                                last_none = True
+                                                new_coordinates.append(coordinate)
+                                        else:
+                                            last_none = False
+                                            new_coordinates.append(coordinate)
+                                    #coordinates = tuple([c for c in list(coordinates) if c != None])
+                                    coordinates = tuple(new_coordinates)
+                                    if coordinates in table_structure.values.keys():
+                                        if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
+                                            value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
+                                            if value == {}:
+                                                value = '0'
+
+                                # If all the values in a coordinate are null, try to search using only the values of one coordinate
+                                if value == '0':
+                                    coordinates = []
+                                    if len(set(table_value_column_cordinates)) != 1 and set(table_value_column_cordinates) != {None}:
+                                        coordinates += table_value_column_cordinates
+                                    if len(set(table_value_row_cordinates_)) != 1 and set(table_value_row_cordinates_) != {None}:
+                                        coordinates += table_value_row_cordinates_
+                                    if len(set(table_value_row_cordinates)) == 1 and set(table_value_row_cordinates) == {None}:
+                                        coordinates += table_value_row_cordinates
+
+                                    coordinates = tuple(coordinates)
+                                    if coordinates in table_structure.values.keys():
+                                        if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
+                                            value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
+                                            if value == {}:
+                                                value = '0'
+
+                                if value == '0':
+                                    coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates_ + table_value_row_cordinates)
                                     coordinates = tuple([c for c in list(coordinates) if c != None])
                                     if coordinates in table_structure.values.keys():
                                         if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
                                             value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
                                             if value == {}:
                                                 value = '0'
+                                #print(f'COORDINATES0: {coordinates}\n    VALUE: {value}')
                                 row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4"))
-                        if table_structure_child_row.state == 'open':
-                            create_childs_rows = True
+                                if table_structure_column.state == 'open':
+                                    specific_record_column_open = table_structure_column.hierarchy
+                                if table_structure_column.state == 'open' and specific_record_column_open:
+                                    for record_child in table_structure_column.record_childs:
+                                        table_value_column_cordinates = []
+                                        table_value_column_cordinates.append(table_structure_column.name)
+                                        table_value_column_cordinates.append(record_child.name)
+
+                                        coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
+
+                                        value = '0'
+                                        if (coordinates) in table_structure.values.keys():
+                                            if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
+                                                value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
+                                                if value == {}:
+                                                    value = '0'
+                                        if value == '0':
+                                            coordinates = tuple([c for c in list(coordinates) if c != None])
+                                            if (coordinates) in table_structure.values.keys():
+                                                if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
+                                                    value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
+                                                    if value == {}:
+                                                        value = '0'
+                                        #print(f'COORDINATES0.1: {coordinates}\n    VALUE: {value}')
+                                        row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4"))
                         lines_to_add.append(row)
+                        if table_structure_child_row.state == 'open' and table_structure_child_row != last_row_open:
+                            child_rows = create_row_childs(table_value_row_cordinates, hierarchy_row_child, index_child)
+                            lines_to_add += child_rows
+                            last_row_open = table_structure_child_row
                 index_child += 1
             return lines_to_add
 
@@ -325,13 +440,16 @@ class Operation:
                 row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
             first_column = True
 
+            #TODO: In the first header, we need to know how much records are open
             if specific_record_column_open and specific_record_column_open < hierarchy_column:
                 row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                 for table_strucutre_column in table_structure.columns:
                     if table_strucutre_column.hierarchy == specific_record_column_open:
                         if table_strucutre_column.record_childs:
                             row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+
                             for record_child in table_strucutre_column.record_childs:
+                                #TODO: add url
                                 row.add(td(record_child.name,cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                         else:
                             row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
@@ -342,19 +460,30 @@ class Operation:
                     if hierarchy_column != hierarchy_columns[0] and first_column:
                         first_column = False
                         parent = table_structure_column.parent
-                        while parent:
-                            row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                            parent = parent.parent
+                        if parent and parent.state == 'open':
+                            while parent:
+                                row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                                parent = parent.parent
 
-                        grouping_fields, result_fields = self.create_url(table_structure_column)
-                        row.add(td(a(table_structure_column.name, href="#",
-                                hx_target="#pivot_table",
-                                hx_post=Pivot(database_name=self.database_name,
-                                    table_name=self.table, grouping_fields=grouping_fields,
-                                    result_fields=result_fields, render=False).url(),
-                                hx_trigger="click", hx_swap="outerHTML"),
-                            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                            #print(f'\n<<<< NAME1: {table_structure_column.name} ')
+                            # If we are in the last level, dont use a link
+                            grouping_fields, result_fields = self.create_url(table_structure_column)
+                            row.add(td(a(table_structure_column.name, href="#",
+                                    hx_target="#pivot_table",
+                                    hx_post=Pivot(database_name=self.database_name,
+                                        table_name=self.table, grouping_fields=grouping_fields,
+                                        result_fields=result_fields, render=False).url(),
+                                    hx_trigger="click", hx_swap="outerHTML"),
+                                cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                        else:
+                            # If we dont have a parent, and we are in antoher that the first level dont show anything?
+                            row = tr()
+                            continue
+
                     else:
+                        if table_structure_column.parent and table_structure_column.parent.state != 'open':
+                            continue
+                        #print(f'\n<<<< NAME2: {table_structure_column.name} ')
                         grouping_fields, result_fields = self.create_url(table_structure_column)
                         row.add(td(a(table_structure_column.name, href="#",
                                     hx_target="#pivot_table",
@@ -363,39 +492,65 @@ class Operation:
                                         result_fields=result_fields, render=False).url(),
                                     hx_trigger="click", hx_swap="outerHTML"),
                             cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                        #row.add(td(table_structure_column.name,cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                        for child in table_structure_column.childs:
-                            row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                         #TODO: add news columns of childs
                     if table_structure_column.state == 'open':
                         specific_record_column_open = hierarchy_column
+
                         for table_structure_child_column in table_structure.columns:
                             if table_structure_child_column.hierarchy == hierarchy_column + 1:
                                 table_structure_column.record_childs.append(table_structure_child_column)
                                 table_structure_child_column.record_parents.append(table_structure_column)
                                 row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                                if table_structure_child_column.state == 'open':
+                                    create_child_columns = True
+                                    hierarchy_child_column = hierarchy_column + 1
+                                    while create_child_columns:
+                                        create_child_columns = False
+                                        for table_structure_child_column in table_structure.columns:
+                                            if table_structure_child_column.hierarchy == hierarchy_child_column + 1:
+                                                row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                                                if table_structure_child_column.state == 'open':
+                                                    create_child_columns = True
+                                        hierarchy_child_column += 1
             table_to_show.append(row)
+
 
         index = 0
         # If true, we dont show the next level or any other level by default, only if the header is "open"
         specific_record_row_open = None
+        specific_record_column_open = None
+        # We need to know what is the uppler level state to know if we need to try to calculate the sublevles
+        first_row_level_state = None
+        upper_row_level_state = None
         for hierarchy_row in hierarchy_rows:
             # Fill row headers
             for table_structure_row in table_structure.rows:
                 row = tr()
 
                 if table_structure_row.hierarchy == hierarchy_row:
+                    # If we have the first level closed dont let open any other sublevel
+                    if (table_structure_row.hierarchy != hierarchy_rows[0] and
+                            first_row_level_state and
+                            first_row_level_state == 'closed'):
+                        continue
                     # This "if" dont let the script create more sublevels if we
                     # have any open, this way, we dont have at the end the
                     # sublevels rows with "0" as value (because they dont have a value)
-                    if specific_record_row_open and specific_record_row_open < table_structure_row.hierarchy:
+                    if ((isinstance(specific_record_row_open, int) and
+                            specific_record_row_open < table_structure_row.hierarchy) or
+                            (upper_row_level_state == 'closed')):
+                        #print('=========== CONTINUE ===========')
                         continue
-                    #row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+
+                    if (table_structure_row.hierarchy != hierarchy_rows[0] and
+                            table_structure_row.parent == None and
+                            table_structure_row.state == 'closed'):
+                        continue
                     for i in range(index):
                         row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                     #TODO: URL
                     grouping_fields, result_fields = self.create_url(table_structure_row)
-
+                    #print(f'<<<< NAME3: {table_structure_row.name}\n    grouping_fields: {grouping_fields}\n    result_fields: {result_fields}')
                     row.add(td(a(table_structure_row.name, href="#",
                             hx_target="#pivot_table",
                             hx_post=Pivot(database_name=self.database_name,
@@ -414,6 +569,12 @@ class Operation:
                         table_value_row_cordinates.append(table_structure_row.name)
 
                     for table_structure_column in table_structure.columns:
+                        if (table_structure_column.hierarchy != hierarchy_columns[0] and
+                                table_structure_column.parent == None and
+                                table_structure_column.state == 'closed'):
+                            continue
+                        if table_structure_column.state == 'closed' and specific_record_column_open and specific_record_column_open < table_structure_column.hierarchy:
+                                continue
                         for aggregation in table_structure.aggregations:
                             value = '0'
 
@@ -424,14 +585,15 @@ class Operation:
                                 table_value_column_cordinates.append(table_structure_column.name)
 
                             coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
-
                             if (coordinates) in table_structure.values.keys():
                                 if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
                                     value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
                                     if value == {}:
                                         value = '0'
+                            #print(f'COORDINATES1: {coordinates}\n    VALUE: {value}')
                             row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4"))
-
+                            if table_structure_column.state == 'open':
+                                specific_record_column_open = table_structure_column.hierarchy
                             if table_structure_column.state == 'open' and specific_record_column_open:
                                 #TODO: we need to remade this section
                                 for record_child in table_structure_column.record_childs:
@@ -442,19 +604,30 @@ class Operation:
                                     #TODO: loop to navigate multiple open levles
                                     coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
 
+                                    value = '0'
                                     if (coordinates) in table_structure.values.keys():
                                         if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
                                             value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
                                             if value == {}:
                                                 value = '0'
+                                    if value == '0':
+                                        coordinates = tuple([c for c in list(coordinates) if c != None])
+                                        if (coordinates) in table_structure.values.keys():
+                                            if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
+                                                value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
+                                                if value == {}:
+                                                    value = '0'
+                                    #print(f'COORDINATES2: {coordinates}\n    VALUE: {value}')
                                     row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4"))
                     table_to_show.append(row)
+                    #TODO: if closed dont open sublevels
+                    if table_structure_row.hierarchy == hierarchy_rows[0]:
+                        first_row_level_state = table_structure_row.state
                     if table_structure_row.state == 'open':
                         specific_record_row_open = hierarchy_row
                         child_rows = create_row_childs(table_value_row_cordinates, hierarchy_row, index)
                         table_to_show += child_rows
             index += 1
-        #print(tabulate(table_to_show, tablefmt='fancy_grid'))
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
         for row in table_to_show:
             pivot_table.add(row)
@@ -491,29 +664,48 @@ class Operation:
                     #new_grouping_field = grouping_field
 
         if not new_grouping_field:
-            #TODO: we need to serach what we do in this case
             raise
         if new_grouping_field.state == 'closed':
-            if not new_grouping_field:
-                new_grouping_field = GroupingField()
-                new_grouping_field.name = cell.name
-                new_grouping_field.position = cell.position
-                new_grouping_field.hierarchy = cell.hierarchy
-                new_grouping_field.state = 'open'
-                new_grouping_field.open_records = []
-            elif new_grouping_field and parent:
+            if new_grouping_field and parent:
                 if not new_grouping_field.open_records:
                     new_grouping_field.open_records = [cell.name]
                 else:
                     new_grouping_field.open_records.append(cell.name)
             else:
+                new_grouping_field.open_records = []
                 new_grouping_field.state = 'open'
         else:
-            if new_grouping_field and parent:
-                if new_grouping_field.open_records:
-                    new_grouping_field.open_records.remove(cell.name)
+            if cell.state == 'open':
+                if new_grouping_field and parent:
+                    if new_grouping_field.open_records:
+                        open_records = new_grouping_field.open_records.replace(
+                            '[', '').replace(']', '').replace(' ', '').replace("'", '').split(',')
+                        if str(cell.name) in open_records:
+                            open_records.remove(str(cell.name))
+                            if not open_records:
+                                open_records = []
+                            new_grouping_field.open_records = open_records
+                else:
+                    new_grouping_field.state = 'closed'
             else:
-                new_grouping_field.state = 'closed'
+                if new_grouping_field and parent:
+                    # In the case we open a level with parent, we need to open
+                    # her sublevel too
+                    for grouping_field in self.grouping_fields:
+                        if grouping_field.hierarchy == cell.hierarchy:
+                            grouping_field.state = 'open'
+
+                    if not new_grouping_field.open_records:
+                        new_grouping_field.open_records = [cell.name]
+                    else:
+                        open_records = new_grouping_field.open_records.replace(
+                            '[', '').replace(']', '').replace(' ', '').split(',')
+                        open_records.append(cell.name)
+                        new_grouping_field.open_records = open_records
+                else:
+                    new_grouping_field.state = 'closed'
+
+        #TODO: we need a better way to handle closed levels
 
         # Adapt to the url format
         grouping_fields = ''
@@ -524,7 +716,10 @@ class Operation:
                 new_record_added = True
                 grouping_fields += f'name={new_grouping_field.name}&position={new_grouping_field.position}&hierarchy={new_grouping_field.hierarchy}&state={new_grouping_field.state}&open_records={new_grouping_field.open_records}&__'
             else:
-                grouping_fields += f'name={grouping_field.name}&position={grouping_field.position}&hierarchy={grouping_field.hierarchy}&state={grouping_field.state}&open_records={grouping_field.open_records}&__'
+                if cell.state == 'open' and grouping_field.hierarchy >= cell.hierarchy:
+                    grouping_fields += f'name={grouping_field.name}&position={grouping_field.position}&hierarchy={grouping_field.hierarchy}&state=closed&open_records=&__'
+                else:
+                    grouping_fields += f'name={grouping_field.name}&position={grouping_field.position}&hierarchy={grouping_field.hierarchy}&state={grouping_field.state}&open_records={grouping_field.open_records}&__'
         if not new_record_added:
             grouping_fields += f'name={new_grouping_field.name}&position={new_grouping_field.position}&hierarchy={new_grouping_field.hierarchy}&state={new_grouping_field.state}&open_records={new_grouping_field.open_records}&__'
 
@@ -573,19 +768,6 @@ class GroupingField:
     # Open records structure waited: [(level0, level1, level2, ...)]
     open_records = []
 
-    """     def __init__(self, name, position, hierarchy, state, open_records):
-        # Name of the column
-        self.name = name
-        # Position of the field (column or row)
-        self.position = position
-        # Position of the field (column or row)
-        self.hierarchy = hierarchy
-        # State of the field (open or closed)
-        self.state = state
-        # Specific records open in this level
-        # Open records structure waited: [(level0, level1, level2, ...)]
-        self.open_records = open_records """
-
     def create_operation(self, table=None):
         op = Operation()
         op.name = self.name
@@ -594,11 +776,12 @@ class GroupingField:
         op.state = self.state
         op.table = table
         op.open_records = self.open_records
-        op.record_state = 'closed'
 
         if self.state == 'closed':
+            op.record_state = 'closed'
             op.operation = 'select_closed'
         elif self.state == 'open':
+            op.record_state = 'open'
             op.operation = 'select_open'
         else:
             raise
@@ -708,8 +891,6 @@ class Index(Component):
         else:
             table_properties = self.table_properties
 
-        print(f'>>> HEADER TABLE PROPERTIES: {table_properties}')
-
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-2"):
                 div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
@@ -776,7 +957,6 @@ class Index(Component):
                 if len(x_fields) >= 1 and len(y_fields) >= 1 and len(aggregation_fields) >= 1:
                     show_error = False
                     # Prepare the group fields
-                    print(f'X FIELDS: {x_fields} \nY FIELDS: {y_fields} \nAGGREGATION FIELDS: {aggregation_fields}')
                     for grouping_field in x_fields + y_fields:
                         #TODO: what we do with open_records={grouping_field["open_records"]}??
                         position = grouping_field["position"]
@@ -854,7 +1034,6 @@ class PivotHeader(Component):
                 fields = sorted(fields, key=lambda x: x['hierarchy'])
 
         self.header = 'x'
-        print(f'self.table_properties: {self.table_properties}')
         with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4", id='header_x') as header_x:
             div(id='field_selection_x')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
@@ -878,13 +1057,15 @@ class PivotHeader(Component):
                                 with tr():
                                     td(field['name'].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(
-                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
+                                        if field != fields[0]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(
+                                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(
-                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
+                                        if field != fields[-1]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(
+                                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
                                             cls="text-indigo-600 hover:text-indigo-900").add(
@@ -934,11 +1115,13 @@ class PivotHeader(Component):
                                 with tr():
                                     td(field['name'].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
+                                        if field != fields[0]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
+                                        if field != fields[-1]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
                                             cls="text-indigo-600 hover:text-indigo-900").add(
@@ -1000,7 +1183,6 @@ class PivotHeader(Component):
         pool = Pool()
         PivotHeader = pool.get('www.pivot_header')
 
-        #print(f'=====\nOPEN FIElD SELECTION: {self.header} | {self.table_properties} \n=====')
         name = None
         match self.header:
             case 'x':
@@ -1143,7 +1325,6 @@ class PivotHeader(Component):
             for field in aggregation_fields:
                 table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
 
-        print(f'TABLE PROPERTIES: {table_properties}')
         # Redirect to the index table
         return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
 
@@ -1151,7 +1332,6 @@ class PivotHeader(Component):
         # In this case we assume that we always have table_properties
         pool = Pool()
         Index = pool.get('www.index')
-        print(f'REMOVE FIELD: {self.field}')
 
         x_fields = []
         y_fields = []
@@ -1255,7 +1435,6 @@ class PivotHeader(Component):
         match self.header:
             case 'x':
                 for field in x_fields:
-                    #import pdb; pdb.set_trace()
                     if (field['hierarchy'] == hierarchy and
                             field['name'] != self.field):
                         field['hierarchy'] += 1
@@ -1329,7 +1508,6 @@ class PivotHeader(Component):
         match self.header:
             case 'x':
                 for field in x_fields:
-                    #import pdb; pdb.set_trace()
                     if (field['hierarchy'] == hierarchy and
                             field['name'] != self.field):
                         field['hierarchy'] -= 1
@@ -1444,4 +1622,3 @@ class PivotTable(Component):
                 op.result_fields = result_fields
                 op.database_name = self.database_name
                 operations.append(op)
-

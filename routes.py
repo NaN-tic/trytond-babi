@@ -8,10 +8,7 @@ from trytond.wsgi import app
 @with_pool
 @with_transaction(readonly=False)
 def pivot(request, pool, path):
-    print('== PIVOT FUNCTION ==')
     Site = pool.get('www.site')
-
     site_type = 'babi_pivot'
     site_id = 1
-
     return Site.dispatch(site_type, site_id, request)
