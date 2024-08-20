@@ -193,6 +193,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ], ondelete='SET NULL', states={
             'invisible': Bool(Eval('company')) | ~Bool(Eval('warn')),
             })
+    url = fields.Function(fields.Char('URL'), 'get_url')
 
     @staticmethod
     def default_timeout():
@@ -427,6 +428,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 })
             context = ev.eval(context)
             return context
+
+    def get_url(self, name):
+        if config.get("web", "cors"):
+            return f'{(config.get("web", "cors"))}/{Transaction().database.name}/babi/pivot/__{self.internal_name}/null'
+        return f'http://{(config.get("web", "listen"))}/{Transaction().database.name}/babi/pivot/__{self.internal_name}/null'
 
     @property
     def ai_sql_tables(self):

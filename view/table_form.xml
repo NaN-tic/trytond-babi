@@ -12,6 +12,8 @@
     <field name="model"/>
     <label name="filter"/>
     <field name="filter"/>
+    <label name="url"/>
+    <field name="url" widget="url"/>
     <newline/>
     <notebook colspan="8">
         <page name="query">
