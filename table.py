@@ -193,6 +193,15 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ], ondelete='SET NULL', states={
             'invisible': Bool(Eval('company')) | ~Bool(Eval('warn')),
             })
+    party = fields.Many2One('party.party', 'Party', ondelete='SET NULL',
+        states={
+        'invisible': Bool(Eval('party_field')) | ~Bool(Eval('warn')),
+        })
+    party_field = fields.Many2One('babi.field', 'Party Field', domain=[
+            ('table.id', '=', Eval('id', -1)),
+            ], ondelete='SET NULL', states={
+            'invisible': Bool(Eval('party')) | ~Bool(Eval('warn')),
+            })
     url = fields.Function(fields.Char('URL'), 'get_url')
 
     @staticmethod
@@ -626,14 +635,22 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             else:
                 company_id = 'NULL'
 
+            if self.party_field:
+                party_id = self.party_field.internal_name
+            elif self.party:
+                party_id = self.party.id
+            else:
+                party_id = 'NULL'
+
             query_full = 'SELECT '
             query_full += '   count(*), '
             query_full += f'  {user_id} AS user_id, '
             query_full += f'  {employee_id} as employee_id, '
             query_full += f'  {company_id} as company_id '
+            query_full += f' {party_id} as party_id '
             query_full += 'FROM (%s) AS compute_warnings_subquery ' % query
 
-            group_by = [user_id, employee_id, company_id]
+            group_by = [user_id, employee_id, company_id, party_id]
             group_by = [x for x in group_by
                 if isinstance(x, str) and x != 'NULL']
             if group_by:
@@ -657,6 +674,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                         'employee': x[2],
                         'company': x[3],
                         'group': self.group,
+                        'party': x[4],
                         })
 
         if to_create:
@@ -967,6 +985,8 @@ class Warning(Workflow, ModelSQL, ModelView):
             ondelete='CASCADE')
     group = fields.Many2One('res.group', 'Group', ondelete='CASCADE',
             readonly=True)
+    party = fields.Many2One('party.party', 'Party', ondelete='CASCADE',
+            readonly=True)
     users = fields.Function(fields.Many2Many('res.user', None, None, 'Users'),
         'get_users')
     emails = fields.Function(fields.Char('E-mails'), 'get_emails')
@@ -1055,6 +1075,8 @@ class Warning(Workflow, ModelSQL, ModelView):
         elif self.company:
             users = User.search([('companies.id', '=', self.company.id)])
             emails = [user.email for user in users]
+        elif self.party:
+            emails = [self.party.email]
         else:
             users = User.search([])
             emails = [user.email for user in users]
