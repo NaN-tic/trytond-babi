@@ -610,7 +610,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         self.compute_warning_error = None
         self.save()
         query = self.get_query()
+        print('Computing warnings for %s' % self.rec_name)
         if query:
+            print('Query: %s' % query)
             user_id = None
             if self.user_field:
                 user_id = self.user_field.internal_name
@@ -646,8 +648,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             query_full += '   count(*), '
             query_full += f'  {user_id} AS user_id, '
             query_full += f'  {employee_id} as employee_id, '
+            query_full += f'  {party_id} as party_id, '
             query_full += f'  {company_id} as company_id '
-            query_full += f' {party_id} as party_id '
             query_full += 'FROM (%s) AS compute_warnings_subquery ' % query
 
             group_by = [user_id, employee_id, company_id, party_id]
@@ -672,11 +674,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                         'count': count,
                         'user': x[1],
                         'employee': x[2],
-                        'company': x[3],
+                        'party': x[3],
+                        'company': x[4],
                         'group': self.group,
-                        'party': x[4],
                         })
-
+        print(to_create)
         if to_create:
             try:
                 warnings = Warning.create(to_create)
