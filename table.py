@@ -196,7 +196,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     party = fields.Many2One('party.party', 'Party', ondelete='SET NULL',
         states={
         'invisible': Bool(Eval('party_field')) | ~Bool(Eval('warn')),
-        })
+        },
+        context={
+            'company': Eval('company', -1),
+            },
+        depends={'company'})
     party_field = fields.Many2One('babi.field', 'Party Field', domain=[
             ('table.id', '=', Eval('id', -1)),
             ], ondelete='SET NULL', states={
@@ -988,7 +992,10 @@ class Warning(Workflow, ModelSQL, ModelView):
     group = fields.Many2One('res.group', 'Group', ondelete='CASCADE',
             readonly=True)
     party = fields.Many2One('party.party', 'Party', ondelete='CASCADE',
-            readonly=True)
+            readonly=True, context={
+                'company': Eval('company', -1),
+            }, depends=['company'])
+
     users = fields.Function(fields.Many2Many('res.user', None, None, 'Users'),
         'get_users')
     emails = fields.Function(fields.Char('E-mails'), 'get_emails')
