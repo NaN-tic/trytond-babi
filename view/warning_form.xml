@@ -16,6 +16,8 @@ contains the full copyright notices and license terms. -->
     <field name="company"/>
     <label name="employee"/>
     <field name="employee"/>
+    <label name="party"/>
+    <field name="party"/>
     <label name="done_by"/>
     <field name="done_by"/>
     <label name="ignored_by"/>
