@@ -84,6 +84,11 @@
             <field name="company"/>
             <label name="company_field"/>
             <field name="company_field"/>
+            <newline/>
+            <label name="party"/>
+            <field name="party"/>
+            <label name="party_field"/>
+            <field name="party_field"/>
             <separator name="warning_description" colspan="8"/>
             <field name="warning_description" colspan="8"/>
         </page>

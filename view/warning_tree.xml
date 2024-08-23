@@ -8,6 +8,7 @@
     <field name="group" optional="1"/>
     <field name="employee" optional="1"/>
     <field name="company" optional="1"/>
+    <field name="party" optional="1"/>
     <field name="description" expand="2" optional="0"/>
     <button name="open"/>
     <button name="do"/>
