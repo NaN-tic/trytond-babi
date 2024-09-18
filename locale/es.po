@@ -1211,7 +1211,7 @@ msgstr "Inicio Actualizar información"
 
 msgctxt "model:babi.warning,name:"
 msgid "BABI Warning"
-msgstr "Avíso BABI"
+msgstr "Aviso BABI"
 
 msgctxt "model:babi.widget,name:"
 msgid "Widget"
