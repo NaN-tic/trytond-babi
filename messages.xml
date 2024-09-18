@@ -142,7 +142,7 @@ Exception: %(error)s</field>
             <field name="text">Warning: tables could not be created. Please check your query.</field>
         </record>
         <record model="ir.message" id="msg_open_warning_single">
-            <field name="text">You can only open records for a single warning.</field>
+            <field name="text">You can only open records for several warnings if they are all of the same type.</field>
         </record>
     </data>
 </tryton>
