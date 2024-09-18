@@ -682,7 +682,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                         'company': x[4],
                         'group': self.group,
                         })
-        print(to_create)
         if to_create:
             try:
                 warnings = Warning.create(to_create)
@@ -1115,33 +1114,35 @@ class Warning(Workflow, ModelSQL, ModelView):
     def get_description(self, name):
         return self.table.warning_description
 
-    @classmethod
-    @ModelView.button
-    def open(cls, warnings):
+    def get_ids(self):
         pool = Pool()
         Table = pool.get('babi.table')
 
-        if len(warnings) != 1:
-            raise UserError(gettext('babi.msg_open_warning_single'))
-
-        warning, = warnings
+        if not self.table.related_model:
+            return []
 
         user_index = 1
-        fields = [warning.table.related_field.internal_name]
-        if warning.table.company_field:
+        fields = [self.table.related_field.internal_name]
+        if self.table.company_field:
             user_index += 1
-            fields.append(warning.table.company_field.internal_name)
-        if warning.table.user_field:
-            fields.append(warning.table.user_field.internal_name)
-        records = Table.execute_query(warning.table,
+            fields.append(self.table.company_field.internal_name)
+        if self.table.user_field:
+            fields.append(self.table.user_field.internal_name)
+        if self.table.employee_field:
+            fields.append(self.table.employee_field.internal_name)
+        if self.table.party_field:
+            fields.append(self.table.party_field.internal_name)
+        records = Table.execute_query(self.table,
             fields=fields)
 
-        if warning.table.company_field:
-            if warning.company:
-                records = [x for x in records if x[1] == warning.company.id]
-        if warning.table.user_field:
-            if warning.user:
-                records = [x for x in records if x[user_index] == warning.user.id]
+        if self.table.company_field and self.company:
+            records = [x for x in records if x[1] == self.company.id]
+        if self.table.user_field and self.user:
+            records = [x for x in records if x[user_index] == self.user.id]
+        if self.table.employee_field and self.employee:
+            records = [x for x in records if x[user_index] == self.employee.id]
+        if self.table.party_field and self.party:
+            records = [x for x in records if x[user_index] == self.party.id]
 
         try:
             ids = []
@@ -1157,17 +1158,34 @@ class Warning(Workflow, ModelSQL, ModelView):
                     ids.append(int(value))
         except:
             raise UserError(gettext('babi.msg_not_converted',
-                field=warning.table.related_field.rec_name))
+                field=self.table.related_field.rec_name))
+        return ids
 
-        Model = pool.get(warning.table.related_model.model)
+    def get_records(self, ids=None):
+        pool = Pool()
+        Model = pool.get(self.table.related_model.model)
+        if ids is None:
+            ids = self.get_ids()
+        return Model.search([('id', 'in', ids)])
 
-        count = Model.search([('id', 'in', ids)], count=True)
+    @classmethod
+    @ModelView.button
+    def open(cls, warnings):
+        if len(set([x.table for x in warnings])) > 1:
+            raise UserError(gettext('babi.msg_open_warning_single'))
 
-        if count != len(ids):
+        ids = []
+        records = []
+        for warning in warnings:
+            wids = warning.get_ids()
+            records += warning.get_records(wids)
+            ids += wids
+
+        if len(records) != len(ids):
             raise UserError(gettext('babi.msg_wrong_info',
                 field=warning.table.related_field.rec_name,
                 query_count=str(len(ids)),
-                model_query_count=str(count)))
+                model_query_count=str(len(records))))
 
         return {
             'res_model': warning.table.related_model.model,
