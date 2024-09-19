@@ -329,7 +329,7 @@ def create_groups_access(model, groups):
     to_create = []
     for group in groups:
         exists = ModelAccess.search([
-                ('model', '=', model.id),
+                ('model', '=', model.model),
                 ('group', '=', group.id),
                 ])
         if not exists:
