@@ -15,6 +15,8 @@ from werkzeug.wrappers import Response
 
 from collections import deque
 
+COLLAPSE = '➖'
+EXPAND = '➕'
 
 class Site(metaclass=PoolMeta):
     __name__ = 'www.site'
@@ -298,9 +300,9 @@ class Operation:
                         grouping_fields, result_fields = self.create_url(table_structure_child_row)
 
                         if table_structure_child_row.state == 'open':
-                            icon = '➖'
+                            icon = COLLAPSE
                         else:
-                            icon = '➕'
+                            icon = EXPAND
                         row.add(td(a(str(table_structure_child_row.name or '(Empty)') + ' ' + str(icon), href="#",
                                 hx_target="#pivot_table",
                                 hx_post=Pivot(database_name=self.database_name,
@@ -472,9 +474,9 @@ class Operation:
                             grouping_fields, result_fields = self.create_url(table_structure_column)
 
                             if table_structure_column.state == 'open':
-                                icon = '➖'
+                                icon = COLLAPSE
                             else:
-                                icon = '➕'
+                                icon = EXPAND
                             row.add(td(a(str(table_structure_column.name or '(Empty)') + ' ' + str(icon), href="#",
                                     hx_target="#pivot_table",
                                     hx_post=Pivot(database_name=self.database_name,
@@ -494,9 +496,9 @@ class Operation:
                         grouping_fields, result_fields = self.create_url(table_structure_column)
 
                         if table_structure_column.state == 'open':
-                            icon = '➖'
+                            icon = COLLAPSE
                         else:
-                            icon = '➕'
+                            icon = EXPAND
 
                         row.add(td(a(str(table_structure_column.name or '(Empty)') + ' ' + str(icon), href="#",
                                     hx_target="#pivot_table",
@@ -565,9 +567,9 @@ class Operation:
                     grouping_fields, result_fields = self.create_url(table_structure_row)
 
                     if table_structure_row.state == 'open':
-                        icon = '➖'
+                        icon = COLLAPSE
                     else:
-                        icon = '➕'
+                        icon = EXPAND
                     row.add(td(a(str(table_structure_row.name or '(Empty)') + ' ' + str(icon), href="#",
                             hx_target="#pivot_table",
                             hx_post=Pivot(database_name=self.database_name,
@@ -654,8 +656,9 @@ class Operation:
                 download_table = pivot_table.render(pretty=False)
                 download_table = re.sub(r'<a[^>]*>(.*?)<\/a>', r'\1', download_table)
                 download_table = re.sub(r'\s*class="[^"]*"', '', download_table)
-                download_table = download_table.replace('➖', '')
-                download_table = download_table.replace('➕', '')
+                download_table = download_table.replace('/', '\\')
+                download_table = download_table.replace(COLLAPSE, '')
+                download_table = download_table.replace(EXPAND, '')
                 print('DOWNLOAD TABLE: ', download_table)
                 a(href=DownlowadReport(database_name=self.database_name,
                         table_name=self.table, pivot_table=download_table,
