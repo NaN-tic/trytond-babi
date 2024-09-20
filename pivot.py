@@ -303,7 +303,7 @@ class Operation:
                             icon = COLLAPSE
                         else:
                             icon = EXPAND
-                        row.add(td(a(str(table_structure_child_row.name or '(Empty)') + ' ' + str(icon), href="#",
+                        row.add(td(a(str(icon) +  ' ' + str(table_structure_child_row.name or '(Empty)'), href="#",
                                 hx_target="#pivot_table",
                                 hx_post=Pivot(database_name=self.database_name,
                                     table_name=self.table, grouping_fields=grouping_fields,
@@ -477,7 +477,7 @@ class Operation:
                                 icon = COLLAPSE
                             else:
                                 icon = EXPAND
-                            row.add(td(a(str(table_structure_column.name or '(Empty)') + ' ' + str(icon), href="#",
+                            row.add(td(a(str(icon) + ' ' + str(table_structure_column.name or '(Empty)'), href="#",
                                     hx_target="#pivot_table",
                                     hx_post=Pivot(database_name=self.database_name,
                                         table_name=self.table, grouping_fields=grouping_fields,
@@ -500,7 +500,7 @@ class Operation:
                         else:
                             icon = EXPAND
 
-                        row.add(td(a(str(table_structure_column.name or '(Empty)') + ' ' + str(icon), href="#",
+                        row.add(td(a(str(icon) + ' ' + str(table_structure_column.name or '(Empty)'), href="#",
                                     hx_target="#pivot_table",
                                     hx_post=Pivot(database_name=self.database_name,
                                         table_name=self.table, grouping_fields=grouping_fields,
@@ -570,7 +570,7 @@ class Operation:
                         icon = COLLAPSE
                     else:
                         icon = EXPAND
-                    row.add(td(a(str(table_structure_row.name or '(Empty)') + ' ' + str(icon), href="#",
+                    row.add(td(a(str(icon) + ' ' +  str(table_structure_row.name or '(Empty)'), href="#",
                             hx_target="#pivot_table",
                             hx_post=Pivot(database_name=self.database_name,
                                 table_name=self.table, grouping_fields=grouping_fields,
@@ -651,7 +651,7 @@ class Operation:
         for row in table_to_show:
             pivot_table.add(row)
         with div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8") as pivot_div:
-            # Download XLM file with the tables
+            # Download XLS file with the tables
             with div(cls="w-10"):
                 download_table = pivot_table.render(pretty=False)
                 download_table = re.sub(r'<a[^>]*>(.*?)<\/a>', r'\1', download_table)
@@ -896,7 +896,9 @@ class Index(Component):
     @classmethod
     def get_url_map(cls):
         return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>')
+            #Rule('/<string:database_name>/babi/pivot/<string:table_name>/'),
+            #Rule('/<string:database_name>/babi/pivot/<string:table_name>'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>'),
         ]
 
     def render(self):
@@ -920,8 +922,7 @@ class Index(Component):
             babi_table = babi_tables[0]
             table_name = babi_table.name
 
-            users = User.search([('id', '=', Transaction().user)], limit=1)
-            user = users[0] if users else None
+            user = User(Transaction().user)
             error_page = False
             if not user:
                 error_page = True
@@ -1055,7 +1056,6 @@ class Index(Component):
         layout = Layout(title=f'{table_name} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
-
 
 class PivotHeader(Component):
     'Pivot Header'
