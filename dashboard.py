@@ -318,7 +318,8 @@ class Widget(ModelSQL, ModelView):
 
     @fields.depends('type', 'where', 'parameters', 'timeout', 'limit',
         'show_title', 'show_toolbox', 'show_legend', 'static', 'name',
-        'image_format', 'zoom', 'box_points', methods=['get_values'])
+        'image_format', 'zoom', 'box_points', 'total_branch_values',
+        methods=['get_values'])
     def on_change_with_chart(self, name=None):
         data = []
         layout = {
