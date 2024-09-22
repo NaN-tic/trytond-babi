@@ -1,17 +1,14 @@
 import re
-import datetime
-import ast
 from werkzeug.routing import Rule
-from werkzeug.utils import redirect, send_from_directory
-from dominate.tags import (div, h1, h2, p, a, form, button, span, table, thead,
-    tbody, tr, td, input_, br, head, html, body, meta, link, title, script, h3,
-    comment, section, nav, ul, li, img, footer, label, ol, dl, dt, dd,
-    select, option, main, th, fieldset, legend, h4, time_, h5, aside)
+from werkzeug.utils import redirect
+from dominate.tags import (div, h1, p, a, form, button, span, table, thead,
+    tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
+    option, main, th)
 from dominate.util import raw
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
-from trytond.modules.voyager.voyager import Component, Trigger
+from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
 from werkzeug.wrappers import Response
 
@@ -672,7 +669,6 @@ class Operation:
         return pivot_div
 
     def create_url(self, cell):
-        url = ''
         parent = None
         if cell.parent:
             parent = cell.parent
@@ -945,7 +941,7 @@ class Index(Component):
                         p('404', cls="text-base font-semibold text-indigo-600")
                         h1('Page not found', cls="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl")
                         p('Sorry, we couldn’t find the page you’re looking for.', cls="mt-6 text-base leading-7 text-gray-600")
-                layout = Layout(title=f'Page not found | Tryton')
+                layout = Layout(title='Page not found | Tryton')
                 layout.main.add(error_section)
                 return layout.tag()
 
