@@ -660,7 +660,7 @@ class Operation:
                 download_table = download_table.replace(COLLAPSE, '')
                 download_table = download_table.replace(EXPAND, '')
                 print('DOWNLOAD TABLE: ', download_table)
-                a(href=DownlowadReport(database_name=self.database_name,
+                a(href=DownloadReport(database_name=self.database_name,
                         table_name=self.table, pivot_table=download_table,
                         render=False).url('download'),
                     cls="relative left-4 top-8").add(
@@ -1697,7 +1697,7 @@ class PivotTable(Component):
                 operations.append(op)
 
 
-class DownlowadReport(Component):
+class DownloadReport(Component):
     'Download Report'
     __name__ = 'www.download_report'
     _path = None

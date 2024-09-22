@@ -58,7 +58,7 @@ def register():
         pivot.Index,
         pivot.PivotHeader,
         pivot.PivotTable,
-        pivot.DownlowadReport,
+        pivot.DownloadReport,
         module='babi', type_='model')
     Pool.register(
         babi.OpenChart,
