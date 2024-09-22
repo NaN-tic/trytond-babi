@@ -1,4 +1,6 @@
 import re
+import datetime
+import ast
 from werkzeug.routing import Rule
 from werkzeug.utils import redirect, send_from_directory
 from dominate.tags import (div, h1, h2, p, a, form, button, span, table, thead,
@@ -17,6 +19,7 @@ from collections import deque
 
 COLLAPSE = '➖'
 EXPAND = '➕'
+
 
 class Site(metaclass=PoolMeta):
     __name__ = 'www.site'
@@ -1056,6 +1059,7 @@ class Index(Component):
         layout = Layout(title=f'{table_name} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
+
 
 class PivotHeader(Component):
     'Pivot Header'
