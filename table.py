@@ -689,7 +689,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                     warning.send()
             except Exception as e:
                 Transaction().connection.rollback()
-                self.compute_warning_error = str(e)
+                self.compute_warning_error = f'{e}\n{traceback.format_exc()}'
                 self.save()
 
     def update_fields(self, field_names):
