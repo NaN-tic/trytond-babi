@@ -11,6 +11,7 @@ from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
 from werkzeug.wrappers import Response
+from decimal import Decimal
 
 from collections import deque
 
@@ -398,6 +399,8 @@ class Operation:
                                             if value == {}:
                                                 value = '0'
                                 #print(f'COORDINATES0: {coordinates}\n    VALUE: {value}')
+                                if type(value) == Decimal:
+                                    value = round(value, 2)
                                 row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
                                 if table_structure_column.state == 'open':
                                     specific_record_column_open = table_structure_column.hierarchy
@@ -423,6 +426,8 @@ class Operation:
                                                     if value == {}:
                                                         value = '0'
                                         #print(f'COORDINATES0.1: {coordinates}\n    VALUE: {value}')
+                                        if type(value) == Decimal:
+                                            value = round(value, 2)
                                         row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
                         lines_to_add.append(row)
                         if table_structure_child_row.state == 'open' and table_structure_child_row != last_row_open:
@@ -610,6 +615,8 @@ class Operation:
                                     if value == {}:
                                         value = '0'
                             #print(f'COORDINATES1: {coordinates}\n    VALUE: {value}')
+                            if type(value) == Decimal:
+                                value = round(value, 2)
                             row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
                             if table_structure_column.state == 'open':
                                 specific_record_column_open = table_structure_column.hierarchy
@@ -637,6 +644,8 @@ class Operation:
                                                 if value == {}:
                                                     value = '0'
                                     #print(f'COORDINATES2: {coordinates}\n    VALUE: {value}')
+                                    if type(value) == Decimal:
+                                        value = round(value, 2)
                                     row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
                     table_to_show.append(row)
                     #TODO: if closed dont open sublevels
