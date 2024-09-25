@@ -47,6 +47,8 @@ def register():
         action.ActionDashboard,
         action.Menu,
         test_model.TestBabiModel,
+        table.TableUser,
+        table.TableGroup,
         table.Table,
         table.Field,
         table.TableDependency,
@@ -56,6 +58,7 @@ def register():
         pivot.Index,
         pivot.PivotHeader,
         pivot.PivotTable,
+        pivot.DownloadReport,
         module='babi', type_='model')
     Pool.register(
         babi.OpenChart,
