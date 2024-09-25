@@ -77,6 +77,24 @@ def generate_html_table(records):
     return table
 
 
+class TableUser(ModelSQL):
+    'BABI Table User'
+    __name__ = 'babi.table-res.user'
+    babi_table = fields.Many2One('babi.table', 'Table', required=True,
+        ondelete='CASCADE')
+    user = fields.Many2One('res.user', 'User', required=True,
+        ondelete='CASCADE')
+
+
+class TableGroup(ModelSQL):
+    'BABI Table Group'
+    __name__ = 'babi.table-res.group'
+    babi_table = fields.Many2One('babi.table', 'Table', required=True,
+        ondelete='CASCADE')
+    user = fields.Many2One('res.group', 'Group', required=True,
+        ondelete='CASCADE')
+
+
 class Table(DeactivableMixin, ModelSQL, ModelView):
     'BABI Table'
     __name__ = 'babi.table'
@@ -208,6 +226,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             'invisible': Bool(Eval('party')) | ~Bool(Eval('warn')),
             })
     url = fields.Function(fields.Char('URL'), 'get_url')
+    access_users = fields.Many2Many('babi.table-res.user', 'babi_table', 'user',
+        'Access Users')
+    access_groups = fields.Many2Many('babi.table-res.group', 'babi_table', 'user',
+        'Access Groups')
 
     @staticmethod
     def default_timeout():
