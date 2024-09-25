@@ -85,7 +85,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             (None, ''),
             ('model', 'Model'),
             ('table', 'Table'),
-            ('query', 'Query'),
+            ('view', 'View'),
             ], 'Type', required=True)
     internal_name = fields.Char('Internal Name', required=True)
     model = fields.Many2One('ir.model', 'Model', states={
@@ -232,6 +232,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 })
 
     @classmethod
+    def __register__(cls, module_name):
+        super().__register__(module_name)
+        cursor = Transaction().connection.cursor()
+        sql_table = cls.__table__()
+
+        # Migration to 7.2: rename query to view
+        cursor.execute(*sql_table.update([sql_table.type], ['view'],
+                where=sql_table.type == 'query'))
+
+    @classmethod
     def view_attributes(cls):
         return super().view_attributes() + [
             ('//page[@id="warning"]', 'states', {
@@ -340,7 +350,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def get_required_by_table_names(self):
         tables = self.search([
-                ('type', 'in', ['table', 'query']),
+                ('type', 'in', ['table', 'view']),
                 ('query', 'ilike', '%' + self.table_name + '%'),
                 ])
         res = set()
@@ -525,7 +535,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         else:
             query += '* '
 
-        if self.type == 'query':
+        if self.type == 'view':
             query += 'FROM (%s) AS a ' % self._stripped_query
         else:
             query += 'FROM %s ' % self.table_name
@@ -547,7 +557,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             limit=None):
         if timeout is None:
             timeout = 10
-        if (self.type != 'query'
+        if (self.type != 'view'
                 and not backend.TableHandler.table_exist(self.table_name)):
             return []
         with Transaction().new_transaction() as transaction:
@@ -586,8 +596,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 self._compute_model()
             elif self.type == 'table':
                 self._compute_table()
-            elif self.type == 'query':
-                self._compute_query()
+            elif self.type == 'view':
+                self._compute_view()
 
             for dependency in self.required_by:
                 dependency.required_by._compute(processed + [self])
@@ -738,7 +748,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE' % self.table_name)
         cursor.execute('DROP TABLE IF EXISTS "%s" CASCADE' % self.table_name)
 
-    def _compute_query(self):
+    def _compute_view(self):
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
             # We must use a subquery because the _stripped_query may contain a
@@ -871,7 +881,7 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
     table_type = fields.Function(fields.Selection([
             ('model', 'Model'),
             ('table', 'Table'),
-            ('query', 'Query'),
+            ('view', 'View'),
             ], 'Table Type'), 'on_change_with_table_type')
 
     @fields.depends('expression')
