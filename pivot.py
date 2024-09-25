@@ -804,7 +804,7 @@ class ResultField():
 ###############################################################################
 class Layout(Component):
     'Layout'
-    __name__ = 'www.layout'
+    __name__ = 'www.layout.pivot'
     _path = None
     __slots__ = ['main']
 
@@ -853,7 +853,7 @@ class Layout(Component):
 
 class Index(Component):
     'Index'
-    __name__ = 'www.index'
+    __name__ = 'www.index.pivot'
     _path = None
 
     database_name = fields.Char('Database Name')
@@ -868,7 +868,7 @@ class Index(Component):
 
     def render(self):
         pool = Pool()
-        Layout = pool.get('www.layout')
+        Layout = pool.get('www.layout.pivot')
         Pivot = pool.get('www.pivot_table')
         PivotHeader = pool.get('www.pivot_header')
         BabiTable = pool.get('babi.table')
@@ -1260,7 +1260,7 @@ class PivotHeader(Component):
 
     def add_field_selection(self):
         pool = Pool()
-        Index = pool.get('www.index')
+        Index = pool.get('www.index.pivot')
         # If we have 'null" as value, is like is empty
         table_properties = 'null'
         if self.table_properties == 'null':
@@ -1331,7 +1331,7 @@ class PivotHeader(Component):
     def remove_field(self):
         # In this case we assume that we always have table_properties
         pool = Pool()
-        Index = pool.get('www.index')
+        Index = pool.get('www.index.pivot')
 
         x_fields = []
         y_fields = []
@@ -1402,7 +1402,7 @@ class PivotHeader(Component):
 
     def level_up_field(self):
         pool = Pool()
-        Index = pool.get('www.index')
+        Index = pool.get('www.index.pivot')
 
         x_fields = []
         y_fields = []
@@ -1475,7 +1475,7 @@ class PivotHeader(Component):
 
     def level_down_field(self):
         pool = Pool()
-        Index = pool.get('www.index')
+        Index = pool.get('www.index.pivot')
 
         x_fields = []
         y_fields = []
