@@ -704,19 +704,15 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return ''
 
     def _drop(self):
+        # Given that the type may be changed from view to table and viceversa
+        # we must try to drop both
         cursor = Transaction().connection.cursor()
         if backend.name != 'postgresql':
             cursor.execute('DROP TABLE IF EXISTS %s' % self.table_name)
+            cursor.execute('DROP VIEW IF EXISTS %s' % self.table_name)
             return
-        cursor.execute("SELECT table_type FROM information_schema.tables "
-            "WHERE table_name=%s AND table_schema='public'", (self.table_name,))
-        record = cursor.fetchone()
-        if not record:
-            return
-        if record[0] == 'VIEW':
-            cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE' % self.table_name)
-        else:
-            cursor.execute('DROP TABLE IF EXISTS %s CASCADE' % self.table_name)
+        cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE' % self.table_name)
+        cursor.execute('DROP TABLE IF EXISTS "%s" CASCADE' % self.table_name)
 
     def _compute_query(self):
         with Transaction().new_transaction() as transaction:
@@ -735,12 +731,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def _compute_table(self):
         with Transaction().new_transaction() as transaction:
-            cursor = transaction.connection.cursor()
-            if backend.name == 'postgresql':
-                cascade = 'CASCADE'
-            else:
-                cascade = ''
-            cursor.execute('DROP TABLE IF EXISTS "%s" %s;' % (self.table_name, cascade))
             self._drop()
             cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
                     self._stripped_query))
@@ -754,12 +744,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-
-            if backend.name == 'postgresql':
-                cascade = 'CASCADE'
-            else:
-                cascade = ''
-            cursor.execute('DROP TABLE IF EXISTS "%s" %s' % (self.table_name, cascade))
+            self._drop()
             fields = []
             for field in self.fields_:
                 fields.append('"%s" %s' % (field.internal_name, field.sql_type()))
