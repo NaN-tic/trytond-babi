@@ -98,8 +98,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             })
     fields_ = fields.One2Many('babi.field', 'table', 'Fields')
     query = fields.Text('Query', states={
-            'invisible': ~Eval('type').in_(['query', 'table']),
-            })
+            'invisible': ~Eval('type').in_(['table', 'view']),
+            }, depends=['type'])
     timeout = fields.Integer('Timeout', required=True, states={
             'invisible': ~Eval('type').in_(['model', 'table']),
             }, help='If table '
@@ -736,6 +736,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def _compute_table(self):
         with Transaction().new_transaction() as transaction:
             self._drop()
+            cursor = transaction.connection.cursor()
             cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
                     self._stripped_query))
             cursor.execute('SELECT * FROM "%s" LIMIT 1' % self.table_name)
