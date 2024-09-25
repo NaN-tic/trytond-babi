@@ -1,21 +1,22 @@
-import datetime
-import ast
+import re
 from werkzeug.routing import Rule
-from werkzeug.utils import redirect, send_from_directory
-from dominate.tags import (div, h1, h2, p, a, form, button, span, table, thead,
-    tbody, tr, td, input_, br, head, html, body, meta, link, title, script, h3,
-    comment, section, nav, ul, li, img, footer, label, ol, dl, dt, dd,
-    select, option, main, th, fieldset, legend, h4, time_, h5, aside)
+from werkzeug.utils import redirect
+from dominate.tags import (div, h1, p, a, form, button, span, table, thead,
+    tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
+    option, main, th)
 from dominate.util import raw
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
-from trytond.modules.voyager.voyager import Component, Trigger
+from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
 from werkzeug.wrappers import Response
-from trytond.config import config
+from decimal import Decimal
 
 from collections import deque
+
+COLLAPSE = '➖'
+EXPAND = '➕'
 
 
 class Site(metaclass=PoolMeta):
@@ -262,6 +263,7 @@ class Operation:
     def create_table(self, table_structure):
         pool = Pool()
         Pivot = pool.get('www.pivot_table')
+        DownloadReport = pool.get('www.download_report')
         # For now, to show the values we separtate the table in rows and
         # calculate all the values of each row
         # The column list (the first row of the table) contain all the columns + a space for each row
@@ -296,17 +298,19 @@ class Operation:
                         # name are the level 0 columns
                         for i in range(index_child):
                             row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                        #print(f'\n<<<< NAME4: {table_structure_child_row.name} | {table_structure_child_row.hierarchy}')
-
-                        #TODO: close sublevel dont work
                         grouping_fields, result_fields = self.create_url(table_structure_child_row)
-                        row.add(td(a(str(table_structure_child_row.name), href="#",
+
+                        if table_structure_child_row.state == 'open':
+                            icon = COLLAPSE
+                        else:
+                            icon = EXPAND
+                        row.add(td(a(str(icon) +  ' ' + str(table_structure_child_row.name or '(Empty)'), href="#",
                                 hx_target="#pivot_table",
                                 hx_post=Pivot(database_name=self.database_name,
                                     table_name=self.table, grouping_fields=grouping_fields,
                                     result_fields=result_fields, render=False).url(),
                                 hx_trigger="click", hx_swap="outerHTML"),
-                            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
 
                         for i in range(len(hierarchy_rows)-(index_child+1)):
                             row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
@@ -395,7 +399,9 @@ class Operation:
                                             if value == {}:
                                                 value = '0'
                                 #print(f'COORDINATES0: {coordinates}\n    VALUE: {value}')
-                                row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4"))
+                                if type(value) == Decimal:
+                                    value = round(value, 2)
+                                row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
                                 if table_structure_column.state == 'open':
                                     specific_record_column_open = table_structure_column.hierarchy
                                 if table_structure_column.state == 'open' and specific_record_column_open:
@@ -420,7 +426,9 @@ class Operation:
                                                     if value == {}:
                                                         value = '0'
                                         #print(f'COORDINATES0.1: {coordinates}\n    VALUE: {value}')
-                                        row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4"))
+                                        if type(value) == Decimal:
+                                            value = round(value, 2)
+                                        row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
                         lines_to_add.append(row)
                         if table_structure_child_row.state == 'open' and table_structure_child_row != last_row_open:
                             child_rows = create_row_childs(table_value_row_cordinates, hierarchy_row_child, index_child)
@@ -450,7 +458,8 @@ class Operation:
 
                             for record_child in table_strucutre_column.record_childs:
                                 #TODO: add url
-                                row.add(td(record_child.name,cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                                row.add(td(str(record_child.name or '(Empty)') ,
+                                    cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
                         else:
                             row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                 table_to_show.append(row)
@@ -468,13 +477,18 @@ class Operation:
                             #print(f'\n<<<< NAME1: {table_structure_column.name} ')
                             # If we are in the last level, dont use a link
                             grouping_fields, result_fields = self.create_url(table_structure_column)
-                            row.add(td(a(table_structure_column.name, href="#",
+
+                            if table_structure_column.state == 'open':
+                                icon = COLLAPSE
+                            else:
+                                icon = EXPAND
+                            row.add(td(a(str(icon) + ' ' + str(table_structure_column.name or '(Empty)'), href="#",
                                     hx_target="#pivot_table",
                                     hx_post=Pivot(database_name=self.database_name,
                                         table_name=self.table, grouping_fields=grouping_fields,
                                         result_fields=result_fields, render=False).url(),
                                     hx_trigger="click", hx_swap="outerHTML"),
-                                cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                                cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
                         else:
                             # If we dont have a parent, and we are in antoher that the first level dont show anything?
                             row = tr()
@@ -485,13 +499,19 @@ class Operation:
                             continue
                         #print(f'\n<<<< NAME2: {table_structure_column.name} ')
                         grouping_fields, result_fields = self.create_url(table_structure_column)
-                        row.add(td(a(table_structure_column.name, href="#",
+
+                        if table_structure_column.state == 'open':
+                            icon = COLLAPSE
+                        else:
+                            icon = EXPAND
+
+                        row.add(td(a(str(icon) + ' ' + str(table_structure_column.name or '(Empty)'), href="#",
                                     hx_target="#pivot_table",
                                     hx_post=Pivot(database_name=self.database_name,
                                         table_name=self.table, grouping_fields=grouping_fields,
                                         result_fields=result_fields, render=False).url(),
                                     hx_trigger="click", hx_swap="outerHTML"),
-                            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
                         #TODO: add news columns of childs
                     if table_structure_column.state == 'open':
                         specific_record_column_open = hierarchy_column
@@ -550,14 +570,18 @@ class Operation:
                         row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                     #TODO: URL
                     grouping_fields, result_fields = self.create_url(table_structure_row)
-                    #print(f'<<<< NAME3: {table_structure_row.name}\n    grouping_fields: {grouping_fields}\n    result_fields: {result_fields}')
-                    row.add(td(a(table_structure_row.name, href="#",
+
+                    if table_structure_row.state == 'open':
+                        icon = COLLAPSE
+                    else:
+                        icon = EXPAND
+                    row.add(td(a(str(icon) + ' ' +  str(table_structure_row.name or '(Empty)'), href="#",
                             hx_target="#pivot_table",
                             hx_post=Pivot(database_name=self.database_name,
                                 table_name=self.table, grouping_fields=grouping_fields,
                                 result_fields=result_fields, render=False).url(),
                             hx_trigger="click", hx_swap="outerHTML"),
-                        cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                        cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
 
                     for i in range((len(hierarchy_rows))-(index+1)):
                         row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
@@ -591,7 +615,9 @@ class Operation:
                                     if value == {}:
                                         value = '0'
                             #print(f'COORDINATES1: {coordinates}\n    VALUE: {value}')
-                            row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4"))
+                            if type(value) == Decimal:
+                                value = round(value, 2)
+                            row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
                             if table_structure_column.state == 'open':
                                 specific_record_column_open = table_structure_column.hierarchy
                             if table_structure_column.state == 'open' and specific_record_column_open:
@@ -618,7 +644,9 @@ class Operation:
                                                 if value == {}:
                                                     value = '0'
                                     #print(f'COORDINATES2: {coordinates}\n    VALUE: {value}')
-                                    row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4"))
+                                    if type(value) == Decimal:
+                                        value = round(value, 2)
+                                    row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
                     table_to_show.append(row)
                     #TODO: if closed dont open sublevels
                     if table_structure_row.hierarchy == hierarchy_rows[0]:
@@ -631,12 +659,25 @@ class Operation:
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
         for row in table_to_show:
             pivot_table.add(row)
-        pivot_div = div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8")
+        with div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8") as pivot_div:
+            # Download XLS file with the tables
+            with div(cls="w-10"):
+                download_table = pivot_table.render(pretty=False)
+                download_table = re.sub(r'<a[^>]*>(.*?)<\/a>', r'\1', download_table)
+                download_table = re.sub(r'\s*class="[^"]*"', '', download_table)
+                download_table = download_table.replace('/', '\\')
+                download_table = download_table.replace(COLLAPSE, '')
+                download_table = download_table.replace(EXPAND, '')
+                print('DOWNLOAD TABLE: ', download_table)
+                a(href=DownloadReport(database_name=self.database_name,
+                        table_name=self.table, pivot_table=download_table,
+                        render=False).url('download'),
+                    cls="relative left-4 top-8").add(
+                        raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>'))
         pivot_div.add(pivot_table)
         return pivot_div
 
     def create_url(self, cell):
-        url = ''
         parent = None
         if cell.parent:
             parent = cell.parent
@@ -863,7 +904,9 @@ class Index(Component):
     @classmethod
     def get_url_map(cls):
         return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>')
+            #Rule('/<string:database_name>/babi/pivot/<string:table_name>/'),
+            #Rule('/<string:database_name>/babi/pivot/<string:table_name>'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>'),
         ]
 
     def render(self):
@@ -872,6 +915,8 @@ class Index(Component):
         Pivot = pool.get('www.pivot_table')
         PivotHeader = pool.get('www.pivot_header')
         BabiTable = pool.get('babi.table')
+        User = pool.get('res.user')
+        Index = pool.get('www.index')
 
         # Get the table name
         # If table name starts with "__" we need to remove this part to search the table name
@@ -882,7 +927,32 @@ class Index(Component):
         babi_tables = BabiTable.search([
             ('internal_name', '=', table_name)], limit=1)
         if babi_tables:
-            table_name = babi_tables[0].name
+            babi_table = babi_tables[0]
+            table_name = babi_table.name
+
+            user = User(Transaction().user)
+            error_page = False
+            if not user:
+                error_page = True
+            if not error_page and user and babi_table.access_users:
+                if user not in babi_table.access_users:
+                    error_page = True
+            if not error_page and user and babi_table.access_groups:
+                error_page = True
+                for group in user.groups:
+                    if group in babi_table.access_groups:
+                        error_page = False
+                        break
+
+            if error_page:
+                with main(cls="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8") as error_section:
+                    with div(cls="text-center"):
+                        p('404', cls="text-base font-semibold text-indigo-600")
+                        h1('Page not found', cls="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl")
+                        p('Sorry, we couldn’t find the page you’re looking for.', cls="mt-6 text-base leading-7 text-gray-600")
+                layout = Layout(title='Page not found | Tryton')
+                layout.main.add(error_section)
+                return layout.tag()
 
         # We cant sent an empty value, the routes dont detect correctly the
         # field and fails
@@ -890,27 +960,6 @@ class Index(Component):
             table_properties = 'null'
         else:
             table_properties = self.table_properties
-
-        with main() as index_section:
-            with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-2"):
-                div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
-                with div(cls="col-span-1"):
-                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
-                        cls="absolute right-6").add(
-                            raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>'))
-            with div(cls="grid grid-cols-12"):
-                PivotHeader(database_name=self.database_name,
-                    table_name=self.table_name,
-                    table_properties=table_properties,
-                    render=False).header_x()
-                PivotHeader(database_name=self.database_name,
-                    table_name=self.table_name,
-                    table_properties=table_properties,
-                    render=False).header_y()
-                PivotHeader(database_name=self.database_name,
-                    table_name=self.table_name,
-                    table_properties=table_properties,
-                    render=False).header_aggregation()
 
             '''
             grouping_fields = []
@@ -970,6 +1019,37 @@ class Index(Component):
                     for result_field in aggregation_fields:
                         result_fields += f'name={result_field["name"]}&operation={result_field["aggregation"]}&__'
 
+        inverted_table_properties = self.table_properties
+        inverted_table_properties = inverted_table_properties.replace('position=x', 'position=z')
+        inverted_table_properties = inverted_table_properties.replace('position=y', 'position=x')
+        inverted_table_properties = inverted_table_properties.replace('position=z', 'position=y')
+
+        with main() as index_section:
+            with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-4"):
+                div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
+                # Inverted columns/rows
+                with div(cls="col-span-1"):
+                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
+                        cls="absolute right-12").add(
+                            raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>'))
+                # Undo all the changes
+                with div(cls="col-span-1"):
+                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
+                        cls="absolute right-3").add(
+                            raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>'))
+            with div(cls="grid grid-cols-12"):
+                PivotHeader(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=table_properties,
+                    render=False).header_x()
+                PivotHeader(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=table_properties,
+                    render=False).header_y()
+                PivotHeader(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=table_properties,
+                    render=False).header_aggregation()
 
             with div(cls="mt-8 flow-root"):
                 with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
@@ -1622,3 +1702,29 @@ class PivotTable(Component):
                 op.result_fields = result_fields
                 op.database_name = self.database_name
                 operations.append(op)
+
+
+class DownloadReport(Component):
+    'Download Report'
+    __name__ = 'www.download_report'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    pivot_table = fields.Char('Pivot Table')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/download/<string:table_name>/<string:pivot_table>/', endpoint="download")
+        ]
+
+    def render(self):
+        pass
+
+    def download(self):
+        pivot_table = self.pivot_table.replace('\\', '/')
+        response = Response(pivot_table)
+        response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
+        response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        return response
