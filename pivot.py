@@ -93,7 +93,6 @@ class Operation:
         cursor = Transaction().connection.cursor()
         cursor.execute(f'SELECT {self.name} FROM {self.table} GROUP BY {self.name} ORDER BY {self.name};')
 
-        print('SELECT OPEN')
         h = Header(self.name, None, self.hierarchy, self.position, [], self.record_state)
         if self.position == 'row':
             table_structure.table_rows.append(h)
@@ -256,7 +255,6 @@ class Operation:
                                     if aggregation not in values[(result[:len(table_strucutre_columns + table_strucutre_rows)])].keys():
                                         values[(result[:len(table_strucutre_columns + table_strucutre_rows)])][aggregation] = {}
                                     values[(result[:len(table_strucutre_columns + table_strucutre_rows)])][aggregation] = result[-1]
-        #print(f'VALUES: {values}')
         table_structure.values = {**table_structure.values, **values}
         return []
 
@@ -268,7 +266,6 @@ class Operation:
         # calculate all the values of each row
         # The column list (the first row of the table) contain all the columns + a space for each row
         # Get the hierarchy levels of the columns and rows
-        print([(t.name, t.hierarchy) for t in table_structure.columns])
         hierarchy_columns = [t.hierarchy for t in table_structure.columns]
         hierarchy_columns.sort()
         hierarchy_columns = list(set(hierarchy_columns))
@@ -398,7 +395,6 @@ class Operation:
                                             value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
                                             if value == {}:
                                                 value = '0'
-                                #print(f'COORDINATES0: {coordinates}\n    VALUE: {value}')
                                 if type(value) == Decimal:
                                     value = round(value, 2)
                                 row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
@@ -425,7 +421,6 @@ class Operation:
                                                     value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
                                                     if value == {}:
                                                         value = '0'
-                                        #print(f'COORDINATES0.1: {coordinates}\n    VALUE: {value}')
                                         if type(value) == Decimal:
                                             value = round(value, 2)
                                         row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
@@ -474,7 +469,6 @@ class Operation:
                                 row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                                 parent = parent.parent
 
-                            #print(f'\n<<<< NAME1: {table_structure_column.name} ')
                             # If we are in the last level, dont use a link
                             grouping_fields, result_fields = self.create_url(table_structure_column)
 
@@ -497,7 +491,6 @@ class Operation:
                     else:
                         if table_structure_column.parent and table_structure_column.parent.state != 'open':
                             continue
-                        #print(f'\n<<<< NAME2: {table_structure_column.name} ')
                         grouping_fields, result_fields = self.create_url(table_structure_column)
 
                         if table_structure_column.state == 'open':
@@ -559,7 +552,6 @@ class Operation:
                     if ((isinstance(specific_record_row_open, int) and
                             specific_record_row_open < table_structure_row.hierarchy) or
                             (upper_row_level_state == 'closed')):
-                        #print('=========== CONTINUE ===========')
                         continue
 
                     if (table_structure_row.hierarchy != hierarchy_rows[0] and
@@ -614,7 +606,6 @@ class Operation:
                                     value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
                                     if value == {}:
                                         value = '0'
-                            #print(f'COORDINATES1: {coordinates}\n    VALUE: {value}')
                             if type(value) == Decimal:
                                 value = round(value, 2)
                             row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
@@ -643,7 +634,6 @@ class Operation:
                                                 value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
                                                 if value == {}:
                                                     value = '0'
-                                    #print(f'COORDINATES2: {coordinates}\n    VALUE: {value}')
                                     if type(value) == Decimal:
                                         value = round(value, 2)
                                     row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
@@ -668,7 +658,6 @@ class Operation:
                 download_table = download_table.replace('/', '\\')
                 download_table = download_table.replace(COLLAPSE, '')
                 download_table = download_table.replace(EXPAND, '')
-                print('DOWNLOAD TABLE: ', download_table)
                 a(href=DownloadReport(database_name=self.database_name,
                         table_name=self.table, pivot_table=download_table,
                         render=False).url('download'),
@@ -1677,7 +1666,6 @@ class PivotTable(Component):
 
         last_steps = False
         while operations:
-            print(f'\nOperation name: {operations[0].operation}')
             operation = operations.popleft()
 
             new_operations = getattr(operation, operation.operation)(table_structure)
