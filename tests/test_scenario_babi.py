@@ -50,7 +50,7 @@ class Test(unittest.TestCase):
         table = Table()
         table.name = 'User'
         self.assertEqual(table.internal_name, 'user')
-        table.type = 'query'
+        table.type = 'view'
         table.query = 'SELECT id, employee, company, name FROM res_user'
         table.save()
         table.click('compute')
