@@ -603,7 +603,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             seq = ' > '.join([x.rec_name for x in processed] + [self.rec_name])
             raise UserError(gettext('babi.msg_circular_dependency',
                     sequence=seq))
-        # print('Computing %s.... ' % self.rec_name)
         try:
             if self.type == 'model':
                 if not self.fields_:
@@ -647,9 +646,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         self.compute_warning_error = None
         self.save()
         query = self.get_query()
-        print('Computing warnings for %s' % self.rec_name)
         if query:
-            print('Query: %s' % query)
             user_id = None
             if self.user_field:
                 user_id = self.user_field.internal_name
