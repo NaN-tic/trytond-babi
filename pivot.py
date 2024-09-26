@@ -916,7 +916,7 @@ class Index(Component):
         PivotHeader = pool.get('www.pivot_header')
         BabiTable = pool.get('babi.table')
         User = pool.get('res.user')
-        Index = pool.get('www.index')
+        Index = pool.get('www.index.pivot')
 
         # Get the table name
         # If table name starts with "__" we need to remove this part to search the table name
