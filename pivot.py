@@ -846,7 +846,7 @@ class Layout(Component):
 
     def render(self):
         # Prepare the head with all the scripts
-        site = self.context['site']
+        site = self.site
 
         html_layout = html()
         with html_layout:
