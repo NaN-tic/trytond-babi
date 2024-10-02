@@ -892,6 +892,28 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         logger.info('Calculated %s, %s records in %s seconds'
             % (self.model.model, count, checker.elapsed))
 
+    def check_access(self, user=None):
+        pool = Pool()
+        User = pool.get('res.user')
+
+        if not user:
+            user = User(Transaction().user)
+
+        access = True
+        if not user:
+            access = False
+        if access and user and self.access_users:
+            if user not in self.access_users:
+                access = False
+        if access and user and self.access_groups:
+            access = False
+            for group in user.groups:
+                if group in self.access_groups:
+                    access = True
+                    break
+
+        return access
+
 
 class Field(sequence_ordered(), ModelSQL, ModelView):
     'BABI Field'
