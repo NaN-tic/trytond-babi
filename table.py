@@ -758,14 +758,26 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def _drop(self):
         # Given that the type may be changed from view to table and viceversa
-        # we must try to drop both
+        # we cannot rely on self.type to know if we have to execute DROP TABLE
+        # or DROP VIEW.
         cursor = Transaction().connection.cursor()
         if backend.name != 'postgresql':
             cursor.execute('DROP TABLE IF EXISTS %s' % self.table_name)
             cursor.execute('DROP VIEW IF EXISTS %s' % self.table_name)
             return
-        cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE' % self.table_name)
-        cursor.execute('DROP TABLE IF EXISTS "%s" CASCADE' % self.table_name)
+        # In Postgres, trying to execute DROP VIEW on a TABLE will make
+        # postgres complaint (even with the 'IF EXISTS' clause). And the same
+        # will happen with DROP TABLE on a VIEW. So we must check if it exists
+        # and its type.
+        cursor.execute("SELECT table_type FROM information_schema.tables "
+            "WHERE table_name=%s AND table_schema='public'", (self.table_name,))
+        record = cursor.fetchone()
+        if not record:
+            return
+        if record[0] == 'VIEW':
+            cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE' % self.table_name)
+        else:
+            cursor.execute('DROP TABLE IF EXISTS %s CASCADE' % self.table_name)
 
     def _compute_view(self):
         with Transaction().new_transaction() as transaction:
