@@ -18,6 +18,20 @@ from collections import deque
 COLLAPSE = '➖'
 EXPAND = '➕'
 
+SWAP_AXIS = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>')
+RELOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>')
+DOWNLOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>')
+
+ROWS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
+COLUMNS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
+AGGREGATION_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>')
+
+ADD_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>')
+REMOVE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>')
+UP_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>')
+DOWN_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>')
+CLOSE_ICON = raw('<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
+
 
 class Site(metaclass=PoolMeta):
     __name__ = 'www.site'
@@ -93,7 +107,6 @@ class Operation:
         cursor = Transaction().connection.cursor()
         cursor.execute(f'SELECT {self.name} FROM {self.table} GROUP BY {self.name} ORDER BY {self.name};')
 
-        print('SELECT OPEN')
         h = Header(self.name, None, self.hierarchy, self.position, [], self.record_state)
         if self.position == 'row':
             table_structure.table_rows.append(h)
@@ -256,7 +269,6 @@ class Operation:
                                     if aggregation not in values[(result[:len(table_strucutre_columns + table_strucutre_rows)])].keys():
                                         values[(result[:len(table_strucutre_columns + table_strucutre_rows)])][aggregation] = {}
                                     values[(result[:len(table_strucutre_columns + table_strucutre_rows)])][aggregation] = result[-1]
-        #print(f'VALUES: {values}')
         table_structure.values = {**table_structure.values, **values}
         return []
 
@@ -268,7 +280,7 @@ class Operation:
         # calculate all the values of each row
         # The column list (the first row of the table) contain all the columns + a space for each row
         # Get the hierarchy levels of the columns and rows
-        print([(t.name, t.hierarchy) for t in table_structure.columns])
+
         hierarchy_columns = [t.hierarchy for t in table_structure.columns]
         hierarchy_columns.sort()
         hierarchy_columns = list(set(hierarchy_columns))
@@ -365,7 +377,6 @@ class Operation:
                                         else:
                                             last_none = False
                                             new_coordinates.append(coordinate)
-                                    #coordinates = tuple([c for c in list(coordinates) if c != None])
                                     coordinates = tuple(new_coordinates)
                                     if coordinates in table_structure.values.keys():
                                         if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
@@ -443,7 +454,6 @@ class Operation:
         specific_record_column_open = None
         for hierarchy_column in hierarchy_columns:
             row = tr()
-            #row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
             for i in range(len(hierarchy_rows)):
                 row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
             first_column = True
@@ -474,7 +484,6 @@ class Operation:
                                 row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                                 parent = parent.parent
 
-                            #print(f'\n<<<< NAME1: {table_structure_column.name} ')
                             # If we are in the last level, dont use a link
                             grouping_fields, result_fields = self.create_url(table_structure_column)
 
@@ -497,7 +506,6 @@ class Operation:
                     else:
                         if table_structure_column.parent and table_structure_column.parent.state != 'open':
                             continue
-                        #print(f'\n<<<< NAME2: {table_structure_column.name} ')
                         grouping_fields, result_fields = self.create_url(table_structure_column)
 
                         if table_structure_column.state == 'open':
@@ -559,7 +567,6 @@ class Operation:
                     if ((isinstance(specific_record_row_open, int) and
                             specific_record_row_open < table_structure_row.hierarchy) or
                             (upper_row_level_state == 'closed')):
-                        #print('=========== CONTINUE ===========')
                         continue
 
                     if (table_structure_row.hierarchy != hierarchy_rows[0] and
@@ -668,12 +675,10 @@ class Operation:
                 download_table = download_table.replace('/', '\\')
                 download_table = download_table.replace(COLLAPSE, '')
                 download_table = download_table.replace(EXPAND, '')
-                print('DOWNLOAD TABLE: ', download_table)
                 a(href=DownloadReport(database_name=self.database_name,
                         table_name=self.table, pivot_table=download_table,
                         render=False).url('download'),
-                    cls="relative left-4 top-8").add(
-                        raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>'))
+                    cls="relative left-4 top-8").add(DOWNLOAD)
         pivot_div.add(pivot_table)
         return pivot_div
 
@@ -875,21 +880,16 @@ class Layout(Component):
                     meta(name='canonical', href=f'{site.url} {site.canonical}')
                 if site.author:
                     meta(name='author', content=site.author)
-                #script(src="{{ url_for('static',
-                #   filename='bower_components/jquery/dist/jquery.min.js') }}")
-                #script(src="{{ url_for('static', filename='js/nantic.js') }}")
                 comment('CSS')
                 link(href="/static/output.css", rel="stylesheet")
                 script(src='https://unpkg.com/htmx.org@2.0.0')
                 script(src="https://cdn.tailwindcss.com")
             main_body = div(id='main', cls='bg-white')
-            #main_body += Header().tag()
             flash_div = div(id='flash_messages',
                 cls="flex w-full flex-col items-center space-y-4 sm:items-end")
             flash_div['hx-swap-oob'] = "afterbegin"
             main_body += flash_div
             main_body += self.main
-            #main_body += Footer().tag()
         return html_layout
 
 class Index(Component):
@@ -929,28 +929,15 @@ class Index(Component):
         if babi_tables:
             babi_table = babi_tables[0]
             table_name = babi_table.name
+            access = babi_table.check_access()
 
-            user = User(Transaction().user)
-            error_page = False
-            if not user:
-                error_page = True
-            if not error_page and user and babi_table.access_users:
-                if user not in babi_table.access_users:
-                    error_page = True
-            if not error_page and user and babi_table.access_groups:
-                error_page = True
-                for group in user.groups:
-                    if group in babi_table.access_groups:
-                        error_page = False
-                        break
-
-            if error_page:
+            if not access:
                 with main(cls="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8") as error_section:
                     with div(cls="text-center"):
-                        p('404', cls="text-base font-semibold text-indigo-600")
-                        h1('Page not found', cls="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl")
-                        p('Sorry, we couldn’t find the page you’re looking for.', cls="mt-6 text-base leading-7 text-gray-600")
-                layout = Layout(title='Page not found | Tryton')
+                        p(_('404'), cls="text-base font-semibold text-indigo-600")
+                        h1(_('Page not found'), cls="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl")
+                        p(_('Sorry, we couldn’t find the page you’re looking for.'), cls="mt-6 text-base leading-7 text-gray-600")
+                layout = Layout(title=_('Page not found | Tryton'))
                 layout.main.add(error_section)
                 return layout.tag()
 
@@ -960,16 +947,6 @@ class Index(Component):
             table_properties = 'null'
         else:
             table_properties = self.table_properties
-
-            '''
-            grouping_fields = []
-            gf1 = GroupingField(fields[0], 'column', 0, 'open', [])
-            grouping_fields.append(gf1)
-            gf2 = GroupingField(fields[1], 'row', 0, 'open', ['2019.0', '2022.0'])
-            grouping_fields.append(gf2)
-            gf3 = GroupingField(fields[3], 'row', 1, 'open',  [])
-            grouping_fields.append(gf3)
-            '''
 
             show_error = True
             grouping_fields = ''
@@ -1032,13 +1009,11 @@ class Index(Component):
                 # Inverted columns/rows
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
-                        cls="absolute right-12").add(
-                            raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>'))
+                        cls="absolute right-12").add(SWAP_AXIS)
                 # Undo all the changes
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
-                        cls="absolute right-3").add(
-                            raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>'))
+                        cls="absolute right-3").add(RELOAD)
             with div(cls="grid grid-cols-12"):
                 PivotHeader(database_name=self.database_name,
                     table_name=self.table_name,
@@ -1123,17 +1098,16 @@ class PivotHeader(Component):
                     with table(cls="min-w-full divide-y divide-gray-300"):
                         with thead():
                             with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(
-                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>'))
-                                th('X axis', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Up', cls="sr-only"))
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Down', cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(ROWS_ICON)
+                                th(_('X axis'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
                                 with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-900",
                                         hx_target="#field_selection_x",
                                         hx_post=PivotHeader(header='x', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
-                                        hx_trigger="click", hx_swap="outerHTML").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
-                                    span('Remove', cls="sr-only")
+                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
+                                    span(_('Remove'), cls="sr-only")
                         with tbody(cls="divide-y divide-gray-200") :
                             for field in fields:
                                 with tr():
@@ -1141,17 +1115,14 @@ class PivotHeader(Component):
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
-                                                cls="text-indigo-600 hover:text-indigo-900").add(
-                                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
+                                                cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[-1]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
-                                                cls="text-indigo-600 hover:text-indigo-900").add(
-                                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
+                                                cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(
-                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
+                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_x
 
     def header_y(self):
@@ -1180,17 +1151,16 @@ class PivotHeader(Component):
                     with table(cls="min-w-full divide-y divide-gray-300"):
                         with thead():
                             with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(
-                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>'))
-                                th('Y axis', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Up', cls="sr-only"))
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Down', cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(COLUMNS_ICON)
+                                th(_('Y axis'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
                                 with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-900",
                                         hx_target="#field_selection_y",
                                         hx_post=PivotHeader(header='y', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
-                                        hx_trigger="click", hx_swap="outerHTML").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
-                                    span('Remove', cls="sr-only")
+                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
+                                    span(_('Remove'), cls="sr-only")
                         with tbody(cls="divide-y divide-gray-200") :
                             #TODO: Loop trough the fields
                             for field in fields:
@@ -1199,15 +1169,14 @@ class PivotHeader(Component):
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
-                                                cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>'))
+                                                cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[-1]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
-                                                cls="text-indigo-600 hover:text-indigo-900").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>'))
+                                                cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(
-                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
+                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_y
 
     def header_aggregation(self):
@@ -1236,16 +1205,15 @@ class PivotHeader(Component):
                     with table(cls="min-w-full divide-y divide-gray-300"):
                         with thead():
                             with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(
-                                    raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>'))
-                                th('Aggregation fields', scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span('Aggregation type', cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(AGGREGATION_ICON)
+                                th(_('Aggregation fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Aggregation type'), cls="sr-only"))
                                 with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-900",
                                         hx_target="#field_selection_aggregation",
                                         hx_post=PivotHeader(header='aggregation', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
-                                        hx_trigger="click", hx_swap="outerHTML").add(raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>'))
-                                    span('Remove', cls="sr-only")
+                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
+                                    span(_('Remove'), cls="sr-only")
                         with tbody(cls="divide-y divide-gray-200") :
                             #TODO: Loop trough the fields
                             for field in fields:
@@ -1257,8 +1225,7 @@ class PivotHeader(Component):
                                                 option(field['aggregation'].capitalize(), value=field['aggregation'])
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(
-                                                raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>'))
+                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_aggregation
 
     def open_field_selection(self):
@@ -1301,11 +1268,11 @@ class PivotHeader(Component):
                                     hx_post=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, table_properties=self.table_properties, render=False).url('close_field_selection'),
                                     hx_trigger="click", hx_swap="outerHTML",
                                     cls="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"):
-                                span('Close', cls="sr-only")
-                                raw('<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
+                                span(_('Close'), cls="sr-only")
+                                CLOSE_ICON
                         with div(cls="sm:flex sm:items-start"):
                             with div(cls="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left"):
-                                h3('Select a field to add:', cls="text-base font-semibold leading-6 text-gray-900", id="modal-title")
+                                h3(_('Select a field to add:'), cls="text-base font-semibold leading-6 text-gray-900", id="modal-title")
                                 with div(cls="mt-2"):
                                     with select(id="field", name="field", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
                                         for field in fields:
@@ -1313,14 +1280,14 @@ class PivotHeader(Component):
                                                 option(field[0].capitalize(), value=field[0])
                                     if self.header == 'aggregation':
                                         with select(id="aggregation", name="aggregation", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
-                                            option('Sum')
-                                            option('Average')
-                                            option('Max')
-                                            option('Min')
-                                            option('Count')
+                                            option(_('Sum'))
+                                            option(_('Average'))
+                                            option(_('Max'))
+                                            option(_('Min'))
+                                            option(_('Count'))
                         with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
-                            button('Add', type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
-                            a('Cancel', href="#",
+                            button(_('Add'), type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
+                            a(_('Cancel'), href="#",
                                 hx_target=f"#{name}",
                                 hx_post=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, table_properties=self.table_properties, render=False).url('close_field_selection'),
                                 hx_trigger="click", hx_swap="outerHTML",
