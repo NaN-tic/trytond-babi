@@ -627,7 +627,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             # we do rollback to obtain a value from the gettext()
             Transaction().connection.rollback()
             notify(gettext('babi.msg_table_failed', table=self.rec_name))
-            self.compute_error = str(e)
+            self.compute_error = f'{e}\n{traceback.format_exc()}'
             self.save()
             return
 
