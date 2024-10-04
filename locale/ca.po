@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Last-Translator: Albert Cervera i Areny <albert@nan-tic.com>\n"
-"PO-Revision-Date: 2024-04-27 23:49+0200\n"
+"PO-Revision-Date: 2024-10-04 19:37+0200\n"
 "Project-Id-Version: \n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca_ES\n"
@@ -601,6 +601,14 @@ msgctxt "field:babi.report.execution.open.select,view_type:"
 msgid "View type"
 msgstr "Tipus de vista"
 
+msgctxt "field:babi.table,access_groups:"
+msgid "Access Groups"
+msgstr "Grups d'accés"
+
+msgctxt "field:babi.table,access_users:"
+msgid "Access Users"
+msgstr "Usuaris d'accés"
+
 msgctxt "field:babi.table,ai_request:"
 msgid "AI Request"
 msgstr "Petició IA"
@@ -681,6 +689,18 @@ msgctxt "field:babi.table,name:"
 msgid "Name"
 msgstr "Nom"
 
+msgctxt "field:babi.table,party:"
+msgid "Party"
+msgstr "Tercer"
+
+msgctxt "field:babi.table,party_field:"
+msgid "Party Field"
+msgstr "Camp del tercer"
+
+msgctxt "field:babi.table,pivot_table:"
+msgid "Pivot Table"
+msgstr "Taula dinàmica"
+
 msgctxt "field:babi.table,preview:"
 msgid "Preview"
 msgstr "Vista prèvia"
@@ -737,6 +757,22 @@ msgctxt "field:babi.table,warning_description:"
 msgid "Description"
 msgstr "Descripció"
 
+msgctxt "field:babi.table-res.group,babi_table:"
+msgid "Table"
+msgstr "Taula"
+
+msgctxt "field:babi.table-res.group,user:"
+msgid "Group"
+msgstr "Grup"
+
+msgctxt "field:babi.table-res.user,babi_table:"
+msgid "Table"
+msgstr "Taula"
+
+msgctxt "field:babi.table-res.user,user:"
+msgid "User"
+msgstr "Usuari"
+
 msgctxt "field:babi.table.dependency,name:"
 msgid "Name"
 msgstr "Nom"
@@ -777,6 +813,10 @@ msgctxt "field:babi.warning,done_by:"
 msgid "Done By"
 msgstr "Realitzat per"
 
+msgctxt "field:babi.warning,emails:"
+msgid "E-mails"
+msgstr "Correus electrònics"
+
 msgctxt "field:babi.warning,employee:"
 msgid "Employee"
 msgstr "Empleat"
@@ -793,6 +833,10 @@ msgctxt "field:babi.warning,ignored_by:"
 msgid "Ignored By"
 msgstr "Ignorat per"
 
+msgctxt "field:babi.warning,party:"
+msgid "Party"
+msgstr "Tercer"
+
 msgctxt "field:babi.warning,state:"
 msgid "State"
 msgstr "Estat"
@@ -808,6 +852,10 @@ msgstr "Marca de temps"
 msgctxt "field:babi.warning,user:"
 msgid "User"
 msgstr "Usuari"
+
+msgctxt "field:babi.warning,users:"
+msgid "Users"
+msgstr "Usuaris"
 
 msgctxt "field:babi.widget,box_points:"
 msgid "Box Points"
@@ -936,6 +984,74 @@ msgstr "Informe BABI"
 msgctxt "field:ir.ui.menu,babi_type:"
 msgid "BABI Type"
 msgstr "Tipus BABI"
+
+msgctxt "field:www.download_report,database_name:"
+msgid "Database Name"
+msgstr "Nom de la base de dades"
+
+msgctxt "field:www.download_report,pivot_table:"
+msgid "Pivot Table"
+msgstr "Taula dinàmica"
+
+msgctxt "field:www.download_report,table_name:"
+msgid "Table Name"
+msgstr "Nom de la taula"
+
+msgctxt "field:www.index.pivot,database_name:"
+msgid "Database Name"
+msgstr "Nom de la base de dades"
+
+msgctxt "field:www.index.pivot,table_name:"
+msgid "Table Name"
+msgstr "Nom de la taula"
+
+msgctxt "field:www.index.pivot,table_properties:"
+msgid "Table Properties"
+msgstr "Propietats de la taula"
+
+msgctxt "field:www.layout.pivot,title:"
+msgid "Title"
+msgstr "Títol"
+
+msgctxt "field:www.pivot_header,aggregation:"
+msgid "Aggregation"
+msgstr "Agregació"
+
+msgctxt "field:www.pivot_header,database_name:"
+msgid "Database Name"
+msgstr "Nom de la base de dades"
+
+msgctxt "field:www.pivot_header,field:"
+msgid "Field"
+msgstr "Camp"
+
+msgctxt "field:www.pivot_header,header:"
+msgid "Header"
+msgstr "Capçalera"
+
+msgctxt "field:www.pivot_header,table_name:"
+msgid "Table Name"
+msgstr "Nom de la taula"
+
+msgctxt "field:www.pivot_header,table_properties:"
+msgid "Table Properties"
+msgstr "Propietats de la taula"
+
+msgctxt "field:www.pivot_table,database_name:"
+msgid "Database Name"
+msgstr "Nom de la base de dades"
+
+msgctxt "field:www.pivot_table,grouping_fields:"
+msgid "Grouping Fields"
+msgstr "Camps d'agrupació"
+
+msgctxt "field:www.pivot_table,result_fields:"
+msgid "Result Fields"
+msgstr "Camps de resultats"
+
+msgctxt "field:www.pivot_table,table_name:"
+msgid "Table Name"
+msgstr "Nom de la taula"
 
 msgctxt "help:babi.action.dashboard,records:"
 msgid "The records on which the action runs."
@@ -1193,6 +1309,14 @@ msgctxt "model:babi.table,name:"
 msgid "BABI Table"
 msgstr "Taula BABI"
 
+msgctxt "model:babi.table-res.group,name:"
+msgid "BABI Table Group"
+msgstr "Grup de Taules BABI"
+
+msgctxt "model:babi.table-res.user,name:"
+msgid "BABI Table User"
+msgstr "Usuari de la taula BABI"
+
 msgctxt "model:babi.table.dependency,name:"
 msgid "BABI Table Dependency"
 msgstr "Taula BABI Dependència"
@@ -1230,8 +1354,8 @@ msgid "Dashboards"
 msgstr "Taulers de control"
 
 msgctxt "model:ir.action,name:act_babi_configuration_form"
-msgid "Business Intelligence Configuration"
-msgstr "Configuració Business Intelligence"
+msgid "Configuration"
+msgstr "Configuració"
 
 msgctxt "model:ir.action,name:act_babi_dashboard"
 msgid "Dashboards"
@@ -1285,6 +1409,10 @@ msgctxt "model:ir.action,name:act_warning_relate"
 msgid "Warnings"
 msgstr "Avisos"
 
+msgctxt "model:ir.action,name:act_widget_table"
+msgid "Widgets"
+msgstr "Ginys"
+
 msgctxt "model:ir.action,name:clear_executions_wizard"
 msgid "Clean Executions"
 msgstr "Eliminar Execucions"
@@ -1300,6 +1428,10 @@ msgstr "Informe de Business Intelligence"
 msgctxt "model:ir.action,name:report_babi_html_report"
 msgid "Report"
 msgstr "Informe"
+
+msgctxt "model:ir.action,name:report_table_excel"
+msgid "Excel"
+msgstr "Excel"
 
 msgctxt "model:ir.action.act_window.domain,name:act_show_all"
 msgid "All"
@@ -1400,6 +1532,16 @@ msgstr ""
 "S'ha produït una excepció en calcular el valor del camp \"%(field)s\" a la "
 "taula \"%(table)s\", registre \"%(record)s\". L'error ha estat: %(error)s"
 
+msgctxt "model:ir.message,text:msg_error_obtaining_records"
+msgid ""
+"An error occurred while obtaining the records for table \"%(table)s\":\n"
+"\n"
+"%(error)s"
+msgstr ""
+"S'ha produït un error en obtenir els registres de la taula \"%(table)s\":\n"
+"\n"
+"%(error)s"
+
 msgctxt "model:ir.message,text:msg_filter_with_parameters"
 msgid "Cannot use filters with parameters in table \"%(table)s\"."
 msgstr "No es poden utilitzar filtres amb paràmetres a la taula \"%(table)s\"."
@@ -1462,8 +1604,12 @@ msgstr ""
 "\"%(widget)s\"."
 
 msgctxt "model:ir.message,text:msg_open_warning_single"
-msgid "You can only open records for a single warning."
-msgstr "Només podeu obrir registres per a un sol avís."
+msgid ""
+"You can only open records for several warnings if they are all of the same "
+"type."
+msgstr ""
+"Només podeu obrir registres per a diversos avisos si tots són del mateix "
+"tipus."
 
 msgctxt "model:ir.message,text:msg_render_report_columns"
 msgid ""
@@ -1673,6 +1819,10 @@ msgctxt "model:ir.rule.group,name:rule_group_babi_execution"
 msgid "Babi Execution"
 msgstr "Execució Babi"
 
+msgctxt "model:ir.rule.group,name:rule_group_babi_table"
+msgid "Babi Table"
+msgstr "Taula Babi"
+
 msgctxt "model:ir.rule.group,name:rule_group_user_warning"
 msgid "User in Warning"
 msgstr "Usuari en avís"
@@ -1694,8 +1844,8 @@ msgid "Clean Executions"
 msgstr "Eliminar Execucions"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_configuration"
-msgid "Business Intelligence Configuration"
-msgstr "Configuració Business Intelligence"
+msgid "Configuration"
+msgstr "Configuració"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_execution"
 msgid "Executions"
@@ -1752,6 +1902,30 @@ msgstr "Business Intelligence"
 msgctxt "model:res.group,name:group_babi_admin"
 msgid "Business Intelligence Administration"
 msgstr "Administració Business Intelligence"
+
+msgctxt "model:res.group,name:group_babi_table"
+msgid "Business Intelligence Table"
+msgstr "Taula d'intel·ligència empresarial"
+
+msgctxt "model:www.download_report,name:"
+msgid "Download Report"
+msgstr "Descarrega l'informe"
+
+msgctxt "model:www.index.pivot,name:"
+msgid "Index"
+msgstr "Índex"
+
+msgctxt "model:www.layout.pivot,name:"
+msgid "Layout"
+msgstr "Disseny"
+
+msgctxt "model:www.pivot_header,name:"
+msgid "Pivot Header"
+msgstr "Capçalera pivot"
+
+msgctxt "model:www.pivot_table,name:"
+msgid "Pivot Table"
+msgstr "Taula dinàmica"
 
 msgctxt "selection:babi.action.dashboard,records:"
 msgid "Listed"
@@ -1814,12 +1988,12 @@ msgid "Model"
 msgstr "Model"
 
 msgctxt "selection:babi.field,table_type:"
-msgid "Query"
-msgstr "Consulta"
-
-msgctxt "selection:babi.field,table_type:"
 msgid "Table"
 msgstr "Taula"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "View"
+msgstr "Vista"
 
 msgctxt "selection:babi.field,type:"
 msgid "Boolean"
@@ -2054,12 +2228,12 @@ msgid "Model"
 msgstr "Model"
 
 msgctxt "selection:babi.table,type:"
-msgid "Query"
-msgstr "Consulta"
-
-msgctxt "selection:babi.table,type:"
 msgid "Table"
 msgstr "Taula"
+
+msgctxt "selection:babi.table,type:"
+msgid "View"
+msgstr "Vista"
 
 msgctxt "selection:babi.table,warn:"
 msgid "Always"
@@ -2305,6 +2479,10 @@ msgctxt "selection:ir.ui.menu,babi_type:"
 msgid "Wizard"
 msgstr "Assistent"
 
+msgctxt "selection:www.site,type:"
+msgid "Pivot"
+msgstr "Taula dinàmica"
+
 msgctxt "view:babi.action.dashboard:"
 msgid "General"
 msgstr "General"
@@ -2406,6 +2584,10 @@ msgid "AI Response:"
 msgstr "Resposta de l'IA:"
 
 msgctxt "view:babi.table:"
+msgid "Access"
+msgstr "Accés"
+
+msgctxt "view:babi.table:"
 msgid "Configuration"
 msgstr "Configuració"
 
@@ -2440,6 +2622,86 @@ msgstr "Es calcularà la informació d'aquest informe."
 msgctxt "view:babi.widget:"
 msgid "Settings"
 msgstr "Configuració"
+
+msgctxt "voyager:v:"
+msgid "404"
+msgstr "404"
+
+msgctxt "voyager:v:"
+msgid "Add"
+msgstr "Afegeix"
+
+msgctxt "voyager:v:"
+msgid "Aggregation fields"
+msgstr "Camps d'agregació"
+
+msgctxt "voyager:v:"
+msgid "Aggregation type"
+msgstr "Tipus d'agregació"
+
+msgctxt "voyager:v:"
+msgid "Average"
+msgstr "Mitjana"
+
+msgctxt "voyager:v:"
+msgid "Cancel"
+msgstr "Cancel·la"
+
+msgctxt "voyager:v:"
+msgid "Close"
+msgstr "Tancar"
+
+msgctxt "voyager:v:"
+msgid "Count"
+msgstr "Comptador"
+
+msgctxt "voyager:v:"
+msgid "Down"
+msgstr "Avall"
+
+msgctxt "voyager:v:"
+msgid "Max"
+msgstr "Màx"
+
+msgctxt "voyager:v:"
+msgid "Min"
+msgstr "Min"
+
+msgctxt "voyager:v:"
+msgid "Page not found"
+msgstr "No s'ha trobat la pàgina"
+
+msgctxt "voyager:v:"
+msgid "Page not found | Tryton"
+msgstr "No s'ha trobat la pàgina | Tryton"
+
+msgctxt "voyager:v:"
+msgid "Remove"
+msgstr "Eliminar"
+
+msgctxt "voyager:v:"
+msgid "Select a field to add:"
+msgstr "Seleccioneu un camp per afegir:"
+
+msgctxt "voyager:v:"
+msgid "Sorry, we couldn’t find the page you’re looking for."
+msgstr "Ho sentim, no hem pogut trobar la pàgina que estàs cercant."
+
+msgctxt "voyager:v:"
+msgid "Sum"
+msgstr "Suma"
+
+msgctxt "voyager:v:"
+msgid "Up"
+msgstr "Amunt"
+
+msgctxt "voyager:v:"
+msgid "X axis"
+msgstr "Eix X"
+
+msgctxt "voyager:v:"
+msgid "Y axis"
+msgstr "Eix Y"
 
 msgctxt "wizard_button:babi.clean_executions,start,clean:"
 msgid "Ok"
