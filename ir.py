@@ -12,6 +12,7 @@ class Rule(metaclass=PoolMeta):
         context = super()._get_context(model_name)
         if model_name == 'babi.warning':
             context['employees'] = User.get_employees()
+        if model_name in ('babi.warning', 'babi.table'):
             context['user_id'] = Transaction().user
         return context
 

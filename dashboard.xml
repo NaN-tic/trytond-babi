@@ -56,6 +56,14 @@
         </record>
 
         <menuitem id="menu_dashboard" parent="menu_babi" sequence="30" action="act_babi_dashboard"/>
+        <record model="ir.ui.menu-res.group" id="menu_babi_dashboard_group_babi_table">
+            <field name="menu" ref="menu_dashboard"/>
+            <field name="group" ref="group_babi_table"/>
+        </record>
+        <record model="ir.ui.menu-res.group" id="menu_babi_dashboard_group_babi_admin">
+            <field name="menu" ref="menu_dashboard"/>
+            <field name="group" ref="group_babi_admin"/>
+        </record>
 
         <!-- babi.dashboard.item -->
         <record model="ir.ui.view" id="babi_dashboard_item_form_view">

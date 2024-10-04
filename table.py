@@ -1,3 +1,4 @@
+import csv
 import time
 import traceback
 import datetime as mdatetime
@@ -6,6 +7,9 @@ import logging
 import sql
 import unidecode
 import json
+import tempfile
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_workbook
 from simpleeval import EvalWithCompoundTypes
 from trytond import backend
 from trytond.bus import notify
@@ -19,6 +23,7 @@ from trytond.pyson import Bool, Eval, PYSONDecoder
 from trytond.config import config
 from trytond.modules.company.model import (
     employee_field, reset_employee, set_employee)
+from trytond.report import Report
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
 
@@ -28,6 +33,12 @@ VALID_SYMBOLS = VALID_FIRST_SYMBOLS + VALID_NEXT_SYMBOLS
 
 
 logger = logging.getLogger(__name__)
+
+def save_virtual_workbook(workbook):
+    with tempfile.NamedTemporaryFile() as tmp:
+        save_workbook(workbook, tmp.name)
+        with open(tmp.name, 'rb') as f:
+            return f.read()
 
 def convert_to_symbol(text):
     if not text:
@@ -225,7 +236,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ], ondelete='SET NULL', states={
             'invisible': Bool(Eval('party')) | ~Bool(Eval('warn')),
             })
-    url = fields.Function(fields.Char('URL'), 'get_url')
+    pivot_table = fields.Function(fields.Char('Pivot Table'), 'get_pivot_table')
     access_users = fields.Many2Many('babi.table-res.user', 'babi_table', 'user',
         'Access Users')
     access_groups = fields.Many2Many('babi.table-res.group', 'babi_table', 'user',
@@ -381,6 +392,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 res.add(table.table_name)
         return res
 
+    def get_records(self):
+        table = []
+        table.append([x.internal_name for x in self.fields_])
+        try:
+            table += self.execute_query(limit=self.preview_limit)
+        except Exception as e:
+            raise UserError(gettext('babi.msg_error_obtaining_records',
+                    table=self.rec_name, error=str(e)))
+        return table
+
     def get_preview(self, name):
         start = time.time()
         content = None
@@ -475,7 +496,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             context = ev.eval(context)
             return context
 
-    def get_url(self, name):
+    def get_pivot_table(self, name):
         if config.get("web", "cors"):
             return f'{(config.get("web", "cors"))}/{Transaction().database.name}/babi/pivot/__{self.internal_name}/null'
         return f'http://{(config.get("web", "listen"))}/{Transaction().database.name}/babi/pivot/__{self.internal_name}/null'
@@ -483,6 +504,21 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @property
     def ai_sql_tables(self):
         return {'account_invoice', 'account_invoice_line'}
+
+    @classmethod
+    @ModelView.button
+    def csv(cls, tables):
+        for table in tables:
+            try:
+                records = table.execute_query()
+            except Exception as e:
+                raise UserError(gettext('babi.msg_table_csv_error',
+                        table=table.rec_name, error=str(e)))
+            filename = table.internal_name + '.csv'
+            with open(filename, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerows(records)
+
 
     @classmethod
     @ModelView.button
@@ -1251,3 +1287,31 @@ class Warning(Workflow, ModelSQL, ModelView):
         if self.table.warn and self.table.email_template:
             self.table.email_template.render_and_send(
                 self.table.email_template.id, [self])
+
+
+class Excel(Report):
+    'Table Excel Export'
+    __name__ = 'babi.table.excel'
+
+    @classmethod
+    def execute(cls, ids, data):
+        pool = Pool()
+        Table = pool.get('babi.table')
+
+        if not ids:
+            return
+        cls.check_access()
+
+        tables = Table.browse(ids)
+        wb = Workbook()
+        wb.remove(wb.active)
+        for table in tables:
+            ws = wb.create_sheet(table.name)
+            for record in table.get_records():
+                ws.append(record)
+
+        if len(tables) == 1:
+            name = table.name
+        else:
+            name = 'tables'
+        return ('xlsx', save_virtual_workbook(wb), False, name)

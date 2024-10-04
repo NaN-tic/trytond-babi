@@ -18,6 +18,10 @@ contains the full copyright notices and license terms. -->
             <field name="group" ref="group_babi"/>
         </record>
 
+        <record model="res.group" id="group_babi_table">
+            <field name="name">Business Intelligence Table</field>
+        </record>
+
         <!-- babi.dimension -->
         <record model="ir.ui.view" id="babi_dimension_form_view">
             <field name="model">babi.dimension</field>

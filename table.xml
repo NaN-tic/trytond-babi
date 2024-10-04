@@ -59,14 +59,39 @@
             <field name="perm_create" eval="False"/>
             <field name="perm_delete" eval="False"/>
         </record>
-
-        <record model="ir.model.access" id="access_babi_table_babi">
+        <record model="ir.model.access" id="access_babi_table_babi_table">
             <field name="model">babi.table</field>
-            <field name="group" ref="group_babi"/>
+            <field name="group" ref="group_babi_table"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_babi_table_babi_admin">
+            <field name="model">babi.table</field>
+            <field name="group" ref="group_babi_admin"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.rule.group" id="rule_group_babi_table">
+            <field name="name">Babi Table</field>
+            <field name="model">babi.table</field>
+            <field name="global_p" eval="False"/>
+        </record>
+        <record model="ir.rule" id="rule_babi_table_access_users">
+            <field name="domain" eval="[('access_users', '=', Eval('user_id', -1))]" pyson="1"/>
+            <field name="rule_group" ref="rule_group_babi_table"/>
+        </record>
+        <record model="ir.rule" id="rule_babi_table_access_groups">
+            <field name="domain" eval="[('access_groups', 'in', Eval('groups', [-1]))]" pyson="1"/>
+            <field name="rule_group" ref="rule_group_babi_table"/>
+        </record>
+        <record model="ir.rule.group-res.group" id="rule_group_babi_table-group_babi">
+            <field name="rule_group" ref="rule_group_babi_table"/>
+            <field name="group" ref="group_babi_table"/>
         </record>
 
         <!-- Create button -->
@@ -86,7 +111,28 @@
             <field name="model">babi.table</field>
         </record>
 
-        <menuitem id="menu_babi_table" parent="menu_configuration" action="act_babi_table" sequence="30"/>
+        <record model="ir.action.act_window" id="act_widget_table">
+            <field name="name">Widgets</field>
+            <field name="res_model">babi.widget</field>
+            <field name="domain" eval="If(Eval('active_ids', []) == [Eval('active_id')], [('table', '=', Eval('active_id', -1))], [('table', 'in', Eval('active_ids', []))])" pyson="1"/>
+        </record>
+        <record model="ir.action.keyword" id="act_widget_keyword_table">
+            <field name="keyword">form_relate</field>
+            <field name="model">babi.table,-1</field>
+            <field name="action" ref="act_widget_table"/>
+        </record>
+
+        <!-- Menu -->
+
+        <menuitem id="menu_babi_table" parent="menu_babi" action="act_babi_table" sequence="30"/>
+        <record model="ir.ui.menu-res.group" id="menu_babi_table_group_babi_table">
+            <field name="menu" ref="menu_babi_table"/>
+            <field name="group" ref="group_babi_table"/>
+        </record>
+        <record model="ir.ui.menu-res.group" id="menu_babi_table_group_babi_admin">
+            <field name="menu" ref="menu_babi_table"/>
+            <field name="group" ref="group_babi_admin"/>
+        </record>
 
         <!-- babi.field -->
         <record model="ir.ui.view" id="babi_field_form_view">
@@ -232,6 +278,20 @@
                     ]"
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_user_warning"/>
+        </record>
+
+        <!-- Report -->
+        <record model="ir.action.report" id="report_table_excel">
+            <field name="name">Excel</field>
+            <field name="model">babi.table</field>
+            <field name="report_name">babi.table.excel</field>
+            <field name="extension">xlsx</field>
+            <field name="template_extension">xml</field>
+        </record>
+        <record model="ir.action.keyword" id="report_table_excel_keyword">
+            <field name="keyword">form_print</field>
+            <field name="model">babi.table,-1</field>
+            <field name="action" ref="report_table_excel"/>
         </record>
     </data>
 </tryton>

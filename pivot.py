@@ -910,7 +910,6 @@ class Index(Component):
         Pivot = pool.get('www.pivot_table')
         PivotHeader = pool.get('www.pivot_header')
         BabiTable = pool.get('babi.table')
-        User = pool.get('res.user')
         Index = pool.get('www.index.pivot')
 
         # Get the table name
