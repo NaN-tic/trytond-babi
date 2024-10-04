@@ -334,7 +334,7 @@ def create_groups_access(model, groups):
                 ])
         if not exists:
             to_create.append({
-                    'model': model.model,
+                    'model': model,
                     'group': group.id,
                     'perm_read': True,
                     'perm_create': True,
