@@ -144,5 +144,10 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_open_warning_single">
             <field name="text">You can only open records for several warnings if they are all of the same type.</field>
         </record>
+        <record model="ir.message" id="msg_error_obtaining_records">
+            <field name="text">An error occurred while obtaining the records for table "%(table)s":
+
+%(error)s</field>
+        </record>
     </data>
 </tryton>

@@ -12,8 +12,8 @@
     <field name="model"/>
     <label name="filter"/>
     <field name="filter"/>
-    <label name="url"/>
-    <field name="url" widget="url"/>
+    <label name="pivot_table"/>
+    <field name="pivot_table" widget="url"/>
     <newline/>
     <notebook colspan="8">
         <page name="query">

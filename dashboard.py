@@ -211,10 +211,7 @@ class Widget(ModelSQL, ModelView):
             ('table', 'Table'),
             ('value', 'Value'),
             ], 'Type', required=True)
-    table = fields.Many2One('babi.table', 'Table', states={
-            'invisible': ~Bool(Eval('type')),
-            'required': Bool(Eval('type')),
-            })
+    table = fields.Many2One('babi.table', 'Table', required=True)
     where = fields.Char('Where', states={
             'invisible': ~Bool(Eval('type')),
             })
@@ -282,6 +279,7 @@ class Widget(ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls._order.insert(0, ('name', 'ASC'))
+        cls.__access__.add('table')
 
     @classmethod
     def validate(cls, widgets):
