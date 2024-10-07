@@ -132,7 +132,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         'timeout': 30,
                         }])
             self.assertEqual(len(report.order), 0)
-            self.assertRaises(UserError, Report.compute, report)
+            self.assertRaises(UserError, Report._compute, report)
 
             category, = Expression.search([('name', '=', 'Category')])
             category, = Dimension.create([{
@@ -141,7 +141,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         'expression': category.id,
                         }])
 
-            self.assertRaises(UserError, Report.compute, report)
+            self.assertRaises(UserError, Report._compute, report)
 
             amount, = Expression.search([('name', '=', 'Amount')])
             amount, = Measure.create([{
@@ -169,7 +169,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             self.assertIsNone(amount_this_month_order.dimension)
             self.assertIsNotNone(amount_this_month_order.measure)
 
-            report.compute()
+            report._compute()
             report, = Report.search([])
 
             execution, = report.executions
@@ -228,7 +228,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         'expression': month.id,
                         }])
 
-            report.compute()
+            report._compute()
             report, = Report.search([])
 
             self.assertEqual(len(report.executions), 2)
@@ -327,7 +327,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         'aggregate': 'count',
                         }])
 
-            report.compute()
+            report._compute()
             report = Report(report.id)
 
             execution, = report.executions
@@ -394,7 +394,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         'name': 'Amount',
                         'aggregate': 'avg',
                         }])
-            report.compute()
+            report._compute()
             report = Report(report.id)
 
             execution, = report.executions
@@ -469,7 +469,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         'aggregate': 'sum',
                         }])
 
-            report.compute()
+            report._compute()
             report = Report(report.id)
 
             execution, = report.executions
@@ -520,7 +520,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         'aggregate': 'sum',
                         }])
 
-            report.compute()
+            report._compute()
             report = Report(report.id)
 
             execution, = report.executions
@@ -582,7 +582,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         'aggregate': 'sum',
                         }])
 
-            report.compute()
+            report._compute()
             report = Report(report.id)
 
             execution, = report.executions

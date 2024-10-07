@@ -860,7 +860,7 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
     def __setup__(cls):
         super(Report, cls).__setup__()
         cls._buttons.update({
-                'calculate': {},
+                'compute': {},
                 'create_menus': {},
                 'remove_menus': {},
                 })
@@ -1086,7 +1086,7 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
             'company': Transaction().context.get('company'),
             }
 
-    def compute(self):
+    def _compute(self):
         '''
         Creates an execution, calculates it and sends e-mail if necessary.
         '''
@@ -1144,10 +1144,10 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
 
     @classmethod
     @ModelView.button
-    def calculate(cls, reports):
+    def compute(cls, reports):
         with Transaction().set_context(queue_name=QUEUE_NAME):
             for report in reports:
-                cls.__queue__.compute(report)
+                cls.__queue__._compute(report)
 
 
 class ReportExecution(ModelSQL, ModelView):

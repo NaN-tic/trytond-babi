@@ -406,9 +406,9 @@ contains the full copyright notices and license terms. -->
             <field name="perm_delete" eval="True"/>
         </record>
 
-        <record model="ir.model.button" id="babi_report_calculate_button">
-            <field name="name">calculate</field>
-            <field name="string">Calculate</field>
+        <record model="ir.model.button" id="babi_report_compute_button">
+            <field name="name">compute</field>
+            <field name="string">Compute</field>
             <field name="model">babi.report</field>
         </record>
 
