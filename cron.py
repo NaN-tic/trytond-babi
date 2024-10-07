@@ -10,14 +10,14 @@ from .babi import QUEUE_NAME
 class Cron(metaclass=PoolMeta):
     __name__ = "ir.cron"
     babi_report = fields.Many2One('babi.report', 'Babi Report', states={
-            'invisible': Eval('method') != 'babi.report|calculate_babi_report',
+            'invisible': Eval('method') != 'babi.report|compute',
             })
     babi_table = fields.Many2One('babi.table', 'Babi Table', states={
-            'invisible': Eval('method') != 'babi.table|calculate_babi_table',
+            'invisible': Eval('method') != 'babi.table|compute',
             })
     babi_calculate_warnings = fields.Boolean('Calculate Warnings', states={
-        'invisible': Eval('method') != 'babi.table|calculate_babi_table',
-            })
+        'invisible': Eval('method') != 'babi.table|compute',
+        })
 
     @classmethod
     def __register__(cls, module_name):
@@ -29,13 +29,21 @@ class Cron(metaclass=PoolMeta):
                 [babi.method], ['babi.report|calculate_babi_report'],
                 where=(babi.method == 'babi.report|calculate_reports')
                 ))
+        cursor.execute(*babi.update(
+                [babi.method], ['babi.report|compute'],
+                where=(babi.method == 'babi.report|calculate_babi_report')
+                ))
+        cursor.execute(*babi.update(
+                [babi.method], ['babi.table|compute'],
+                where=(babi.method == 'babi.tablel|calculate_babi_table')
+                ))
 
     @classmethod
     def __setup__(cls):
         super(Cron, cls).__setup__()
         cls.method.selection.extend([
-                ('babi.report|calculate_babi_report', 'Calculate Babi Report'),
-                ('babi.table|calculate_babi_table', 'Calculate Babi Table'),
+                ('babi.report|compute', 'Compute Business Intelligence Report'),
+                ('babi.table|compute', 'Compute Business Intelligence Table'),
                 ('babi.report.execution|clean', 'Clean Babi Excutions'),
                 ])
 
@@ -48,13 +56,13 @@ class Cron(metaclass=PoolMeta):
             res['interval_number'] = 1
             res['minute'] = 0
             res['hour'] = 5
-            res['method'] = 'babi.report|calculate_babi_report'
+            res['method'] = 'babi.report|compute'
         if context.get('babi_table'):
             res['interval_type'] = 'days'
             res['interval_number'] = 1
             res['minute'] = 0
             res['hour'] = 5
-            res['method'] = 'babi.table|calculate_babi_table'
+            res['method'] = 'babi.table|compute'
         return res
 
     @dualmethod
@@ -87,6 +95,6 @@ class Cron(metaclass=PoolMeta):
 
     @fields.depends('method')
     def on_change_with_babi_calculate_warnings(self, name=None):
-        if self.method != 'babi.table|calculate_babi_table':
+        if self.method != 'babi.table|compute':
             return False
         return self.babi_calculate_warnings

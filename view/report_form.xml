@@ -26,7 +26,7 @@ contains the full copyright notices and license terms. -->
                 <field name="groups"/>
             </group>
             <group col="3" colspan="4" id="buttons">
-                <button name="calculate"/>
+                <button name="compute"/>
                 <button name="create_menus"/>
                 <button name="remove_menus"/>
             </group>

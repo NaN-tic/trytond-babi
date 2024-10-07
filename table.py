@@ -676,7 +676,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             self.__class__.calculation_time.digits[1])
         self.save()
         if compute_warnings:
-            self.__queue__.compute_warnings([self])
+            self.__class__.__queue__.compute_warnings(self)
 
     def compute_warnings(self):
         self.compute_warning_error = None
