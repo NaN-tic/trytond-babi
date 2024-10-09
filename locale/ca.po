@@ -1345,10 +1345,6 @@ msgctxt "model:babi.widget.parameter,name:"
 msgid "Widget Parameter"
 msgstr "Paràmetre de la gràfica"
 
-msgctxt "model:ir.action,name:"
-msgid "Babi Report"
-msgstr "Informe Babi"
-
 msgctxt "model:ir.action,name:act_action_dashboard_form"
 msgid "Dashboards"
 msgstr "Taulers de control"
