@@ -573,12 +573,17 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def compute(cls, tables):
         with Transaction().set_context(queue_name=QUEUE_NAME):
             for table in tables:
+                if not table.active:
+                    continue
                 cls.__queue__._compute(table)
+
     @classmethod
     @ModelView.button
     def compute_warning(cls, tables):
         with Transaction().set_context(queue_name=QUEUE_NAME):
             for table in tables:
+                if not table.active:
+                    continue
                 cls.__queue__.compute_warnings(table)
 
     @property

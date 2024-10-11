@@ -1147,6 +1147,8 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
     def compute(cls, reports):
         with Transaction().set_context(queue_name=QUEUE_NAME):
             for report in reports:
+                if not report.active:
+                    continue
                 cls.__queue__._compute(report)
 
 
