@@ -137,6 +137,126 @@ class Cube:
 
         return column_header
 
+
+    def get_values(self):
+        '''
+        Calculate the values of the cube. Return a dictionary with the format:
+        values = {[((Cell('Party Name 1'), Cell(None)),
+            (Cell('Type'), Cell(None)))]: (Cell(value1), Cell(value2))}
+        '''
+        rows = self.get_query_list(self.rows)
+        columns = self.get_query_list(cube.columns)
+
+        # Get the cartesian product between the rows and columns
+        rxc = list(product(rows, columns))
+        print(f'ROWS COORDINATES: {rows}\nCOLUMNS COORDINATES: {columns}\nRxC: {rxc}')
+
+        # Format the measures to use them in the query
+        measures = ','.join([f'{measure[1]}({measure[0]})' for measure in cube.measures])
+
+        cursor = transaction.connection.cursor()
+        values = OrderedDict()
+        for rowxcolumn in rxc:
+            print(f'  RC: {rowxcolumn}')
+            # Transform the list of coordinates into a string to use it in the
+            # query
+            groupby_columns = ','.join([rc for rowcolumn in rowxcolumn
+                for rc in rowcolumn if rc != None])
+
+            # In the case of having all the columns as "None", it means we are
+            # in the first level and we dont need to do a group by
+            if groupby_columns:
+                query = (f'SELECT {groupby_columns}, {measures} FROM '
+                    f'{cube.table} GROUP BY {groupby_columns}')
+            else:
+                query = f'SELECT {measures} FROM {cube.table}'
+
+            # Perpare the order we need to use in the query
+            if cube.order:
+                order_fields = []
+                for order in cube.order:
+                    for groupby_column in groupby_columns.split(","):
+                        if groupby_column == order[0]:
+                            order_fields.append(f'{order[0]} {order[1]}')
+                    if len(order) > 1:
+                        for measure in cube.measures:
+                            if measure == order[0]:
+                                order_fields.append(
+                                    f'{order[0][1]}({order[0][0]}) {order[1]}')
+
+                if order_fields:
+                    query += f' ORDER BY {",".join(order_fields)}'
+
+            print(f'  QUERY: {query}')
+            cursor.execute(query)
+            results = cursor.fetchall()
+
+            for result in results:
+                result = [Cell(x) for x in result]
+                # To know whick part of the result is the key and which is the
+                # value of the measures we use the lenght of the
+                # "groupby_columns", this variable is a string with the list of
+                # columns we use for the group by in postgresql
+                if groupby_columns:
+                    # If we have the groupby_columns attribute, we get all the
+                    # values since the last column that is not a group by
+                    # column
+                    values[cube.get_value_coordinate(result, rowxcolumn)] = (
+                        result[len(groupby_columns.split(",")):])
+                else:
+                    # In the case we have all the columns as none, the result
+                    # will equal the number of measures we have
+                    values[cube.get_value_coordinate(result, rowxcolumn)] = (
+                        result)
+
+        return values
+
+    def build(self):
+        '''
+        Create the table with values from a cube object. Return a list of lists
+        with the format:
+            table = [[Cell, Cell, Cell, Cell], [Cell, Cell, Cell, Cell]]
+        '''
+        values = self.get_values()
+
+        row_elements = []
+        row_elements.append(tuple([None]*len(cube.rows)))
+        col_elements = []
+        col_elements.append(tuple([None]*len(cube.columns)))
+
+        #TODO: we need to handle better the none keys, right now, we cant know if a
+        # None comes from the name we give to him or form the query of the database
+        for key in values.keys():
+            if (key[0].count(None) == len(cube.rows)-1 and
+                    key[1].count(None) == len(cube.columns)):
+                for sub_key in values.keys():
+                    if (sub_key[0][0] == key[0][0] and
+                            sub_key[1].count(None) == len(cube.columns)):
+                        row_elements.append(sub_key[0])
+
+            if (key[0].count(None) == len(cube.rows) and
+                    key[1].count(None) == len(cube.columns)-1):
+                for sub_key in values.keys():
+                    if (sub_key[0].count(None) == len(cube.rows) and
+                            sub_key[1][0] == key[1][0]):
+                        col_elements.append(sub_key[1])
+
+        row_header = cube.get_row_header(row_elements, cube.rows)
+        table = cube.get_column_header(col_elements, cube.columns)
+        for row in range(len(row_elements)):
+            table_row = []
+            table_row += row_header[row]
+            for col in range(len(col_elements)):
+                value = values.get((row_elements[row], col_elements[col]))
+                if value:
+                    for cell in value:
+                        table_row.append(cell)
+                else:
+                    for measure in range(len(cube.measures)):
+                        table_row.append(Cell(None))
+            table.append(table_row)
+        return table
+
 class CellType(Enum):
     VALUE = 0
     ROW_HEADER = 1
@@ -164,16 +284,12 @@ class Cell:
     def __hash__(self):
         return hash((self.value, self.type))
 
+
 # Fer que les coordenades siguin un objecte "Header"
 class Header:
     def __init__(self, *args):
         self.tuple = args
 
-'''
-class Coordinate:
-    def __init__(self) -> None:
-        pass
-'''
 
 ###############################################################################
 ###############################################################################
@@ -191,105 +307,5 @@ print(f'Cube table: {cube.table}\nCube rows: {cube.rows}\n'
     f'Cube columns: {cube.columns}\nCube measures: {cube.measures}\n'
     f'Cube order: {cube.order}\n')
 
-rows = cube.get_query_list(cube.rows)
-columns = cube.get_query_list(cube.columns)
-
-# Get the cartesian product between the rows and columns
-rxc = list(product(rows, columns))
-print(f'ROWS COORDINATES: {rows}\nCOLUMNS COORDINATES: {columns}\nRxC: {rxc}')
-
-# Format the measures to use them in the query
-measures = ','.join([f'{measure[1]}({measure[0]})' for measure in cube.measures])
-
-cursor = transaction.connection.cursor()
-values = OrderedDict()
-#values = {}
-for rowxcolumn in rxc:
-    print(f'  RC: {rowxcolumn}')
-    # Transform the list of coordinates into a string to use it in the query
-    groupby_columns = ','.join([rc for rowcolumn in rowxcolumn
-        for rc in rowcolumn if rc != None])
-
-    # In the case of having all the columns as "None", it means we are in the
-    # first level and we dont need to do a group by
-    if groupby_columns:
-        query = (f'SELECT {groupby_columns}, {measures} FROM {cube.table} '
-            f'GROUP BY {groupby_columns}')
-    else:
-        query = f'SELECT {measures} FROM {cube.table}'
-
-    # Perpare the order we need to use in the query
-    if cube.order:
-        order_fields = []
-        for order in cube.order:
-            for groupby_column in groupby_columns.split(","):
-                if groupby_column == order[0]:
-                    order_fields.append(f'{order[0]} {order[1]}')
-            if len(order) > 1:
-                for measure in cube.measures:
-                    if measure == order[0]:
-                        order_fields.append(f'{order[0][1]}({order[0][0]}) {order[1]}')
-
-        if order_fields:
-            query += f' ORDER BY {",".join(order_fields)}'
-
-    print(f'  QUERY: {query}')
-    cursor.execute(query)
-    results = cursor.fetchall()
-
-    for result in results:
-        result = [Cell(x) for x in result]
-        # To know whick part of the result is the key and which is the value of
-        # the measures we use the lenght of the "groupby_columns", this
-        # variable is a string with the list of columns we use for the group by
-        # in postgresql
-        if groupby_columns:
-            # If we have the groupby_columns attribute, we get all the values
-            # since the last column that is not a group by column
-            #values[cube.get_value_coordinate(result, rowxcolumn)] = tuple(
-            #    [Cell(r) for r in result[len(groupby_columns.split(",")):]])
-            values[cube.get_value_coordinate(result, rowxcolumn)] = (result[len(groupby_columns.split(",")):])
-        else:
-            # In the case we have all the columns as none, the result will
-            # equal the number of measures we have
-            #values[cube.get_value_coordinate(result, rowxcolumn)] = tuple(
-            #    [Cell(r) for r in result])
-            values[cube.get_value_coordinate(result, rowxcolumn)] = result
-
-row_elements = []
-row_elements.append(tuple([None]*len(cube.rows)))
-col_elements = []
-col_elements.append(tuple([None]*len(cube.columns)))
-
-#TODO: we need to handle better the none keys, right now, we cant know if a
-# None comes from the name we give to him or form the query of the database
-for key in values.keys():
-    if (key[0].count(None) == len(cube.rows)-1 and
-            key[1].count(None) == len(cube.columns)):
-        for sub_key in values.keys():
-            if (sub_key[0][0] == key[0][0] and
-                    sub_key[1].count(None) == len(cube.columns)):
-                row_elements.append(sub_key[0])
-
-    if (key[0].count(None) == len(cube.rows) and
-            key[1].count(None) == len(cube.columns)-1):
-        for sub_key in values.keys():
-            if (sub_key[0].count(None) == len(cube.rows) and
-                    sub_key[1][0] == key[1][0]):
-                col_elements.append(sub_key[1])
-
-row_header = cube.get_row_header(row_elements, cube.rows)
-table = cube.get_column_header(col_elements, cube.columns)
-for row in range(len(row_elements)):
-    table_row = []
-    table_row += row_header[row]
-    for col in range(len(col_elements)):
-        value = values.get((row_elements[row], col_elements[col]))
-        if value:
-            for cell in value:
-                table_row.append(cell)
-        else:
-            for measure in range(len(cube.measures)):
-                table_row.append(Cell(None))
-    table.append(table_row)
+table = cube.build()
 print(tabulate(table))
