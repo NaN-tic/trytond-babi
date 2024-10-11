@@ -2262,7 +2262,7 @@ class OpenExecution(Wizard):
         Report = pool.get('babi.report')
 
         menu = Menu(Transaction().context['active_id'])
-        Report.calculate([menu.babi_report])
+        Report.compute([menu.babi_report])
         return 'update_done'
 
     def do_open_view(self, action):
