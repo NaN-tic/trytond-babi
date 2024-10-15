@@ -1,14 +1,15 @@
 #cat modules/babi/cube.py | ./trytond/bin/trytond-console -d database -c trytond.conf
+import ast
 from tabulate import tabulate
 from itertools import product
 from collections import OrderedDict
 from enum import Enum
+from urllib.parse import urlencode, parse_qs
 
-# Crear clase cube
-# Ha de contienr informació:
+
 class Cube:
     def __init__(self, rows=None, columns=None, measures=None, table=None,
-            order=None):
+            order=None, expansions=None):
         self.table = table # We need the table name to make the query
         self.rows = rows
         self.columns = columns
@@ -49,9 +50,6 @@ class Cube:
         '''
         index = 0
         key = []
-        #TODO: we need to handle better the none columns, right now, we cant
-        # know if a None comes from the name we give to him or from the query of the
-        # database
         for rowxcolumn in rxc:
             rowxcolumn_coordinate = []
             for rowxcolumn_element in rowxcolumn:
@@ -59,6 +57,7 @@ class Cube:
                     rowxcolumn_coordinate.append(None)
                 else:
                     #rowxcolumn_coordinate.append(Cell(result[index]))
+                    result[index].type = CellType.ROW_HEADER
                     rowxcolumn_coordinate.append(result[index])
                     index += 1
             key.append(tuple(rowxcolumn_coordinate))
@@ -113,7 +112,7 @@ class Cube:
 
         # Get the extra rows we need to add at the start for each column header
         # represent the row headers
-        row_extra_space = ['']*(len(cube.rows)+1)
+        row_extra_space = ['']*(len(self.rows)+1)
 
         column_header = []
         # We need to add one extra number to the range to represent the total
@@ -124,13 +123,13 @@ class Cube:
                 column.append(row[i])
                 # We need to substrac 1 to the measure length because the firt
                 # space is were the name of the column go
-                for y in range(len(cube.measures)-1):
+                for y in range(len(self.measures)-1):
                     column.append('')
             column_header.append(row_extra_space + column)
 
         # Add the measure information row
-        measure_names = [m[0] for m in cube.measures]
-        column_length = len(column_header[0])-(len(cube.rows)+1)
+        measure_names = [m[0] for m in self.measures]
+        column_length = len(column_header[0])-(len(self.rows)+1)
         new_list = ((measure_names * (column_length // len(measure_names))) +
             measure_names[:column_length % len(measure_names)])
         column_header.append(row_extra_space + new_list)
@@ -145,14 +144,14 @@ class Cube:
             (Cell('Type'), Cell(None)))]: (Cell(value1), Cell(value2))}
         '''
         rows = self.get_query_list(self.rows)
-        columns = self.get_query_list(cube.columns)
+        columns = self.get_query_list(self.columns)
 
         # Get the cartesian product between the rows and columns
         rxc = list(product(rows, columns))
         print(f'ROWS COORDINATES: {rows}\nCOLUMNS COORDINATES: {columns}\nRxC: {rxc}')
 
         # Format the measures to use them in the query
-        measures = ','.join([f'{measure[1]}({measure[0]})' for measure in cube.measures])
+        measures = ','.join([f'{measure[1]}({measure[0]})' for measure in self.measures])
 
         cursor = transaction.connection.cursor()
         values = OrderedDict()
@@ -167,19 +166,19 @@ class Cube:
             # in the first level and we dont need to do a group by
             if groupby_columns:
                 query = (f'SELECT {groupby_columns}, {measures} FROM '
-                    f'{cube.table} GROUP BY {groupby_columns}')
+                    f'{self.table} GROUP BY {groupby_columns}')
             else:
-                query = f'SELECT {measures} FROM {cube.table}'
+                query = f'SELECT {measures} FROM {self.table}'
 
             # Perpare the order we need to use in the query
-            if cube.order:
+            if self.order:
                 order_fields = []
-                for order in cube.order:
+                for order in self.order:
                     for groupby_column in groupby_columns.split(","):
                         if groupby_column == order[0]:
                             order_fields.append(f'{order[0]} {order[1]}')
                     if len(order) > 1:
-                        for measure in cube.measures:
+                        for measure in self.measures:
                             if measure == order[0]:
                                 order_fields.append(
                                     f'{order[0][1]}({order[0][0]}) {order[1]}')
@@ -201,12 +200,12 @@ class Cube:
                     # If we have the groupby_columns attribute, we get all the
                     # values since the last column that is not a group by
                     # column
-                    values[cube.get_value_coordinate(result, rowxcolumn)] = (
+                    values[self.get_value_coordinate(result, rowxcolumn)] = (
                         result[len(groupby_columns.split(",")):])
                 else:
                     # In the case we have all the columns as none, the result
                     # will equal the number of measures we have
-                    values[cube.get_value_coordinate(result, rowxcolumn)] = (
+                    values[self.get_value_coordinate(result, rowxcolumn)] = (
                         result)
 
         return values
@@ -220,29 +219,30 @@ class Cube:
         values = self.get_values()
 
         row_elements = []
-        row_elements.append(tuple([None]*len(cube.rows)))
+        row_elements.append(tuple([None]*len(self.rows)))
         col_elements = []
-        col_elements.append(tuple([None]*len(cube.columns)))
+        col_elements.append(tuple([None]*len(self.columns)))
 
-        #TODO: we need to handle better the none keys, right now, we cant know if a
-        # None comes from the name we give to him or form the query of the database
+        #TODO: re-implement this loop
         for key in values.keys():
-            if (key[0].count(None) == len(cube.rows)-1 and
-                    key[1].count(None) == len(cube.columns)):
+            if (key[0].count(None) == len(self.rows)-1 and
+                    key[1].count(None) == len(self.columns)):
                 for sub_key in values.keys():
                     if (sub_key[0][0] == key[0][0] and
-                            sub_key[1].count(None) == len(cube.columns)):
+                            sub_key[1].count(None) == len(self.columns)):
                         row_elements.append(sub_key[0])
 
-            if (key[0].count(None) == len(cube.rows) and
-                    key[1].count(None) == len(cube.columns)-1):
+            if (key[0].count(None) == len(self.rows) and
+                    key[1].count(None) == len(self.columns)-1):
                 for sub_key in values.keys():
-                    if (sub_key[0].count(None) == len(cube.rows) and
+                    if (sub_key[0].count(None) == len(self.rows) and
                             sub_key[1][0] == key[1][0]):
                         col_elements.append(sub_key[1])
 
-        row_header = cube.get_row_header(row_elements, cube.rows)
-        table = cube.get_column_header(col_elements, cube.columns)
+        #TODO: instead of return the list "table", return for each row a yeld,
+        # this way we dont need to save in memory the whole table
+        row_header = self.get_row_header(row_elements, self.rows)
+        table = self.get_column_header(col_elements, self.columns)
         for row in range(len(row_elements)):
             table_row = []
             table_row += row_header[row]
@@ -252,10 +252,44 @@ class Cube:
                     for cell in value:
                         table_row.append(cell)
                 else:
-                    for measure in range(len(cube.measures)):
+                    for measure in range(len(self.measures)):
                         table_row.append(Cell(None))
             table.append(table_row)
         return table
+
+    def encode_cube_properties(self):
+        '''
+        Given a cube instance, return a string with the properties of the cube.
+        Make the trasformation using the urllib.parse.urlencode function
+        '''
+        cube_properties = self.__dict__
+        # We need to delte the table property because it is already in the url
+        del cube_properties['table']
+        return urlencode(self.__dict__, doseq=True)
+
+    @classmethod
+    def parse_cube_properties(cls, url, table_name=None):
+        '''
+        Given a string with the properties of a cube, return a cube instance.
+        Make the trasformation using the urllib.parse.parse_qs function
+        '''
+        cube_properties = parse_qs(url)
+        # We need to handle the format of measures and order, the rows and
+        # columns its ok because they are a list of strings, we use
+        # ast.literal_eval because is more secure than eval
+
+        if cube_properties.get('measures'):
+            cube_properties['measures'] = [
+                ast.literal_eval(m) for m in cube_properties['measures']]
+
+        if cube_properties.get('order'):
+            cube_properties['order'] = [
+                ast.literal_eval(m) for m in cube_properties['order']]
+
+        if table_name:
+            cube_properties['table'] = table_name
+        return cls(**cube_properties)
+
 
 class CellType(Enum):
     VALUE = 0
@@ -301,11 +335,15 @@ cube = Cube(
     rows=['franquicia', 'coordinador'],
     columns=['tipo_venda'],
     measures=[('sum', 'SUM'), ('total_line', 'SUM')],
-    order=[(('franquicia'), 'ASC'), (('sum', 'SUM'), 'DESC')])
+    order=[('franquicia', 'ASC'), (('sum', 'SUM'), 'DESC')])
 
 print(f'Cube table: {cube.table}\nCube rows: {cube.rows}\n'
     f'Cube columns: {cube.columns}\nCube measures: {cube.measures}\n'
     f'Cube order: {cube.order}\n')
 
-table = cube.build()
-print(tabulate(table))
+dict = cube.encode_cube_properties()
+x = Cube.parse_cube_properties(dict, '__productes_franquicies_per_tipus_de_vendes')
+#table = x.build()
+
+#table = cube.build()
+#print(tabulate(table))

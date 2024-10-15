@@ -57,6 +57,9 @@ def register():
         pivot.Layout,
         pivot.Index,
         pivot.PivotHeader,
+        pivot.PivotHeaderAxis,
+        pivot.PivotHeaderMeasure,
+        pivot.PivotHeaderSelection,
         pivot.PivotTable,
         pivot.DownloadReport,
         module='babi', type_='model')
