@@ -1,0 +1,4 @@
+<tree>
+    <field name="table"/>
+    <field name="rec_name" expand="1"/>
+</tree>
