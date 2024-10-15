@@ -496,7 +496,6 @@ class Index(Component):
                 cube = Cube.parse_cube_properties(self.table_properties, table_name)
 
             print('==== AAA ====')
-            #import pdb; pdb.set_trace()
             print(f'ROWS: {cube.rows}\nCOLUMNS: {cube.columns}\nMEASURES: {cube.measures}')
             if cube.rows and cube.columns and cube.measures:
                 show_error = False

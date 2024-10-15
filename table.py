@@ -22,7 +22,7 @@ from trytond.modules.company.model import (
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
 
-VALID_FIRST_SYMBOLS = 'abcdefghijklmnopqrstuvwxyz'
+VALID_FIRST_SYMBOLS = '_abcdefghijklmnopqrstuvwxyz'
 VALID_NEXT_SYMBOLS = '_0123456789'
 VALID_SYMBOLS = VALID_FIRST_SYMBOLS + VALID_NEXT_SYMBOLS
 
