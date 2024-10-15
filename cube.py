@@ -61,7 +61,6 @@ class Cube:
                     rowxcolumn_coordinate.append(result[index])
                     index += 1
             key.append(tuple(rowxcolumn_coordinate))
-        #h1 = Header(tuple(key))
         return tuple(key)
 
     def get_row_header(self, rows, cube_rows):
@@ -135,7 +134,6 @@ class Cube:
         column_header.append(row_extra_space + new_list)
 
         return column_header
-
 
     def get_values(self):
         '''
@@ -319,31 +317,21 @@ class Cell:
         return hash((self.value, self.type))
 
 
-# Fer que les coordenades siguin un objecte "Header"
-class Header:
-    def __init__(self, *args):
-        self.tuple = args
-
-
-###############################################################################
-###############################################################################
-###############################################################################
 # Prepare the cube object. We need the table name, the list of rows and
 # columns, the list of measures and the order we want to follow
-cube = Cube(
-    table='__productes_franquicies_per_tipus_de_vendes',
-    rows=['franquicia', 'coordinador'],
-    columns=['tipo_venda'],
-    measures=[('sum', 'SUM'), ('total_line', 'SUM')],
-    order=[('franquicia', 'ASC'), (('sum', 'SUM'), 'DESC')])
+if __name__ == '__main__':
+    cube = Cube(
+        table='__productes_franquicies_per_tipus_de_vendes',
+        rows=['franquicia', 'coordinador'],
+        columns=['tipo_venda'],
+        measures=[('sum', 'SUM'), ('total_line', 'SUM')],
+        order=[('franquicia', 'ASC'), (('sum', 'SUM'), 'DESC')])
 
-print(f'Cube table: {cube.table}\nCube rows: {cube.rows}\n'
-    f'Cube columns: {cube.columns}\nCube measures: {cube.measures}\n'
-    f'Cube order: {cube.order}\n')
+    print(f'Cube table: {cube.table}\nCube rows: {cube.rows}\n'
+        f'Cube columns: {cube.columns}\nCube measures: {cube.measures}\n'
+        f'Cube order: {cube.order}\n')
 
-dict = cube.encode_cube_properties()
-x = Cube.parse_cube_properties(dict, '__productes_franquicies_per_tipus_de_vendes')
-#table = x.build()
-
-#table = cube.build()
-#print(tabulate(table))
+    dict = cube.encode_cube_properties()
+    x = Cube.parse_cube_properties(dict, '__productes_franquicies_per_tipus_de_vendes')
+    table = cube.build()
+    print(tabulate(table))

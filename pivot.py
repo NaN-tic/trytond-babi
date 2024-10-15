@@ -1,25 +1,20 @@
 import ast
-import re
-import json
-from itertools import product
-from enum import Enum
-from werkzeug.routing import Rule
-from werkzeug.utils import redirect
+from collections import OrderedDict
 from dominate.tags import (div, h1, p, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
     option, main, th)
 from dominate.util import raw
+from enum import Enum
+from itertools import product
+from urllib.parse import urlencode, parse_qs
+from werkzeug.routing import Rule
+from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
-from werkzeug.wrappers import Response
-from decimal import Decimal
-from urllib.parse import urlencode, parse_qs
-
-from trytond.protocols.jsonrpc import JSONEncoder, JSONDecoder
-from collections import deque, OrderedDict
 
 # Icons used in website
 COLLAPSE = '➖'
