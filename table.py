@@ -21,6 +21,7 @@ from trytond.modules.company.model import (
     employee_field, reset_employee, set_employee)
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
+from .cube import Cube
 
 VALID_FIRST_SYMBOLS = '_abcdefghijklmnopqrstuvwxyz'
 VALID_NEXT_SYMBOLS = '_0123456789'
@@ -1249,6 +1250,7 @@ class Pivot(ModelSQL, ModelView):
         'Column Dimensions')
     measures = fields.One2Many('babi.pivot.measure', 'pivot', 'Measures')
     order = fields.One2Many('babi.pivot.order', 'pivot', 'Order')
+    url = fields.Function(fields.Char('URL'), 'on_change_with_url')
 
     def get_rec_name(self, name):
         res = []
@@ -1267,6 +1269,32 @@ class Pivot(ModelSQL, ModelView):
             item += ', '.join([x.field.rec_name for x in self.measures])
             res.append(item)
         return ' '.join(res)
+
+    @fields.depends('name', 'row_dimensions', 'column_dimensions', 'measures')
+    def on_change_with_url(self, name=None):
+        base = ''
+        if config.get("web", "cors"):
+            base = f'{(config.get("web", "cors"))}'
+        else:
+            base = f'http://{(config.get("web", "listen"))}'
+
+        order = []
+        for item in self.order:
+            if item.element.__name__ == 'babi.pivot.measure':
+                order.append((item.element.field.internal_name,
+                        item.element.aggregate, item.order))
+            else:
+                order.append((item.element.field.internal_name, item.order))
+
+        cube = Cube(table=self.table,
+            rows=[x.field.internal_name for x in self.row_dimensions],
+            columns=[x.field.internal_name for x in self.column_dimensions],
+            measures=[(x.field.internal_name, x.aggregate)
+                for x in self.measures],
+            order=order,
+            )
+        properties = cube.encode_properties()
+        return f'{base}/{Transaction().database.name}/babi/pivot/{self.table.table_name}/{properties}'
 
     @classmethod
     def search_rec_name(cls, name, clause):
