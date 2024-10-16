@@ -2,6 +2,9 @@ from dominate.tags import (div, h1, p, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
     option, main, th, label, input_)
 from dominate.util import raw
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_workbook
+import tempfile
 from werkzeug.routing import Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -11,6 +14,14 @@ from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
 from .cube import Cube, CellType
+
+
+# TODO: Use table.py implementation in 7.2 version and above
+def save_virtual_workbook(workbook):
+    with tempfile.NamedTemporaryFile() as tmp:
+        save_workbook(workbook, tmp.name)
+        with open(tmp.name, 'rb') as f:
+            return f.read()
 
 # Icons used in website
 COLLAPSE = '➖'
@@ -698,21 +709,25 @@ class PivotTable(Component):
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
 
+        download = a(DOWNLOAD, href=DownloadReport(
+                database_name=self.database_name, table_name=self.table_name,
+                table_properties=self.table_properties, render=False).url('download'))
+
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
         for row in cube.build():
             pivot_row = tr()
             for cell in row:
+                if download:
+                    pivot_row.add(td(download, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                    download = None
+                    continue
                 if cell.type == CellType.ROW_HEADER or cell.type == CellType.COLUMN_HEADER:
                     pivot_row.add(td(cell.text(language), cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                 else:
                     pivot_row.add(td(cell.text(language), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
             pivot_table.add(pivot_row)
 
-        with div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8") as pivot_div:
-            with div(cls="w-10"):
-                #TODO: the download button is hidden, see why
-                a(href=DownloadReport(database_name=self.database_name, table_name=self.table_name,
-                    table_properties=self.table_properties, render=False).url('download'))
+        pivot_div = div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8")
         pivot_div.add(pivot_table)
         return pivot_div
 
@@ -736,12 +751,18 @@ class DownloadReport(Component):
         pass
 
     def download(self):
+        pool = Pool()
+        Language = pool.get('ir.lang')
+
+        language = Transaction().context.get('language', 'en')
+        language, = Language.search([('code', '=', language)], limit=1)
+
         cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
-        table = cube.build()
-        #TODO: transform the list of lists (table) in a xlsx file
-        #response = Response(table)
-        response = Response(None)
+        wb = Workbook()
+        ws = wb.active
+        for row in cube.build():
+            ws.append([x.text(language) for x in row])
+        response = Response(save_virtual_workbook(wb))
         response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        #return response
-        pass
+        return response
