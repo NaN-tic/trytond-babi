@@ -5,17 +5,18 @@ from itertools import product
 from collections import OrderedDict
 from enum import Enum
 from urllib.parse import urlencode, parse_qs
+from trytond.transaction import Transaction
 
 
 class Cube:
-    def __init__(self, rows=None, columns=None, measures=None, table=None,
-            order=None, expansions=None):
+    def __init__(self, rows=[], columns=[], measures=[], table=None,
+            order=[], expansions=[]):
         self.table = table # We need the table name to make the query
         self.rows = rows
         self.columns = columns
         self.measures = measures
         self.order = order
-        self.expansions = []
+        self.expansions = expansions
 
     def get_query_list(self, list):
         '''
@@ -82,20 +83,19 @@ class Cube:
             # We add the first column outside the loop, that colum is
             # "None, None" and dont have a column name
             if r == tuple([None]*len(cube_rows)):
-                row.append(cube_rows[0])
-                row += ['']*len(cube_rows)
+                row.append(Cell(cube_rows[0], type=CellType.ROW_HEADER))
+                row += [Cell('', type=CellType.ROW_HEADER)]*len(cube_rows)
             else:
                 # The empty row at the start represnet the column where we have
                 # total
-                row.append('')
+                row.append(Cell('', type=CellType.ROW_HEADER))
                 for element in r:
                     if element:
                         row.append(element)
                     else:
-                        row.append('')
+                        row.append(Cell('', type=CellType.ROW_HEADER))
             row_header.append(row)
         return row_header
-
 
     def get_column_header(self, columns, cube_columns):
         '''
@@ -111,7 +111,7 @@ class Cube:
 
         # Get the extra rows we need to add at the start for each column header
         # represent the row headers
-        row_extra_space = ['']*(len(self.rows)+1)
+        row_extra_space = [Cell('', type=CellType.COLUMN_HEADER)]*(len(self.rows)+1)
 
         column_header = []
         # We need to add one extra number to the range to represent the total
@@ -119,15 +119,15 @@ class Cube:
         for i in range(len(cube_columns)+1):
             column = []
             for row in columns_in_rows:
-                column.append(row[i])
+                column.append(Cell(row[i].value, type=CellType.COLUMN_HEADER))
                 # We need to substrac 1 to the measure length because the firt
                 # space is were the name of the column go
                 for y in range(len(self.measures)-1):
-                    column.append('')
+                    column.append(Cell('', type=CellType.COLUMN_HEADER))
             column_header.append(row_extra_space + column)
 
         # Add the measure information row
-        measure_names = [m[0] for m in self.measures]
+        measure_names = [Cell(m[0], type=CellType.COLUMN_HEADER) for m in self.measures]
         column_length = len(column_header[0])-(len(self.rows)+1)
         new_list = ((measure_names * (column_length // len(measure_names))) +
             measure_names[:column_length % len(measure_names)])
@@ -149,9 +149,10 @@ class Cube:
         print(f'ROWS COORDINATES: {rows}\nCOLUMNS COORDINATES: {columns}\nRxC: {rxc}')
 
         # Format the measures to use them in the query
-        measures = ','.join([f'{measure[1]}({measure[0]})' for measure in self.measures])
+        measures = ','.join(
+            [f'{measure[1]}({measure[0]})' for measure in self.measures])
 
-        cursor = transaction.connection.cursor()
+        cursor = Transaction().connection.cursor()
         values = OrderedDict()
         for rowxcolumn in rxc:
             print(f'  RC: {rowxcolumn}')
@@ -300,7 +301,8 @@ class Cell:
 
     def __init__(self, value, type=CellType.VALUE):
         self.value = value
-        self.type = type # Utilitzar com a "type" un enum, es molt mes rápid que un diccionari
+        # Use as a type an enum, it is much faster than a dictionary
+        self.type = type
         self.expansion = None
 
     def __str__(self):
@@ -315,23 +317,3 @@ class Cell:
 
     def __hash__(self):
         return hash((self.value, self.type))
-
-
-# Prepare the cube object. We need the table name, the list of rows and
-# columns, the list of measures and the order we want to follow
-if __name__ == '__main__':
-    cube = Cube(
-        table='__productes_franquicies_per_tipus_de_vendes',
-        rows=['franquicia', 'coordinador'],
-        columns=['tipo_venda'],
-        measures=[('sum', 'SUM'), ('total_line', 'SUM')],
-        order=[('franquicia', 'ASC'), (('sum', 'SUM'), 'DESC')])
-
-    print(f'Cube table: {cube.table}\nCube rows: {cube.rows}\n'
-        f'Cube columns: {cube.columns}\nCube measures: {cube.measures}\n'
-        f'Cube order: {cube.order}\n')
-
-    dict = cube.encode_cube_properties()
-    x = Cube.parse_cube_properties(dict, '__productes_franquicies_per_tipus_de_vendes')
-    table = cube.build()
-    print(tabulate(table))

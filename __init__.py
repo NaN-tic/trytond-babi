@@ -64,6 +64,7 @@ def register():
         pivot.PivotHeader,
         pivot.PivotHeaderAxis,
         pivot.PivotHeaderMeasure,
+        pivot.PivotHeaderOrder,
         pivot.PivotHeaderSelection,
         pivot.PivotTable,
         pivot.DownloadReport,

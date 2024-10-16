@@ -1,12 +1,7 @@
-import ast
-from collections import OrderedDict
 from dominate.tags import (div, h1, p, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
-    option, main, th)
+    option, main, th, label, input_)
 from dominate.util import raw
-from enum import Enum
-from itertools import product
-from urllib.parse import urlencode, parse_qs
 from werkzeug.routing import Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -15,6 +10,7 @@ from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
+from .cube import Cube, Cell, CellType
 
 # Icons used in website
 COLLAPSE = '➖'
@@ -30,7 +26,9 @@ REMOVE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="
 UP_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>')
 DOWN_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>')
 CLOSE_ICON = raw('<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
-
+ORDER_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg>')
+ORDER_ASC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" /></svg>')
+ORDER_DESC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>')
 
 class Site(metaclass=PoolMeta):
     __name__ = 'www.site'
@@ -45,324 +43,9 @@ class Site(metaclass=PoolMeta):
         with Transaction().set_context(language=Transaction().language):
             return super().dispatch(site_type, site_id, request, user)
 
-
-###############################################################################
-#################################### CUBE #####################################
-###############################################################################
-class Cube:
-    def __init__(self, rows=[], columns=[], measures=[], table=None,
-            order=[], expansions=[]):
-        self.table = table # We need the table name to make the query
-        self.rows = rows
-        self.columns = columns
-        self.measures = measures
-        self.order = order
-        self.expansions = expansions
-
-    def get_query_list(self, list):
-        '''
-        Given a list of elements, return a list of all possible coordinates.
-        The structure the function receives is:
-            list: ['Party Name 1', 'Party Name 2']
-        And the structure the function returns is:
-            list_coordinates: [[None, None], ['Party Name 1', None],
-                ['Party Name 1', 'Party Name 2]]
-        '''
-        # Given a list of elements, return a list of all possible coordinates
-        list_coordinates = []
-        default_list_coordinates = [None]*len(list)
-        list_coordinates.append(default_list_coordinates)
-
-        index = 0
-        for element in list:
-            list_coordinates.append(list_coordinates[-1][:index] + [element] +
-                list_coordinates[-1][index+1:])
-            index += 1
-        return list_coordinates
-
-    def get_value_coordinate(self, result, rxc):
-        '''
-        Given a result of a cursor query and the list of coordinates, return
-        the key of the dictornary of values we need to use. The strucutre we
-        follow is:
-            result: ('Party Name 1', Decimal('10.01'))
-            rxc: ([None, None], ['party_name'])
-        The key we end calculatin will be:
-            ([None, None], ['Party Name 1'])
-        '''
-        index = 0
-        key = []
-        for rowxcolumn in rxc:
-            rowxcolumn_coordinate = []
-            for rowxcolumn_element in rowxcolumn:
-                if not rowxcolumn_element:
-                    rowxcolumn_coordinate.append(None)
-                else:
-                    #rowxcolumn_coordinate.append(Cell(result[index]))
-                    result[index].type = CellType.ROW_HEADER
-                    rowxcolumn_coordinate.append(result[index])
-                    #print(f'- CELL TYPE: {result[index].type}')
-                    index += 1
-            key.append(tuple(rowxcolumn_coordinate))
-        #h1 = Header(tuple(key))
-        return tuple(key)
-
-    def get_row_header(self, rows, cube_rows):
-        '''
-        Given a list of all the row headers ordered, return a list with the
-        header cells. The structre we folllow is:
-            rows: [[None, None], ['Party Name 1', None],
-                ['Party Name 1', 'Party Name 2']]
-        And the structure we return is:
-            row_header: [['Party', '', ''], ['', 'Party Name 1', ''],
-                ['', '', 'Party Name 2']]
-        We have the variable "cube_rows" to make more generic this function,
-        this way we can use the same function to get the column header
-        '''
-        row_header = []
-
-        for r in rows:
-            row = []
-            # We add the first column outside the loop, that colum is
-            # "None, None" and dont have a column name
-            if r == tuple([None]*len(cube_rows)):
-                row.append(cube_rows[0])
-                row += ['']*len(cube_rows)
-            else:
-                # The empty row at the start represnet the column where we have
-                # total
-                row.append('')
-                for element in r:
-                    if element:
-                        row.append(element)
-                    else:
-                        row.append('')
-            row_header.append(row)
-        return row_header
-
-    def get_column_header(self, columns, cube_columns):
-        '''
-        Given a list of all the column headers, ordered, return a list with the
-        column headers. The strucutre we follow is:
-            columns: [[None, None], ['Party Name 1', None],
-                ['Party Name 1', 'Party Name 2']]
-        And the structure we return is:
-            column_header: [['Party', '', ''],
-                ['', 'Party Name 1', 'Party Name 2']]
-        '''
-        columns_in_rows = self.get_row_header(columns, cube_columns)
-
-        # Get the extra rows we need to add at the start for each column header
-        # represent the row headers
-        row_extra_space = ['']*(len(self.rows)+1)
-
-        column_header = []
-        # We need to add one extra number to the range to represent the total
-        # cell (coordinate None)
-        for i in range(len(cube_columns)+1):
-            column = []
-            for row in columns_in_rows:
-                column.append(row[i])
-                # We need to substrac 1 to the measure length because the firt
-                # space is were the name of the column go
-                for y in range(len(self.measures)-1):
-                    column.append('')
-            column_header.append(row_extra_space + column)
-
-        # Add the measure information row
-        measure_names = [m[0] for m in self.measures]
-        column_length = len(column_header[0])-(len(self.rows)+1)
-        new_list = ((measure_names * (column_length // len(measure_names))) +
-            measure_names[:column_length % len(measure_names)])
-        column_header.append(row_extra_space + new_list)
-
-        return column_header
-
-    def get_values(self):
-        '''
-        Calculate the values of the cube. Return a dictionary with the format:
-        values = {[((Cell('Party Name 1'), Cell(None)),
-            (Cell('Type'), Cell(None)))]: (Cell(value1), Cell(value2))}
-        '''
-        rows = self.get_query_list(self.rows)
-        columns = self.get_query_list(self.columns)
-
-        # Get the cartesian product between the rows and columns
-        rxc = list(product(rows, columns))
-        print(f'ROWS COORDINATES: {rows}\nCOLUMNS COORDINATES: {columns}\nRxC: {rxc}')
-
-        # Format the measures to use them in the query
-        measures = ','.join([f'{measure[1]}({measure[0]})' for measure in self.measures])
-
-        cursor = Transaction().connection.cursor()
-        values = OrderedDict()
-        for rowxcolumn in rxc:
-            print(f'  RC: {rowxcolumn}')
-            # Transform the list of coordinates into a string to use it in the
-            # query
-            groupby_columns = ','.join([rc for rowcolumn in rowxcolumn
-                for rc in rowcolumn if rc != None])
-
-            # In the case of having all the columns as "None", it means we are
-            # in the first level and we dont need to do a group by
-            if groupby_columns:
-                query = (f'SELECT {groupby_columns}, {measures} FROM '
-                    f'{self.table} GROUP BY {groupby_columns}')
-            else:
-                query = f'SELECT {measures} FROM {self.table}'
-
-            # Perpare the order we need to use in the query
-            if self.order:
-                order_fields = []
-                for order in self.order:
-                    for groupby_column in groupby_columns.split(","):
-                        if groupby_column == order[0]:
-                            order_fields.append(f'{order[0]} {order[1]}')
-                    if len(order) > 1:
-                        for measure in self.measures:
-                            if measure == order[0]:
-                                order_fields.append(
-                                    f'{order[0][1]}({order[0][0]}) {order[1]}')
-
-                if order_fields:
-                    query += f' ORDER BY {",".join(order_fields)}'
-
-            print(f'  QUERY: {query}')
-            cursor.execute(query)
-            results = cursor.fetchall()
-
-            for result in results:
-                result = [Cell(x) for x in result]
-                # To know whick part of the result is the key and which is the
-                # value of the measures we use the lenght of the
-                # "groupby_columns", this variable is a string with the list of
-                # columns we use for the group by in postgresql
-                if groupby_columns:
-                    # If we have the groupby_columns attribute, we get all the
-                    # values since the last column that is not a group by
-                    # column
-                    values[self.get_value_coordinate(result, rowxcolumn)] = (
-                        result[len(groupby_columns.split(",")):])
-                else:
-                    # In the case we have all the columns as none, the result
-                    # will equal the number of measures we have
-                    values[self.get_value_coordinate(result, rowxcolumn)] = (
-                        result)
-
-        return values
-
-    def build(self):
-        '''
-        Create the table with values from a cube object. Return a list of lists
-        with the format:
-            table = [[Cell, Cell, Cell, Cell], [Cell, Cell, Cell, Cell]]
-        '''
-        values = self.get_values()
-
-        row_elements = []
-        row_elements.append(tuple([None]*len(self.rows)))
-        col_elements = []
-        col_elements.append(tuple([None]*len(self.columns)))
-
-        #TODO: re-implement this loop
-        for key in values.keys():
-            if (key[0].count(None) == len(self.rows)-1 and
-                    key[1].count(None) == len(self.columns)):
-                for sub_key in values.keys():
-                    if (sub_key[0][0] == key[0][0] and
-                            sub_key[1].count(None) == len(self.columns)):
-                        row_elements.append(sub_key[0])
-
-            if (key[0].count(None) == len(self.rows) and
-                    key[1].count(None) == len(self.columns)-1):
-                for sub_key in values.keys():
-                    if (sub_key[0].count(None) == len(self.rows) and
-                            sub_key[1][0] == key[1][0]):
-                        col_elements.append(sub_key[1])
-
-        #TODO: instead of return the list "table", return for each row a yeld,
-        # this way we dont need to save in memory the whole table
-        row_header = self.get_row_header(row_elements, self.rows)
-        table = self.get_column_header(col_elements, self.columns)
-        for row in range(len(row_elements)):
-            table_row = []
-            table_row += row_header[row]
-            for col in range(len(col_elements)):
-                value = values.get((row_elements[row], col_elements[col]))
-                if value:
-                    for cell in value:
-                        table_row.append(cell)
-                else:
-                    for measure in range(len(self.measures)):
-                        table_row.append(Cell(None))
-            table.append(table_row)
-        return table
-
-    def encode_cube_properties(self):
-        '''
-        Given a cube instance, return a string with the properties of the cube.
-        Make the trasformation using the urllib.parse.urlencode function
-        '''
-        cube_properties = self.__dict__
-        # We need to delte the table property because it is already in the url
-        del cube_properties['table']
-        return urlencode(self.__dict__, doseq=True)
-
-    @classmethod
-    def parse_cube_properties(cls, url, table_name=None):
-        '''
-        Given a string with the properties of a cube, return a cube instance.
-        Make the trasformation using the urllib.parse.parse_qs function
-        '''
-        cube_properties = parse_qs(url)
-        # We need to handle the format of measures and order, the rows and
-        # columns its ok because they are a list of strings, we use
-        # ast.literal_eval because is more secure than eval
-
-        if cube_properties.get('measures'):
-            cube_properties['measures'] = [
-                ast.literal_eval(m) for m in cube_properties['measures']]
-
-        if cube_properties.get('order'):
-            cube_properties['order'] = [
-                ast.literal_eval(m) for m in cube_properties['order']]
-
-        if table_name:
-            cube_properties['table'] = table_name
-        return cls(**cube_properties)
-
-class CellType(Enum):
-    VALUE = 0
-    ROW_HEADER = 1
-    COLUMN_HEADER = 2
-
-
-class Cell:
-    __slots__ = ('value', 'type', 'expansion')
-
-    def __init__(self, value, type=CellType.VALUE):
-        self.value = value
-        self.type = type # Utilitzar com a "type" un enum, es molt mes rápid que un diccionari
-        self.expansion = None
-
-    def __str__(self):
-        if self.value is None:
-            return '-'
-        return str(self.value)
-
-    def __eq__(self, value):
-        if isinstance(value, Cell):
-            return self.value == value.value and self.type == value.type
-        return False
-
-    def __hash__(self):
-        return hash((self.value, self.type))
-
 ###############################################################################
 #################################### SITE #####################################
 ###############################################################################
-
-
 class Layout(Component):
     'Layout'
     __name__ = 'www.layout.pivot'
@@ -431,22 +114,11 @@ class Index(Component):
         # Components
         PivotHeaderAxis = pool.get('www.pivot_header.axis')
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
+        PivotHeaderOrder = pool.get('www.pivot_header.order')
         PivotTable = pool.get('www.pivot_table')
 
         '''
             We need to:
-            - Show the header:
-                - Show the button to invert axis
-                - Show the button to relad the page with a new configuration
-            - Show the table headers:
-                - Show the row table header
-                - Show the column table header
-                - Show the measure table header (aggregation)
-                - Show the order table header
-            - Once a value is selected in a table, we cant show this value in
-                the other tables
-            - In the order table, we need to show the aggregation of the
-                columns we have in the row, column and measure headers
             - If we delete a cell from any of the table that is begin used in
                 the order table, we need to delete the field from the order table
             - If we delte a cell from the order table, we dont need to do
@@ -454,7 +126,6 @@ class Index(Component):
         '''
 
         table_name = self.table_name
-        print(f'Table Name: {table_name}')
         if table_name.startswith('__'):
             table_name = table_name.split('__')[-1]
 
@@ -487,11 +158,9 @@ class Index(Component):
             if self.table_properties == 'null':
                 cube = Cube(table=babi_table.name)
             else:
-                print(f'TABLE PROPERTIES: {self.table_properties}')
                 cube = Cube.parse_cube_properties(self.table_properties, table_name)
 
-            print('==== AAA ====')
-            print(f'ROWS: {cube.rows}\nCOLUMNS: {cube.columns}\nMEASURES: {cube.measures}')
+            print(f'ROWS: {cube.rows}\nCOLUMNS: {cube.columns}\nMEASURES: {cube.measures}\nORDER: {cube.order}')
             if cube.rows and cube.columns and cube.measures:
                 show_error = False
 
@@ -522,9 +191,10 @@ class Index(Component):
                 PivotHeaderMeasure(database_name=self.database_name,
                     table_name=self.table_name,
                     table_properties=self.table_properties)
+                PivotHeaderOrder(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=self.table_properties)
 
-            print(f'SHOW ERROR: {show_error}')
-            #TODO: add table
             with div(cls="mt-8 flow-root"):
                 with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                     if show_error == True:
@@ -580,7 +250,7 @@ class PivotHeaderAxis(Component):
             if cube:
                 fields = cube.columns
 
-        self.header = name
+        self.header = self.axis
         with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id=f'header_{self.axis}') as header_axis:
             div(id=f'field_selection_{self.axis}')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
@@ -604,14 +274,14 @@ class PivotHeaderAxis(Component):
                                     td(field.capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[-1]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, render=False).url('remove_field'),
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, render=False).url('remove_field'),
                                             cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_axis
 
@@ -643,55 +313,108 @@ class PivotHeaderMeasure(Component):
             cube = Cube.parse_cube_properties(self.table_properties,
                 self.table_name)
             fields = cube.measures
-
-        self.header = _('Measures')
-        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id='header_aggregation') as header_aggregation:
-            div(id='field_selection_aggregation')
+        self.header = 'measures'
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id='header_measure') as header_measure:
+            div(id='field_selection_measure')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                 with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
                     with table(cls="min-w-full divide-y divide-gray-300"):
                         with thead():
                             with tr():
                                 th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(MEASURE_ICON)
-                                th(_('Aggregation fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Aggregation type'), cls="sr-only"))
+                                th(_('Measure fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
                                 with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-900",
-                                        hx_target="#field_selection_aggregation",
-                                        hx_post=PivotHeaderSelection(header='aggregation', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
+                                        hx_target="#field_selection_measure",
+                                        hx_post=PivotHeaderSelection(header='measure', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
                                         hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
-                                    span(_('Remove'), cls="sr-only")
+                                    span(_('Add'), cls="sr-only")
                         with tbody(cls="divide-y divide-gray-200"):
                             for field in fields:
                                 with tr():
                                     td(field[0].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        with div():
-                                            with select(id="aggregation", name="aggregation", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6", disabled=True):
-                                                option(field[1].capitalize(), value=field)
+                                        match field[1]:
+                                            case 'sum':
+                                                p(_('Sum'))
+                                            case 'avg':
+                                                p(_('Average'))
+                                            case 'count':
+                                                p(_('Count'))
+                                            case 'min':
+                                                p(_('Minimum'))
+                                            case 'max':
+                                                p(_('Maximum'))
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field[0], table_properties=self.table_properties, render=False).url('remove_field'),
                                             cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
-        return header_aggregation
+        return header_measure
 
 
-'''
 # This class handle the order table header
 class PivotHeaderOrder(Component):
     'Pivot Header Component'
     __name__ = 'www.pivot_header.order'
     _path = None
 
+    header = fields.Char('Header')
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+
     @classmethod
     def get_url_map(cls):
         return [
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_order/<string:table_properties>'),
         ]
 
     def render(self):
-        pass
-'''
+        pool = Pool()
+        PivotHeader = pool.get('www.pivot_header')
+        PivotHeaderSelection = pool.get('www.pivot_header.selection')
+
+        fields = []
+        if self.table_properties != 'null':
+            cube = Cube.parse_cube_properties(self.table_properties,
+                self.table_name)
+            fields = cube.order
+        self.header = 'order'
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id='header_order') as header_order:
+            div(id='field_selection_order')
+            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
+                    with table(cls="min-w-full divide-y divide-gray-300"):
+                        with thead():
+                            with tr():
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(ORDER_ICON)
+                                th(_('Order fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
+                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
+                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
+                                        hx_target="#field_selection_order",
+                                        hx_post=PivotHeaderSelection(header='order', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
+                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
+                                    span(_('Add'), cls="sr-only")
+                        with tbody(cls="divide-y divide-gray-200"):
+                            for field in fields:
+                                with tr():
+                                    print(f'====> FIELD: {field}')
+                                    td(field[0].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        if field[1] == 'desc':
+                                            div(ORDER_DESC_ICON)
+                                        else:
+                                            div(ORDER_ASC_ICON)
+                                    #TODO: add arrows to move up/down a record?
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field[0], table_properties=self.table_properties, render=False).url('remove_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
+        return header_order
 
 
+# This function handles the pup up that is show in every header table and add
+# the item to the table properties
 class PivotHeaderSelection(Component):
     'Pivot Header Selection'
     __name__ = 'www.pivot_header.selection'
@@ -702,7 +425,8 @@ class PivotHeaderSelection(Component):
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
     field = fields.Char('Field')
-    aggregation = fields.Char('Aggregation')
+    measure = fields.Char('Measure')
+    order = fields.Char('Order')
 
     @classmethod
     def get_url_map(cls):
@@ -722,8 +446,8 @@ class PivotHeaderSelection(Component):
                 name = 'field_selection_x'
             case 'y':
                 name = 'field_selection_y'
-            case 'aggregation':
-                name = 'field_selection_aggregation'
+            case 'measure':
+                name = 'field_selection_measure'
             case 'order':
                 name = 'field_selection_order'
 
@@ -731,7 +455,11 @@ class PivotHeaderSelection(Component):
         if self.table_properties != 'null':
             cube = Cube.parse_cube_properties(self.table_properties,
                 self.table_name)
-            fields_used = cube.rows + cube.columns + [m[0] for m in cube.measures]
+            if self.header != 'order':
+                fields_used = cube.rows + cube.columns + [m[0] for m in cube.measures]
+            else:
+                order_fields = [o[0] for o in cube.order]
+                fields_used = cube.rows + cube.columns + cube.measures
 
         cursor = Transaction().connection.cursor()
         cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{self.table_name}';")
@@ -753,28 +481,53 @@ class PivotHeaderSelection(Component):
                         with div(cls="sm:flex sm:items-start"):
                             with div(cls="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left"):
                                 h3(_('Select a field to add:'), cls="text-base font-semibold leading-6 text-gray-900", id="modal-title")
-                                with div(cls="mt-2"):
+                                with div(cls="mt-2 space-y-4"):
                                     with select(id="field", name="field", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
-                                        for field in fields:
-                                            if field[0] not in fields_used:
-                                                option(field[0].capitalize(), value=field[0])
-                                    if self.header == 'aggregation':
-                                        with select(id="aggregation", name="aggregation", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
+                                        if self.header != 'order':
+                                            for field in fields:
+                                                if field[0] not in fields_used:
+                                                    option(field[0].capitalize(), value=field[0])
+                                        else:
+                                            for field in fields_used:
+                                                if field not in order_fields:
+                                                    if isinstance(field, tuple):
+                                                        name_ = f'{field[1].capitalize()}({field[0].capitalize()})'
+                                                    else:
+                                                        name_=field.capitalize()
+                                                    option(name_, value=field)
+
+                                    if self.header == 'measure':
+                                        with select(id="measure", name="measure", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
                                             option(_('Sum'), value='sum')
                                             option(_('Average'), value='average')
                                             option(_('Max'), value='max')
                                             option(_('Min'), value='min')
                                             option(_('Count'), value='count')
-                                    if self.header == 'option':
-                                        #TODO: we need to handle the order case
-                                        pass
+                                    if self.header == 'order':
+                                        with div(cls="grid grid-cols-4"):
+                                            with div(cls="flex items-start col-span-2"):
+                                                with div(cls="relative flex items-start"):
+                                                    with div(cls="flex h-6 items-center"):
+                                                        input_(id="order_asc", name="order", type="radio", value="asc", cls="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600")
+                                                    with div(cls="ml-3 text-sm leading-6"):
+                                                        label_asc = label(for_="order", cls="text-gray-900 flex items-center")
+                                                        label_asc.add(ORDER_ASC_ICON)
+                                                        label_asc.add(p(_('Ascending')))
+
+                                            with div(cls="flex items-start col-span-2"):
+                                                with div(cls="relative flex items-start"):
+                                                    with div(cls="flex h-6 items-center"):
+                                                        input_(id="order_desc", name="order", type="radio", value="desc", cls="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600")
+                                                    with div(cls="ml-3 text-sm leading-6"):
+                                                        label_desc = label(for_="order", cls="text-gray-900 flex items-center")
+                                                        label_desc.add(ORDER_DESC_ICON)
+                                                        label_desc.add(p(_('Descending')))
                         with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
                             button(_('Add'), type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
                             a(_('Cancel'), href="#",
                                 hx_target=f"#{name}",
                                 hx_post=self.url('close_field_selection'),
                                 hx_trigger="click", hx_swap="outerHTML",
-                                hx_vals="{'test': 'THIS IS TEST DATA'}",
                                 cls="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto")
         return field_slection
 
@@ -785,8 +538,8 @@ class PivotHeaderSelection(Component):
                 name = 'field_selection_x'
             case 'y':
                 name = 'field_selection_y'
-            case 'aggregation':
-                name = 'field_selection_aggregation'
+            case 'measure':
+                name = 'field_selection_measure'
             case 'order':
                 name = 'field_selection_order'
 
@@ -797,23 +550,29 @@ class PivotHeaderSelection(Component):
         pool = Pool()
         Index = pool.get('www.index.pivot')
 
-        table_properties = 'null'
         if self.table_properties == 'null':
             cube = Cube(table=self.table_name)
         else:
             cube = Cube.parse_cube_properties(self.table_properties,
                 self.table_name)
 
-        print(f'\n\nCUBE: {cube}')
+        # We need to check if a specific field is already in the cube, if is
+        # the case, dont add again. If we clic fast enougth while adding fields
+        # we can send multiple times a request to the server, tryton to add
+        # multiple times a field
         match self.header:
             case 'x':
-                cube.rows.append(self.field)
+                if self.field not in cube.rows:
+                    cube.rows.append(self.field)
             case 'y':
-                cube.columns.append(self.field)
-            case 'aggregation':
-                cube.measures.append((self.field, self.aggregation))
+                if self.field not in cube.columns:
+                    cube.columns.append(self.field)
+            case 'measure':
+                if (self.field, self.measure) not in cube.measures:
+                    cube.measures.append((self.field, self.measure))
             case 'order':
-                #TODO: we need to handle the order case
+                if (self.field, self.order) not in cube.order:
+                    cube.order.append((self.field, self.order))
                 pass
 
         return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=cube.encode_cube_properties(), render=False).url())
@@ -844,13 +603,67 @@ class PivotHeader(Component):
         pass
 
     def remove_field(self):
-        #TODO: here we only need to delete the field form the correct property
-        pass
+        pool = Pool()
+        # Component
+        Index = pool.get('www.index.pivot')
+        cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
+        print(f'\n\n==== REMOVE FIELD: {self.field} ====')
+        print(f'X: {cube.rows}\nY: {cube.columns}\nMEASURES: {cube.measures}\nORDER: {cube.order}')
+        match self.header:
+            case 'x':
+                print(f'X: {cube.rows}')
+                cube.rows.remove(self.field)
+            case 'y':
+                print(f'Y: {cube.columns}')
+                cube.columns.remove(self.field)
+            case 'measures':
+                print(f'Measure: {cube.measures}')
+                index = 0
+                for measure in cube.measures:
+                    if measure[0] == self.field:
+                        cube.measures.pop(index)
+                        break
+                    index += 1
+            case 'order':
+                print(f'Order: {cube.order}')
+                index = 0
+                for o in cube.order:
+                    #TODO: we need to see how to handle the fields that are a tuple
+                    if o[0] == self.field:
+                        cube.order.pop(index)
+                        break
+                    index += 1
+        table_properties = cube.encode_cube_properties()
+        #TODO: remove this section when we found the correct way to handle
+        # multiple URLs with the same endpoint
+        if not cube.rows and not cube.columns and not cube.measures and not cube.order:
+            table_properties = 'null'
+        print('=========\n\n')
+        #TODO: the redirect is not working correctly, the url changes but the page is not reloaded
+        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
 
     def level_field(self):
+        pool = Pool()
+        Index = pool.get('www.index.pivot')
+
+        cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
+        match self.header:
+            case 'x':
+                pass
+            case 'y':
+                pass
+            case 'measures':
+                pass
+            case 'order':
+                pass
+
         #TODO: here we need to level up by 1 element or down by element the field properties
+        table_properties = cube.encode_cube_properties()
+        #return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
         pass
 
+
+#This function handles the render of the cube into a table and the download button
 class PivotTable(Component):
     'Pivot Table'
     __name__ = 'www.pivot_table'
@@ -878,7 +691,8 @@ class PivotTable(Component):
         cube_table = cube.build()
 
         '''
-        # TODO: we need to handle the expansions
+        # TODO: we need to handle the expansions and the format of the headers
+        # (add an icon at the start to indicate if the element is open or closed)
         row.add(td(a(str(icon) +  ' ' + str(table_structure_child_row.name or '(Empty)'), href="#",
                 hx_target="#pivot_table",
                 hx_post=Pivot(database_name=self.database_name,
@@ -888,28 +702,23 @@ class PivotTable(Component):
             cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
         '''
 
-        '''
-        pivot_table_ = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
+
+        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
         for row in cube_table:
             pivot_row = tr()
             for cell in row:
-                #TODO: som cell are string, not a cell object, fix this
-                if isinstance(cell, str):
-                    pivot_row.add(td(cell, cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
+                if cell.type == CellType.ROW_HEADER or cell.type == CellType.COLUMN_HEADER:
+                    pivot_row.add(td(str(cell), cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                 else:
-                    pivot_row.add(td(str(cell.value), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
-                #if cell.type == CellType.ROW_HEADER:
-                #    pivot_row.add(td(cell, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                #else:
-                #    pivot_row.add(td(cell, cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
-            pivot_table_.add(pivot_row)
-        '''
+                    pivot_row.add(td(str(cell), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
+            pivot_table.add(pivot_row)
 
         with div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8") as pivot_div:
             with div(cls="w-10"):
+                #TODO: the download button is hidden, see why
                 a(href=DownloadReport(database_name=self.database_name, table_name=self.table_name,
                     table_properties=self.table_properties, render=False).url('download'))
-        #pivot_div.add(pivot_table_)
+        pivot_div.add(pivot_table)
         return pivot_div
 
 
