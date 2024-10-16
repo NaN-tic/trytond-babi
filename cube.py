@@ -1,15 +1,27 @@
 import ast
+import binascii
 from datetime import datetime, date, timedelta
 from decimal import Decimal
-from tabulate import tabulate
 from itertools import product
 from collections import OrderedDict
 from enum import Enum
 from urllib.parse import urlencode, parse_qs
-from trytond.transaction import Transaction
 from trytond.config import config
+from trytond.i18n import gettext
+from trytond.transaction import Transaction
 
 DEFAULT_MIME_TYPE = config.get('babi', 'mime_type', default='image/png')
+
+# From html_report
+def strfdelta(tdelta, fmt):
+    d = {"days": tdelta.days}
+    d["hours"], rem = divmod(tdelta.seconds, 3600)
+    d["minutes"], d["seconds"] = divmod(rem, 60)
+    d['minutes'] = '%02d' % d['minutes']
+    d['seconds'] = '%02d' % d['seconds']
+    if not 'days' in fmt and d.get('days') > 0:
+        d["hours"] += d.get('days') * 24 # 24h/day
+    return fmt.format(**d)
 
 
 class Cube:
@@ -337,12 +349,7 @@ class Cell:
         if isinstance(value, bytes):
             value = binascii.b2a_base64(value)
             value = value.decode('ascii')
-            mimetype = None
-            if filename:
-                mimetype = mimetypes.guess_type(filename)[0]
-            if not mimetype:
-                mimetype = DEFAULT_MIME_TYPE
-            return ('data:%s;base64,%s' % (mimetype, value)).strip()
+            return ('data:%s;base64,%s' % (DEFAULT_MIME_TYPE, value)).strip()
         return str(value)
 
     def __str__(self):

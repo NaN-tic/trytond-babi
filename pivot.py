@@ -10,7 +10,7 @@ from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
-from .cube import Cube, Cell, CellType
+from .cube import Cube, CellType
 
 # Icons used in website
 COLLAPSE = '➖'
@@ -152,17 +152,14 @@ class Index(Component):
 
         # Check if we have the cube properties to see the table, if not, show a messagge
         show_error = True
-        if not hasattr(self, 'table_properties'):
-            table_properties = 'null'
+        if self.table_properties == 'null':
+            cube = Cube(table=babi_table.name)
         else:
-            if self.table_properties == 'null':
-                cube = Cube(table=babi_table.name)
-            else:
-                cube = Cube.parse_cube_properties(self.table_properties, table_name)
+            cube = Cube.parse_cube_properties(self.table_properties, table_name)
 
-            print(f'ROWS: {cube.rows}\nCOLUMNS: {cube.columns}\nMEASURES: {cube.measures}\nORDER: {cube.order}')
-            if cube.rows and cube.columns and cube.measures:
-                show_error = False
+        print(f'ROWS: {cube.rows}\nCOLUMNS: {cube.columns}\nMEASURES: {cube.measures}\nORDER: {cube.order}')
+        if cube.rows and cube.columns and cube.measures:
+            show_error = False
 
         # Prepare the cube properties to the invert cube function
         axuiliar_row = cube.rows
@@ -437,8 +434,6 @@ class PivotHeaderSelection(Component):
         ]
 
     def render(self):
-        pool = Pool()
-
         name = None
         #TODO: we need to handle the order case
         match self.header:
