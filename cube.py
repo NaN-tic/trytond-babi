@@ -25,9 +25,25 @@ def strfdelta(tdelta, fmt):
 
 
 class Cube:
-    def __init__(self, rows=[], columns=[], measures=[], table=None,
-            order=[], expansions=[]):
-        self.table = table # We need the table name to make the query
+    def __init__(self, table=None, rows=None, columns=None, measures=None,
+            order=None, expansions=None):
+        '''
+        order must have the following format:
+        [('column_name', 'asc'), ('column_name', 'desc'), ('measure', 'sum', 'asc')]
+        '''
+        if rows is None:
+            rows = []
+        if columns is None:
+            columns = []
+        if measures is None:
+            measures = []
+        if order is None:
+            order = []
+        if expansions is None:
+            expansions = []
+        assert all(len(x) in (2, 3) for x in order), ('Each order item have 2 '
+            'or 3 elements')
+        self.table = table
         self.rows = rows
         self.columns = columns
         self.measures = measures
@@ -185,21 +201,20 @@ class Cube:
             else:
                 query = f'SELECT {measures} FROM {self.table}'
 
-            # Perpare the order we need to use in the query
-            if self.order:
-                order_fields = []
-                for order in self.order:
-                    for groupby_column in groupby_columns.split(","):
-                        if groupby_column == order[0]:
-                            order_fields.append(f'{order[0]} {order[1]}')
-                    if len(order) > 1:
-                        for measure in self.measures:
-                            if measure == order[0]:
-                                order_fields.append(
-                                    f'{order[0][1]}({order[0][0]}) {order[1]}')
+            # Prepare the order we need to use in the query
+            order = []
+            for item in self.order:
+                if len(item) == 2:
+                    for column in groupby_columns.split(","):
+                        if column == item[0]:
+                            order.append(f'{item[0]} {item[-1]}')
+                elif len(item) == 3:
+                    for measure in self.measures:
+                        if measure == item[:-1]:
+                            order.append(f'{item[1]}({item[0]}) {item[-1]}')
 
-                if order_fields:
-                    query += f' ORDER BY {",".join(order_fields)}'
+            if order:
+                query += f' ORDER BY {",".join(order)}'
 
             print(f'  QUERY: {query}')
             cursor.execute(query)

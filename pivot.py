@@ -382,11 +382,11 @@ class PivotHeaderOrder(Component):
         PivotHeader = pool.get('www.pivot_header')
         PivotHeaderSelection = pool.get('www.pivot_header.selection')
 
-        fields = []
+        items = []
         if self.table_properties != 'null':
             cube = Cube.parse_properties(self.table_properties,
                 self.table_name)
-            fields = cube.order
+            items = cube.order
         self.header = 'order'
         with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id='header_order') as header_order:
             div(id='field_selection_order')
@@ -405,18 +405,22 @@ class PivotHeaderOrder(Component):
                                         hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
                                     span(_('Add'), cls="sr-only")
                         with tbody(cls="divide-y divide-gray-200"):
-                            for field in fields:
+                            for item in items:
                                 with tr():
-                                    print(f'====> FIELD: {field}')
-                                    td(field[0].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    if len(item) == 2:
+                                        value = item[0]
+                                    else:
+                                        value = f'{item[1]}({item[0]})'
+                                    td(value.capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        if field[1] == 'desc':
+                                        if item[1] == 'desc':
                                             div(ORDER_DESC_ICON)
                                         else:
                                             div(ORDER_ASC_ICON)
                                     #TODO: add arrows to move up/down a record?
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field[0], table_properties=self.table_properties, render=False).url('remove_field'),
+                                        # TODO: With the change of managing measures as tuples, we need to change the way we handle the order
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=item[0], table_properties=self.table_properties, render=False).url('remove_field'),
                                             cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_order
 
