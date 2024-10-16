@@ -258,6 +258,8 @@ class Cube:
         # this way we dont need to save in memory the whole table
         row_header = self.get_row_header(row_elements, self.rows)
         table = self.get_column_header(col_elements, self.columns)
+        for row in table:
+            yield row
         for row in range(len(row_elements)):
             table_row = []
             table_row += row_header[row]
@@ -269,8 +271,7 @@ class Cube:
                 else:
                     for measure in range(len(self.measures)):
                         table_row.append(Cell(None))
-            table.append(table_row)
-        return table
+            yield table_row
 
     def encode_cube_properties(self):
         '''

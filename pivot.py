@@ -684,8 +684,6 @@ class PivotTable(Component):
         Language = pool.get('ir.lang')
 
         cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
-        cube_table = cube.build()
-
         '''
         # TODO: we need to handle the expansions and the format of the headers
         # (add an icon at the start to indicate if the element is open or closed)
@@ -701,7 +699,7 @@ class PivotTable(Component):
         language, = Language.search([('code', '=', language)], limit=1)
 
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
-        for row in cube_table:
+        for row in cube.build():
             pivot_row = tr()
             for cell in row:
                 if cell.type == CellType.ROW_HEADER or cell.type == CellType.COLUMN_HEADER:
