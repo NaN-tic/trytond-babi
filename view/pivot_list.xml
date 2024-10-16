@@ -1,0 +1,5 @@
+<tree>
+    <field name="table"/>
+    <field name="rec_name" expand="1"/>
+    <field name="url" widget="url"/>
+</tree>

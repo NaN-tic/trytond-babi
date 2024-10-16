@@ -1,0 +1,11 @@
+<form>
+    <label name="sequence"/>
+    <field name="sequence"/>
+    <label name="pivot"/>
+    <field name="pivot"/>
+    <label name="element"/>
+    <field name="element"/>
+    <label name="order"/>
+    <field name="order"/>
+</form>
+

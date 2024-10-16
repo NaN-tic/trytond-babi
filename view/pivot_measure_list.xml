@@ -1,0 +1,5 @@
+<tree sequence="sequence" editable="1">
+    <field name="pivot"/>
+    <field name="field"/>
+    <field name="aggregate"/>
+</tree>
