@@ -449,6 +449,9 @@ class PivotHeaderSelection(Component):
         ]
 
     def render(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+
         name = None
         #TODO: we need to handle the order case
         match self.header:
@@ -471,11 +474,10 @@ class PivotHeaderSelection(Component):
                 order_fields = [o[0] for o in cube.order]
                 fields_used = cube.rows + cube.columns + cube.measures
 
-        cursor = Transaction().connection.cursor()
-        cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{self.table_name}';")
-        fields = cursor.fetchall()
+        table, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
+        fields = [x.internal_name for x in table.fields_]
 
-        with div(id=name, cls="relative z-10", aria_labelledby="modal-title", role="dialog", aria_modal="true") as field_slection:
+        with div(id=name, cls="relative z-10", aria_labelledby="modal-title", role="dialog", aria_modal="true") as field_selection:
             div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
             with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
                 with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
@@ -495,8 +497,8 @@ class PivotHeaderSelection(Component):
                                     with select(id="field", name="field", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
                                         if self.header != 'order':
                                             for field in fields:
-                                                if field[0] not in fields_used:
-                                                    option(field[0].capitalize(), value=field[0])
+                                                if field not in fields_used:
+                                                    option(field.capitalize(), value=field)
                                         else:
                                             for field in fields_used:
                                                 if field not in order_fields:
@@ -539,7 +541,7 @@ class PivotHeaderSelection(Component):
                                 hx_post=self.url('close_field_selection'),
                                 hx_trigger="click", hx_swap="outerHTML",
                                 cls="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto")
-        return field_slection
+        return field_selection
 
     def close_field_selection(self):
         name = None
