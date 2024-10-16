@@ -193,6 +193,8 @@ class Cube:
             groupby_columns = ','.join([rc for rowcolumn in rowxcolumn
                 for rc in rowcolumn if rc != None])
 
+            # TODO: There's a huge SQL injection issue in this code
+
             # In the case of having all the columns as "None", it means we are
             # in the first level and we dont need to do a group by
             if groupby_columns:
@@ -222,7 +224,7 @@ class Cube:
 
             for result in results:
                 result = [Cell(x) for x in result]
-                # To know whick part of the result is the key and which is the
+                # To know which part of the result is the key and which is the
                 # value of the measures we use the lenght of the
                 # "groupby_columns", this variable is a string with the list of
                 # columns we use for the group by in postgresql

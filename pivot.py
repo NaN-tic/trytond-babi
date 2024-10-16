@@ -129,11 +129,11 @@ class Index(Component):
         PivotTable = pool.get('www.pivot_table')
 
         '''
-            We need to:
-            - If we delete a cell from any of the table that is begin used in
-                the order table, we need to delete the field from the order table
-            - If we delte a cell from the order table, we dont need to do
-                anything apart of realoading the table
+        We need to:
+        - If we delete a cell from any of the table that is begin used in
+            the order table, we need to delete the field from the order table
+        - If we delte a cell from the order table, we dont need to do
+            anything apart of realoading the table
         '''
 
         table_name = self.table_name
@@ -722,6 +722,7 @@ class PivotTable(Component):
             pivot_row = tr()
             for cell in row:
                 if download:
+                    # Paint the download button in the first cell
                     pivot_row.add(td(download, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                     download = None
                     continue
