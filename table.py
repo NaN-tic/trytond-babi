@@ -484,7 +484,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def get_context(self):
         if self.filter and self.filter.context:
-            context = self.replace_parameters(self.filter.context)
+            context = self.filter.context
             ev = EvalWithCompoundTypes(names={}, functions={
                 'date': lambda x: datetime.strptime(x, '%Y-%m-%d').date(),
                 'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d'),
