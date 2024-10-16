@@ -273,7 +273,7 @@ class Cube:
                         table_row.append(Cell(None))
             yield table_row
 
-    def encode_cube_properties(self):
+    def encode_properties(self):
         '''
         Given a cube instance, return a string with the properties of the cube.
         Make the trasformation using the urllib.parse.urlencode function
@@ -284,7 +284,7 @@ class Cube:
         return urlencode(self.__dict__, doseq=True)
 
     @classmethod
-    def parse_cube_properties(cls, url, table_name=None):
+    def parse_properties(cls, url, table_name=None):
         '''
         Given a string with the properties of a cube, return a cube instance.
         Make the trasformation using the urllib.parse.parse_qs function

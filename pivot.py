@@ -166,7 +166,7 @@ class Index(Component):
         if self.table_properties == 'null':
             cube = Cube(table=babi_table.name)
         else:
-            cube = Cube.parse_cube_properties(self.table_properties, table_name)
+            cube = Cube.parse_properties(self.table_properties, table_name)
 
         print(f'ROWS: {cube.rows}\nCOLUMNS: {cube.columns}\nMEASURES: {cube.measures}\nORDER: {cube.order}')
         if cube.rows and cube.columns and cube.measures:
@@ -176,7 +176,7 @@ class Index(Component):
         axuiliar_row = cube.rows
         cube.rows = cube.columns
         cube.columns = axuiliar_row
-        inverted_table_properties = cube.encode_cube_properties()
+        inverted_table_properties = cube.encode_properties()
 
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-4"):
@@ -245,7 +245,7 @@ class PivotHeaderAxis(Component):
         fields = []
         cube = None
         if self.table_properties != 'null':
-            cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
+            cube = Cube.parse_properties(self.table_properties, self.table_name)
 
         if self.axis == 'x':
             icon = ROWS_ICON
@@ -318,7 +318,7 @@ class PivotHeaderMeasure(Component):
 
         fields = []
         if self.table_properties != 'null':
-            cube = Cube.parse_cube_properties(self.table_properties,
+            cube = Cube.parse_properties(self.table_properties,
                 self.table_name)
             fields = cube.measures
         self.header = 'measures'
@@ -384,7 +384,7 @@ class PivotHeaderOrder(Component):
 
         fields = []
         if self.table_properties != 'null':
-            cube = Cube.parse_cube_properties(self.table_properties,
+            cube = Cube.parse_properties(self.table_properties,
                 self.table_name)
             fields = cube.order
         self.header = 'order'
@@ -459,7 +459,7 @@ class PivotHeaderSelection(Component):
 
         fields_used = []
         if self.table_properties != 'null':
-            cube = Cube.parse_cube_properties(self.table_properties,
+            cube = Cube.parse_properties(self.table_properties,
                 self.table_name)
             if self.header != 'order':
                 fields_used = cube.rows + cube.columns + [m[0] for m in cube.measures]
@@ -559,7 +559,7 @@ class PivotHeaderSelection(Component):
         if self.table_properties == 'null':
             cube = Cube(table=self.table_name)
         else:
-            cube = Cube.parse_cube_properties(self.table_properties,
+            cube = Cube.parse_properties(self.table_properties,
                 self.table_name)
 
         # We need to check if a specific field is already in the cube, if is
@@ -581,7 +581,7 @@ class PivotHeaderSelection(Component):
                     cube.order.append((self.field, self.order))
                 pass
 
-        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=cube.encode_cube_properties(), render=False).url())
+        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=cube.encode_properties(), render=False).url())
 
 
 # In this function we have some default options available in all the PivotHeader components (handle levels, remove items from header)
@@ -612,7 +612,7 @@ class PivotHeader(Component):
         pool = Pool()
         # Component
         Index = pool.get('www.index.pivot')
-        cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
         print(f'\n\n==== REMOVE FIELD: {self.field} ====')
         print(f'X: {cube.rows}\nY: {cube.columns}\nMEASURES: {cube.measures}\nORDER: {cube.order}')
         match self.header:
@@ -639,7 +639,7 @@ class PivotHeader(Component):
                         cube.order.pop(index)
                         break
                     index += 1
-        table_properties = cube.encode_cube_properties()
+        table_properties = cube.encode_properties()
         #TODO: remove this section when we found the correct way to handle
         # multiple URLs with the same endpoint
         if not cube.rows and not cube.columns and not cube.measures and not cube.order:
@@ -652,7 +652,7 @@ class PivotHeader(Component):
         pool = Pool()
         Index = pool.get('www.index.pivot')
 
-        cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
         match self.header:
             case 'x':
                 pass
@@ -664,7 +664,7 @@ class PivotHeader(Component):
                 pass
 
         #TODO: here we need to level up by 1 element or down by element the field properties
-        table_properties = cube.encode_cube_properties()
+        table_properties = cube.encode_properties()
         #return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
         pass
 
@@ -694,7 +694,7 @@ class PivotTable(Component):
         DownloadReport = pool.get('www.download_report')
         Language = pool.get('ir.lang')
 
-        cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
         '''
         # TODO: we need to handle the expansions and the format of the headers
         # (add an icon at the start to indicate if the element is open or closed)
@@ -757,7 +757,7 @@ class DownloadReport(Component):
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
 
-        cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
         wb = Workbook()
         ws = wb.active
         for row in cube.build():
