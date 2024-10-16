@@ -1,11 +1,15 @@
-#cat modules/babi/cube.py | ./trytond/bin/trytond-console -d database -c trytond.conf
 import ast
+from datetime import datetime, date, timedelta
+from decimal import Decimal
 from tabulate import tabulate
 from itertools import product
 from collections import OrderedDict
 from enum import Enum
 from urllib.parse import urlencode, parse_qs
 from trytond.transaction import Transaction
+from trytond.config import config
+
+DEFAULT_MIME_TYPE = config.get('babi', 'mime_type', default='image/png')
 
 
 class Cube:
@@ -305,9 +309,47 @@ class Cell:
         self.type = type
         self.expansion = None
 
+    def text(self, lang=None):
+        if not lang:
+            return str(self)
+
+        value = self.value
+        if value is None:
+            return '-'
+        if isinstance(value, (float, Decimal)):
+            # TODO: Make it configurable
+            digits = 2
+            return lang.format('%.*f', (digits, value),
+                grouping=True)
+        if isinstance(value, bool):
+            return (gettext('babi.msg_yes') if value else
+                gettext('babi.msg_no'))
+        if isinstance(value, int):
+            return lang.format('%d', value, grouping=True)
+        if isinstance(value, datetime):
+            return lang.strftime(value)
+        if isinstance(value, date):
+            return lang.strftime(value)
+        if isinstance(value, timedelta):
+            return strfdelta(value, '{hours}:{minutes}')
+        if isinstance(value, str):
+            return value.replace('\n', '<br/>')
+        if isinstance(value, bytes):
+            value = binascii.b2a_base64(value)
+            value = value.decode('ascii')
+            mimetype = None
+            if filename:
+                mimetype = mimetypes.guess_type(filename)[0]
+            if not mimetype:
+                mimetype = DEFAULT_MIME_TYPE
+            return ('data:%s;base64,%s' % (mimetype, value)).strip()
+        return str(value)
+
     def __str__(self):
         if self.value is None:
             return '-'
+        if isinstance(self.value, (float, Decimal)):
+            return f'{self.value:.2f}'
         return str(self.value)
 
     def __eq__(self, value):

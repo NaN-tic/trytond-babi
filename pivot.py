@@ -686,6 +686,7 @@ class PivotTable(Component):
         pool = Pool()
         # Component
         DownloadReport = pool.get('www.download_report')
+        Language = pool.get('ir.lang')
 
         cube = Cube.parse_cube_properties(self.table_properties, self.table_name)
         cube_table = cube.build()
@@ -701,16 +702,17 @@ class PivotTable(Component):
                 hx_trigger="click", hx_swap="outerHTML"),
             cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
         '''
-
+        language = Transaction().context.get('language', 'en')
+        language, = Language.search([('code', '=', language)], limit=1)
 
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
         for row in cube_table:
             pivot_row = tr()
             for cell in row:
                 if cell.type == CellType.ROW_HEADER or cell.type == CellType.COLUMN_HEADER:
-                    pivot_row.add(td(str(cell), cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                    pivot_row.add(td(cell.text(language), cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                 else:
-                    pivot_row.add(td(str(cell), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
+                    pivot_row.add(td(cell.text(language), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
             pivot_table.add(pivot_row)
 
         with div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8") as pivot_div:
