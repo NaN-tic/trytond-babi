@@ -87,9 +87,12 @@
             <separator name="warning_description" colspan="8"/>
             <field name="warning_description" colspan="8"/>
         </page>
-        <page id="pivot" string="Access" col="2">
+        <page id="access" string="Access" col="2">
             <field name="access_users" colspan="2"/>
             <field name="access_groups" colspan="2"/>
+        </page>
+        <page name="pivots">
+            <field name="pivots" colspan="4"/>
         </page>
     </notebook>
 </form>

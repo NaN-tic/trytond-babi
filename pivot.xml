@@ -1,0 +1,74 @@
+<tryton>
+    <data>
+        <!-- babi.pivot -->
+        <record model="ir.ui.view" id="babi_pivot_form_view">
+            <field name="model">babi.pivot</field>
+            <field name="type">form</field>
+            <field name="name">pivot_form</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_tree_view">
+            <field name="model">babi.pivot</field>
+            <field name="type">tree</field>
+            <field name="name">pivot_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_babi_pivot">
+            <field name="name">Pivot Tables</field>
+            <field name="res_model">babi.pivot</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_pivot_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="babi_pivot_tree_view"/>
+            <field name="act_window" ref="act_babi_pivot"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_pivot_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="babi_pivot_form_view"/>
+            <field name="act_window" ref="act_babi_pivot"/>
+        </record>
+
+        <menuitem id="menu_babi_pivot" parent="menu_babi_table" action="act_babi_pivot" sequence="20"/>
+
+        <record model="ir.ui.view" id="babi_pivot_row_dimension_form_view">
+            <field name="model">babi.pivot.row_dimension</field>
+            <field name="type">form</field>
+            <field name="name">pivot_row_dimension_form</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_row_dimension_tree_view">
+            <field name="model">babi.pivot.row_dimension</field>
+            <field name="type">tree</field>
+            <field name="name">pivot_row_dimension_list</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_column_dimension_form_view">
+            <field name="model">babi.pivot.column_dimension</field>
+            <field name="type">form</field>
+            <field name="name">pivot_column_dimension_form</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_column_dimension_tree_view">
+            <field name="model">babi.pivot.column_dimension</field>
+            <field name="type">tree</field>
+            <field name="name">pivot_column_dimension_list</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_measure_form_view">
+            <field name="model">babi.pivot.measure</field>
+            <field name="type">form</field>
+            <field name="name">pivot_measure_form</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_measure_tree_view">
+            <field name="model">babi.pivot.measure</field>
+            <field name="type">tree</field>
+            <field name="name">pivot_measure_list</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_order_form_view">
+            <field name="model">babi.pivot.order</field>
+            <field name="type">form</field>
+            <field name="name">pivot_order_form</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_order_tree_view">
+            <field name="model">babi.pivot.order</field>
+            <field name="type">tree</field>
+            <field name="name">pivot_order_list</field>
+        </record>
+    </data>
+</tryton>
+
