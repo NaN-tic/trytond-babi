@@ -115,15 +115,42 @@ class Cube:
             # We add the first column outside the loop, that colum is
             # "None, None" and dont have a column name
             if r == tuple([None]*len(cube_rows)):
-                row.append(Cell(cube_rows[0], type=CellType.ROW_HEADER))
+                # Prepare the first level of the table, this name always will
+                # be the name we get form the database
+                header_cell = Cell(cube_rows[0], type=CellType.ROW_HEADER)
+                header_cell.expansion = cube_rows[0]
+                if cube_rows[0] in self.expansions:
+                    header_cell.expansion = None
+                row.append(header_cell)
                 row += [Cell('', type=CellType.ROW_HEADER)]*len(cube_rows)
             else:
+                # Each list "r" must have only one element with a value, this
+                # element will be always the last element of the list with
+                # text. An example of what we do here is:
+                # r = ['Element1', 'Subelement1'] -> row = [None, 'Subelement1']
+                last_item = [lt for lt in [
+                    next(item for item in reversed(r) if item is not None)]][0]
+
                 # The empty row at the start represnet the column where we have
                 # total
                 row.append(Cell('', type=CellType.ROW_HEADER))
                 for element in r:
-                    if element:
-                        row.append(element)
+                    if element and element == last_item:
+                        # In the case of being in the last element of the list,
+                        # we can know that there are no more expansions
+                        if element == r[-1]:
+                            row.append(Cell(element.value, type=CellType.ROW_HEADER))
+                        else:
+                            # Here we are calculating the expansion of this
+                            # cell. Here is an example:
+                            # r = ['Element1', None] -> ['Element1']
+                            element_expansion = [e.value for e in r[:r.index(element)+1]]
+                            if element_expansion in self.expansions:
+                                element_expansion = None
+
+                            print('ELEMENT EXPANSION: ', element_expansion)
+                            row.append(Cell(element.value, type=CellType.ROW_HEADER,
+                                expansion=element_expansion))
                     else:
                         row.append(Cell('', type=CellType.ROW_HEADER))
             row_header.append(row)
@@ -151,7 +178,8 @@ class Cube:
         for i in range(len(cube_columns)+1):
             column = []
             for row in columns_in_rows:
-                column.append(Cell(row[i].value, type=CellType.COLUMN_HEADER))
+                column.append(Cell(row[i].value, type=CellType.COLUMN_HEADER,
+                    expansion=row[i].expansion))
                 # We need to substrac 1 to the measure length because the firt
                 # space is were the name of the column go
                 for y in range(len(self.measures)-1):
@@ -179,11 +207,11 @@ class Cube:
         # Get the cartesian product between the rows and columns
         rxc = list(product(rows, columns))
         print(f'ROWS COORDINATES: {rows}\nCOLUMNS COORDINATES: {columns}\nRxC: {rxc}')
+        self.expansions = sorted(self.expansions, key=len)
 
         # Format the measures to use them in the query
         measures = ','.join(
             [f'{measure[1]}({measure[0]})' for measure in self.measures])
-
         cursor = Transaction().connection.cursor()
         values = OrderedDict()
         for rowxcolumn in rxc:
@@ -221,25 +249,52 @@ class Cube:
             print(f'  QUERY: {query}')
             cursor.execute(query)
             results = cursor.fetchall()
-
+            # If we dont have any expansion -> we are in the level 0
+            # TODO: We need a "special" case to show all levels
             for result in results:
                 result = [Cell(x) for x in result]
+                coordinates = self.get_value_coordinate(result, rowxcolumn)
                 # To know which part of the result is the key and which is the
                 # value of the measures we use the lenght of the
                 # "groupby_columns", this variable is a string with the list of
                 # columns we use for the group by in postgresql
+
+                # We need to show always the level 0, so this level skip the
+                # expansions checks
+                if (coordinates != tuple([ tuple([None]*len(self.rows)), tuple(
+                    [None]*len(self.columns))])):
+
+                    if self.expansions:
+                        for expansion in self.expansions:
+                            print(f'Expansion: {expansion}')
+                            # First we check if the type of the expansion if is
+                            # a str it means is one of the default headers from
+                            # level 0
+                            if isinstance(expansion, str):
+                                # In this case, first we need to check what
+                                # measure comes the expansion
+                                pass
+                            else:
+                                # If its a list it means is one of the headers from
+                                # level 1 or above
+                                pass
+                    else:
+                        # If we dont have any expansion it mean we dont need
+                        # to check anythyng and dont show any level (except the
+                        # level 0 that skip the checks)
+                        continue
+
                 if groupby_columns:
                     # If we have the groupby_columns attribute, we get all the
                     # values since the last column that is not a group by
                     # column
-                    values[self.get_value_coordinate(result, rowxcolumn)] = (
-                        result[len(groupby_columns.split(",")):])
+                    values[coordinates] = result[
+                        len(groupby_columns.split(",")):]
                 else:
                     # In the case we have all the columns as none, the result
                     # will equal the number of measures we have
-                    values[self.get_value_coordinate(result, rowxcolumn)] = (
-                        result)
-
+                    values[coordinates] = result
+        print(f'VALUES: {len(values)}')
         return values
 
     def build(self):
@@ -271,8 +326,7 @@ class Cube:
                             sub_key[1][0] == key[1][0]):
                         col_elements.append(sub_key[1])
 
-        #TODO: instead of return the list "table", return for each row a yeld,
-        # this way we dont need to save in memory the whole table
+        # TODO: for each cell header, know the expansion we need to do
         row_header = self.get_row_header(row_elements, self.rows)
         table = self.get_column_header(col_elements, self.columns)
         for row in table:
@@ -333,11 +387,11 @@ class CellType(Enum):
 class Cell:
     __slots__ = ('value', 'type', 'expansion')
 
-    def __init__(self, value, type=CellType.VALUE):
+    def __init__(self, value, type=CellType.VALUE, expansion=None):
         self.value = value
         # Use as a type an enum, it is much faster than a dictionary
         self.type = type
-        self.expansion = None
+        self.expansion = expansion
 
     def text(self, lang=None):
         if not lang:

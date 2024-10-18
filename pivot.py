@@ -28,6 +28,7 @@ COLLAPSE = '➖'
 EXPAND = '➕'
 SWAP_AXIS = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>')
 RELOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>')
+EXPAND_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>')
 DOWNLOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>')
 ROWS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
 COLUMNS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
@@ -181,7 +182,10 @@ class Index(Component):
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-4"):
                 div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
+                # Each button is a 36px width
                 # Invert axis button
+                with div(cls="col-span-1"):
+                    a(href="#", cls="absolute right-[84px]").add(EXPAND_ALL)
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
                         cls="absolute right-12").add(SWAP_AXIS)
@@ -453,7 +457,6 @@ class PivotHeaderSelection(Component):
         Table = pool.get('babi.table')
 
         name = None
-        #TODO: we need to handle the order case
         match self.header:
             case 'x':
                 name = 'field_selection_x'
@@ -684,14 +687,11 @@ class PivotTable(Component):
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
-    #grouping_fields = fields.Char('Grouping Fields')
-    #result_fields = fields.Char('Result Fields')
 
     @classmethod
     def get_url_map(cls):
         return [
             Rule('/<string:database_name>/babi/pivot/table/<string:table_name>/<string:table_properties>'),
-            #Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:grouping_fields>/<string:result_fields>')
         ]
 
     def render(self):
@@ -729,7 +729,54 @@ class PivotTable(Component):
                     download = None
                     continue
                 if cell.type == CellType.ROW_HEADER or cell.type == CellType.COLUMN_HEADER:
-                    pivot_row.add(td(cell.text(language), cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                    #TODO: add the link to the cell to expand the table
+                    # In chase a cell dont have more childs dont show a link
+                    cell_value = cell.text(language)
+
+                    if cell.expansion:
+                        # This case handles all the expansions
+                        icon = EXPAND
+
+                        cell_cube = Cube.parse_properties(self.table_properties, self.table_name)
+                        cell_cube.expansions.append(cell.expansion)
+                        table_properties = cell_cube.encode_properties()
+
+                        cell_value = a(str(icon) + ' ' + str(cell.text(language)), href="#",
+                            hx_target="#pivot_table",
+                            hx_post=PivotTable(database_name=self.database_name, table_name=self.table_name,
+                                table_properties=table_properties, render=False).url(),
+                            hx_trigger="click", hx_swap="outerHTML")
+                    elif cell.value in cube.expansions:
+                        # This case handles the collapse action of the headers cells
+                        icon = COLLAPSE
+
+                        cell_cube = Cube.parse_properties(self.table_properties, self.table_name)
+                        #TODO: we need a better way to handle the expresions here
+                        cell_cube.expansions.remove(cell.value)
+                        table_properties = cell_cube.encode_properties()
+
+                        cell_value = a(str(icon) + ' ' + str(cell.text(language)), href="#",
+                            hx_target="#pivot_table",
+                            hx_post=PivotTable(database_name=self.database_name, table_name=self.table_name,
+                                table_properties=table_properties, render=False).url(),
+                            hx_trigger="click", hx_swap="outerHTML")
+                    elif cell.expansion in cube.expansions:
+                        # This case handles the collapse action for any other case except the headers ceññs
+                        icon = COLLAPSE
+
+                        cell_cube = Cube.parse_properties(self.table_properties, self.table_name)
+                        #TODO: we need a better way to handle the expresions here
+                        cell_cube.expansions.remove(cell.expression)
+                        table_properties = cell_cube.encode_properties()
+
+                        cell_value = a(str(icon) + ' ' + str(cell.text(language)), href="#",
+                            hx_target="#pivot_table",
+                            hx_post=PivotTable(database_name=self.database_name, table_name=self.table_name,
+                                table_properties=table_properties, render=False).url(),
+                            hx_trigger="click", hx_swap="outerHTML")
+
+                    pivot_row.add(td(cell_value, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+
                 else:
                     pivot_row.add(td(cell.text(language), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
             pivot_table.add(pivot_row)
