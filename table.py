@@ -493,7 +493,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return context
 
     def get_url(self, name):
-        hostname = config.get('web', 'hostname'):
+        hostname = config.get('web', 'hostname')
         if not hostname:
             hostname = config.get('web', 'listen')
         return f'{hostname}/{Transaction().database.name}/babi/pivot/{self.table_name}'
