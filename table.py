@@ -493,9 +493,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return context
 
     def get_url(self, name):
-        if config.get("web", "cors"):
-            return f'{(config.get("web", "cors"))}/{Transaction().database.name}/babi/pivot/__{self.internal_name}/null'
-        return f'http://{(config.get("web", "listen"))}/{Transaction().database.name}/babi/pivot/__{self.internal_name}/null'
+        hostname = config.get('web', 'hostname'):
+        if not hostname:
+            hostname = config.get('web', 'listen')
+        return f'{hostname}/{Transaction().database.name}/babi/pivot/{self.table_name}'
 
     @property
     def ai_sql_tables(self):
@@ -1270,14 +1271,10 @@ class Pivot(ModelSQL, ModelView):
             res.append(item)
         return ' '.join(res)
 
-    @fields.depends('name', 'row_dimensions', 'column_dimensions', 'measures')
+    @fields.depends('table', 'name', 'row_dimensions', 'column_dimensions', 'measures')
     def on_change_with_url(self, name=None):
-        base = ''
-        if config.get("web", "cors"):
-            base = f'{(config.get("web", "cors"))}'
-        else:
-            base = f'http://{(config.get("web", "listen"))}'
-
+        if not self.table:
+            return
         order = []
         for item in self.order:
             if item.element.__name__ == 'babi.pivot.measure':
@@ -1294,7 +1291,7 @@ class Pivot(ModelSQL, ModelView):
             order=order,
             )
         properties = cube.encode_properties()
-        return f'{base}/{Transaction().database.name}/babi/pivot/{self.table.table_name}/{properties}'
+        return f'{self.table.url}/{properties}'
 
     @classmethod
     def search_rec_name(cls, name, clause):
