@@ -1,0 +1,8 @@
+<form>
+    <label name="pivot"/>
+    <field name="pivot"/>
+    <label name="field"/>
+    <field name="field"/>
+    <label name="aggregate"/>
+    <field name="aggregate"/>
+</form>
