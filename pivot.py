@@ -173,7 +173,17 @@ class Index(Component):
         if cube.rows and cube.columns and cube.measures:
             show_error = False
 
+        # Prepare the cube properties to the expand all cube function
+        auxiliar_expansion_rows = cube.expansions_rows
+        auxiliar_expansions_columns = cube.expansions_columns
+        cube.expansions_rows = 'all'
+        cube.expansions_columns = 'all'
+        expansion_cube_properties = cube.encode_properties()
+        cube.expansions_rows = auxiliar_expansion_rows
+        cube.expansions_columns = auxiliar_expansions_columns
+
         # Prepare the cube properties to the invert cube function
+        cube.table = table_name
         axuiliar_row = cube.rows
         cube.rows = cube.columns
         cube.columns = axuiliar_row
@@ -183,9 +193,11 @@ class Index(Component):
             with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-4"):
                 div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
                 # Each button is a 36px width
-                # Invert axis button
+                # Expand all button
                 with div(cls="col-span-1"):
-                    a(href="#", cls="absolute right-[84px]").add(EXPAND_ALL)
+                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=expansion_cube_properties, render=False).url(),
+                        cls="absolute right-[84px]").add(EXPAND_ALL)
+                # Invert axis button
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
                         cls="absolute right-12").add(SWAP_AXIS)
@@ -662,20 +674,64 @@ class PivotHeader(Component):
         Index = pool.get('www.index.pivot')
 
         cube = Cube.parse_properties(self.table_properties, self.table_name)
+        auxiliar_position = None
+        #TODO: try to make this more generic (check if we can use a variable
+        # and set the value to the cube directly)
         match self.header:
             case 'x':
-                pass
+                print('x')
+                # Search element position in list
+                auxiliar_position = cube.rows.index(self.field)
+                # Get element and savit in a auxiliar val
+                auxiliar_value = cube.rows[auxiliar_position]
+                # Remove element from list
+                cube.rows.remove(self.field)
+                # Add element in the new position
+                if self.level_action == 'up':
+                    cube.rows.insert(auxiliar_position-1, auxiliar_value)
+                else:
+                    cube.rows.insert(auxiliar_position+1, auxiliar_value)
             case 'y':
-                pass
+                print('y')
+                # Search element position in list
+                auxiliar_position = cube.columns.index(self.field)
+                # Get element and savit in a auxiliar val
+                auxiliar_value = cube.columns[auxiliar_position]
+                # Remove element from list
+                cube.columns.remove(self.field)
+                # Add element in the new position
+                if self.level_action == 'up':
+                    cube.columns.insert(auxiliar_position-1, auxiliar_value)
+                else:
+                    cube.columns.insert(auxiliar_position+1, auxiliar_value)
             case 'measures':
-                pass
+                # Search element position in list
+                auxiliar_position = cube.measures.index(self.field)
+                # Get element and savit in a auxiliar val
+                auxiliar_value = cube.measures[auxiliar_position]
+                # Remove element from list
+                cube.measures.remove(self.field)
+                # Add element in the new position
+                if self.level_action == 'up':
+                    cube.measures.insert(auxiliar_position-1, auxiliar_value)
+                else:
+                    cube.measures.insert(auxiliar_position+1, auxiliar_value)
             case 'order':
-                pass
+                print('order')
+                # Search element position in list
+                auxiliar_position = cube.order.index(self.field)
+                # Get element and savit in a auxiliar val
+                auxiliar_value = cube.order[auxiliar_position]
+                # Remove element from list
+                cube.order.remove(self.field)
+                # Add element in the new position
+                if self.level_action == 'up':
+                    cube.order.insert(auxiliar_position-1, auxiliar_value)
+                else:
+                    cube.order.insert(auxiliar_position+1, auxiliar_value)
 
-        #TODO: here we need to level up by 1 element or down by element the field properties
         table_properties = cube.encode_properties()
-        #return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
-        pass
+        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
 
 
 #This function handles the render of the cube into a table and the download button
@@ -701,17 +757,6 @@ class PivotTable(Component):
         Language = pool.get('ir.lang')
 
         cube = Cube.parse_properties(self.table_properties, self.table_name)
-        '''
-        # TODO: we need to handle the expansions and the format of the headers
-        # (add an icon at the start to indicate if the element is open or closed)
-        row.add(td(a(str(icon) +  ' ' + str(table_structure_child_row.name or '(Empty)'), href="#",
-                hx_target="#pivot_table",
-                hx_post=Pivot(database_name=self.database_name,
-                    table_name=self.table, grouping_fields=grouping_fields,
-                    result_fields=result_fields, render=False).url(),
-                hx_trigger="click", hx_swap="outerHTML"),
-            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
-        '''
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
 
@@ -728,51 +773,48 @@ class PivotTable(Component):
                     pivot_row.add(td(download, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
                     download = None
                     continue
-                if cell.type == CellType.ROW_HEADER or cell.type == CellType.COLUMN_HEADER:
-                    #TODO: add the link to the cell to expand the table
-                    # In chase a cell dont have more childs dont show a link
+                # Handle the headers links
+                if (cell.type == CellType.ROW_HEADER or
+                        cell.type == CellType.COLUMN_HEADER):
                     cell_value = cell.text(language)
-
-                    if cell.expansion:
-                        # This case handles all the expansions
-                        icon = EXPAND
-
-                        cell_cube = Cube.parse_properties(self.table_properties, self.table_name)
-                        cell_cube.expansions.append(cell.expansion)
-                        table_properties = cell_cube.encode_properties()
-
-                        cell_value = a(str(icon) + ' ' + str(cell.text(language)), href="#",
-                            hx_target="#pivot_table",
-                            hx_post=PivotTable(database_name=self.database_name, table_name=self.table_name,
-                                table_properties=table_properties, render=False).url(),
-                            hx_trigger="click", hx_swap="outerHTML")
-                    elif cell.value in cube.expansions:
+                    table_properties = None
+                    if (cell.expansion_row and cell.expansion_row in
+                            cube.expansions_rows) or (cell.expansion_column and
+                            cell.expansion_column in cube.expansions_columns):
                         # This case handles the collapse action of the headers cells
                         icon = COLLAPSE
 
-                        cell_cube = Cube.parse_properties(self.table_properties, self.table_name)
-                        #TODO: we need a better way to handle the expresions here
-                        cell_cube.expansions.remove(cell.value)
+                        cell_cube = Cube.parse_properties(
+                            self.table_properties, self.table_name)
+                        if cell.type == CellType.ROW_HEADER:
+                            cell_cube.expansions_rows.remove(
+                                cell.expansion_row)
+                        elif cell.type == CellType.COLUMN_HEADER:
+                            cell_cube.expansions_columns.remove(
+                                cell.expansion_column)
+                        table_properties = cell_cube.encode_properties()
+                    elif cell.expansion_row or cell.expansion_column:
+                        # This case handles all the expansions
+                        icon = EXPAND
+
+                        cell_cube = Cube.parse_properties(
+                            self.table_properties, self.table_name)
+                        if cell.type == CellType.ROW_HEADER:
+                            cell_cube.expansions_rows.append(cell.expansion_row)
+                        elif cell.type == CellType.COLUMN_HEADER:
+                            cell_cube.expansions_columns.append(
+                                cell.expansion_column)
                         table_properties = cell_cube.encode_properties()
 
-                        cell_value = a(str(icon) + ' ' + str(cell.text(language)), href="#",
-                            hx_target="#pivot_table",
-                            hx_post=PivotTable(database_name=self.database_name, table_name=self.table_name,
-                                table_properties=table_properties, render=False).url(),
-                            hx_trigger="click", hx_swap="outerHTML")
-                    elif cell.expansion in cube.expansions:
-                        # This case handles the collapse action for any other case except the headers ceññs
-                        icon = COLLAPSE
-
-                        cell_cube = Cube.parse_properties(self.table_properties, self.table_name)
-                        #TODO: we need a better way to handle the expresions here
-                        cell_cube.expansions.remove(cell.expression)
-                        table_properties = cell_cube.encode_properties()
-
-                        cell_value = a(str(icon) + ' ' + str(cell.text(language)), href="#",
-                            hx_target="#pivot_table",
-                            hx_post=PivotTable(database_name=self.database_name, table_name=self.table_name,
-                                table_properties=table_properties, render=False).url(),
+                    if table_properties:
+                        cell_value = a(
+                            str(icon) + ' ' + str(cell.text(language)),
+                            href="#", hx_target="#pivot_table",
+                            hx_post=PivotTable(
+                                    database_name=self.database_name,
+                                    table_name=self.table_name,
+                                    table_properties=table_properties,
+                                    render=False).url(),
                             hx_trigger="click", hx_swap="outerHTML")
 
                     pivot_row.add(td(cell_value, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
