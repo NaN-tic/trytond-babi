@@ -115,15 +115,19 @@ class Index(Component):
     def get_url_map(cls):
         #TODO: we need to hande multiple URLs with the same endpoint
         return [
-            #Rule('/<string:database_name>/babi/pivot/<string:table_name>/'),
-            #Rule('/<string:database_name>/babi/pivot/<string:table_name>'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>', endpoint='render_null'),
             Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>'),
         ]
+
+    # Temporal solution to have differents urls with the same endpoint
+    def render_null(self):
+        return self.render()
 
     def render(self):
         pool = Pool()
         BabiTable = pool.get('babi.table')
         # Components
+        Layout = pool.get('www.layout.pivot')
         PivotHeaderAxis = pool.get('www.pivot_header.axis')
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
         PivotHeaderOrder = pool.get('www.pivot_header.order')
@@ -162,6 +166,10 @@ class Index(Component):
             layout.main.add(error_section)
             return layout.tag()
 
+        # Ensure we have a value in table_properties
+        if not hasattr(self, 'table_properties'):
+            self.table_properties = 'null'
+
         # Check if we have the cube properties to see the table, if not, show a messagge
         show_error = True
         if self.table_properties == 'null':
@@ -169,7 +177,6 @@ class Index(Component):
         else:
             cube = Cube.parse_properties(self.table_properties, table_name)
 
-        print(f'ROWS: {cube.rows}\nCOLUMNS: {cube.columns}\nMEASURES: {cube.measures}\nORDER: {cube.order}')
         if cube.rows and cube.columns and cube.measures:
             show_error = False
 
@@ -193,10 +200,10 @@ class Index(Component):
             with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-4"):
                 div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
                 # Each button is a 36px width
-                # Expand all button
-                with div(cls="col-span-1"):
-                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=expansion_cube_properties, render=False).url(),
-                        cls="absolute right-[84px]").add(EXPAND_ALL)
+                #TODO: Expand all button
+                #with div(cls="col-span-1"):
+                #    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=expansion_cube_properties, render=False).url(),
+                #        cls="absolute right-[84px]").add(EXPAND_ALL)
                 # Invert axis button
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
@@ -395,8 +402,9 @@ class PivotHeaderOrder(Component):
 
     def render(self):
         pool = Pool()
+        # Components
+        Index = pool.get('www.index.pivot')
         PivotHeader = pool.get('www.pivot_header')
-        PivotHeaderSelection = pool.get('www.pivot_header.selection')
 
         items = []
         if self.table_properties != 'null':
@@ -414,30 +422,45 @@ class PivotHeaderOrder(Component):
                                 th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(ORDER_ICON)
                                 th(_('Order fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
                                 th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
-                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
-                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
-                                        hx_target="#field_selection_order",
-                                        hx_post=PivotHeaderSelection(header='order', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
-                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
-                                    span(_('Add'), cls="sr-only")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0")
                         with tbody(cls="divide-y divide-gray-200"):
                             for item in items:
                                 with tr():
-                                    if len(item) == 2:
-                                        value = item[0]
+                                    if isinstance(item[0], tuple):
+                                        value = f'{item[0][1].capitalize()}({item[0][0].capitalize()})'
+                                        field = '__'.join(item[0])
                                     else:
-                                        value = f'{item[1]}({item[0]})'
-                                    td(value.capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                        value = item[0].capitalize()
+                                        field = item[0]
+                                    td(value, colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        if item[1] == 'desc':
-                                            div(ORDER_DESC_ICON)
+                                        cube = Cube.parse_properties(self.table_properties,
+                                            self.table_name)
+                                        auxiliar_position = cube.order.index(item)
+                                        auxiliar_element = item
+                                        cube.order.remove(auxiliar_element)
+                                        auxiliar_element = list(item)
+                                        if auxiliar_element[1] == 'asc':
+                                                auxiliar_element[1] = 'desc'
                                         else:
-                                            div(ORDER_ASC_ICON)
-                                    #TODO: add arrows to move up/down a record?
+                                            auxiliar_element[1] = 'asc'
+                                        cube.order.insert(auxiliar_position, tuple(auxiliar_element))
+                                        invert_table_properties = cube.encode_properties()
+
+                                        if item[1] == 'desc':
+                                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties, render=False).url(),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(ORDER_DESC_ICON)
+                                        else:
+                                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties, render=False).url(),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(ORDER_ASC_ICON)
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        # TODO: With the change of managing measures as tuples, we need to change the way we handle the order
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=item[0], table_properties=self.table_properties, render=False).url('remove_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
+                                        if item != items[0]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        if item != items[-1]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
         return header_order
 
 
@@ -454,7 +477,6 @@ class PivotHeaderSelection(Component):
     table_properties = fields.Char('Table Properties')
     field = fields.Char('Field')
     measure = fields.Char('Measure')
-    order = fields.Char('Order')
 
     @classmethod
     def get_url_map(cls):
@@ -524,31 +546,12 @@ class PivotHeaderSelection(Component):
                                                     option(name_, value=field)
 
                                     if self.header == 'measure':
-                                        with select(id="measure", name="measure", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
+                                        with select(id="measure", name="measure", required=True, cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
                                             option(_('Sum'), value='sum')
                                             option(_('Average'), value='average')
                                             option(_('Max'), value='max')
                                             option(_('Min'), value='min')
                                             option(_('Count'), value='count')
-                                    if self.header == 'order':
-                                        with div(cls="grid grid-cols-4"):
-                                            with div(cls="flex items-start col-span-2"):
-                                                with div(cls="relative flex items-start"):
-                                                    with div(cls="flex h-6 items-center"):
-                                                        input_(id="order_asc", name="order", type="radio", value="asc", cls="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600")
-                                                    with div(cls="ml-3 text-sm leading-6"):
-                                                        label_asc = label(for_="order", cls="text-gray-900 flex items-center")
-                                                        label_asc.add(ORDER_ASC_ICON)
-                                                        label_asc.add(p(_('Ascending')))
-
-                                            with div(cls="flex items-start col-span-2"):
-                                                with div(cls="relative flex items-start"):
-                                                    with div(cls="flex h-6 items-center"):
-                                                        input_(id="order_desc", name="order", type="radio", value="desc", cls="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600")
-                                                    with div(cls="ml-3 text-sm leading-6"):
-                                                        label_desc = label(for_="order", cls="text-gray-900 flex items-center")
-                                                        label_desc.add(ORDER_DESC_ICON)
-                                                        label_desc.add(p(_('Descending')))
                         with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
                             button(_('Add'), type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
                             a(_('Cancel'), href="#",
@@ -586,20 +589,21 @@ class PivotHeaderSelection(Component):
         # We need to check if a specific field is already in the cube, if is
         # the case, dont add again. If we clic fast enougth while adding fields
         # we can send multiple times a request to the server, tryton to add
-        # multiple times a field
+        # multiple times a field. For each header, we add the field in his
+        # header and in the order header
         match self.header:
             case 'x':
                 if self.field not in cube.rows:
                     cube.rows.append(self.field)
+                    cube.order.append((self.field, 'asc'))
             case 'y':
                 if self.field not in cube.columns:
                     cube.columns.append(self.field)
+                    cube.order.append((self.field, 'asc'))
             case 'measure':
                 if (self.field, self.measure) not in cube.measures:
                     cube.measures.append((self.field, self.measure))
-            case 'order':
-                if (self.field, self.order) not in cube.order:
-                    cube.order.append((self.field, self.order))
+                    cube.order.append(((self.field, self.measure), 'asc'))
                 pass
 
         return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=cube.encode_properties(), render=False).url())
@@ -634,39 +638,39 @@ class PivotHeader(Component):
         # Component
         Index = pool.get('www.index.pivot')
         cube = Cube.parse_properties(self.table_properties, self.table_name)
-        print(f'\n\n==== REMOVE FIELD: {self.field} ====')
-        print(f'X: {cube.rows}\nY: {cube.columns}\nMEASURES: {cube.measures}\nORDER: {cube.order}')
         match self.header:
             case 'x':
-                print(f'X: {cube.rows}')
                 cube.rows.remove(self.field)
             case 'y':
-                print(f'Y: {cube.columns}')
                 cube.columns.remove(self.field)
             case 'measures':
-                print(f'Measure: {cube.measures}')
+                #TODO: we need to handle the case when we have multiple
+                # measures for the same field.
+                # For example, we can have: SUM('x') and MAX('x')
                 index = 0
                 for measure in cube.measures:
                     if measure[0] == self.field:
                         cube.measures.pop(index)
                         break
                     index += 1
-            case 'order':
-                print(f'Order: {cube.order}')
-                index = 0
-                for o in cube.order:
-                    #TODO: we need to see how to handle the fields that are a tuple
-                    if o[0] == self.field:
-                        cube.order.pop(index)
-                        break
-                    index += 1
+
+        # Remove the field from the order property
+        index = 0
+        for order in cube.order:
+            if self.header in ['x', 'y'] and order[0] == self.field:
+                cube.order.pop(index)
+                break
+            if self.header == 'measures':
+                if isinstance(order[0], tuple) and order[0][0] == self.field:
+                    cube.order.pop(index)
+                    break
+            index +=1
+
         table_properties = cube.encode_properties()
         #TODO: remove this section when we found the correct way to handle
         # multiple URLs with the same endpoint
         if not cube.rows and not cube.columns and not cube.measures and not cube.order:
             table_properties = 'null'
-        print('=========\n\n')
-        #TODO: the redirect is not working correctly, the url changes but the page is not reloaded
         return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
 
     def level_field(self):
@@ -675,60 +679,40 @@ class PivotHeader(Component):
 
         cube = Cube.parse_properties(self.table_properties, self.table_name)
         auxiliar_position = None
-        #TODO: try to make this more generic (check if we can use a variable
-        # and set the value to the cube directly)
-        match self.header:
-            case 'x':
-                print('x')
-                # Search element position in list
-                auxiliar_position = cube.rows.index(self.field)
-                # Get element and savit in a auxiliar val
-                auxiliar_value = cube.rows[auxiliar_position]
-                # Remove element from list
-                cube.rows.remove(self.field)
-                # Add element in the new position
-                if self.level_action == 'up':
-                    cube.rows.insert(auxiliar_position-1, auxiliar_value)
+        headers = {
+            'x': 'rows',
+            'y': 'columns',
+            'measures': 'measures',
+            'order': 'order',
+        }
+
+        if self.header in headers:
+            cube_attribute = getattr(cube, headers[self.header])
+            if self.header == 'order':
+                field = self.field.split('__')
+                if len(field) > 1:
+                    field = tuple(field)
                 else:
-                    cube.rows.insert(auxiliar_position+1, auxiliar_value)
-            case 'y':
-                print('y')
-                # Search element position in list
-                auxiliar_position = cube.columns.index(self.field)
-                # Get element and savit in a auxiliar val
-                auxiliar_value = cube.columns[auxiliar_position]
-                # Remove element from list
-                cube.columns.remove(self.field)
-                # Add element in the new position
-                if self.level_action == 'up':
-                    cube.columns.insert(auxiliar_position-1, auxiliar_value)
-                else:
-                    cube.columns.insert(auxiliar_position+1, auxiliar_value)
-            case 'measures':
-                # Search element position in list
-                auxiliar_position = cube.measures.index(self.field)
-                # Get element and savit in a auxiliar val
-                auxiliar_value = cube.measures[auxiliar_position]
-                # Remove element from list
-                cube.measures.remove(self.field)
-                # Add element in the new position
-                if self.level_action == 'up':
-                    cube.measures.insert(auxiliar_position-1, auxiliar_value)
-                else:
-                    cube.measures.insert(auxiliar_position+1, auxiliar_value)
-            case 'order':
-                print('order')
-                # Search element position in list
-                auxiliar_position = cube.order.index(self.field)
-                # Get element and savit in a auxiliar val
-                auxiliar_value = cube.order[auxiliar_position]
-                # Remove element from list
-                cube.order.remove(self.field)
-                # Add element in the new position
-                if self.level_action == 'up':
-                    cube.order.insert(auxiliar_position-1, auxiliar_value)
-                else:
-                    cube.order.insert(auxiliar_position+1, auxiliar_value)
+                    field = self.field
+
+                index = 0
+                for ca in cube_attribute:
+                    if ca[0] == field:
+                        field = ca
+                        break
+                    index +1
+                auxiliar_position = cube_attribute.index(field)
+            else:
+                auxiliar_position = cube_attribute.index(self.field)
+            # Get element and save it in a auxiliar val
+            auxiliar_value = cube_attribute[auxiliar_position]
+            # remove element from list
+            cube_attribute.remove(auxiliar_value)
+            # Add element in the new position
+            if self.level_action == 'up':
+                cube_attribute.insert(auxiliar_position-1, auxiliar_value)
+            else:
+                cube_attribute.insert(auxiliar_position+1, auxiliar_value)
 
         table_properties = cube.encode_properties()
         return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())

@@ -207,8 +207,6 @@ class Cube:
 
         # Get the cartesian product between the rows and columns
         rxc = list(product(rows, columns))
-        print(f'ROWS COORDINATES: {rows}\nCOLUMNS COORDINATES: {columns}\nRxC: {rxc}')
-        print(f'  EXPANSION ROWS: {self.expansions_rows}\n  EXPANSION COLUMNS: {self.expansions_columns}')
 
         # Format the measures to use them in the query
         measures = ','.join(
@@ -235,26 +233,21 @@ class Cube:
             # Prepare the order we need to use in the query
             order = []
             for item in self.order:
-                if len(item) == 2:
-                    for column in groupby_columns.split(","):
-                        if column == item[0]:
-                            order.append(f'{item[0]} {item[-1]}')
-                elif len(item) == 3:
-                    for measure in self.measures:
-                        if measure == item[:-1]:
-                            order.append(f'{item[1]}({item[0]}) {item[-1]}')
+                if isinstance(item[0], tuple):
+                    field = f'{item[0][1]}({item[0][0]})'
+                    if field in measures:
+                        order.append(f'{item[0][1]}({item[0][0]}) {item[1]}')
+                else:
+                    if item[0] in groupby_columns:
+                        order.append(f'{item[0]} {item[1]}')
 
+            print(f'ORDER: {order}')
             if order:
                 query += f' ORDER BY {",".join(order)}'
-
 
             # If we dont have any expansion -> we are in the level 0
             # TODO: We need a "special" case to show all levels list
             #  |-> use expansions / None -> open everything
-            for expansion_row in self.expansions_rows:
-                print(f'  EXPANSION ROW: {expansion_row}')
-            for expansion_column in self.expansions_columns:
-                print(f'  EXPANSION COLUMN: {expansion_column}')
 
             default_row_coordinates = tuple([None]*len(self.rows))
             default_column_coordinates = tuple([None]*len(self.columns))
