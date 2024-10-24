@@ -1,37 +1,46 @@
-import re
-from werkzeug.routing import Rule
-from werkzeug.utils import redirect
 from dominate.tags import (div, h1, p, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
-    option, main, th)
+    option, main, th, label, input_)
 from dominate.util import raw
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_workbook
+import tempfile
+from werkzeug.routing import Rule
+from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
-from werkzeug.wrappers import Response
-from decimal import Decimal
+from .cube import Cube, CellType
 
-from collections import deque
 
+# TODO: Use table.py implementation in 7.2 version and above
+def save_virtual_workbook(workbook):
+    with tempfile.NamedTemporaryFile() as tmp:
+        save_workbook(workbook, tmp.name)
+        with open(tmp.name, 'rb') as f:
+            return f.read()
+
+# Icons used in website
 COLLAPSE = '➖'
 EXPAND = '➕'
-
 SWAP_AXIS = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>')
 RELOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>')
+EXPAND_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>')
 DOWNLOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>')
-
 ROWS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
 COLUMNS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
-AGGREGATION_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>')
-
+MEASURE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>')
 ADD_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>')
 REMOVE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>')
 UP_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>')
 DOWN_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>')
 CLOSE_ICON = raw('<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
-
+ORDER_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg>')
+ORDER_ASC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" /></svg>')
+ORDER_DESC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>')
 
 class Site(metaclass=PoolMeta):
     __name__ = 'www.site'
@@ -41,812 +50,13 @@ class Site(metaclass=PoolMeta):
         super().__setup__()
         cls.type.selection += [('babi_pivot', 'Pivot')]
 
-###############################################################################
-################################ PIVOT CLASSES ################################
-###############################################################################
-class Operation:
-    # Common fields
-    name = ''
-    table = ''
-    # Grouping fields
-    position = ''
-    hierarchy = ''
-    state = ''
-    operation = ''
-    parent = None
-    # Result fields
-    aggregation_operation = ''
-    # Record fields
-    record_state = ''
-    open_records = []
-    parent_record = []
-    childs_record = []
-    # List of grouping fields and reuslt fields, needed to create the urls
-    grouping_fields = []
-    result_fields = []
-    database_name = ''
-
-    def select_closed(self, table_structure):
-        h = Header(self.name, None, self.hierarchy, self.position, [], self.record_state)
-        if self.parent:
-            h.parent = self.parent
-
-        # The columns at level 0 are like the parents and must have the same
-        # name as the column from postgress
-        if self.hierarchy == 0:
-            if self.position == 'row':
-                table_structure.table_rows.append(h)
-                #table_structure.rows.append(h)
-            elif self.position == 'column':
-                table_structure.table_columns.append(h)
-                #table_structure.columns.append(h)
-
-        if self.parent:
-            self.parent.childs.append(h)
-        #TODO: Diference between table row/column and records used as headers
-        # Calculate only the total (like using a sum)
-        if self.position == 'row':
-            table_structure.rows.append(h)
-            for row in table_structure.rows:
-                # TODO: for now this works with two levels, we need to makit work with infinite levels
-                if row.hierarchy == self.hierarchy and not row.parent and self.name != row.name:
-                    row.hierarchy += 1
-        elif self.position == 'column':
-            table_structure.columns.append(h)
-            for column in table_structure.columns:
-                # TODO: for now this works with two levels, we need to makit work with infinite levels
-                if column.hierarchy == self.hierarchy and not column.parent and self.name != column.name:
-                    column.hierarchy += 1
-        else:
-            raise
-
-        return []
-
-    def select_open(self, table_structure):
-        # We need to get the child level
-        cursor = Transaction().connection.cursor()
-        cursor.execute(f'SELECT {self.name} FROM {self.table} GROUP BY {self.name} ORDER BY {self.name};')
-
-        h = Header(self.name, None, self.hierarchy, self.position, [], self.record_state)
-        if self.position == 'row':
-            table_structure.table_rows.append(h)
-            # Only add as row the first level of the table
-            if self.hierarchy == 0:
-                table_structure.rows.append(h)
-        elif self.position == 'column':
-            table_structure.table_columns.append(h)
-            # Only add as row the first level of the table
-            if self.hierarchy == 0:
-                table_structure.columns.append(h)
-
-        #TODO: if we open a record, we need to search if thers any other column
-        # in that level and aguemt the level in 1 for this column
-
-        results = cursor.fetchall()
-        new_operations = []
-        for result in results:
-            op = Operation()
-            op.name = result[0]
-            op.position = self.position
-            op.hierarchy = self.hierarchy + 1
-            op.state = 'closed'
-            op.table = self.table
-            op.operation = 'select_closed'
-            op.parent = h
-            op.open_records = self.open_records
-            op.record_state = 'closed'
-            if str(result[0]) in self.open_records:
-                op.record_state = 'open'
-            new_operations.append(op)
-        return new_operations
-
-    def calculate_total(self, table_structure):
-        cursor = Transaction().connection.cursor()
-        cursor.execute(f'SELECT {self.aggregation_oeration}({self.name}) FROM {self.table}')
-        results = cursor.fetchall()
-        if (None, None) not in table_structure.values.keys():
-            table_structure.values[(None, None)] = {}
-        if (self.aggregation_oeration, self.name) not in table_structure.values[(None, None)].keys():
-            table_structure.values[(None, None)][(self.aggregation_oeration, self.name)] = {}
-        table_structure.values[(None, None)][(self.aggregation_oeration, self.name)] = results[0][0]
-        table_structure.aggregations.append((self.aggregation_oeration, self.name))
-        return []
-
-    def calculate_values(self, table_structure):
-        values = {}
-        cursor = Transaction().connection.cursor()
-        aggregate_fields = ','.join([f'{aggregation[0]}({aggregation[1]})' for aggregation in table_structure.aggregations])
-        #TODO: If we only have a one dimension in the rows or the columns we dont need to do the group by
-
-        # Get the hierarchy levels of the columns and rows
-        hierarchy_columns = [t.hierarchy for t in table_structure.columns]
-        hierarchy_columns.sort()
-        hierarchy_columns = list(set(hierarchy_columns))
-        hierarchy_rows = [t.hierarchy for t in table_structure.rows]
-        hierarchy_rows.sort()
-        hierarchy_rows = list(set(hierarchy_rows))
-
-        for hierarchy_column in hierarchy_columns:
-            for table_structure_column in table_structure.table_columns:
-                # If we only have one dimension, we dont need to calculate
-                # anything the values are already calculated using
-                # "calculate_totals"
-                if len(table_structure.columns) < 1:
-                    continue
-
-                # Get the list of each parent
-                table_strucutre_columns = []
-                table_strucutre_columns.append(table_structure_column.name)
-                # Loop trough all the hierarchy levels, we
-                # remove one level (is the level where we are now)
-                hierarchy_level = table_structure_column.hierarchy - 1
-                while hierarchy_level >= 0:
-                    for table_row in table_structure.table_columns:
-                        if table_row.hierarchy == hierarchy_level:
-                            table_strucutre_columns.append(table_row.name)
-                    hierarchy_level -= 1
-                table_strucutre_columns.reverse()
-
-                for aggregation in table_structure.aggregations:
-                    # If we are checking the first level, we need to do other things
-                    if (table_structure_column.hierarchy == hierarchy_column and
-                        hierarchy_column == hierarchy_columns[0]):
-                        cursor.execute(f'SELECT {table_structure_column.name}, {aggregate_fields} FROM {self.table} GROUP BY {table_structure_column.name} ORDER BY {table_structure_column.name};')
-                        results = cursor.fetchall()
-                        if results:
-                            for result in results:
-                                if (result[0], None) not in values.keys():
-                                    values[(result[0], None)] = {}
-                                if aggregation not in values[(result[0], None)].keys():
-                                    values[(result[0], None)][aggregation] = {}
-                                values[(result[0], None)][aggregation] = result[-1]
-                    # for each other level, we need to get all the parents and group by them
-                    elif (table_structure_column.hierarchy == hierarchy_column):
-                        # Get the list of each parent
-                        cursor.execute(f'SELECT {",".join(table_strucutre_columns)}, {aggregate_fields} FROM {self.table} GROUP BY {",".join(table_strucutre_columns)} ORDER BY {",".join(table_strucutre_columns)};')
-                        results = cursor.fetchall()
-                        if results:
-                            for result in results:
-                                coordinates = list(result[:-1])
-                                coordinates.append(None)
-                                if tuple(coordinates) not in values.keys():
-                                    values[tuple(coordinates)] = {}
-                                if aggregation not in values[tuple(coordinates)].keys():
-                                    values[tuple(coordinates)][aggregation] = {}
-                                values[tuple(coordinates)][aggregation] = result[-1]
-                    else:
-                        continue
-                for hierarchy_row in hierarchy_rows:
-                    for table_structure_row in table_structure.table_rows:
-                        if len(table_structure.rows) < 1:
-                            continue
-
-                        # Get the list of each parent
-                        table_strucutre_rows = []
-                        table_strucutre_rows.append(table_structure_row.name)
-                        # Loop trough all the hierarchy levels, we
-                        # remove one level (is the level where we are now)
-                        hierarchy_level = table_structure_row.hierarchy - 1
-                        while hierarchy_level >= 0:
-                            for table_row in table_structure.table_rows:
-                                if table_row.hierarchy == hierarchy_level:
-                                    table_strucutre_rows.append(table_row.name)
-                            hierarchy_level -= 1
-                        table_strucutre_rows.reverse()
-
-                        for aggregation in table_structure.aggregations:
-                            # If we are checking the first level, we need to do other things
-                            if (table_structure_row.hierarchy == hierarchy_row and
-                                    hierarchy_row == hierarchy_rows[0]):
-                                cursor.execute(f'SELECT {table_structure_row.name}, {aggregate_fields} FROM {self.table} GROUP BY {table_structure_row.name} ORDER BY {table_structure_row.name}')
-                                results = cursor.fetchall()
-                                if results:
-                                    for result in results:
-                                        if (None, result[0]) not in values.keys():
-                                            values[(None, result[0])] = {}
-                                        if aggregation not in values[(None, result[0])].keys():
-                                            values[(None, result[0])][aggregation] = {}
-                                        values[(None, result[0])][aggregation] = result[-1]
-                            elif (table_structure_row.hierarchy == hierarchy_row):
-                                cursor.execute(f'SELECT {",".join(table_strucutre_rows)} , {aggregate_fields} FROM {self.table} GROUP BY {",".join(table_strucutre_rows)} ORDER BY {",".join(table_strucutre_rows)};')
-                                results = cursor.fetchall()
-                                if results:
-                                    for result in results:
-                                        if (result[:len(table_strucutre_rows)]) not in values.keys():
-                                            values[(result[:len(table_strucutre_rows)])] = {}
-                                        if aggregation not in values[(result[:len(table_strucutre_rows)])].keys():
-                                            values[(result[0], result[1])][aggregation] = {}
-                                        values[(result[:len(table_strucutre_rows)])][aggregation] = result[-1]
-                            else:
-                                continue
-
-                            cursor.execute(f'SELECT {",".join(table_strucutre_columns + table_strucutre_rows)}, {aggregate_fields} FROM {self.table} GROUP BY {",".join(table_strucutre_columns + table_strucutre_rows)} ORDER BY {",".join(table_strucutre_columns + table_strucutre_rows)};')
-                            results = cursor.fetchall()
-                            if results:
-                                for result in results:
-                                    if (result[:len(table_strucutre_columns + table_strucutre_rows)]) not in values.keys():
-                                        values[(result[:len(table_strucutre_columns + table_strucutre_rows)])] = {}
-                                    if aggregation not in values[(result[:len(table_strucutre_columns + table_strucutre_rows)])].keys():
-                                        values[(result[:len(table_strucutre_columns + table_strucutre_rows)])][aggregation] = {}
-                                    values[(result[:len(table_strucutre_columns + table_strucutre_rows)])][aggregation] = result[-1]
-        table_structure.values = {**table_structure.values, **values}
-        return []
-
-    def create_table(self, table_structure):
-        pool = Pool()
-        Pivot = pool.get('www.pivot_table')
-        DownloadReport = pool.get('www.download_report')
-        # For now, to show the values we separtate the table in rows and
-        # calculate all the values of each row
-        # The column list (the first row of the table) contain all the columns + a space for each row
-        # Get the hierarchy levels of the columns and rows
-
-        hierarchy_columns = [t.hierarchy for t in table_structure.columns]
-        hierarchy_columns.sort()
-        hierarchy_columns = list(set(hierarchy_columns))
-        hierarchy_rows = [t.hierarchy for t in table_structure.rows]
-        hierarchy_rows.sort()
-        hierarchy_rows = list(set(hierarchy_rows))
-        # For each column hierarchy level we need to add a new row
-        # For each row hierarchy level we need to add a new column
-
-        def create_row_childs(table_value_row_cordinates_, hierarchy_row, index):
-            create_childs_rows = True
-            hierarchy_row_child = hierarchy_row + 1
-            index_child = index + 1
-
-            lines_to_add = []
-            last_row_open = None
-            specific_record_column_open = None
-            while create_childs_rows:
-                create_childs_rows = False
-                for table_structure_child_row in table_structure.rows:
-                    row = tr()
-                    table_value_row_cordinates = []
-
-                    if table_structure_child_row.hierarchy == hierarchy_row_child:
-                        # Any sublevel show the original table name, only the
-                        # record name, the only columns where we see the column
-                        # name are the level 0 columns
-                        for i in range(index_child):
-                            row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                        grouping_fields, result_fields = self.create_url(table_structure_child_row)
-
-                        if table_structure_child_row.state == 'open':
-                            icon = COLLAPSE
-                        else:
-                            icon = EXPAND
-                        row.add(td(a(str(icon) +  ' ' + str(table_structure_child_row.name or '(Empty)'), href="#",
-                                hx_target="#pivot_table",
-                                hx_post=Pivot(database_name=self.database_name,
-                                    table_name=self.table, grouping_fields=grouping_fields,
-                                    result_fields=result_fields, render=False).url(),
-                                hx_trigger="click", hx_swap="outerHTML"),
-                            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
-
-                        for i in range(len(hierarchy_rows)-(index_child+1)):
-                            row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-
-                        table_value_row_cordinates.append(table_structure_child_row.name)
-
-                        for table_structure_column in table_structure.columns:
-                            if (table_structure_column.hierarchy != hierarchy_columns[0] and
-                                    table_structure_column.parent == None and
-                                    table_structure_column.state == 'closed'):
-                                continue
-                            if table_structure_column.state == 'closed' and specific_record_column_open and specific_record_column_open < table_structure_column.hierarchy:
-                                continue
-                            if table_structure_column.hierarchy != hierarchy_columns[0] and not table_structure_column.record_parents:
-                                continue
-                            #TODO: use the record_childs / record_parents to know if we need to show a specific collumn
-                            for aggregation in table_structure.aggregations:
-                                table_value_column_cordinates = []
-                                value = '0'
-
-                                table_value_column_cordinate = table_structure_column.name
-                                if table_structure_column in table_structure.table_columns:
-                                    table_value_column_cordinate = None
-                                table_value_column_cordinates.append(table_value_column_cordinate)
-
-                                coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates_ + table_value_row_cordinates)
-                                if coordinates in table_structure.values.keys():
-                                    if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
-                                        value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
-                                        if value == {}:
-                                            value = '0'
-
-                                coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
-                                if coordinates in table_structure.values.keys():
-                                    if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
-                                        value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
-                                        if value == {}:
-                                            value = '0'
-
-                                # If we have value = '0' we need to check if any of the coordinates is "None" and try to search again without this coordinate:
-                                if value == '0':
-                                    last_none = False
-                                    new_coordinates = []
-                                    for coordinate in coordinates:
-                                        if not coordinate:
-                                            if last_none:
-                                                last_none = False
-                                                continue
-                                            else:
-                                                last_none = True
-                                                new_coordinates.append(coordinate)
-                                        else:
-                                            last_none = False
-                                            new_coordinates.append(coordinate)
-                                    coordinates = tuple(new_coordinates)
-                                    if coordinates in table_structure.values.keys():
-                                        if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
-                                            value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
-                                            if value == {}:
-                                                value = '0'
-
-                                # If all the values in a coordinate are null, try to search using only the values of one coordinate
-                                if value == '0':
-                                    coordinates = []
-                                    if len(set(table_value_column_cordinates)) != 1 and set(table_value_column_cordinates) != {None}:
-                                        coordinates += table_value_column_cordinates
-                                    if len(set(table_value_row_cordinates_)) != 1 and set(table_value_row_cordinates_) != {None}:
-                                        coordinates += table_value_row_cordinates_
-                                    if len(set(table_value_row_cordinates)) == 1 and set(table_value_row_cordinates) == {None}:
-                                        coordinates += table_value_row_cordinates
-
-                                    coordinates = tuple(coordinates)
-                                    if coordinates in table_structure.values.keys():
-                                        if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
-                                            value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
-                                            if value == {}:
-                                                value = '0'
-
-                                if value == '0':
-                                    coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates_ + table_value_row_cordinates)
-                                    coordinates = tuple([c for c in list(coordinates) if c != None])
-                                    if coordinates in table_structure.values.keys():
-                                        if (aggregation[0], aggregation[1]) in table_structure.values[coordinates].keys():
-                                            value = table_structure.values[coordinates][(aggregation[0], aggregation[1])]
-                                            if value == {}:
-                                                value = '0'
-                                #print(f'COORDINATES0: {coordinates}\n    VALUE: {value}')
-                                if type(value) == Decimal:
-                                    value = round(value, 2)
-                                row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
-                                if table_structure_column.state == 'open':
-                                    specific_record_column_open = table_structure_column.hierarchy
-                                if table_structure_column.state == 'open' and specific_record_column_open:
-                                    for record_child in table_structure_column.record_childs:
-                                        table_value_column_cordinates = []
-                                        table_value_column_cordinates.append(table_structure_column.name)
-                                        table_value_column_cordinates.append(record_child.name)
-
-                                        coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
-
-                                        value = '0'
-                                        if (coordinates) in table_structure.values.keys():
-                                            if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
-                                                value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
-                                                if value == {}:
-                                                    value = '0'
-                                        if value == '0':
-                                            coordinates = tuple([c for c in list(coordinates) if c != None])
-                                            if (coordinates) in table_structure.values.keys():
-                                                if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
-                                                    value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
-                                                    if value == {}:
-                                                        value = '0'
-                                        #print(f'COORDINATES0.1: {coordinates}\n    VALUE: {value}')
-                                        if type(value) == Decimal:
-                                            value = round(value, 2)
-                                        row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
-                        lines_to_add.append(row)
-                        if table_structure_child_row.state == 'open' and table_structure_child_row != last_row_open:
-                            child_rows = create_row_childs(table_value_row_cordinates, hierarchy_row_child, index_child)
-                            lines_to_add += child_rows
-                            last_row_open = table_structure_child_row
-                index_child += 1
-            return lines_to_add
-
-        table_to_show = []
-        # Header
-        # If true, we dont show the next level or any other level by default, only if the header is "open"
-        specific_record_column_open = None
-        for hierarchy_column in hierarchy_columns:
-            row = tr()
-            for i in range(len(hierarchy_rows)):
-                row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-            first_column = True
-
-            #TODO: In the first header, we need to know how much records are open
-            if specific_record_column_open and specific_record_column_open < hierarchy_column:
-                row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                for table_strucutre_column in table_structure.columns:
-                    if table_strucutre_column.hierarchy == specific_record_column_open:
-                        if table_strucutre_column.record_childs:
-                            row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-
-                            for record_child in table_strucutre_column.record_childs:
-                                #TODO: add url
-                                row.add(td(str(record_child.name or '(Empty)') ,
-                                    cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
-                        else:
-                            row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                table_to_show.append(row)
-                continue
-            for table_structure_column in table_structure.columns:
-                if table_structure_column.hierarchy == hierarchy_column:
-                    if hierarchy_column != hierarchy_columns[0] and first_column:
-                        first_column = False
-                        parent = table_structure_column.parent
-                        if parent and parent.state == 'open':
-                            while parent:
-                                row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                                parent = parent.parent
-
-                            # If we are in the last level, dont use a link
-                            grouping_fields, result_fields = self.create_url(table_structure_column)
-
-                            if table_structure_column.state == 'open':
-                                icon = COLLAPSE
-                            else:
-                                icon = EXPAND
-                            row.add(td(a(str(icon) + ' ' + str(table_structure_column.name or '(Empty)'), href="#",
-                                    hx_target="#pivot_table",
-                                    hx_post=Pivot(database_name=self.database_name,
-                                        table_name=self.table, grouping_fields=grouping_fields,
-                                        result_fields=result_fields, render=False).url(),
-                                    hx_trigger="click", hx_swap="outerHTML"),
-                                cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
-                        else:
-                            # If we dont have a parent, and we are in antoher that the first level dont show anything?
-                            row = tr()
-                            continue
-
-                    else:
-                        if table_structure_column.parent and table_structure_column.parent.state != 'open':
-                            continue
-                        grouping_fields, result_fields = self.create_url(table_structure_column)
-
-                        if table_structure_column.state == 'open':
-                            icon = COLLAPSE
-                        else:
-                            icon = EXPAND
-
-                        row.add(td(a(str(icon) + ' ' + str(table_structure_column.name or '(Empty)'), href="#",
-                                    hx_target="#pivot_table",
-                                    hx_post=Pivot(database_name=self.database_name,
-                                        table_name=self.table, grouping_fields=grouping_fields,
-                                        result_fields=result_fields, render=False).url(),
-                                    hx_trigger="click", hx_swap="outerHTML"),
-                            cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
-                        #TODO: add news columns of childs
-                    if table_structure_column.state == 'open':
-                        specific_record_column_open = hierarchy_column
-
-                        for table_structure_child_column in table_structure.columns:
-                            if table_structure_child_column.hierarchy == hierarchy_column + 1:
-                                table_structure_column.record_childs.append(table_structure_child_column)
-                                table_structure_child_column.record_parents.append(table_structure_column)
-                                row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                                if table_structure_child_column.state == 'open':
-                                    create_child_columns = True
-                                    hierarchy_child_column = hierarchy_column + 1
-                                    while create_child_columns:
-                                        create_child_columns = False
-                                        for table_structure_child_column in table_structure.columns:
-                                            if table_structure_child_column.hierarchy == hierarchy_child_column + 1:
-                                                row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                                                if table_structure_child_column.state == 'open':
-                                                    create_child_columns = True
-                                        hierarchy_child_column += 1
-            table_to_show.append(row)
-
-
-        index = 0
-        # If true, we dont show the next level or any other level by default, only if the header is "open"
-        specific_record_row_open = None
-        specific_record_column_open = None
-        # We need to know what is the uppler level state to know if we need to try to calculate the sublevles
-        first_row_level_state = None
-        upper_row_level_state = None
-        for hierarchy_row in hierarchy_rows:
-            # Fill row headers
-            for table_structure_row in table_structure.rows:
-                row = tr()
-
-                if table_structure_row.hierarchy == hierarchy_row:
-                    # If we have the first level closed dont let open any other sublevel
-                    if (table_structure_row.hierarchy != hierarchy_rows[0] and
-                            first_row_level_state and
-                            first_row_level_state == 'closed'):
-                        continue
-                    # This "if" dont let the script create more sublevels if we
-                    # have any open, this way, we dont have at the end the
-                    # sublevels rows with "0" as value (because they dont have a value)
-                    if ((isinstance(specific_record_row_open, int) and
-                            specific_record_row_open < table_structure_row.hierarchy) or
-                            (upper_row_level_state == 'closed')):
-                        continue
-
-                    if (table_structure_row.hierarchy != hierarchy_rows[0] and
-                            table_structure_row.parent == None and
-                            table_structure_row.state == 'closed'):
-                        continue
-                    for i in range(index):
-                        row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-                    #TODO: URL
-                    grouping_fields, result_fields = self.create_url(table_structure_row)
-
-                    if table_structure_row.state == 'open':
-                        icon = COLLAPSE
-                    else:
-                        icon = EXPAND
-                    row.add(td(a(str(icon) + ' ' +  str(table_structure_row.name or '(Empty)'), href="#",
-                            hx_target="#pivot_table",
-                            hx_post=Pivot(database_name=self.database_name,
-                                table_name=self.table, grouping_fields=grouping_fields,
-                                result_fields=result_fields, render=False).url(),
-                            hx_trigger="click", hx_swap="outerHTML"),
-                        cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3 hover:underline"))
-
-                    for i in range((len(hierarchy_rows))-(index+1)):
-                        row.add(td('',cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
-
-                    table_value_row_cordinates = []
-                    if table_structure_row in table_structure.table_rows:
-                        table_value_row_cordinates.append(None)
-                    else:
-                        table_value_row_cordinates.append(table_structure_row.name)
-
-                    for table_structure_column in table_structure.columns:
-                        if (table_structure_column.hierarchy != hierarchy_columns[0] and
-                                table_structure_column.parent == None and
-                                table_structure_column.state == 'closed'):
-                            continue
-                        if table_structure_column.state == 'closed' and specific_record_column_open and specific_record_column_open < table_structure_column.hierarchy:
-                                continue
-                        for aggregation in table_structure.aggregations:
-                            value = '0'
-
-                            table_value_column_cordinates = []
-                            if table_structure_column in table_structure.table_columns:
-                                table_value_column_cordinates.append(None)
-                            else:
-                                table_value_column_cordinates.append(table_structure_column.name)
-
-                            coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
-                            if (coordinates) in table_structure.values.keys():
-                                if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
-                                    value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
-                                    if value == {}:
-                                        value = '0'
-                            #print(f'COORDINATES1: {coordinates}\n    VALUE: {value}')
-                            if type(value) == Decimal:
-                                value = round(value, 2)
-                            row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
-                            if table_structure_column.state == 'open':
-                                specific_record_column_open = table_structure_column.hierarchy
-                            if table_structure_column.state == 'open' and specific_record_column_open:
-                                #TODO: we need to remade this section
-                                for record_child in table_structure_column.record_childs:
-                                    table_value_column_cordinates = []
-                                    table_value_column_cordinates.append(table_structure_column.name)
-                                    table_value_column_cordinates.append(record_child.name)
-
-                                    #TODO: loop to navigate multiple open levles
-                                    coordinates = tuple(table_value_column_cordinates + table_value_row_cordinates)
-
-                                    value = '0'
-                                    if (coordinates) in table_structure.values.keys():
-                                        if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
-                                            value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
-                                            if value == {}:
-                                                value = '0'
-                                    if value == '0':
-                                        coordinates = tuple([c for c in list(coordinates) if c != None])
-                                        if (coordinates) in table_structure.values.keys():
-                                            if (aggregation[0], aggregation[1]) in table_structure.values[(coordinates)].keys():
-                                                value = table_structure.values[(coordinates)][(aggregation[0], aggregation[1])]
-                                                if value == {}:
-                                                    value = '0'
-                                    #print(f'COORDINATES2: {coordinates}\n    VALUE: {value}')
-                                    if type(value) == Decimal:
-                                        value = round(value, 2)
-                                    row.add(td(str(value),cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
-                    table_to_show.append(row)
-                    #TODO: if closed dont open sublevels
-                    if table_structure_row.hierarchy == hierarchy_rows[0]:
-                        first_row_level_state = table_structure_row.state
-                    if table_structure_row.state == 'open':
-                        specific_record_row_open = hierarchy_row
-                        child_rows = create_row_childs(table_value_row_cordinates, hierarchy_row, index)
-                        table_to_show += child_rows
-            index += 1
-        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
-        for row in table_to_show:
-            pivot_table.add(row)
-        with div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8") as pivot_div:
-            # Download XLS file with the tables
-            with div(cls="w-10"):
-                download_table = pivot_table.render(pretty=False)
-                download_table = re.sub(r'<a[^>]*>(.*?)<\/a>', r'\1', download_table)
-                download_table = re.sub(r'\s*class="[^"]*"', '', download_table)
-                download_table = download_table.replace('/', '\\')
-                download_table = download_table.replace(COLLAPSE, '')
-                download_table = download_table.replace(EXPAND, '')
-                a(href=DownloadReport(database_name=self.database_name,
-                        table_name=self.table, pivot_table=download_table,
-                        render=False).url('download'),
-                    cls="relative left-4 top-8").add(DOWNLOAD)
-        pivot_div.add(pivot_table)
-        return pivot_div
-
-    def create_url(self, cell):
-        parent = None
-        if cell.parent:
-            parent = cell.parent
-        # Prepare the modified grouping_field
-        new_grouping_field = None
-        if parent:
-            for grouping_field in self.grouping_fields:
-                if grouping_field.name == parent.name:
-                    new_grouping_field = GroupingField()
-                    new_grouping_field.name = grouping_field.name
-                    new_grouping_field.position = grouping_field.position
-                    new_grouping_field.hierarchy = grouping_field.hierarchy
-                    new_grouping_field.state = grouping_field.state
-                    new_grouping_field.open_records = grouping_field.open_records
-                    #new_grouping_field = grouping_field
-        else:
-            for grouping_field in self.grouping_fields:
-                if grouping_field.name == cell.name:
-                    new_grouping_field = GroupingField()
-                    new_grouping_field.name = grouping_field.name
-                    new_grouping_field.position = grouping_field.position
-                    new_grouping_field.hierarchy = grouping_field.hierarchy
-                    new_grouping_field.state = grouping_field.state
-                    new_grouping_field.open_records = grouping_field.open_records
-                    #new_grouping_field = grouping_field
-
-        if not new_grouping_field:
-            raise
-        if new_grouping_field.state == 'closed':
-            if new_grouping_field and parent:
-                if not new_grouping_field.open_records:
-                    new_grouping_field.open_records = [cell.name]
-                else:
-                    new_grouping_field.open_records.append(cell.name)
-            else:
-                new_grouping_field.open_records = []
-                new_grouping_field.state = 'open'
-        else:
-            if cell.state == 'open':
-                if new_grouping_field and parent:
-                    if new_grouping_field.open_records:
-                        open_records = new_grouping_field.open_records.replace(
-                            '[', '').replace(']', '').replace(' ', '').replace("'", '').split(',')
-                        if str(cell.name) in open_records:
-                            open_records.remove(str(cell.name))
-                            if not open_records:
-                                open_records = []
-                            new_grouping_field.open_records = open_records
-                else:
-                    new_grouping_field.state = 'closed'
-            else:
-                if new_grouping_field and parent:
-                    # In the case we open a level with parent, we need to open
-                    # her sublevel too
-                    for grouping_field in self.grouping_fields:
-                        if grouping_field.hierarchy == cell.hierarchy:
-                            grouping_field.state = 'open'
-
-                    if not new_grouping_field.open_records:
-                        new_grouping_field.open_records = [cell.name]
-                    else:
-                        open_records = new_grouping_field.open_records.replace(
-                            '[', '').replace(']', '').replace(' ', '').split(',')
-                        open_records.append(cell.name)
-                        new_grouping_field.open_records = open_records
-                else:
-                    new_grouping_field.state = 'closed'
-
-        #TODO: we need a better way to handle closed levels
-
-        # Adapt to the url format
-        grouping_fields = ''
-        new_record_added = False
-        for grouping_field in self.grouping_fields:
-            if ((parent and parent.name == grouping_field.name) or
-                    (cell.name == grouping_field.name)):
-                new_record_added = True
-                grouping_fields += f'name={new_grouping_field.name}&position={new_grouping_field.position}&hierarchy={new_grouping_field.hierarchy}&state={new_grouping_field.state}&open_records={new_grouping_field.open_records}&__'
-            else:
-                if cell.state == 'open' and grouping_field.hierarchy >= cell.hierarchy:
-                    grouping_fields += f'name={grouping_field.name}&position={grouping_field.position}&hierarchy={grouping_field.hierarchy}&state=closed&open_records=&__'
-                else:
-                    grouping_fields += f'name={grouping_field.name}&position={grouping_field.position}&hierarchy={grouping_field.hierarchy}&state={grouping_field.state}&open_records={grouping_field.open_records}&__'
-        if not new_record_added:
-            grouping_fields += f'name={new_grouping_field.name}&position={new_grouping_field.position}&hierarchy={new_grouping_field.hierarchy}&state={new_grouping_field.state}&open_records={new_grouping_field.open_records}&__'
-
-        result_fields = ''
-        for result_field in self.result_fields:
-            result_fields += f'name={result_field.name}&operation={result_field.operation}&__'
-        return [grouping_fields, result_fields]
-
-
-class TableStrucutre:
-    def __init__(self, columns, rows, values):
-        # Columns/rows we use in the pibot table to show
-        self.columns = columns
-        self.rows = rows
-        # List of aggregations we need to show (aggregation, field)
-        self.aggregations = []
-        # List of values for each coordinate (column, row) for each aggregation
-        self.values = values
-        # Original table columns/rows we use to get the values
-        self.table_columns = []
-        self.table_rows = []
-
-class Header:
-    def __init__(self, name, parent, hierarchy, position, childs, state):
-        self.name = name
-        self.position = position
-        self.hierarchy = hierarchy
-        self.parent = parent
-        self.childs = childs
-        self.table_name = []
-        # Indicate if this record is open or closed
-        self.state = state
-        self.record_childs = []
-        self.record_parents = []
-
-class GroupingField:
-    # Name of the column
-    name = ''
-    # Position of the field (column or row)
-    position = ''
-    # Position of the field (column or row)
-    hierarchy = ''
-    # State of the field (open or closed)
-    state = ''
-    # Specific records open in this level
-    # Open records structure waited: [(level0, level1, level2, ...)]
-    open_records = []
-
-    def create_operation(self, table=None):
-        op = Operation()
-        op.name = self.name
-        op.position = self.position
-        op.hierarchy = self.hierarchy
-        op.state = self.state
-        op.table = table
-        op.open_records = self.open_records
-
-        if self.state == 'closed':
-            op.record_state = 'closed'
-            op.operation = 'select_closed'
-        elif self.state == 'open':
-            op.record_state = 'open'
-            op.operation = 'select_open'
-        else:
-            raise
-        return op
-
-class ResultField():
-    name = ''
-    operation = ''
-
-    def create_operation(self, table=None):
-        op = Operation()
-        op.name = self.name
-        op.table = table
-        op.aggregation_oeration = self.operation
-        op.operation = 'calculate_total'
-        return op
+    @classmethod
+    def dispatch(cls, site_type, site_id, request, user):
+        with Transaction().set_context(language=Transaction().language):
+            return super().dispatch(site_type, site_id, request, user)
 
 ###############################################################################
-#################################### BASE #####################################
+#################################### SITE #####################################
 ###############################################################################
 class Layout(Component):
     'Layout'
@@ -861,7 +71,6 @@ class Layout(Component):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        # Prepare the head with all the scripts
         site = self.site
 
         html_layout = html()
@@ -892,6 +101,7 @@ class Layout(Component):
             main_body += self.main
         return html_layout
 
+
 class Index(Component):
     'Index'
     __name__ = 'www.index.pivot'
@@ -903,144 +113,503 @@ class Index(Component):
 
     @classmethod
     def get_url_map(cls):
+        #TODO: we need to hande multiple URLs with the same endpoint
         return [
-            #Rule('/<string:database_name>/babi/pivot/<string:table_name>/'),
-            #Rule('/<string:database_name>/babi/pivot/<string:table_name>'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>', endpoint='render_null'),
             Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>'),
         ]
 
+    # Temporal solution to have differents urls with the same endpoint
+    def render_null(self):
+        return self.render()
+
     def render(self):
         pool = Pool()
-        Layout = pool.get('www.layout.pivot')
-        Pivot = pool.get('www.pivot_table')
-        PivotHeader = pool.get('www.pivot_header')
         BabiTable = pool.get('babi.table')
-        User = pool.get('res.user')
-        Index = pool.get('www.index.pivot')
+        # Components
+        Layout = pool.get('www.layout.pivot')
+        PivotHeaderAxis = pool.get('www.pivot_header.axis')
+        PivotHeaderMeasure = pool.get('www.pivot_header.measure')
+        PivotHeaderOrder = pool.get('www.pivot_header.order')
+        PivotTable = pool.get('www.pivot_table')
 
-        # Get the table name
-        # If table name starts with "__" we need to remove this part to search the table name
+        '''
+        We need to:
+        - If we delete a cell from any of the table that is begin used in
+            the order table, we need to delete the field from the order table
+        - If we delte a cell from the order table, we dont need to do
+            anything apart of realoading the table
+        '''
+
         table_name = self.table_name
         if table_name.startswith('__'):
             table_name = table_name.split('__')[-1]
 
-        babi_tables = BabiTable.search([
+        babi_table = BabiTable.search([
             ('internal_name', '=', table_name)], limit=1)
-        if babi_tables:
-            babi_table = babi_tables[0]
+
+        # Check if the user can see the table, if not, return an error page
+        access = False
+        if babi_table:
+            babi_table, = babi_table
             table_name = babi_table.name
             access = babi_table.check_access()
 
-            if not access:
-                with main(cls="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8") as error_section:
-                    with div(cls="text-center"):
-                        p(_('404'), cls="text-base font-semibold text-indigo-600")
-                        h1(_('Page not found'), cls="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl")
-                        p(_('Sorry, we couldn’t find the page you’re looking for.'), cls="mt-6 text-base leading-7 text-gray-600")
-                layout = Layout(title=_('Page not found | Tryton'))
-                layout.main.add(error_section)
-                return layout.tag()
+        if not access or not babi_table:
+            # TODO: move the error page to a component, this way we call the same error in multiple places
+            with main(cls="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8") as error_section:
+                with div(cls="text-center"):
+                    p(_('404'), cls="text-base font-semibold text-indigo-600")
+                    h1(_('Page not found'), cls="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl")
+                    p(_('Sorry, we couldn’t find the page you’re looking for.'), cls="mt-6 text-base leading-7 text-gray-600")
+            layout = Layout(title=_('Page not found | Tryton'))
+            layout.main.add(error_section)
+            return layout.tag()
 
-        # We cant sent an empty value, the routes dont detect correctly the
-        # field and fails
+        # Ensure we have a value in table_properties
         if not hasattr(self, 'table_properties'):
-            table_properties = 'null'
+            self.table_properties = 'null'
+
+        # Check if we have the cube properties to see the table, if not, show a messagge
+        show_error = True
+        if self.table_properties == 'null':
+            cube = Cube(table=babi_table.name)
         else:
-            table_properties = self.table_properties
+            cube = Cube.parse_properties(self.table_properties, table_name)
 
-            show_error = True
-            grouping_fields = ''
-            result_fields = ''
+        if cube.rows and cube.columns and cube.measures:
+            show_error = False
 
-            if table_properties != 'null':
-                x_fields = []
-                y_fields = []
-                aggregation_fields = []
+        # Prepare the cube properties to the expand all cube function
+        auxiliar_expansion_rows = cube.expansions_rows
+        auxiliar_expansions_columns = cube.expansions_columns
+        cube.expansions_rows = 'all'
+        cube.expansions_columns = 'all'
+        expansion_cube_properties = cube.encode_properties()
+        cube.expansions_rows = auxiliar_expansion_rows
+        cube.expansions_columns = auxiliar_expansions_columns
 
-                for table_property in table_properties.split('__'):
-                    if table_property:
-                        tp = {}
-                        position = ''
-                        for field in table_property.split('&'):
-                            if field:
-                                tp[field.split('=')[0]] = field.split('=')[1]
-
-                        match tp['position']:
-                            case 'x':
-                                x_fields.append(tp)
-                            case 'y':
-                                y_fields.append(tp)
-                            case 'aggregation':
-                                aggregation_fields.append(tp)
-                # Sort each list using the "hierarchy" field
-                if x_fields:
-                    x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
-                if y_fields:
-                    y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
-                if aggregation_fields:
-                    aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
-
-                if len(x_fields) >= 1 and len(y_fields) >= 1 and len(aggregation_fields) >= 1:
-                    show_error = False
-                    # Prepare the group fields
-                    for grouping_field in x_fields + y_fields:
-                        #TODO: what we do with open_records={grouping_field["open_records"]}??
-                        position = grouping_field["position"]
-                        if position == 'x':
-                            position = 'row'
-                        elif position == 'y':
-                            position = 'column'
-                        grouping_fields += f'name={grouping_field["name"]}&position={position}&hierarchy={grouping_field["hierarchy"]}&state=closed&open_records=&__'
-
-                    # Prepare the result fields
-                    for result_field in aggregation_fields:
-                        result_fields += f'name={result_field["name"]}&operation={result_field["aggregation"]}&__'
-
-        inverted_table_properties = self.table_properties
-        inverted_table_properties = inverted_table_properties.replace('position=x', 'position=z')
-        inverted_table_properties = inverted_table_properties.replace('position=y', 'position=x')
-        inverted_table_properties = inverted_table_properties.replace('position=z', 'position=y')
-
-
+        # Prepare the cube properties to the invert cube function
+        cube.table = table_name
+        axuiliar_row = cube.rows
+        cube.rows = cube.columns
+        cube.columns = axuiliar_row
+        inverted_table_properties = cube.encode_properties()
 
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-4"):
                 div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
-                # Inverted columns/rows
+                # Each button is a 36px width
+                #TODO: Expand all button
+                #with div(cls="col-span-1"):
+                #    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=expansion_cube_properties, render=False).url(),
+                #        cls="absolute right-[84px]").add(EXPAND_ALL)
+                # Invert axis button
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
                         cls="absolute right-12").add(SWAP_AXIS)
-                # Undo all the changes
+                # Empty cube properties
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
                         cls="absolute right-3").add(RELOAD)
             with div(cls="grid grid-cols-12"):
-                PivotHeader(database_name=self.database_name,
+                PivotHeaderAxis(database_name=self.database_name,
+                    table_name=self.table_name, axis='x',
+                    table_properties=self.table_properties)
+                PivotHeaderAxis(database_name=self.database_name,
+                    table_name=self.table_name, axis='y',
+                    table_properties=self.table_properties)
+                PivotHeaderMeasure(database_name=self.database_name,
                     table_name=self.table_name,
-                    table_properties=table_properties,
-                    render=False).header_x()
-                PivotHeader(database_name=self.database_name,
+                    table_properties=self.table_properties)
+                PivotHeaderOrder(database_name=self.database_name,
                     table_name=self.table_name,
-                    table_properties=table_properties,
-                    render=False).header_y()
-                PivotHeader(database_name=self.database_name,
-                    table_name=self.table_name,
-                    table_properties=table_properties,
-                    render=False).header_aggregation()
+                    table_properties=self.table_properties)
 
             with div(cls="mt-8 flow-root"):
                 with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                     if show_error == True:
-                        div(cls="text-center").add(p('You need to select at least one field in each column to show a table', cls="mt-1 text-sm text-gray-500"))
+                        div(cls="text-center").add(p(_('You need to select at least one field in each column to show a table'), cls="mt-1 text-sm text-gray-500"))
                     else:
-                        Pivot(database_name=self.database_name, table_name=self.table_name,
-                            grouping_fields=grouping_fields, result_fields=result_fields)
-
+                        PivotTable(database_name=self.database_name, table_name=self.table_name,
+                            table_properties=self.table_properties)
         layout = Layout(title=f'{table_name} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
 
 
+# This class handle the row/columns table headers
+class PivotHeaderAxis(Component):
+    'Pivot Header Axis'
+    __name__ = 'www.pivot_header.axis'
+    _path = None
+
+    header = fields.Char('Header')
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    axis = fields.Char('Axis')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header/<string:axis>/<string:table_properties>'),
+        ]
+
+    def render(self):
+        pool = Pool()
+        PivotHeader = pool.get('www.pivot_header')
+        PivotHeaderSelection = pool.get('www.pivot_header.selection')
+
+        if not self.axis or self.axis not in ['x', 'y']:
+            #TODO: add error "Page not found"
+            raise
+
+        fields = []
+        cube = None
+        if self.table_properties != 'null':
+            cube = Cube.parse_properties(self.table_properties, self.table_name)
+
+        if self.axis == 'x':
+            icon = ROWS_ICON
+            name = _('Rows')
+            if cube:
+                fields = cube.rows
+        else:
+            icon = COLUMNS_ICON
+            name = _('Columns')
+            if cube:
+                fields = cube.columns
+
+        self.header = self.axis
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id=f'header_{self.axis}') as header_axis:
+            div(id=f'field_selection_{self.axis}')
+            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
+                    with table(cls="min-w-full divide-y divide-gray-300"):
+                        with thead():
+                            with tr():
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(icon)
+                                th(name, scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
+                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
+                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
+                                        hx_target=f"#field_selection_{self.axis}",
+                                        hx_post=PivotHeaderSelection(header=self.axis, database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
+                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
+                                    span(_('Add'), cls="sr-only")
+                        with tbody(cls="divide-y divide-gray-200"):
+                            for field in fields:
+                                with tr():
+                                    td(field.capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        if field != fields[0]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        if field != fields[-1]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, render=False).url('remove_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
+        return header_axis
+
+
+# This class handle the measure table header
+class PivotHeaderMeasure(Component):
+    'Pivot Header Measure'
+    __name__ = 'www.pivot_header.measure'
+    _path = None
+
+    header = fields.Char('Header')
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_measure/<string:table_properties>'),
+        ]
+
+    def render(self):
+        pool = Pool()
+        PivotHeader = pool.get('www.pivot_header')
+        PivotHeaderSelection = pool.get('www.pivot_header.selection')
+
+        fields = []
+        if self.table_properties != 'null':
+            cube = Cube.parse_properties(self.table_properties,
+                self.table_name)
+            fields = cube.measures
+        self.header = 'measures'
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id='header_measure') as header_measure:
+            div(id='field_selection_measure')
+            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
+                    with table(cls="min-w-full divide-y divide-gray-300"):
+                        with thead():
+                            with tr():
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(MEASURE_ICON)
+                                th(_('Measure fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
+                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
+                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
+                                        hx_target="#field_selection_measure",
+                                        hx_post=PivotHeaderSelection(header='measure', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
+                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
+                                    span(_('Add'), cls="sr-only")
+                        with tbody(cls="divide-y divide-gray-200"):
+                            for field in fields:
+                                with tr():
+                                    td(field[0].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        match field[1]:
+                                            case 'sum':
+                                                p(_('Sum'))
+                                            case 'avg':
+                                                p(_('Average'))
+                                            case 'count':
+                                                p(_('Count'))
+                                            case 'min':
+                                                p(_('Minimum'))
+                                            case 'max':
+                                                p(_('Maximum'))
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field[0], table_properties=self.table_properties, render=False).url('remove_field'),
+                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
+        return header_measure
+
+
+# This class handle the order table header
+class PivotHeaderOrder(Component):
+    'Pivot Header Component'
+    __name__ = 'www.pivot_header.order'
+    _path = None
+
+    header = fields.Char('Header')
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_order/<string:table_properties>'),
+        ]
+
+    def render(self):
+        pool = Pool()
+        # Components
+        Index = pool.get('www.index.pivot')
+        PivotHeader = pool.get('www.pivot_header')
+
+        items = []
+        if self.table_properties != 'null':
+            cube = Cube.parse_properties(self.table_properties,
+                self.table_name)
+            items = cube.order
+        self.header = 'order'
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id='header_order') as header_order:
+            div(id='field_selection_order')
+            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
+                    with table(cls="min-w-full divide-y divide-gray-300"):
+                        with thead():
+                            with tr():
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(ORDER_ICON)
+                                th(_('Order fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
+                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0")
+                        with tbody(cls="divide-y divide-gray-200"):
+                            for item in items:
+                                with tr():
+                                    if isinstance(item[0], tuple):
+                                        value = f'{item[0][1].capitalize()}({item[0][0].capitalize()})'
+                                        field = '__'.join(item[0])
+                                    else:
+                                        value = item[0].capitalize()
+                                        field = item[0]
+                                    td(value, colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        cube = Cube.parse_properties(self.table_properties,
+                                            self.table_name)
+                                        auxiliar_position = cube.order.index(item)
+                                        auxiliar_element = item
+                                        cube.order.remove(auxiliar_element)
+                                        auxiliar_element = list(item)
+                                        if auxiliar_element[1] == 'asc':
+                                                auxiliar_element[1] = 'desc'
+                                        else:
+                                            auxiliar_element[1] = 'asc'
+                                        cube.order.insert(auxiliar_position, tuple(auxiliar_element))
+                                        invert_table_properties = cube.encode_properties()
+
+                                        if item[1] == 'desc':
+                                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties, render=False).url(),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(ORDER_DESC_ICON)
+                                        else:
+                                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties, render=False).url(),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(ORDER_ASC_ICON)
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        if item != items[0]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
+                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        if item != items[-1]:
+                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
+                                                cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
+        return header_order
+
+
+# This function handles the pup up that is show in every header table and add
+# the item to the table properties
+class PivotHeaderSelection(Component):
+    'Pivot Header Selection'
+    __name__ = 'www.pivot_header.selection'
+    _path = None
+
+    header = fields.Char('Header')
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    field = fields.Char('Field')
+    measure = fields.Char('Measure')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/open_field_selection/<string:header>/<string:table_properties>'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/close_field_selection/<string:header>/<string:table_properties>', endpoint='close_field_selection'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/add_field_selection/<string:header>/<string:table_properties>', endpoint='add_field_selection'),
+        ]
+
+    def render(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+
+        name = None
+        match self.header:
+            case 'x':
+                name = 'field_selection_x'
+            case 'y':
+                name = 'field_selection_y'
+            case 'measure':
+                name = 'field_selection_measure'
+            case 'order':
+                name = 'field_selection_order'
+
+        fields_used = []
+        if self.table_properties != 'null':
+            cube = Cube.parse_properties(self.table_properties,
+                self.table_name)
+            if self.header != 'order':
+                fields_used = cube.rows + cube.columns + [m[0] for m in cube.measures]
+            else:
+                order_fields = [o[0] for o in cube.order]
+                fields_used = cube.rows + cube.columns + cube.measures
+
+        table, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
+        fields = [x.internal_name for x in table.fields_]
+
+        with div(id=name, cls="relative z-10", aria_labelledby="modal-title", role="dialog", aria_modal="true") as field_selection:
+            div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
+            with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
+                with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
+                    with form(action=self.url('add_field_selection') ,method="POST", cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
+                        with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
+                            with a(href="#",
+                                    hx_target=f"#{name}",
+                                    hx_post=self.url('close_field_selection'),
+                                    hx_trigger="click", hx_swap="outerHTML",
+                                    cls="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2").add(CLOSE_ICON):
+                                span(_('Close'), cls="sr-only")
+                                CLOSE_ICON
+                        with div(cls="sm:flex sm:items-start"):
+                            with div(cls="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left"):
+                                h3(_('Select a field to add:'), cls="text-base font-semibold leading-6 text-gray-900", id="modal-title")
+                                with div(cls="mt-2 space-y-4"):
+                                    with select(id="field", name="field", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
+                                        if self.header != 'order':
+                                            for field in fields:
+                                                if field not in fields_used:
+                                                    option(field.capitalize(), value=field)
+                                        else:
+                                            for field in fields_used:
+                                                if field not in order_fields:
+                                                    if isinstance(field, tuple):
+                                                        name_ = f'{field[1].capitalize()}({field[0].capitalize()})'
+                                                    else:
+                                                        name_=field.capitalize()
+                                                    option(name_, value=field)
+
+                                    if self.header == 'measure':
+                                        with select(id="measure", name="measure", required=True, cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
+                                            option(_('Sum'), value='sum')
+                                            option(_('Average'), value='average')
+                                            option(_('Max'), value='max')
+                                            option(_('Min'), value='min')
+                                            option(_('Count'), value='count')
+                        with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
+                            button(_('Add'), type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
+                            a(_('Cancel'), href="#",
+                                hx_target=f"#{name}",
+                                hx_post=self.url('close_field_selection'),
+                                hx_trigger="click", hx_swap="outerHTML",
+                                cls="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto")
+        return field_selection
+
+    def close_field_selection(self):
+        name = None
+        match self.header:
+            case 'x':
+                name = 'field_selection_x'
+            case 'y':
+                name = 'field_selection_y'
+            case 'measure':
+                name = 'field_selection_measure'
+            case 'order':
+                name = 'field_selection_order'
+
+        field_selection = div(id=name)
+        return field_selection
+
+    def add_field_selection(self):
+        pool = Pool()
+        Index = pool.get('www.index.pivot')
+
+        if self.table_properties == 'null':
+            cube = Cube(table=self.table_name)
+        else:
+            cube = Cube.parse_properties(self.table_properties,
+                self.table_name)
+
+        # We need to check if a specific field is already in the cube, if is
+        # the case, dont add again. If we clic fast enougth while adding fields
+        # we can send multiple times a request to the server, tryton to add
+        # multiple times a field. For each header, we add the field in his
+        # header and in the order header
+        match self.header:
+            case 'x':
+                if self.field not in cube.rows:
+                    cube.rows.append(self.field)
+                    cube.order.append((self.field, 'asc'))
+            case 'y':
+                if self.field not in cube.columns:
+                    cube.columns.append(self.field)
+                    cube.order.append((self.field, 'asc'))
+            case 'measure':
+                if (self.field, self.measure) not in cube.measures:
+                    cube.measures.append((self.field, self.measure))
+                    cube.order.append(((self.field, self.measure), 'asc'))
+                pass
+
+        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=cube.encode_properties(), render=False).url())
+
+
+# In this function we have some default options available in all the PivotHeader components (handle levels, remove items from header)
 class PivotHeader(Component):
     'Pivot Header'
     __name__ = 'www.pivot_header'
@@ -1050,551 +619,106 @@ class PivotHeader(Component):
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
+    level_action = fields.Char('Level Action')
 
     field = fields.Char('Field')
-    aggregation = fields.Char('Aggregation')
-
 
     @classmethod
     def get_url_map(cls):
         return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_x/<string:table_properties>', endpoint='header_x'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_y/<string:table_properties>', endpoint='header_y'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_aggregation/<string:table_properties>', endpoint='header_aggregation'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/open_field_selection/<string:header>/<string:table_properties>', endpoint='open_field_selection'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/close_field_selection/<string:header>/<string:table_properties>', endpoint='close_field_selection'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/add_field_selection/<string:header>/<string:table_properties>', endpoint='add_field_selection'),
             Rule('/<string:database_name>/babi/pivot/<string:table_name>/remove_field/<string:header>/<string:field>/<string:table_properties>', endpoint='remove_field'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/level_up_field/<string:header>/<string:field>/<string:table_properties>', endpoint='level_up_field'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/level_down_field/<string:header>/<string:field>/<string:table_properties>', endpoint='level_down_field'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/level/<string:level_action>/<string:header>/<string:field>/<string:table_properties>', endpoint='level_field'),
         ]
 
     def render(self):
         pass
 
-    def header_x(self):
-        pool = Pool()
-        PivotHeader = pool.get('www.pivot_header')
-
-        fields = []
-        if self.table_properties != 'null':
-            for table_property in self.table_properties.split('__'):
-                if table_property:
-                    tp = {}
-                    for field in table_property.split('&'):
-                        if field:
-                            tp[field.split('=')[0]] = field.split('=')[1]
-                    if tp['position'] == 'x':
-                        fields.append(tp)
-
-            if fields:
-                fields = sorted(fields, key=lambda x: x['hierarchy'])
-
-        self.header = 'x'
-        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4", id='header_x') as header_x:
-            div(id='field_selection_x')
-            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
-                    with table(cls="min-w-full divide-y divide-gray-300"):
-                        with thead():
-                            with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(ROWS_ICON)
-                                th(_('X axis'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
-                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
-                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
-                                        hx_target="#field_selection_x",
-                                        hx_post=PivotHeader(header='x', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
-                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
-                                    span(_('Remove'), cls="sr-only")
-                        with tbody(cls="divide-y divide-gray-200") :
-                            for field in fields:
-                                with tr():
-                                    td(field['name'].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        if field != fields[0]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
-                                                cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        if field != fields[-1]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
-                                                cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
-        return header_x
-
-    def header_y(self):
-        pool = Pool()
-        PivotHeader = pool.get('www.pivot_header')
-
-        fields = []
-        if self.table_properties != 'null':
-            for table_property in self.table_properties.split('__'):
-                if table_property:
-                    tp = {}
-                    for field in table_property.split('&'):
-                        if field:
-                            tp[field.split('=')[0]] = field.split('=')[1]
-                    if tp['position'] == 'y':
-                        fields.append(tp)
-
-            if fields:
-                fields = sorted(fields, key=lambda x: x['hierarchy'])
-
-        self.header = 'y'
-        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4", id='header_y') as header_y:
-            div(id='field_selection_y')
-            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
-                    with table(cls="min-w-full divide-y divide-gray-300"):
-                        with thead():
-                            with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(COLUMNS_ICON)
-                                th(_('Y axis'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
-                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
-                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
-                                        hx_target="#field_selection_y",
-                                        hx_post=PivotHeader(header='y', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
-                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
-                                    span(_('Remove'), cls="sr-only")
-                        with tbody(cls="divide-y divide-gray-200") :
-                            #TODO: Loop trough the fields
-                            for field in fields:
-                                with tr():
-                                    td(field['name'].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        if field != fields[0]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_up_field'),
-                                                cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        if field != fields[-1]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('level_down_field'),
-                                                cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
-        return header_y
-
-    def header_aggregation(self):
-        pool = Pool()
-        PivotHeader = pool.get('www.pivot_header')
-
-        fields = []
-        if self.table_properties != 'null':
-            for table_property in self.table_properties.split('__'):
-                if table_property:
-                    tp = {}
-                    for field in table_property.split('&'):
-                        if field:
-                            tp[field.split('=')[0]] = field.split('=')[1]
-                    if tp['position'] == 'aggregation':
-                        fields.append(tp)
-
-            if fields:
-                fields = sorted(fields, key=lambda x: x['hierarchy'])
-
-        self.header = 'aggregation'
-        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-4", id='header_aggregation') as header_aggregation:
-            div(id='field_selection_aggregation')
-            with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
-                    with table(cls="min-w-full divide-y divide-gray-300"):
-                        with thead():
-                            with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(AGGREGATION_ICON)
-                                th(_('Aggregation fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Aggregation type'), cls="sr-only"))
-                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
-                                    a(href="#", cls="text-indigo-600 hover:text-indigo-900",
-                                        hx_target="#field_selection_aggregation",
-                                        hx_post=PivotHeader(header='aggregation', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url('open_field_selection'),
-                                        hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
-                                    span(_('Remove'), cls="sr-only")
-                        with tbody(cls="divide-y divide-gray-200") :
-                            #TODO: Loop trough the fields
-                            for field in fields:
-                                with tr():
-                                    td(field['name'].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        with div():
-                                            with select(id="aggregation", name="aggregation", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6", disabled=True):
-                                                option(field['aggregation'].capitalize(), value=field['aggregation'])
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field['name'], table_properties=self.table_properties, render=False).url('remove_field'),
-                                            cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
-        return header_aggregation
-
-    def open_field_selection(self):
-        pool = Pool()
-        PivotHeader = pool.get('www.pivot_header')
-
-        name = None
-        match self.header:
-            case 'x':
-                name = 'field_selection_x'
-            case 'y':
-                name = 'field_selection_y'
-            case 'aggregation':
-                name = 'field_selection_aggregation'
-
-        #TODO: only show fields that are not selected
-        fields_used = []
-        if self.table_properties != 'null':
-            for table_property in self.table_properties.split('__'):
-                if table_property:
-                    for field in table_property.split('&'):
-                        if field and field.split('=')[0] == 'name':
-                            fields_used.append(field.split('=')[1])
-
-
-        cursor = Transaction().connection.cursor()
-        cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{self.table_name}';")
-        fields = cursor.fetchall()
-
-        with div(id=name, cls="relative z-10", aria_labelledby="modal-title", role="dialog", aria_modal="true") as field_slection:
-            div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
-            with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
-                with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
-                    with form(action=self.url('add_field_selection') ,method="POST", cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
-                        with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
-                            #TODO: replace with a link (a) and add htmx trigger
-
-                            with a(href="#",
-                                    hx_target=f"#{name}",
-                                    hx_post=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, table_properties=self.table_properties, render=False).url('close_field_selection'),
-                                    hx_trigger="click", hx_swap="outerHTML",
-                                    cls="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"):
-                                span(_('Close'), cls="sr-only")
-                                CLOSE_ICON
-                        with div(cls="sm:flex sm:items-start"):
-                            with div(cls="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left"):
-                                h3(_('Select a field to add:'), cls="text-base font-semibold leading-6 text-gray-900", id="modal-title")
-                                with div(cls="mt-2"):
-                                    with select(id="field", name="field", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
-                                        for field in fields:
-                                            if field[0] not in fields_used:
-                                                option(field[0].capitalize(), value=field[0])
-                                    if self.header == 'aggregation':
-                                        with select(id="aggregation", name="aggregation", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
-                                            option(_('Sum'))
-                                            option(_('Average'))
-                                            option(_('Max'))
-                                            option(_('Min'))
-                                            option(_('Count'))
-                        with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
-                            button(_('Add'), type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
-                            a(_('Cancel'), href="#",
-                                hx_target=f"#{name}",
-                                hx_post=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, table_properties=self.table_properties, render=False).url('close_field_selection'),
-                                hx_trigger="click", hx_swap="outerHTML",
-                                cls="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto")
-        return field_slection
-
-    def close_field_selection(self):
-        name = None
-        match self.header:
-            case 'x':
-                name = 'field_selection_x'
-            case 'y':
-                name = 'field_selection_y'
-            case 'aggregation':
-                name = 'field_selection_aggregation'
-
-        field_selection = div(id=name)
-        return field_selection
-
-    def add_field_selection(self):
-        pool = Pool()
-        Index = pool.get('www.index.pivot')
-        # If we have 'null" as value, is like is empty
-        table_properties = 'null'
-        if self.table_properties == 'null':
-            # If we dont have any element we can add the field without check anything
-            table_properties = f'name={self.field}&position={self.header}&hierarchy=0&__'
-        else:
-            x_fields = []
-            y_fields = []
-            aggregation_fields = []
-
-            # Transform the string into a list of dictionaries for each property
-            for table_property in self.table_properties.split('__'):
-                if table_property:
-                    tp = {}
-                    for field in table_property.split('&'):
-                        if field:
-                            tp[field.split('=')[0]] = field.split('=')[1]
-
-                    match tp['position']:
-                        case 'x':
-                            x_fields.append(tp)
-                        case 'y':
-                            y_fields.append(tp)
-                        case 'aggregation':
-                            aggregation_fields.append(tp)
-
-            # Sort each list using the "hierarchy" field
-            if x_fields:
-                x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
-            if y_fields:
-                y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
-            if aggregation_fields:
-                aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
-
-            # Add the new field to the list
-            new_field = {}
-            new_field['name'] = self.field
-            new_field['position'] = self.header
-            new_field['hierarchy'] = 0
-
-            match self.header:
-                case 'x':
-                    if x_fields and x_fields[-1] and x_fields[-1]['hierarchy']:
-                        new_field['hierarchy'] = int(x_fields[-1]['hierarchy']) + 1
-                    x_fields.append(new_field)
-                case 'y':
-                    if y_fields and y_fields[-1] and y_fields[-1]['hierarchy']:
-                        new_field['hierarchy'] = int(y_fields[-1]['hierarchy']) + 1
-                    y_fields.append(new_field)
-                case 'aggregation':
-                    new_field['aggregation'] = self.aggregation
-                    if aggregation_fields and aggregation_fields[-1] and aggregation_fields[-1]['hierarchy']:
-                        new_field['hierarchy'] = int(aggregation_fields[-1]['hierarchy']) + 1
-                    aggregation_fields.append(new_field)
-
-            # Transform again to string
-            table_properties = ''
-            for field in x_fields:
-                table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
-            for field in y_fields:
-                table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
-            for field in aggregation_fields:
-                table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
-
-        # Redirect to the index table
-        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
-
     def remove_field(self):
-        # In this case we assume that we always have table_properties
         pool = Pool()
+        # Component
         Index = pool.get('www.index.pivot')
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+        match self.header:
+            case 'x':
+                cube.rows.remove(self.field)
+            case 'y':
+                cube.columns.remove(self.field)
+            case 'measures':
+                #TODO: we need to handle the case when we have multiple
+                # measures for the same field.
+                # For example, we can have: SUM('x') and MAX('x')
+                index = 0
+                for measure in cube.measures:
+                    if measure[0] == self.field:
+                        cube.measures.pop(index)
+                        break
+                    index += 1
 
-        x_fields = []
-        y_fields = []
-        aggregation_fields = []
+        # Remove the field from the order property
+        index = 0
+        for order in cube.order:
+            if self.header in ['x', 'y'] and order[0] == self.field:
+                cube.order.pop(index)
+                break
+            if self.header == 'measures':
+                if isinstance(order[0], tuple) and order[0][0] == self.field:
+                    cube.order.pop(index)
+                    break
+            index +=1
 
-        # Transform the string into a list of dictionaries for each property
-        # and remove the field
-        hierarchy = None
-        for table_property in self.table_properties.split('__'):
-            remove_field = False
-            if table_property:
-                tp = {}
-                for field in table_property.split('&'):
-                    if field:
-                        if field.split('=')[0] == 'hierarchy':
-                            tp[field.split('=')[0]] = int(field.split('=')[1])
-                        else:
-                            tp[field.split('=')[0]] = field.split('=')[1]
-                        if (field.split('=')[0] == 'name' and
-                                field.split('=')[1] == self.field):
-                            remove_field = True
-                if remove_field:
-                    hierarchy = tp['hierarchy']
-
-                if not remove_field:
-                    match tp['position']:
-                        case 'x':
-                            x_fields.append(tp)
-                        case 'y':
-                            y_fields.append(tp)
-                        case 'aggregation':
-                            aggregation_fields.append(tp)
-
-        # Sort each list using the "hierarchy" field
-        if x_fields:
-            if self.header == 'x':
-                for x_field in x_fields:
-                    if x_field['hierarchy'] > hierarchy:
-                        x_field['hierarchy'] -= 1
-            x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
-        if y_fields:
-            if self.header == 'y':
-                for y_field in y_fields:
-                    if y_field['hierarchy'] > hierarchy:
-                        y_field['hierarchy'] -= 1
-            y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
-        if aggregation_fields:
-            if self.header == 'y':
-                for aggregation_field in aggregation_fields:
-                    if aggregation_field['hierarchy'] > hierarchy:
-                        aggregation_field['hierarchy'] -= 1
-            aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
-
-        # Transform again to string
-        table_properties = ''
-        for field in x_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
-        for field in y_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
-        for field in aggregation_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
-
-        # In case we delete all the fields
-        if table_properties == '':
+        table_properties = cube.encode_properties()
+        #TODO: remove this section when we found the correct way to handle
+        # multiple URLs with the same endpoint
+        if not cube.rows and not cube.columns and not cube.measures and not cube.order:
             table_properties = 'null'
-        # Send the new table properties (redirect to index)
         return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
 
-    def level_up_field(self):
+    def level_field(self):
         pool = Pool()
         Index = pool.get('www.index.pivot')
 
-        x_fields = []
-        y_fields = []
-        aggregation_fields = []
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+        auxiliar_position = None
+        headers = {
+            'x': 'rows',
+            'y': 'columns',
+            'measures': 'measures',
+            'order': 'order',
+        }
 
-        # Transform the string into a list of dictionaries for each property
-        # and remove the field
-        hierarchy = None
-        for table_property in self.table_properties.split('__'):
-            if table_property:
-                tp = {}
-                for field in table_property.split('&'):
-                    if field:
-                        if (field.split('=')[0] == 'hierarchy' and
-                                field.split('=')[1]):
-                            tp[field.split('=')[0]] = int(field.split('=')[1])
-                        else:
-                            tp[field.split('=')[0]] = field.split('=')[1]
-                if (tp['name'] == self.field):
-                    hierarchy = tp['hierarchy']-1
-                match tp['position']:
-                    case 'x':
-                        x_fields.append(tp)
-                    case 'y':
-                        y_fields.append(tp)
-                    case 'aggregation':
-                        aggregation_fields.append(tp)
-        # Get the property to modify using self.header
-        #TODO: search a better way of do this
-        match self.header:
-            case 'x':
-                for field in x_fields:
-                    if (field['hierarchy'] == hierarchy and
-                            field['name'] != self.field):
-                        field['hierarchy'] += 1
-                    if field['name'] == self.field:
-                        field['hierarchy'] -= 1
-            case 'y':
-                for field in y_fields:
-                    if (field['hierarchy'] == hierarchy and
-                            field['name'] != self.field):
-                        field['hierarchy'] += 1
-                    if field['name'] == self.field:
-                        field['hierarchy'] -= 1
-            case 'aggregation':
-                for field in aggregation_fields:
-                    if (field['hierarchy'] == hierarchy and
-                            field['name'] != self.field):
-                        field['hierarchy'] += 1
-                    if field['name'] == self.field:
-                        field['hierarchy'] -= 1
+        if self.header in headers:
+            cube_attribute = getattr(cube, headers[self.header])
+            if self.header == 'order':
+                field = self.field.split('__')
+                if len(field) > 1:
+                    field = tuple(field)
+                else:
+                    field = self.field
 
-        # Sort each list using the "hierarchy" field
-        if x_fields:
-                x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
-        if y_fields:
-            y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
-        if aggregation_fields:
-            aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
+                index = 0
+                for ca in cube_attribute:
+                    if ca[0] == field:
+                        field = ca
+                        break
+                    index +1
+                auxiliar_position = cube_attribute.index(field)
+            else:
+                auxiliar_position = cube_attribute.index(self.field)
+            # Get element and save it in a auxiliar val
+            auxiliar_value = cube_attribute[auxiliar_position]
+            # remove element from list
+            cube_attribute.remove(auxiliar_value)
+            # Add element in the new position
+            if self.level_action == 'up':
+                cube_attribute.insert(auxiliar_position-1, auxiliar_value)
+            else:
+                cube_attribute.insert(auxiliar_position+1, auxiliar_value)
 
-        # Transform again to string
-        table_properties = ''
-        for field in x_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
-        for field in y_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
-        for field in aggregation_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
+        table_properties = cube.encode_properties()
         return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
 
-    def level_down_field(self):
-        pool = Pool()
-        Index = pool.get('www.index.pivot')
 
-        x_fields = []
-        y_fields = []
-        aggregation_fields = []
-
-        # Transform the string into a list of dictionaries for each property
-        # and remove the field
-        hierarchy = None
-        for table_property in self.table_properties.split('__'):
-            if table_property:
-                tp = {}
-                for field in table_property.split('&'):
-                    if field:
-                        if (field.split('=')[0] == 'hierarchy' and
-                                field.split('=')[1]):
-                            tp[field.split('=')[0]] = int(field.split('=')[1])
-                        else:
-                            tp[field.split('=')[0]] = field.split('=')[1]
-                if (tp['name'] == self.field):
-                    hierarchy = tp['hierarchy']+1
-                match tp['position']:
-                    case 'x':
-                        x_fields.append(tp)
-                    case 'y':
-                        y_fields.append(tp)
-                    case 'aggregation':
-                        aggregation_fields.append(tp)
-        # Get the property to modify using self.header
-        #TODO: search a better way of do this
-        match self.header:
-            case 'x':
-                for field in x_fields:
-                    if (field['hierarchy'] == hierarchy and
-                            field['name'] != self.field):
-                        field['hierarchy'] -= 1
-                    if field['name'] == self.field:
-                        field['hierarchy'] += 1
-            case 'y':
-                for field in y_fields:
-                    if (field['hierarchy'] == hierarchy and
-                            field['name'] != self.field):
-                        field['hierarchy'] -= 1
-                    if field['name'] == self.field:
-                        field['hierarchy'] += 1
-            case 'aggregation':
-                for field in aggregation_fields:
-                    if (field['hierarchy'] == hierarchy and
-                            field['name'] != self.field):
-                        field['hierarchy'] -= 1
-                    if field['name'] == self.field:
-                        field['hierarchy'] += 1
-
-        # Sort each list using the "hierarchy" field
-        if x_fields:
-                x_fields = sorted(x_fields, key=lambda x: x['hierarchy'])
-        if y_fields:
-            y_fields = sorted(y_fields, key=lambda x: x['hierarchy'])
-        if aggregation_fields:
-            aggregation_fields = sorted(aggregation_fields, key=lambda x: x['hierarchy'])
-
-        # Transform again to string
-        table_properties = ''
-        for field in x_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
-        for field in y_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&hierarchy={field["hierarchy"]}&__'
-        for field in aggregation_fields:
-            table_properties += f'name={field["name"]}&position={field["position"]}&aggregation={field["aggregation"]}&hierarchy={field["hierarchy"]}&__'
-        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
-
+#This function handles the render of the cube into a table and the download button
 class PivotTable(Component):
     'Pivot Table'
     __name__ = 'www.pivot_table'
@@ -1602,75 +726,90 @@ class PivotTable(Component):
 
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
-    grouping_fields = fields.Char('Grouping Fields')
-    result_fields = fields.Char('Result Fields')
+    table_properties = fields.Char('Table Properties')
 
     @classmethod
     def get_url_map(cls):
         return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:grouping_fields>/<string:result_fields>')
+            Rule('/<string:database_name>/babi/pivot/table/<string:table_name>/<string:table_properties>'),
         ]
 
     def render(self):
-        grouping_fields = []
-        for grouping_field in self.grouping_fields.split('__'):
-            if grouping_field:
-                groupingfield = GroupingField()
-                for field in grouping_field.split('&'):
-                    if field:
-                        if field.split('=')[0] == 'hierarchy' and field.split('=')[1]:
-                            setattr(groupingfield, field.split('=')[0], int(field.split('=')[1]))
-                        else:
-                            setattr(groupingfield, field.split('=')[0], field.split('=')[1])
-                grouping_fields.append(groupingfield)
+        pool = Pool()
+        # Component
+        DownloadReport = pool.get('www.download_report')
+        Language = pool.get('ir.lang')
 
-        result_fields = []
-        for result_field in self.result_fields.split('__'):
-            if result_field:
-                resultfield = ResultField()
-                for field in result_field.split('&'):
-                    if field:
-                        setattr(resultfield, field.split('=')[0], field.split('=')[1])
-                result_fields.append(resultfield)
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+        language = Transaction().context.get('language', 'en')
+        language, = Language.search([('code', '=', language)], limit=1)
 
-        table_structure = TableStrucutre([], [], {})
-        operations = deque()
+        download = a(DOWNLOAD, href=DownloadReport(
+                database_name=self.database_name, table_name=self.table_name,
+                table_properties=self.table_properties, render=False).url('download'))
 
-        for grouping_field in grouping_fields:
-            operations.append(
-                GroupingField.create_operation(grouping_field, self.table_name))
+        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600")
+        for row in cube.build():
+            pivot_row = tr()
+            for cell in row:
+                if download:
+                    # Paint the download button in the first cell
+                    pivot_row.add(td(download, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                    download = None
+                    continue
+                # Handle the headers links
+                if (cell.type == CellType.ROW_HEADER or
+                        cell.type == CellType.COLUMN_HEADER):
+                    cell_value = cell.text(language)
+                    table_properties = None
+                    if (cell.expansion_row and cell.expansion_row in
+                            cube.expansions_rows) or (cell.expansion_column and
+                            cell.expansion_column in cube.expansions_columns):
+                        # This case handles the collapse action of the headers cells
+                        icon = COLLAPSE
 
-        for result_field in result_fields:
-            operations.append(ResultField.create_operation(result_field,
-                self.table_name))
+                        cell_cube = Cube.parse_properties(
+                            self.table_properties, self.table_name)
+                        if cell.type == CellType.ROW_HEADER:
+                            cell_cube.expansions_rows.remove(
+                                cell.expansion_row)
+                        elif cell.type == CellType.COLUMN_HEADER:
+                            cell_cube.expansions_columns.remove(
+                                cell.expansion_column)
+                        table_properties = cell_cube.encode_properties()
+                    elif cell.expansion_row or cell.expansion_column:
+                        # This case handles all the expansions
+                        icon = EXPAND
 
-        last_steps = False
-        while operations:
-            print(f'\nOperation name: {operations[0].operation}')
-            operation = operations.popleft()
+                        cell_cube = Cube.parse_properties(
+                            self.table_properties, self.table_name)
+                        if cell.type == CellType.ROW_HEADER:
+                            cell_cube.expansions_rows.append(cell.expansion_row)
+                        elif cell.type == CellType.COLUMN_HEADER:
+                            cell_cube.expansions_columns.append(
+                                cell.expansion_column)
+                        table_properties = cell_cube.encode_properties()
 
-            new_operations = getattr(operation, operation.operation)(table_structure)
-            if isinstance(new_operations, list):
-                if new_operations:
-                    for new_operation in new_operations:
-                        operations.append(new_operation)
-            else:
-                # For now, if we return anything, that is not a list, we suppose is the html table
-                return new_operations
-            if len(operations) == 0 and not last_steps:
-                # Create the last operations (get values) and create table
-                last_steps = True
-                op = Operation()
-                op.operation = 'calculate_values'
-                op.table = self.table_name
-                operations.append(op)
-                op = Operation()
-                op.operation = 'create_table'
-                op.table = self.table_name
-                op.grouping_fields = grouping_fields
-                op.result_fields = result_fields
-                op.database_name = self.database_name
-                operations.append(op)
+                    if table_properties:
+                        cell_value = a(
+                            str(icon) + ' ' + str(cell.text(language)),
+                            href="#", hx_target="#pivot_table",
+                            hx_post=PivotTable(
+                                    database_name=self.database_name,
+                                    table_name=self.table_name,
+                                    table_properties=table_properties,
+                                    render=False).url(),
+                            hx_trigger="click", hx_swap="outerHTML")
+
+                    pivot_row.add(td(cell_value, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+
+                else:
+                    pivot_row.add(td(cell.text(language), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
+            pivot_table.add(pivot_row)
+
+        pivot_div = div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8")
+        pivot_div.add(pivot_table)
+        return pivot_div
 
 
 class DownloadReport(Component):
@@ -1680,20 +819,30 @@ class DownloadReport(Component):
 
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
-    pivot_table = fields.Char('Pivot Table')
+    table_properties = fields.Char('Table Properties')
 
     @classmethod
     def get_url_map(cls):
         return [
-            Rule('/<string:database_name>/babi/pivot/download/<string:table_name>/<string:pivot_table>/', endpoint="download")
+            Rule('/<string:database_name>/babi/pivot/download/<string:table_name>/<string:table_properties>/', endpoint="download")
         ]
 
     def render(self):
         pass
 
     def download(self):
-        pivot_table = self.pivot_table.replace('\\', '/')
-        response = Response(pivot_table)
+        pool = Pool()
+        Language = pool.get('ir.lang')
+
+        language = Transaction().context.get('language', 'en')
+        language, = Language.search([('code', '=', language)], limit=1)
+
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+        wb = Workbook()
+        ws = wb.active
+        for row in cube.build():
+            ws.append([x.text(language) for x in row])
+        response = Response(save_virtual_workbook(wb))
         response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         return response
