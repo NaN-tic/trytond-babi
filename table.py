@@ -496,7 +496,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         hostname = config.get('web', 'hostname')
         if not hostname:
             hostname = config.get('web', 'listen')
-        return f'{hostname}/{Transaction().database.name}/babi/pivot/{self.table_name}'
+        return f'{hostname}/{Transaction().database.name}/babi/pivot/{self.table_name}/null'
 
     @property
     def ai_sql_tables(self):
