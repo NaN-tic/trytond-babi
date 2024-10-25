@@ -414,6 +414,90 @@ msgctxt "field:babi.order,report:"
 msgid "Report"
 msgstr "Informe"
 
+msgctxt "field:babi.pivot,column_dimensions:"
+msgid "Column Dimensions"
+msgstr "Domensions de les columnes"
+
+msgctxt "field:babi.pivot,measures:"
+msgid "Measures"
+msgstr "Mesures"
+
+msgctxt "field:babi.pivot,name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:babi.pivot,order:"
+msgid "Order"
+msgstr "Ordre"
+
+msgctxt "field:babi.pivot,row_dimensions:"
+msgid "Row Dimensions"
+msgstr "Dimensions de les files"
+
+msgctxt "field:babi.pivot,table:"
+msgid "Table"
+msgstr "Taula"
+
+msgctxt "field:babi.pivot,url:"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "field:babi.pivot.column_dimension,field:"
+msgid "Field"
+msgstr "Camp"
+
+msgctxt "field:babi.pivot.column_dimension,pivot:"
+msgid "Pivot"
+msgstr "Pivot"
+
+msgctxt "field:babi.pivot.column_dimension,table:"
+msgid "Table"
+msgstr "Taula"
+
+msgctxt "field:babi.pivot.measure,aggregate:"
+msgid "Aggregate"
+msgstr "Agregat"
+
+msgctxt "field:babi.pivot.measure,field:"
+msgid "Field"
+msgstr "Camp"
+
+msgctxt "field:babi.pivot.measure,pivot:"
+msgid "Pivot"
+msgstr "Pivot"
+
+msgctxt "field:babi.pivot.measure,table:"
+msgid "Table"
+msgstr "Taula"
+
+msgctxt "field:babi.pivot.order,element:"
+msgid "Element"
+msgstr "Element"
+
+msgctxt "field:babi.pivot.order,order:"
+msgid "Order"
+msgstr "Ordre"
+
+msgctxt "field:babi.pivot.order,pivot:"
+msgid "Pivot"
+msgstr "Pivot"
+
+msgctxt "field:babi.pivot.order,table:"
+msgid "Table"
+msgstr "Taula"
+
+msgctxt "field:babi.pivot.row_dimension,field:"
+msgid "Field"
+msgstr "Camp"
+
+msgctxt "field:babi.pivot.row_dimension,pivot:"
+msgid "Pivot"
+msgstr "Pivot"
+
+msgctxt "field:babi.pivot.row_dimension,table:"
+msgid "Table"
+msgstr "Taula"
+
 msgctxt "field:babi.report,actions:"
 msgid "Actions"
 msgstr "Accions"
@@ -678,6 +762,10 @@ msgctxt "field:babi.table,name:"
 msgid "Name"
 msgstr "Nom"
 
+msgctxt "field:babi.table,pivots:"
+msgid "Pivot Tables"
+msgstr "Taules Pivot"
+
 msgctxt "field:babi.table,preview:"
 msgid "Preview"
 msgstr "Vista prèvia"
@@ -718,7 +806,6 @@ msgctxt "field:babi.table,type:"
 msgid "Type"
 msgstr "Tipus"
 
-#, fuzzy
 msgctxt "field:babi.table,url:"
 msgid "URL"
 msgstr "URL"
@@ -739,22 +826,18 @@ msgctxt "field:babi.table,warning_description:"
 msgid "Description"
 msgstr "Descripció"
 
-#, fuzzy
 msgctxt "field:babi.table-res.group,babi_table:"
 msgid "Table"
 msgstr "Taula"
 
-#, fuzzy
 msgctxt "field:babi.table-res.group,user:"
 msgid "Group"
 msgstr "Grup"
 
-#, fuzzy
 msgctxt "field:babi.table-res.user,babi_table:"
 msgid "Table"
 msgstr "Taula"
 
-#, fuzzy
 msgctxt "field:babi.table-res.user,user:"
 msgid "User"
 msgstr "Usuari"
@@ -971,13 +1054,13 @@ msgctxt "field:www.download_report,database_name:"
 msgid "Database Name"
 msgstr ""
 
-msgctxt "field:www.download_report,pivot_table:"
-msgid "Pivot Table"
-msgstr ""
-
 msgctxt "field:www.download_report,table_name:"
 msgid "Table Name"
 msgstr ""
+
+msgctxt "field:www.download_report,table_properties:"
+msgid "Table Properties"
+msgstr "Propietats de la taula"
 
 msgctxt "field:www.index.pivot,database_name:"
 msgid "Database Name"
@@ -999,15 +1082,13 @@ msgctxt "field:www.pivot_header,database_name:"
 msgid "Database Name"
 msgstr ""
 
-#, fuzzy
 msgctxt "field:www.pivot_header,field:"
 msgid "Field"
 msgstr "Camp"
 
-#, fuzzy
 msgctxt "field:www.pivot_header,header:"
 msgid "Header"
-msgstr "Encapçalament"
+msgstr "Capçalera"
 
 msgctxt "field:www.pivot_header,level_action:"
 msgid "Level Action"
@@ -1021,23 +1102,6 @@ msgctxt "field:www.pivot_header,table_properties:"
 msgid "Table Properties"
 msgstr ""
 
-msgctxt "field:www.pivot_header.aggregation,database_name:"
-msgid "Database Name"
-msgstr ""
-
-#, fuzzy
-msgctxt "field:www.pivot_header.aggregation,header:"
-msgid "Header"
-msgstr "Encapçalament"
-
-msgctxt "field:www.pivot_header.aggregation,table_name:"
-msgid "Table Name"
-msgstr ""
-
-msgctxt "field:www.pivot_header.aggregation,table_properties:"
-msgid "Table Properties"
-msgstr ""
-
 msgctxt "field:www.pivot_header.axis,axis:"
 msgid "Axis"
 msgstr ""
@@ -1046,10 +1110,9 @@ msgctxt "field:www.pivot_header.axis,database_name:"
 msgid "Database Name"
 msgstr ""
 
-#, fuzzy
 msgctxt "field:www.pivot_header.axis,header:"
 msgid "Header"
-msgstr "Encapçalament"
+msgstr "Capçalera"
 
 msgctxt "field:www.pivot_header.axis,table_name:"
 msgid "Table Name"
@@ -1059,23 +1122,53 @@ msgctxt "field:www.pivot_header.axis,table_properties:"
 msgid "Table Properties"
 msgstr ""
 
-msgctxt "field:www.pivot_header.selection,aggregation:"
-msgid "Aggregation"
-msgstr ""
+msgctxt "field:www.pivot_header.measure,database_name:"
+msgid "Database Name"
+msgstr "Nom base de dades"
+
+msgctxt "field:www.pivot_header.measure,header:"
+msgid "Header"
+msgstr "Capçalera"
+
+msgctxt "field:www.pivot_header.measure,table_name:"
+msgid "Table Name"
+msgstr "Nom taula"
+
+msgctxt "field:www.pivot_header.measure,table_properties:"
+msgid "Table Properties"
+msgstr "Propietats de la taula"
+
+msgctxt "field:www.pivot_header.order,database_name:"
+msgid "Database Name"
+msgstr "Nom de la base de dades"
+
+msgctxt "field:www.pivot_header.order,header:"
+msgid "Header"
+msgstr "Capçalera"
+
+msgctxt "field:www.pivot_header.order,table_name:"
+msgid "Table Name"
+msgstr "Nom taula"
+
+msgctxt "field:www.pivot_header.order,table_properties:"
+msgid "Table Properties"
+msgstr "Propietats de la taula"
 
 msgctxt "field:www.pivot_header.selection,database_name:"
 msgid "Database Name"
 msgstr ""
 
-#, fuzzy
 msgctxt "field:www.pivot_header.selection,field:"
 msgid "Field"
 msgstr "Camp"
 
-#, fuzzy
 msgctxt "field:www.pivot_header.selection,header:"
 msgid "Header"
-msgstr "Encapçalament"
+msgstr "Capçalera"
+
+msgctxt "field:www.pivot_header.selection,measure:"
+msgid "Measure"
+msgstr "Mesura"
 
 msgctxt "field:www.pivot_header.selection,table_name:"
 msgid "Table Name"
@@ -1089,17 +1182,13 @@ msgctxt "field:www.pivot_table,database_name:"
 msgid "Database Name"
 msgstr ""
 
-msgctxt "field:www.pivot_table,grouping_fields:"
-msgid "Grouping Fields"
-msgstr ""
-
-msgctxt "field:www.pivot_table,result_fields:"
-msgid "Result Fields"
-msgstr ""
-
 msgctxt "field:www.pivot_table,table_name:"
 msgid "Table Name"
 msgstr ""
+
+msgctxt "field:www.pivot_table,table_properties:"
+msgid "Table Properties"
+msgstr "Propietats de la taula"
 
 msgctxt "help:babi.action.dashboard,records:"
 msgid "The records on which the action runs."
@@ -1335,6 +1424,26 @@ msgctxt "model:babi.order,name:"
 msgid "Order"
 msgstr "Ordre"
 
+msgctxt "model:babi.pivot,name:"
+msgid "Pivot Table"
+msgstr "Taula Pivot"
+
+msgctxt "model:babi.pivot.column_dimension,name:"
+msgid "Pivot Column Dimension"
+msgstr "Dimensió columna Pivot"
+
+msgctxt "model:babi.pivot.measure,name:"
+msgid "Pivot Measure"
+msgstr "Mesures Pivot"
+
+msgctxt "model:babi.pivot.order,name:"
+msgid "Pivot Order"
+msgstr "Ordre Pivot"
+
+msgctxt "model:babi.pivot.row_dimension,name:"
+msgid "Pivot Row Dimension"
+msgstr "Dimensions de la fila Pivot"
+
 msgctxt "model:babi.report,name:"
 msgid "Report"
 msgstr "Informe"
@@ -1422,6 +1531,10 @@ msgstr "Camps"
 msgctxt "model:ir.action,name:act_babi_filter"
 msgid "Filters"
 msgstr "Filtres"
+
+msgctxt "model:ir.action,name:act_babi_pivot"
+msgid "Pivot Tables"
+msgstr "Taules Pivot"
 
 msgctxt "model:ir.action,name:act_babi_report"
 msgid "Reports"
@@ -1867,6 +1980,10 @@ msgctxt "model:ir.ui.menu,name:menu_babi_filter"
 msgid "Filters"
 msgstr "Filtre"
 
+msgctxt "model:ir.ui.menu,name:menu_babi_pivot"
+msgid "Pivot Tables"
+msgstr "Taula Pivot"
+
 msgctxt "model:ir.ui.menu,name:menu_babi_report"
 msgid "Reports"
 msgstr "Informes"
@@ -1923,13 +2040,17 @@ msgctxt "model:www.pivot_header,name:"
 msgid "Pivot Header"
 msgstr ""
 
-msgctxt "model:www.pivot_header.aggregation,name:"
-msgid "Pivot Header Aggregation"
-msgstr ""
-
 msgctxt "model:www.pivot_header.axis,name:"
 msgid "Pivot Header Axis"
 msgstr ""
+
+msgctxt "model:www.pivot_header.measure,name:"
+msgid "Pivot Header Measure"
+msgstr "Mesura de la capçalera Pivot"
+
+msgctxt "model:www.pivot_header.order,name:"
+msgid "Pivot Header Component"
+msgstr "Component de capçalera Pivot"
 
 msgctxt "model:www.pivot_header.selection,name:"
 msgid "Pivot Header Selection"
@@ -2003,7 +2124,6 @@ msgctxt "selection:babi.field,table_type:"
 msgid "Table"
 msgstr "Taula"
 
-#, fuzzy
 msgctxt "selection:babi.field,table_type:"
 msgid "View"
 msgstr "Vista"
@@ -2204,6 +2324,34 @@ msgctxt "selection:babi.order,order:"
 msgid "Descending"
 msgstr "Descendent"
 
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Average"
+msgstr "Mitjana"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Count"
+msgstr "Comptador"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Max"
+msgstr "Màxim"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Min"
+msgstr "Mínim"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Sum"
+msgstr "Suma"
+
+msgctxt "selection:babi.pivot.order,order:"
+msgid "Ascending"
+msgstr "Ascendent"
+
+msgctxt "selection:babi.pivot.order,order:"
+msgid "Descending"
+msgstr "Descendent"
+
 msgctxt "selection:babi.report.execution,state:"
 msgid "Calculated"
 msgstr "Calcul·lat"
@@ -2244,7 +2392,6 @@ msgctxt "selection:babi.table,type:"
 msgid "Table"
 msgstr "Taula"
 
-#, fuzzy
 msgctxt "selection:babi.table,type:"
 msgid "View"
 msgstr "Vista"
@@ -2646,14 +2793,6 @@ msgid "Add"
 msgstr "Afegeix"
 
 msgctxt "voyager:v:"
-msgid "Aggregation fields"
-msgstr "Camps d'agregació"
-
-msgctxt "voyager:v:"
-msgid "Aggregation type"
-msgstr "Tipus d'agregació"
-
-msgctxt "voyager:v:"
 msgid "Average"
 msgstr "Mitjana"
 
@@ -2682,8 +2821,28 @@ msgid "Max"
 msgstr "Màxim"
 
 msgctxt "voyager:v:"
+msgid "Maximum"
+msgstr "Màxim"
+
+msgctxt "voyager:v:"
+msgid "Measure fields"
+msgstr "Camps de mesura"
+
+msgctxt "voyager:v:"
+msgid "Measure type"
+msgstr "Tipus de mesura"
+
+msgctxt "voyager:v:"
 msgid "Min"
 msgstr "Mínim"
+
+msgctxt "voyager:v:"
+msgid "Minimum"
+msgstr "Mínim"
+
+msgctxt "voyager:v:"
+msgid "Order fields"
+msgstr "Camps ordenació"
 
 msgctxt "voyager:v:"
 msgid "Page not found"
@@ -2692,10 +2851,6 @@ msgstr "Pàgina no trobada"
 msgctxt "voyager:v:"
 msgid "Page not found | Tryton"
 msgstr "Pàgina no trobada | Tryton"
-
-msgctxt "voyager:v:"
-msgid "Remove"
-msgstr "Eliminar"
 
 msgctxt "voyager:v:"
 msgid "Rows"
