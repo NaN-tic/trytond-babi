@@ -527,7 +527,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             context = ev.eval(context)
             return context
 
-    def get_url(self, name):
+    def get_pivot_table(self, name):
         hostname = config.get('web', 'hostname')
         if not hostname:
             hostname = config.get('web', 'listen')
@@ -1407,7 +1407,7 @@ class Pivot(ModelSQL, ModelView):
             order=order,
             )
         properties = cube.encode_properties()
-        return f'{self.table.url}/{properties}'
+        return f'{self.table.pivot_table.replace("/null", "")}/{properties}'
 
     @classmethod
     def search_rec_name(cls, name, clause):
