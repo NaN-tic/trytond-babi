@@ -1271,7 +1271,8 @@ class Pivot(ModelSQL, ModelView):
             res.append(item)
         return ' '.join(res)
 
-    @fields.depends('table', 'name', 'row_dimensions', 'column_dimensions', 'measures')
+    @fields.depends('table', 'name', 'row_dimensions', 'column_dimensions',
+            'measures', '_parent_table.url')
     def on_change_with_url(self, name=None):
         if not self.table:
             return
