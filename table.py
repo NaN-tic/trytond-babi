@@ -26,11 +26,18 @@ from trytond.modules.company.model import (
 from trytond.report import Report
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
+from .cube import Cube
 
-VALID_FIRST_SYMBOLS = 'abcdefghijklmnopqrstuvwxyz'
+VALID_FIRST_SYMBOLS = '_abcdefghijklmnopqrstuvwxyz'
 VALID_NEXT_SYMBOLS = '_0123456789'
 VALID_SYMBOLS = VALID_FIRST_SYMBOLS + VALID_NEXT_SYMBOLS
 
+RIGHT_ARROW_HTML = '&#x27A1'
+RIGHT_ARROW = html.unescape(RIGHT_ARROW_HTML)
+DOWN_ARROW_HTML = '&#x2B07'
+DOWN_ARROW = html.unescape(DOWN_ARROW_HTML)
+MEASURE_HTML = '&#x1F4CA'
+MEASURE = html.unescape(MEASURE_HTML)
 
 logger = logging.getLogger(__name__)
 
@@ -241,6 +248,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         'Access Users')
     access_groups = fields.Many2Many('babi.table-res.group', 'babi_table', 'user',
         'Access Groups')
+    pivots = fields.One2Many('babi.pivot', 'table', 'Pivot Tables')
 
     @staticmethod
     def default_timeout():
@@ -315,6 +323,28 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         for table in tables:
             table._drop()
         super().delete(tables)
+
+    @classmethod
+    def copy(cls, tables, default=None):
+        if default is None:
+            default = {}
+
+        default = default.copy()
+        default.setdefault('pivots')
+        default.setdefault('related_field')
+        default.setdefault('user_field')
+        default.setdefault('employee_field')
+        default.setdefault('company_field')
+        new_tables = super().copy(tables, default=default)
+        to_save = []
+        for old, new in zip(tables, new_tables):
+            rel = {x.internal_name: x for x in new.fields_}
+            new.related_field = rel.get(old.related_field.internal_name)
+            new.user_field = rel.get(old.user_field.internal_name)
+            new.employee_field = rel.get(old.employee_field.internal_name)
+            new.company_field = rel.get(old.company_field.internal_name)
+            to_save.append(new)
+        cls.save(to_save)
 
     @fields.depends('user_field')
     def on_change_user(self):
@@ -488,7 +518,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def get_context(self):
         if self.filter and self.filter.context:
-            context = self.replace_parameters(self.filter.context)
+            context = self.filter.context
             ev = EvalWithCompoundTypes(names={}, functions={
                 'date': lambda x: datetime.strptime(x, '%Y-%m-%d').date(),
                 'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d'),
@@ -496,10 +526,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             context = ev.eval(context)
             return context
 
-    def get_pivot_table(self, name):
-        if config.get("web", "cors"):
-            return f'{(config.get("web", "cors"))}/{Transaction().database.name}/babi/pivot/__{self.internal_name}/null'
-        return f'http://{(config.get("web", "listen"))}/{Transaction().database.name}/babi/pivot/__{self.internal_name}/null'
+    def get_url(self, name):
+        hostname = config.get('web', 'hostname')
+        if not hostname:
+            hostname = config.get('web', 'listen')
+        return f'{hostname}/{Transaction().database.name}/babi/pivot/{self.table_name}/null'
 
     @property
     def ai_sql_tables(self):
@@ -1320,3 +1351,242 @@ class Excel(Report):
         else:
             name = 'tables'
         return ('xlsx', save_virtual_workbook(wb), False, name)
+
+
+class Pivot(ModelSQL, ModelView):
+    'Pivot Table'
+    __name__ = 'babi.pivot'
+
+    table = fields.Many2One('babi.table', 'Table', required=True,
+        ondelete='CASCADE')
+    name = fields.Char('Name')
+    row_dimensions = fields.One2Many('babi.pivot.row_dimension', 'pivot',
+        'Row Dimensions')
+    column_dimensions = fields.One2Many('babi.pivot.column_dimension', 'pivot',
+        'Column Dimensions')
+    measures = fields.One2Many('babi.pivot.measure', 'pivot', 'Measures')
+    order = fields.One2Many('babi.pivot.order', 'pivot', 'Order')
+    url = fields.Function(fields.Char('URL'), 'on_change_with_url')
+
+    def get_rec_name(self, name):
+        res = []
+        if self.name:
+            res.append(self.name)
+        if self.row_dimensions:
+            item = RIGHT_ARROW + ' '
+            item += ', '.join([x.field.rec_name for x in self.row_dimensions])
+            res.append(item)
+        if self.column_dimensions:
+            item = DOWN_ARROW + ' '
+            item += ', '.join([x.field.rec_name for x in self.column_dimensions])
+            res.append(item)
+        if self.measures:
+            item += MEASURE + ' '
+            item += ', '.join([x.field.rec_name for x in self.measures])
+            res.append(item)
+        return ' '.join(res)
+
+    @fields.depends('table', 'name', 'row_dimensions', 'column_dimensions', 'measures')
+    def on_change_with_url(self, name=None):
+        if not self.table:
+            return
+        order = []
+        for item in self.order:
+            if item.element.__name__ == 'babi.pivot.measure':
+                order.append((item.element.field.internal_name,
+                        item.element.aggregate, item.order))
+            else:
+                order.append((item.element.field.internal_name, item.order))
+
+        cube = Cube(table=self.table,
+            rows=[x.field.internal_name for x in self.row_dimensions],
+            columns=[x.field.internal_name for x in self.column_dimensions],
+            measures=[(x.field.internal_name, x.aggregate)
+                for x in self.measures],
+            order=order,
+            )
+        properties = cube.encode_properties()
+        return f'{self.table.url}/{properties}'
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return ['OR',
+            ('name',) + tuple(clause[1:]),
+            ('table.rec_name',) + tuple(clause[1:]),
+            ('row_dimensions.field.rec_name',) + tuple(clause[1:]),
+            ('column_dimensions.field.rec_name',) + tuple(clause[1:]),
+            ('measures.field.rec_name',) + tuple(clause[1:]),
+            ]
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._order.insert(0, ('name', 'ASC'))
+        cls.__access__.add('table')
+
+    @classmethod
+    def create(cls, vlist):
+        pivots = super().create(vlist)
+        cls.update_order(pivots)
+        return pivots
+
+    @classmethod
+    def write(cls, *args):
+        super().write(*args)
+        cls.update_order(cls.browse([x[0] for x in args[::2]]))
+
+    @classmethod
+    def update_order(cls, pivots):
+        pool = Pool()
+        Order = pool.get('babi.pivot.order')
+
+        to_save = []
+        for pivot in pivots:
+            orders = [x.sequence for x in pivot.order if x.sequence is not None]
+            if orders:
+                sequence = max(orders) + 1
+            else:
+                sequence = 1
+
+            records = []
+            records += pivot.row_dimensions
+            records += pivot.column_dimensions
+            records += pivot.measures
+            existing = [x.element for x in pivot.order]
+
+            missing = set(records) - set(existing)
+            for record in missing:
+                to_save.append(
+                    Order(pivot=pivot, element=record, sequence=sequence))
+
+        Order.save(to_save)
+
+
+class RowDimension(sequence_ordered(), ModelSQL, ModelView):
+    'Pivot Row Dimension'
+    __name__ = 'babi.pivot.row_dimension'
+    pivot = fields.Many2One('babi.pivot', 'Pivot', required=True,
+        ondelete='CASCADE')
+    field = fields.Many2One('babi.field', 'Field', required=True,
+        ondelete='CASCADE', domain=[
+                ('table', '=', Eval('table', -1)),
+                ])
+    table = fields.Function(fields.Many2One('babi.table', 'Table'),
+        'on_change_with_table')
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__access__.add('pivot')
+
+    def get_rec_name(self, name):
+        return self.field.rec_name
+
+    @fields.depends('pivot', '_parent_pivot.table')
+    def on_change_with_table(self, name=None):
+        if self.pivot and self.pivot.table:
+            return self.pivot.table.id
+
+
+class ColumnDimension(sequence_ordered(), ModelSQL, ModelView):
+    'Pivot Column Dimension'
+    __name__ = 'babi.pivot.column_dimension'
+    pivot = fields.Many2One('babi.pivot', 'Pivot', required=True,
+        ondelete='CASCADE')
+    field = fields.Many2One('babi.field', 'Field', required=True,
+        ondelete='CASCADE', domain=[
+                ('table', '=', Eval('table', -1)),
+                ])
+    table = fields.Function(fields.Many2One('babi.table', 'Table'),
+        'on_change_with_table')
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__access__.add('pivot')
+
+    def get_rec_name(self, name):
+        return self.field.rec_name
+
+    @fields.depends('pivot', '_parent_pivot.table')
+    def on_change_with_table(self, name=None):
+        if self.pivot and self.pivot.table:
+            return self.pivot.table.id
+
+
+class Measure(sequence_ordered(), ModelSQL, ModelView):
+    'Pivot Measure'
+    __name__ = 'babi.pivot.measure'
+    pivot = fields.Many2One('babi.pivot', 'Pivot', required=True,
+        ondelete='CASCADE')
+    field = fields.Many2One('babi.field', 'Field', required=True,
+        ondelete='CASCADE', domain=[
+                ('table', '=', Eval('table', -1)),
+                ])
+    table = fields.Function(fields.Many2One('babi.table', 'Table'),
+        'on_change_with_table')
+    aggregate = fields.Selection([
+            ('sum', 'Sum'),
+            ('avg', 'Average'),
+            ('count', 'Count'),
+            ('max', 'Max'),
+            ('min', 'Min'),
+            ], 'Aggregate')
+
+    @staticmethod
+    def default_aggregate():
+        return 'sum'
+
+    def get_rec_name(self, name):
+        return self.field.rec_name
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__access__.add('pivot')
+
+    @fields.depends('pivot', '_parent_pivot.table')
+    def on_change_with_table(self, name=None):
+        if self.pivot and self.pivot.table:
+            return self.pivot.table.id
+
+
+class Order(sequence_ordered(), ModelSQL, ModelView):
+    'Pivot Order'
+    __name__ = 'babi.pivot.order'
+    pivot = fields.Many2One('babi.pivot', 'Pivot', required=True,
+        ondelete='CASCADE')
+    element = fields.Reference('Element', selection='get_elements',
+        readonly=True)
+    order = fields.Selection([
+            ('asc', 'Ascending'),
+            ('desc', 'Descending'),
+            ], 'Order')
+    table = fields.Function(fields.Many2One('babi.table', 'Table'),
+        'on_change_with_table')
+
+    @staticmethod
+    def default_order():
+        return 'asc'
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__access__.add('pivot')
+
+    @fields.depends('pivot', '_parent_pivot.table')
+    def on_change_with_table(self, name=None):
+        if self.pivot and self.pivot.table:
+            return self.pivot.table.id
+
+    @classmethod
+    def _get_elements(cls):
+        return ['babi.pivot.row_dimension', 'babi.pivot.column_dimension',
+            'babi.pivot.measure']
+
+    @classmethod
+    def get_elements(cls):
+        Model = Pool().get('ir.model')
+        get_name = Model.get_name
+        models = cls._get_elements()
+        return [(None, '')] + [(m, get_name(m)) for m in models]
