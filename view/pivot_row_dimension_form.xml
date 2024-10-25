@@ -1,0 +1,9 @@
+<form>
+    <label name="sequence"/>
+    <field name="sequence"/>
+    <label name="pivot"/>
+    <field name="pivot"/>
+    <label name="field"/>
+    <field name="field"/>
+</form>
+
