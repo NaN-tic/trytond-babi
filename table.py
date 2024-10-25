@@ -8,6 +8,7 @@ import sql
 import unidecode
 import json
 import tempfile
+import html
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
 from simpleeval import EvalWithCompoundTypes
