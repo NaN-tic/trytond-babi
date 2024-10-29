@@ -77,7 +77,7 @@ class Cron(metaclass=PoolMeta):
             for company in cron.companies:
                 with Transaction().set_context(company=company.id,
                         queue_name=QUEUE_NAME):
-                    BabiReport.__queue__.compute(cron.babi_report)
+                    BabiReport.__queue__._compute(cron.babi_report)
 
         table_crons = [cron for cron in crons if cron.babi_table]
         for cron in table_crons:
