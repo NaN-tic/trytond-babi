@@ -229,7 +229,7 @@ class Index(Component):
             with div(cls="mt-8 flow-root"):
                 with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                     if show_error == True:
-                        div(cls="text-center").add(p(_('You need to select at least one field in each column to show a table'), cls="mt-1 text-sm text-gray-500"))
+                        div(cls="text-center").add(p(_('You need to select at least one measure and one row or one column to show the table.'), cls="mt-1 text-sm text-gray-500"))
                     else:
                         PivotTable(database_name=self.database_name, table_name=self.table_name,
                             table_properties=self.table_properties)
