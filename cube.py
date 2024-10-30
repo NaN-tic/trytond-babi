@@ -121,7 +121,11 @@ class Cube:
             if r == tuple([None]*len(cube_rows)):
                 # Prepare the first level of the table, this name always will
                 # be the name we get form the database
-                header_cell = Cell(cube_rows[0], type=CellType.ROW_HEADER)
+                if cube_rows:
+                    value = cube_rows[0]
+                else:
+                    value = ''
+                header_cell = Cell(value, type=CellType.ROW_HEADER)
                 header_cell.expansion_row = tuple([None]*(len(cube_rows)))
                 row.append(header_cell)
                 row += [Cell('', type=CellType.ROW_HEADER)]*len(cube_rows)
