@@ -177,7 +177,7 @@ class Index(Component):
         else:
             cube = Cube.parse_properties(self.table_properties, table_name)
 
-        if cube.rows and cube.columns and cube.measures:
+        if cube.measures and (cube.rows or cube.columns):
             show_error = False
 
         # Prepare the cube properties to the expand all cube function
