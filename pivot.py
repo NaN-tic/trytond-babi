@@ -1,6 +1,6 @@
 from dominate.tags import (div, h1, p, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
-    option, main, th, label, input_)
+    option, main, th)
 from dominate.util import raw
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
@@ -13,7 +13,7 @@ from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
-from .cube import Cube, CellType
+from .cube import Cube, CellType, capitalize
 
 
 # TODO: Use table.py implementation in 7.2 version and above
@@ -22,6 +22,7 @@ def save_virtual_workbook(workbook):
         save_workbook(workbook, tmp.name)
         with open(tmp.name, 'rb') as f:
             return f.read()
+
 
 # Icons used in website
 COLLAPSE = '➖'
@@ -32,6 +33,7 @@ EXPAND_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0
 DOWNLOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>')
 ROWS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
 COLUMNS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
+PROPERTY_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M160-760v560h240v-560H160ZM80-120v-720h720v160h-80v-80H480v560h240v-80h80v160H80Zm400-360Zm-80 0h80-80Zm0 0Zm320 120v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/></svg>')
 MEASURE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>')
 ADD_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>')
 REMOVE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>')
@@ -185,7 +187,6 @@ class Index(Component):
         auxiliar_expansions_columns = cube.expansions_columns
         cube.expansions_rows = 'all'
         cube.expansions_columns = 'all'
-        expansion_cube_properties = cube.encode_properties()
         cube.expansions_rows = auxiliar_expansion_rows
         cube.expansions_columns = auxiliar_expansions_columns
 
@@ -221,6 +222,9 @@ class Index(Component):
                     table_properties=self.table_properties)
                 PivotHeaderMeasure(database_name=self.database_name,
                     table_name=self.table_name,
+                    table_properties=self.table_properties)
+                PivotHeaderAxis(database_name=self.database_name,
+                    table_name=self.table_name, axis='property',
                     table_properties=self.table_properties)
                 PivotHeaderOrder(database_name=self.database_name,
                     table_name=self.table_name,
@@ -261,7 +265,7 @@ class PivotHeaderAxis(Component):
         PivotHeader = pool.get('www.pivot_header')
         PivotHeaderSelection = pool.get('www.pivot_header.selection')
 
-        if not self.axis or self.axis not in ['x', 'y']:
+        if not self.axis or self.axis not in ['x', 'y', 'property']:
             #TODO: add error "Page not found"
             raise
 
@@ -275,14 +279,19 @@ class PivotHeaderAxis(Component):
             name = _('Rows')
             if cube:
                 fields = cube.rows
-        else:
+        elif self.axis == 'y':
             icon = COLUMNS_ICON
             name = _('Columns')
             if cube:
                 fields = cube.columns
+        else:
+            icon = PROPERTY_ICON
+            name = _('Properties')
+            if cube:
+                fields = cube.properties
 
         self.header = self.axis
-        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id=f'header_{self.axis}') as header_axis:
+        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-2", id=f'header_{self.axis}') as header_axis:
             div(id=f'field_selection_{self.axis}')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                 with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
@@ -302,7 +311,7 @@ class PivotHeaderAxis(Component):
                         with tbody(cls="divide-y divide-gray-200"):
                             for field in fields:
                                 with tr():
-                                    td(field.capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    td(capitalize(field), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
@@ -364,7 +373,7 @@ class PivotHeaderMeasure(Component):
                         with tbody(cls="divide-y divide-gray-200"):
                             for field in fields:
                                 with tr():
-                                    td(field[0].capitalize(), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    td(capitalize(field[0]), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         match field[1]:
                                             case 'sum':
@@ -427,10 +436,10 @@ class PivotHeaderOrder(Component):
                             for item in items:
                                 with tr():
                                     if isinstance(item[0], tuple):
-                                        value = f'{item[0][1].capitalize()}({item[0][0].capitalize()})'
+                                        value = f'{capitalize(item[0][1])}({capitalize(item[0][0])})'
                                         field = '__'.join(item[0])
                                     else:
-                                        value = item[0].capitalize()
+                                        value = capitalize(item[0])
                                         field = item[0]
                                     td(value, colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
@@ -498,6 +507,8 @@ class PivotHeaderSelection(Component):
                 name = 'field_selection_y'
             case 'measure':
                 name = 'field_selection_measure'
+            case 'property':
+                name = 'field_selection_property'
             case 'order':
                 name = 'field_selection_order'
 
@@ -535,14 +546,14 @@ class PivotHeaderSelection(Component):
                                         if self.header != 'order':
                                             for field in fields:
                                                 if field not in fields_used:
-                                                    option(field.capitalize(), value=field)
+                                                    option(capitalize(field), value=field)
                                         else:
                                             for field in fields_used:
                                                 if field not in order_fields:
                                                     if isinstance(field, tuple):
-                                                        name_ = f'{field[1].capitalize()}({field[0].capitalize()})'
+                                                        name_ = f'{capitalize(field[1])}({capitalize(field[0])})'
                                                     else:
-                                                        name_=field.capitalize()
+                                                        name_ = capitalize(field)
                                                     option(name_, value=field)
 
                                     if self.header == 'measure':
@@ -570,6 +581,8 @@ class PivotHeaderSelection(Component):
                 name = 'field_selection_y'
             case 'measure':
                 name = 'field_selection_measure'
+            case 'property':
+                name = 'field_selection_property'
             case 'order':
                 name = 'field_selection_order'
 
@@ -604,7 +617,9 @@ class PivotHeaderSelection(Component):
                 if (self.field, self.measure) not in cube.measures:
                     cube.measures.append((self.field, self.measure))
                     cube.order.append(((self.field, self.measure), 'asc'))
-                pass
+            case 'property':
+                if self.field not in cube.properties:
+                    cube.properties.append(self.field)
 
         return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=cube.encode_properties(), render=False).url())
 
