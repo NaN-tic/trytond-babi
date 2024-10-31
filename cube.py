@@ -1,5 +1,6 @@
 import ast
 import binascii
+import sql
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 from itertools import product
@@ -23,10 +24,14 @@ def strfdelta(tdelta, fmt):
         d["hours"] += d.get('days') * 24 # 24h/day
     return fmt.format(**d)
 
+def capitalize(string):
+    return ' '.join([word.capitalize() for word in string.split('_')])
+
 
 class Cube:
     def __init__(self, table=None, rows=None, columns=None, measures=None,
-            order=None, expansions_rows=None, expansions_columns=None):
+            properties=None, order=None, expansions_rows=None,
+            expansions_columns=None):
         '''
         order must have the following format:
         [('column_name', 'asc'), ('column_name', 'desc'), ('measure', 'sum', 'asc')]
@@ -37,6 +42,8 @@ class Cube:
             columns = []
         if measures is None:
             measures = []
+        if properties is None:
+            properties = []
         if order is None:
             order = []
         if expansions_rows is None:
@@ -50,6 +57,7 @@ class Cube:
         self.rows = rows
         self.columns = columns
         self.measures = measures
+        self.properties = properties
         self.order = order
         self.expansions_rows = expansions_rows
         self.expansions_columns = expansions_columns
@@ -82,7 +90,7 @@ class Cube:
         follow is:
             result: ('Party Name 1', Decimal('10.01'))
             rxc: ([None, None], ['party_name'])
-        The key we end calculatin will be:
+        The key we end calculating will be:
             ([None, None], ['Party Name 1'])
         '''
         index = 0
@@ -103,7 +111,7 @@ class Cube:
     def get_row_header(self, rows, cube_rows):
         '''
         Given a list of all the row headers ordered, return a list with the
-        header cells. The structre we folllow is:
+        header cells. The structre we follow is:
             rows: [[None, None], ['Party Name 1', None],
                 ['Party Name 1', 'Party Name 2']]
         And the structure we return is:
@@ -145,13 +153,13 @@ class Cube:
                         # In the case of being in the last element of the list,
                         # we can know that there are no more expansions
                         if element == r[-1]:
-                            row.append(Cell(element.value, type=CellType.ROW_HEADER))
+                            row.append(element.copy(type=CellType.ROW_HEADER))
                         else:
                             # Here we are calculating the expansion of this
                             # cell. Here is an example:
                             # r = ['Element1', None] -> ['Element1']
                             element_expansion = tuple([e.value for e in r[:r.index(element)+1]])
-                            row.append(Cell(element.value, type=CellType.ROW_HEADER,
+                            row.append(element.copy(type=CellType.ROW_HEADER,
                                 expansion_row=element_expansion))
                     else:
                         row.append(Cell('', type=CellType.ROW_HEADER))
@@ -200,6 +208,18 @@ class Cube:
 
         return column_header
 
+    @staticmethod
+    def measure_method(table, measure):
+        Operator = getattr(sql.aggregate, measure[1].capitalize())
+        return Operator(getattr(table, measure[0]))
+
+    @staticmethod
+    def apply_order(field, order):
+        if order == 'asc':
+            return field.asc
+        else:
+            return field.desc
+
     def get_values(self):
         '''
         Calculate the values of the cube. Return a dictionary with the format:
@@ -212,63 +232,51 @@ class Cube:
         # Get the cartesian product between the rows and columns
         rxc = list(product(rows, columns))
 
-        # Format the measures to use them in the query
-        measures = ','.join(
-            [f'{measure[1]}({measure[0]})' for measure in self.measures])
+        table = sql.Table(self.table)
+        # Format the measures and properties to use them in the query
+        measures = [self.measure_method(table, x) for x in self.measures]
+        properties = [sql.aggregate.Min(getattr(table, x)) for x in self.properties]
         cursor = Transaction().connection.cursor()
         values = OrderedDict()
+        property_values = OrderedDict()
         for rowxcolumn in rxc:
-            print(f'  RC: {rowxcolumn}')
-            # Transform the list of coordinates into a string to use it in the
-            # query
-            groupby_columns = ','.join([rc for rowcolumn in rowxcolumn
-                for rc in rowcolumn if rc != None])
+            print(f'RC: {rowxcolumn}')
+            groupby = [getattr(table, rc) for rowcolumn in rowxcolumn
+                for rc in rowcolumn if rc != None]
+            fields = groupby + measures + properties
 
-            # TODO: There's a huge SQL injection issue in this code
+            # Prepare the order we need to use in the query
+            orderby = []
+            for item in self.order:
+                if isinstance(item[0], tuple):
+                    field = self.measure_method(table, item[0])
+                    orderby.append(self.apply_order(field, item[1]))
+                else:
+                    field = getattr(table, item[0])
+                    if str(field) in [str(x) for x in groupby]:
+                        orderby.append(self.apply_order(field, item[1]))
 
             # In the case of having all the columns as "None", it means we are
             # in the first level and we dont need to do a group by
-            if groupby_columns:
-                query = (f'SELECT {groupby_columns}, {measures} FROM '
-                    f'{self.table} GROUP BY {groupby_columns}')
-            else:
-                query = f'SELECT {measures} FROM {self.table}'
-
-            # Prepare the order we need to use in the query
-            order = []
-            for item in self.order:
-                if isinstance(item[0], tuple):
-                    field = f'{item[0][1]}({item[0][0]})'
-                    if field in measures:
-                        order.append(f'{item[0][1]}({item[0][0]}) {item[1]}')
-                else:
-                    if item[0] in groupby_columns:
-                        order.append(f'{item[0]} {item[1]}')
-
-            print(f'ORDER: {order}')
-            if order:
-                query += f' ORDER BY {",".join(order)}'
+            query = table.select(*fields, group_by=groupby, order_by=orderby)
 
             # If we dont have any expansion -> we are in the level 0
             # TODO: We need a "special" case to show all levels list
             #  |-> use expansions / None -> open everything
 
-            default_row_coordinates = tuple([None]*len(self.rows))
-            default_column_coordinates = tuple([None]*len(self.columns))
+            default_row_coordinates = tuple([None] * len(self.rows))
+            default_column_coordinates = tuple([None] * len(self.columns))
 
-            print(f'  QUERY: {query}')
-            cursor.execute(query)
+            print(f'QUERY: {query}')
+            cursor.execute(*query)
             results = cursor.fetchall()
-            for result in results:
-                result = [Cell(x) for x in result]
+            for raw_result in results:
+                result = [Cell(x) for x in raw_result[:-len(properties)]]
                 coordinates = self.get_value_coordinate(result, rowxcolumn)
-                # To know which part of the result is the key and which is the
-                # value of the measures we use the lenght of the
-                # "groupby_columns", this variable is a string with the list of
-                # columns we use for the group by in postgresql
 
-                #TODO: we need a way to delete the sublevels oppened: if we
-                # close a parent level, right now we dont close the childs elements
+                if coordinates[0][-1] is not None:
+                    coordinates[0][-1].properties = raw_result[-len(properties):]
+                    #property_values[coordinates] = [Cell(x) for x in raw_result[-len(properties):]]
 
                 # Get the row values from the coordinates
                 row_coordinate_values = tuple(
@@ -291,7 +299,7 @@ class Cube:
                             row_ok = True
                             break
                 else:
-                    # If we dont have any expansions, we only allow the rows
+                    # If we don't have any expansions, we only allow the rows
                     # with the default value
                     if row_coordinate_values == default_row_coordinates:
                         row_ok = True
@@ -317,24 +325,23 @@ class Cube:
                             column_ok = True
                             break
                 else:
-                    # If we dont have any expansions, we only allow the columns
+                    # If we don't have any expansions, we only allow the columns
                     # with the default value
                     if column_coordinate_values == default_column_coordinates:
                         column_ok = True
 
                 if row_ok and column_ok:
-                    if groupby_columns:
+                    if groupby:
                         # If we have the groupby_columns attribute, we get all the
                         # values since the last column that is not a group by
                         # column
-                        values[coordinates] = result[
-                            len(groupby_columns.split(",")):]
+                        values[coordinates] = result[len(groupby):]
                     else:
                         # In the case we have all the columns as none, the result
                         # will equal the number of measures we have
                         values[coordinates] = result
         print(f'VALUES: {len(values)}')
-        return values
+        return values, property_values
 
     def build(self):
         '''
@@ -342,7 +349,7 @@ class Cube:
         with the format:
             table = [[Cell, Cell, Cell, Cell], [Cell, Cell, Cell, Cell]]
         '''
-        values = self.get_values()
+        values, property_values = self.get_values()
 
         row_elements = []
         row_elements.append(tuple([None]*len(self.rows)))
@@ -368,11 +375,32 @@ class Cube:
         # TODO: for each cell header, know the expansion we need to do
         row_header = self.get_row_header(row_elements, self.rows)
         table = self.get_column_header(col_elements, self.columns)
+        count = 0
         for row in table:
+            count += 1
+            if self.properties:
+                if row_header:
+                    length = len(row_header[0])
+                else:
+                    length = 0
+                nrow = row[:length]
+                if count == len(table):
+                    nrow += [Cell(x, type=CellType.ROW_HEADER) for x in self.properties]
+                else:
+                    nrow += [Cell('', type=CellType.ROW_HEADER)] * len(self.properties)
+                nrow += row[length:]
+                row = nrow
             yield row
         for row in range(len(row_elements)):
-            table_row = []
-            table_row += row_header[row]
+            table_row = row_header[row]
+            if self.properties:
+                if row_header:
+                    length = len(row_header[0])
+                else:
+                    length = 0
+            if self.properties:
+                props = table_row[-1].properties or [''] * len(self.properties)
+                table_row += [Cell(x, type=CellType.ROW_HEADER) for x in props]
             for col in range(len(col_elements)):
                 value = values.get((row_elements[row], col_elements[col]))
                 if value:
@@ -389,7 +417,7 @@ class Cube:
         Make the trasformation using the urllib.parse.urlencode function
         '''
         cube_properties = self.__dict__
-        # We need to delte the table property because it is already in the url
+        # We need to delete the table property because it is already in the url
         del cube_properties['table']
         return urlencode(self.__dict__, doseq=True)
 
@@ -432,15 +460,16 @@ class CellType(Enum):
 
 
 class Cell:
-    __slots__ = ('value', 'type', 'expansion_row', 'expansion_column')
+    __slots__ = ('value', 'type', 'expansion_row', 'expansion_column', 'properties')
 
-    def __init__(self, value, type=CellType.VALUE, expansion_row=None,
-            expansion_column=None):
+    def __init__(self, value=None, type=CellType.VALUE, expansion_row=None,
+            expansion_column=None, properties=None):
         self.value = value
         # Use as a type an enum, it is much faster than a dictionary
         self.type = type
         self.expansion_row = expansion_row
         self.expansion_column = expansion_column
+        self.properties = properties
 
     def text(self, lang=None):
         if not lang:
@@ -480,6 +509,9 @@ class Cell:
             return f'{self.value:.2f}'
         return str(self.value)
 
+    def __repr__(self):
+        return f'<Cell {self.value} {self.type}>'
+
     def __eq__(self, value):
         if isinstance(value, Cell):
             return self.value == value.value and self.type == value.type
@@ -487,3 +519,10 @@ class Cell:
 
     def __hash__(self):
         return hash((self.value, self.type))
+
+    def copy(self, **kwargs):
+        new = Cell(self.value, self.type, self.expansion_row,
+            self.expansion_column, self.properties)
+        for arg in kwargs:
+            setattr(new, arg, kwargs[arg])
+        return new
