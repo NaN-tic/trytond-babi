@@ -57,7 +57,7 @@
         <record model="ir.ui.view" id="babi_pivot_property_form_view">
             <field name="model">babi.pivot.property</field>
             <field name="type">form</field>
-            <field name="name">pivot_row_dimension_form</field>
+            <field name="name">pivot_property_form</field>
         </record>
         <record model="ir.ui.view" id="babi_pivot_property_tree_view">
             <field name="model">babi.pivot.property</field>
