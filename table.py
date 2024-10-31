@@ -39,6 +39,8 @@ DOWN_ARROW_HTML = '&#x2B07'
 DOWN_ARROW = html.unescape(DOWN_ARROW_HTML)
 MEASURE_HTML = '&#x1F4CA'
 MEASURE = html.unescape(MEASURE_HTML)
+PROPERTY_HTML = '&#x1F6C8'
+PROPERTY = html.unescape(PROPERTY_HTML)
 
 logger = logging.getLogger(__name__)
 
@@ -1366,6 +1368,7 @@ class Pivot(ModelSQL, ModelView):
     column_dimensions = fields.One2Many('babi.pivot.column_dimension', 'pivot',
         'Column Dimensions')
     measures = fields.One2Many('babi.pivot.measure', 'pivot', 'Measures')
+    properties = fields.One2Many('babi.pivot.property', 'pivot', 'Properties')
     order = fields.One2Many('babi.pivot.order', 'pivot', 'Order')
     url = fields.Function(fields.Char('URL'), 'on_change_with_url')
 
@@ -1377,18 +1380,22 @@ class Pivot(ModelSQL, ModelView):
             item = RIGHT_ARROW + ' '
             item += ', '.join([x.field.rec_name for x in self.row_dimensions])
             res.append(item)
+        if self.properties:
+            item = PROPERTY + ' '
+            item += ', '.join([x.field.rec_name for x in self.properties])
+            res.append(item)
         if self.column_dimensions:
             item = DOWN_ARROW + ' '
             item += ', '.join([x.field.rec_name for x in self.column_dimensions])
             res.append(item)
         if self.measures:
-            item += MEASURE + ' '
+            item = MEASURE + ' '
             item += ', '.join([x.field.rec_name for x in self.measures])
             res.append(item)
         return ' '.join(res)
 
     @fields.depends('table', 'name', 'row_dimensions', 'column_dimensions',
-            'measures', '_parent_table.pivot_table')
+            'measures', 'properties', 'order', '_parent_table.pivot_table')
     def on_change_with_url(self, name=None):
         if not self.table:
             return
@@ -1401,10 +1408,11 @@ class Pivot(ModelSQL, ModelView):
                 order.append((item.element.field.internal_name, item.order))
 
         cube = Cube(table=self.table,
-            rows=[x.field.internal_name for x in self.row_dimensions],
-            columns=[x.field.internal_name for x in self.column_dimensions],
+            rows=[x.field.internal_name for x in self.row_dimensions if x.field],
+            columns=[x.field.internal_name for x in self.column_dimensions if x.field],
             measures=[(x.field.internal_name, x.aggregate)
-                for x in self.measures],
+                for x in self.measures if x.field and x.aggregate],
+            properties=[x.field.internal_name for x in self.properties if x.field],
             order=order,
             )
         properties = cube.encode_properties()
@@ -1546,6 +1554,32 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls.__access__.add('pivot')
+
+    @fields.depends('pivot', '_parent_pivot.table')
+    def on_change_with_table(self, name=None):
+        if self.pivot and self.pivot.table:
+            return self.pivot.table.id
+
+
+class Property(sequence_ordered(), ModelSQL, ModelView):
+    'Pivot Property'
+    __name__ = 'babi.pivot.property'
+    pivot = fields.Many2One('babi.pivot', 'Pivot', required=True,
+        ondelete='CASCADE')
+    field = fields.Many2One('babi.field', 'Field', required=True,
+        ondelete='CASCADE', domain=[
+                ('table', '=', Eval('table', -1)),
+                ])
+    table = fields.Function(fields.Many2One('babi.table', 'Table'),
+        'on_change_with_table')
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__access__.add('pivot')
+
+    def get_rec_name(self, name):
+        return self.field.rec_name
 
     @fields.depends('pivot', '_parent_pivot.table')
     def on_change_with_table(self, name=None):

@@ -54,6 +54,16 @@
             <field name="type">form</field>
             <field name="name">pivot_measure_form</field>
         </record>
+        <record model="ir.ui.view" id="babi_pivot_property_form_view">
+            <field name="model">babi.pivot.property</field>
+            <field name="type">form</field>
+            <field name="name">pivot_row_dimension_form</field>
+        </record>
+        <record model="ir.ui.view" id="babi_pivot_property_tree_view">
+            <field name="model">babi.pivot.property</field>
+            <field name="type">tree</field>
+            <field name="name">pivot_property_list</field>
+        </record>
         <record model="ir.ui.view" id="babi_pivot_measure_tree_view">
             <field name="model">babi.pivot.measure</field>
             <field name="type">tree</field>

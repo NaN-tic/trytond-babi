@@ -59,6 +59,7 @@ def register():
         table.RowDimension,
         table.ColumnDimension,
         table.Measure,
+        table.Property,
         table.Order,
         pivot.Site,
         pivot.Layout,
