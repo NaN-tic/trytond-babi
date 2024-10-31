@@ -317,10 +317,14 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         to_save = []
         for old, new in zip(tables, new_tables):
             rel = {x.internal_name: x for x in new.fields_}
-            new.related_field = rel.get(old.related_field.internal_name)
-            new.user_field = rel.get(old.user_field.internal_name)
-            new.employee_field = rel.get(old.employee_field.internal_name)
-            new.company_field = rel.get(old.company_field.internal_name)
+            new.related_field = (old.related_field
+                and rel.get(old.related_field.internal_name))
+            new.user_field = (old.user_field
+                and rel.get(old.user_field.internal_name))
+            new.employee_field = (old.employee_field
+                and rel.get(old.employee_field.internal_name))
+            new.company_field = (old.company_field
+                and rel.get(old.company_field.internal_name))
             to_save.append(new)
         cls.save(to_save)
 
