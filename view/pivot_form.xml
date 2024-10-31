@@ -1,12 +1,15 @@
 <form col="6">
-    <label name="table"/>
-    <field name="table"/>
-    <label name="name"/>
-    <field name="name"/>
-    <label name="url"/>
-    <field name="url" widget="url"/>
+    <group id="header" colspan="6" col="6">
+        <label name="table"/>
+        <field name="table"/>
+        <label name="name"/>
+        <field name="name"/>
+        <label name="url"/>
+        <field name="url" widget="url"/>
+    </group>
     <field name="row_dimensions" colspan="3"/>
     <field name="column_dimensions" colspan="3"/>
     <field name="measures" colspan="3"/>
+    <field name="properties" colspan="3"/>
     <field name="order" colspan="3"/>
 </form>
