@@ -101,7 +101,6 @@ class Cube:
                 if not rowxcolumn_element:
                     rowxcolumn_coordinate.append(None)
                 else:
-                    #rowxcolumn_coordinate.append(Cell(result[index]))
                     result[index].type = CellType.ROW_HEADER
                     rowxcolumn_coordinate.append(result[index])
                     index += 1
@@ -271,12 +270,14 @@ class Cube:
             cursor.execute(*query)
             results = cursor.fetchall()
             for raw_result in results:
-                result = [Cell(x) for x in raw_result[:-len(properties)]]
+                if properties:
+                    result = [Cell(x) for x in raw_result[:-len(properties)]]
+                else:
+                    result = [Cell(x) for x in raw_result]
                 coordinates = self.get_value_coordinate(result, rowxcolumn)
 
-                if coordinates[0][-1] is not None:
+                if properties and coordinates[0][-1] is not None:
                     coordinates[0][-1].properties = raw_result[-len(properties):]
-                    #property_values[coordinates] = [Cell(x) for x in raw_result[-len(properties):]]
 
                 # Get the row values from the coordinates
                 row_coordinate_values = tuple(
