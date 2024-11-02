@@ -1,7 +1,8 @@
-from dominate.tags import (div, h1, p, a, form, button, span, table, thead,
+from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
     option, main, th, style)
 from dominate.util import raw
+import logging
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
 import tempfile
@@ -15,6 +16,8 @@ from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
 from .cube import Cube, CellType, capitalize
 
+
+logger = logging.getLogger(__name__)
 
 # TODO: Use table.py implementation in 7.2 version and above
 def save_virtual_workbook(workbook):
@@ -240,8 +243,14 @@ class Index(Component):
                     if show_error == True:
                         div(cls="text-center").add(p(_('You need to select at least one measure and one row or one column to show the table.'), cls="mt-1 text-sm text-gray-500"))
                     else:
-                        PivotTable(database_name=self.database_name, table_name=self.table_name,
-                            table_properties=self.table_properties)
+                        try:
+                            PivotTable(database_name=self.database_name, table_name=self.table_name,
+                                table_properties=self.table_properties)
+                        except Exception as e:
+                            div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
+                            div(cls="text-center").add(pre(str(e)))
+                            logger.exception(e)
+
         layout = Layout(title=f'{table_name} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
