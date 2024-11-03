@@ -1,5 +1,6 @@
 import ast
 import binascii
+import hashlib
 import sql
 from datetime import datetime, date, timedelta
 from decimal import Decimal
@@ -26,6 +27,15 @@ def strfdelta(tdelta, fmt):
 
 def capitalize(string):
     return ' '.join([word.capitalize() for word in string.split('_')])
+
+def table_exists(table_name):
+    tables = sql.Table('tables', schema='information_schema')
+    query = tables.select(tables.table_name, where=tables.table_name == table_name)
+    cursor = Transaction().connection.cursor()
+    cursor.execute(*query)
+    if cursor.fetchone():
+        return True
+    return False
 
 
 class Cube:
@@ -61,6 +71,67 @@ class Cube:
         self.order = order
         self.expansions_rows = expansions_rows
         self.expansions_columns = expansions_columns
+
+    def clear_cache(self):
+        cursor = Transaction().connection.cursor()
+        table = sql.Table('tables', schema='information_schema')
+        cursor.execute(*table.select(table.table_name,
+            where=(table.table_schema == 'public') &
+            (table.table_name.like(self.cache_prefix() + '%'))))
+        for cache in [x[0] for x in cursor.fetchall()]:
+            cursor.execute('DROP TABLE IF EXISTS "%s"' % cache)
+
+    @staticmethod
+    def clear_orphan_caches(tables):
+        # Remove all cache tables that are not in use by any of the tables
+        prefixes = []
+        for table in tables:
+            cube = Cube(table)
+            prefixes.append(cube.cache_prefix())
+        cursor = Transaction().connection.cursor()
+        table = sql.Table('tables', schema='information_schema')
+        cursor.execute(*table.select(table.table_name,
+            where=(table.table_schema == 'public') &
+            (table.table_name.like('_babi_cache_%'))))
+        for cache in [x[0] for x in cursor.fetchall()]:
+            for prefix in prefixes:
+                if cache.startswith(prefix):
+                    break
+            else:
+                cursor.execute('DROP TABLE IF EXISTS "%s"' % cache)
+
+    def cache_prefix(self):
+        h = hashlib.md5(self.table.encode()).hexdigest()[:20]
+        return f'_babi_cache_{h}_'
+
+    def get_data(self, query, orderby):
+        cursor = Transaction().connection.cursor()
+
+        cursor.execute('SAVEPOINT babi_cube')
+        try:
+            mogrified = cursor.mogrify(*query)
+            cache = self.cache_prefix() + hashlib.md5(mogrified).hexdigest()[:20]
+            if not table_exists(cache):
+                # TODO: We could have some performance improvements if we did not
+                # depend on the order of the fields in the query. That would probably mean
+                # that get_values() should sort groupby fields alphabetically and then
+                # be able to pick the right values from the result tuple
+                # (probably using DictCursor)
+                cursor.execute(f"CREATE UNLOGGED TABLE {cache} AS {mogrified.decode('utf-8')}")
+
+            table = sql.Table(cache)
+            query_order = []
+            for field, order in orderby:
+                query_order.append(
+                    self.apply_order(getattr(table, field), order))
+
+            cursor.execute(*table.select(order_by=query_order))
+            records = cursor.fetchall()
+            cursor.execute('RELEASE SAVEPOINT babi_cube')
+        except:
+            cursor.execute('ROLLBACK TO SAVEPOINT babi_cube')
+            raise
+        return records
 
     def get_query_list(self, list):
         '''
@@ -207,10 +278,24 @@ class Cube:
 
         return column_header
 
-    @staticmethod
-    def measure_method(table, measure):
-        Operator = getattr(sql.aggregate, measure[1].capitalize())
-        return Operator(getattr(table, measure[0]))
+    @classmethod
+    def measure_method(cls, table, measure):
+        field = measure[0]
+        aggregate = measure[1]
+        if aggregate == 'average':
+            aggregate = 'avg'
+        Operator = getattr(sql.aggregate, aggregate.capitalize())
+        return Operator(getattr(table, field)).as_(cls.measure_name(measure))
+
+    @classmethod
+    def measure_name(cls, measure):
+        field = measure[0]
+        aggregate = measure[1]
+        return f'{aggregate}_{field}__'
+
+    @classmethod
+    def property_name(cls, property):
+        return f'prop_{property}__'
 
     @staticmethod
     def apply_order(field, order):
@@ -234,41 +319,34 @@ class Cube:
         table = sql.Table(self.table)
         # Format the measures and properties to use them in the query
         measures = [self.measure_method(table, x) for x in self.measures]
-        properties = [sql.aggregate.Min(getattr(table, x)) for x in self.properties]
-        cursor = Transaction().connection.cursor()
+        properties = [sql.aggregate.Min(
+                getattr(table, x).as_(self.property_name(x)))
+            for x in self.properties]
         values = OrderedDict()
         property_values = OrderedDict()
         for rowxcolumn in rxc:
-            print(f'RC: {rowxcolumn}')
-            groupby = [getattr(table, rc) for rowcolumn in rowxcolumn
+            groupby = [rc for rowcolumn in rowxcolumn
                 for rc in rowcolumn if rc != None]
-            fields = groupby + measures + properties
 
             # Prepare the order we need to use in the query
             orderby = []
             for item in self.order:
                 if isinstance(item[0], tuple):
-                    field = self.measure_method(table, item[0])
-                    orderby.append(self.apply_order(field, item[1]))
+                    orderby.append((self.measure_name(item[0]), item[1]))
                 else:
-                    field = getattr(table, item[0])
-                    if str(field) in [str(x) for x in groupby]:
-                        orderby.append(self.apply_order(field, item[1]))
+                    if item[0] in groupby:
+                        orderby.append(item)
 
-            # In the case of having all the columns as "None", it means we are
-            # in the first level and we dont need to do a group by
-            query = table.select(*fields, group_by=groupby, order_by=orderby)
+            groupby = [getattr(table, x) for x in groupby]
+            fields = groupby + measures + properties
+            query = table.select(*fields, group_by=groupby)
+            results = self.get_data(query, orderby)
 
             # If we dont have any expansion -> we are in the level 0
             # TODO: We need a "special" case to show all levels list
             #  |-> use expansions / None -> open everything
-
             default_row_coordinates = tuple([None] * len(self.rows))
             default_column_coordinates = tuple([None] * len(self.columns))
-
-            print(f'QUERY: {query}')
-            cursor.execute(*query)
-            results = cursor.fetchall()
             for raw_result in results:
                 if properties:
                     result = [Cell(x) for x in raw_result[:-len(properties)]]
@@ -341,7 +419,6 @@ class Cube:
                         # In the case we have all the columns as none, the result
                         # will equal the number of measures we have
                         values[coordinates] = result
-        print(f'VALUES: {len(values)}')
         return values, property_values
 
     def build(self):
