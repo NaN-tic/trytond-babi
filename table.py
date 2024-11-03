@@ -273,6 +273,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 'compute_warning': {
                     'invisible': ~Bool(Eval('warn')),
                     },
+                'clear_cache': {},
                 })
 
     @classmethod
@@ -624,6 +625,17 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                     continue
                 cls.__queue__.compute_warnings(table)
 
+    @classmethod
+    @ModelView.button
+    def clear_cache(cls, tables):
+        for table in tables:
+            cube = Cube(table.table_name)
+            cube.clear_cache()
+
+        # Remove all cache tables that are not in use by any of the tables
+        tables = cls.search([])
+        Cube.clear_orphan_caches([x.table_name for x in tables])
+
     @property
     def table_name(self):
         # Add a suffix to the table name to prevent removing production tables
@@ -675,6 +687,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         raise TimeoutException
 
     def _compute(self, processed=None, compute_warnings=False):
+        self.clear_cache([self])
         start_time = time.time()
         if processed is None:
             processed = []
@@ -1630,3 +1643,4 @@ class Order(sequence_ordered(), ModelSQL, ModelView):
         get_name = Model.get_name
         models = cls._get_elements()
         return [(None, '')] + [(m, get_name(m)) for m in models]
+

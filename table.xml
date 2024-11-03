@@ -110,6 +110,11 @@
             <field name="string">AI</field>
             <field name="model">babi.table</field>
         </record>
+        <record model="ir.model.button" id="babi_table_clear_cache_button">
+            <field name="name">clear_cache</field>
+            <field name="string">Clear Cache</field>
+            <field name="model">babi.table</field>
+        </record>
 
         <record model="ir.action.act_window" id="act_widget_table">
             <field name="name">Widgets</field>

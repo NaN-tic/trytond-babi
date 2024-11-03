@@ -97,7 +97,9 @@
             <field name="access_groups" colspan="2"/>
         </page>
         <page name="pivots">
-            <field name="pivots" colspan="4"/>
+            <button name="clear_cache"/>
+            <newline/>
+            <field name="pivots" colspan="4" height="450"/>
         </page>
     </notebook>
 </form>
