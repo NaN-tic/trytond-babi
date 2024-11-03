@@ -328,7 +328,7 @@ class Cube:
         # Format the measures and properties to use them in the query
         measures = [self.measure_method(table, x) for x in self.measures]
         properties = [sql.aggregate.Min(
-                getattr(table, x).as_(self.property_name(x)))
+                getattr(table, x)).as_(self.property_name(x))
             for x in self.properties]
         values = OrderedDict()
         property_values = OrderedDict()
