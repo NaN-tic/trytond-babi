@@ -558,7 +558,7 @@ class PivotHeaderSelection(Component):
                                 with div(cls="mt-2 space-y-4"):
                                     with select(id="field", name="field", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
                                         if self.header != 'order':
-                                            for field in fields:
+                                            for field in sorted(fields):
                                                 if field not in fields_used:
                                                     option(capitalize(field), value=field)
                                         else:
@@ -572,11 +572,11 @@ class PivotHeaderSelection(Component):
 
                                     if self.header == 'measure':
                                         with select(id="measure", name="measure", required=True, cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
-                                            option(_('Sum'), value='sum')
                                             option(_('Average'), value='average')
+                                            option(_('Count'), value='count')
                                             option(_('Max'), value='max')
                                             option(_('Min'), value='min')
-                                            option(_('Count'), value='count')
+                                            option(_('Sum'), value='sum', selected=True)
                         with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
                             button(_('Add'), type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
                             a(_('Cancel'), href="#",
