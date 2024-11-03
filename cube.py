@@ -11,6 +11,7 @@ from urllib.parse import urlencode, parse_qs
 from trytond.config import config
 from trytond.i18n import gettext
 from trytond.transaction import Transaction
+from trytond import backend
 
 DEFAULT_MIME_TYPE = config.get('babi', 'mime_type', default='image/png')
 
@@ -27,15 +28,6 @@ def strfdelta(tdelta, fmt):
 
 def capitalize(string):
     return ' '.join([word.capitalize() for word in string.split('_')])
-
-def table_exists(table_name):
-    tables = sql.Table('tables', schema='information_schema')
-    query = tables.select(tables.table_name, where=tables.table_name == table_name)
-    cursor = Transaction().connection.cursor()
-    cursor.execute(*query)
-    if cursor.fetchone():
-        return True
-    return False
 
 
 class Cube:
@@ -74,10 +66,16 @@ class Cube:
 
     def clear_cache(self):
         cursor = Transaction().connection.cursor()
-        table = sql.Table('tables', schema='information_schema')
-        cursor.execute(*table.select(table.table_name,
-            where=(table.table_schema == 'public') &
-            (table.table_name.like(self.cache_prefix() + '%'))))
+        if backend.name == 'postgresql':
+            table = sql.Table('tables', schema='information_schema')
+            query = table.select(table.table_name, where=(
+                    table.table_schema == 'public') &
+                (table.table_name.like(self.cache_prefix() + '%')))
+        else:
+            table = sql.Table('sqlite_master')
+            query = table.select(table.name, where=(table.type == 'table') &
+                (table.name.like(self.cache_prefix() + '%')))
+        cursor.execute(*query)
         for cache in [x[0] for x in cursor.fetchall()]:
             cursor.execute('DROP TABLE IF EXISTS "%s"' % cache)
 
@@ -89,10 +87,17 @@ class Cube:
             cube = Cube(table)
             prefixes.append(cube.cache_prefix())
         cursor = Transaction().connection.cursor()
-        table = sql.Table('tables', schema='information_schema')
-        cursor.execute(*table.select(table.table_name,
-            where=(table.table_schema == 'public') &
-            (table.table_name.like('_babi_cache_%'))))
+        if backend.name == 'postgresql':
+            table = sql.Table('tables', schema='information_schema')
+            query = table.select(table.table_name,
+                where=(table.table_schema == 'public') &
+                (table.table_name.like('_babi_cache_%')))
+        else:
+            table = sql.Table('sqlite_master')
+            query = table.select(table.name,
+                where=(table.type == 'table') &
+                (table.name.like('_babi_cache_%')))
+        cursor.execute(*query)
         for cache in [x[0] for x in cursor.fetchall()]:
             for prefix in prefixes:
                 if cache.startswith(prefix):
@@ -111,13 +116,16 @@ class Cube:
         try:
             mogrified = cursor.mogrify(*query)
             cache = self.cache_prefix() + hashlib.md5(mogrified).hexdigest()[:20]
-            if not table_exists(cache):
-                # TODO: We could have some performance improvements if we did not
-                # depend on the order of the fields in the query. That would probably mean
-                # that get_values() should sort groupby fields alphabetically and then
-                # be able to pick the right values from the result tuple
-                # (probably using DictCursor)
-                cursor.execute(f"CREATE UNLOGGED TABLE {cache} AS {mogrified.decode('utf-8')}")
+            mogrified = mogrified.decode('utf-8')
+            unlogged = ''
+            if backend.name == 'postgresql':
+                unlogged = 'UNLOGGED'
+            # TODO: We could have some performance improvements if we did not
+            # depend on the order of the fields in the query. That would probably mean
+            # that get_values() should sort groupby fields alphabetically and then
+            # be able to pick the right values from the result tuple
+            # (probably using DictCursor)
+            cursor.execute(f"CREATE {unlogged} TABLE IF NOT EXISTS {cache} AS {mogrified}")
 
             table = sql.Table(cache)
             query_order = []
