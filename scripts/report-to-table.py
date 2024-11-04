@@ -81,7 +81,7 @@ for report in reports:
         new.save()
 
     for cron in report.crons:
-        Cron.copy([cron], defaults={
+        Cron.copy([cron], default={
                 'babi_report': report.id,
                 'babi_table': table.id,
                 })
