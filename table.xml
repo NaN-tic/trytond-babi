@@ -88,7 +88,7 @@
         <record model="ir.model.button" id="babi_table_clear_cache_button">
             <field name="name">clear_cache</field>
             <field name="string">Clear Cache</field>
-            <field name="model">babi.table</field>
+            <field name="model" search="[('model', '=', 'babi.table')]"/>
         </record>
 
         <menuitem id="menu_babi_table" parent="menu_configuration" action="act_babi_table" sequence="30"/>
