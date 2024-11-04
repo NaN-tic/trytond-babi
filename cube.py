@@ -327,6 +327,8 @@ class Cube:
         table = sql.Table(self.table)
         # Format the measures and properties to use them in the query
         measures = [self.measure_method(table, x) for x in self.measures]
+        # Use DISTINCT ON instead of Min to get the first value of the group
+        # See: https://www.postgresql.org/docs/17/sql-select.html#SQL-DISTINCT
         properties = [sql.aggregate.Min(
                 getattr(table, x)).as_(self.property_name(x))
             for x in self.properties]
