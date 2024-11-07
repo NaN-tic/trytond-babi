@@ -353,6 +353,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 and rel.get(old.company_field.internal_name))
             to_save.append(new)
         cls.save(to_save)
+        return new_tables
 
     @fields.depends('user_field')
     def on_change_user(self):
@@ -1643,4 +1644,3 @@ class Order(sequence_ordered(), ModelSQL, ModelView):
         get_name = Model.get_name
         models = cls._get_elements()
         return [(None, '')] + [(m, get_name(m)) for m in models]
-
