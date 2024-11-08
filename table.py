@@ -1420,8 +1420,8 @@ class Pivot(ModelSQL, ModelView):
         order = []
         for item in self.order:
             if item.element.__name__ == 'babi.pivot.measure':
-                order.append((item.element.field.internal_name,
-                        item.element.aggregate, item.order))
+                order.append(((item.element.field.internal_name,
+                            item.element.aggregate), item.order))
             else:
                 order.append((item.element.field.internal_name, item.order))
 
