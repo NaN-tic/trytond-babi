@@ -36,7 +36,7 @@ class Cube:
             expansions_columns=None):
         '''
         order must have the following format:
-        [('column_name', 'asc'), ('column_name', 'desc'), ('measure', 'sum', 'asc')]
+        [('column_name', 'asc'), ('column_name', 'desc'), (('measure', 'sum'), 'asc')]
         '''
         if rows is None:
             rows = []
@@ -53,8 +53,8 @@ class Cube:
         if expansions_columns is None:
             expansions_columns = []
 
-        assert all(len(x) in (2, 3) for x in order), ('Each order item must '
-            'have 2 or 3 elements')
+        assert all(len(x) == 2 for x in order), ('Each order item must '
+            'have 2 elements')
         self.table = table
         self.rows = rows
         self.columns = columns
