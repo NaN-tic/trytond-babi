@@ -1636,7 +1636,7 @@ class Order(sequence_ordered(), ModelSQL, ModelView):
     @classmethod
     def _get_elements(cls):
         return ['babi.pivot.row_dimension', 'babi.pivot.column_dimension',
-            'babi.pivot.measure']
+            'babi.pivot.measure', 'babi.pivot.property']
 
     @classmethod
     def get_elements(cls):

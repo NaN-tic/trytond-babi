@@ -8,6 +8,7 @@ Pivot = pool.get('babi.pivot')
 RowDimension = pool.get('babi.pivot.row_dimension')
 ColumnDimension = pool.get('babi.pivot.column_dimension')
 Measure = pool.get('babi.pivot.measure')
+Property = pool.get('babi.pivot.property')
 Order = pool.get('babi.pivot.order')
 Cron = pool.get('ir.cron')
 
@@ -58,10 +59,16 @@ for report in reports:
     fields = []
     mapping = {}
     for dimension in report.dimensions:
-        existing = add_field(fields, table, dimension)
-        new = RowDimension(pivot=pivot, field=fields[-1], sequence=dimension.sequence)
-        new.save()
-        mapping[dimension] = new
+        if dimension.group_by:
+            existing = add_field(fields, table, dimension)
+            new = RowDimension(pivot=pivot, field=fields[-1], sequence=dimension.sequence)
+            new.save()
+            mapping[dimension] = new
+        else:
+            existing = add_field(fields, table, dimension)
+            new = Property(pivot=pivot, field=fields[-1], sequence=dimension.sequence)
+            new.save()
+            mapping[dimension] = new
 
     for column in report.columns:
         existing = add_field(fields, table, column)
