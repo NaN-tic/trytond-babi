@@ -37,10 +37,14 @@
         <page id="configuration" string="Configuration" col="6">
             <label name="preview_limit"/>
             <field name="preview_limit"/>
-            <label name="babi_raise_user_error"/>
-            <field name="babi_raise_user_error"/>
             <label name="timeout"/>
             <field name="timeout"/>
+            <group id="checkboxes" colspan="2" col="-1">
+                <label name="active"/>
+                <field name="active"/>
+                <label name="babi_raise_user_error"/>
+                <field name="babi_raise_user_error"/>
+            </group>
             <separator id="last_execution" colspan="6" string="Last Execution"/>
             <label name="calculation_date"/>
             <field name="calculation_date"/>
