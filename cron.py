@@ -11,13 +11,15 @@ class Cron(metaclass=PoolMeta):
     __name__ = "ir.cron"
     babi_report = fields.Many2One('babi.report', 'Babi Report', states={
             'invisible': Eval('method') != 'babi.report|compute',
+            'required': Eval('method') == 'babi.report|compute',
             }, ondelete='CASCADE')
     babi_table = fields.Many2One('babi.table', 'Babi Table', states={
-            'invisible': Eval('method') != 'babi.table|compute',
+            'invisible': Eval('method') != 'babi.table|_compute',
+            'required': Eval('method') == 'babi.table|_compute',
             }, ondelete='CASCADE')
     babi_calculate_warnings = fields.Boolean('Calculate Warnings', states={
-        'invisible': Eval('method') != 'babi.table|compute',
-        })
+            'invisible': Eval('method') != 'babi.table|_compute',
+            })
 
     @classmethod
     def __register__(cls, module_name):
@@ -37,13 +39,17 @@ class Cron(metaclass=PoolMeta):
                 [babi.method], ['babi.table|compute'],
                 where=(babi.method == 'babi.tablel|calculate_babi_table')
                 ))
+        cursor.execute(*babi.update(
+                [babi.method], ['babi.table|_compute'],
+                where=(babi.method == 'babi.table|compute')
+                ))
 
     @classmethod
     def __setup__(cls):
         super(Cron, cls).__setup__()
         cls.method.selection.extend([
                 ('babi.report|compute', 'Compute Business Intelligence Report'),
-                ('babi.table|compute', 'Compute Business Intelligence Table'),
+                ('babi.table|_compute', 'Compute Business Intelligence Table'),
                 ('babi.report.execution|clean', 'Clean Babi Excutions'),
                 ])
 
@@ -84,14 +90,10 @@ class Cron(metaclass=PoolMeta):
             # babi execution require company. Run calculate when has a company
             for company in cron.companies:
                 with Transaction().set_context(company=company.id,
-                        queue_name='babi'):
-                    if cron.babi_table.type == 'query':
-                        if cron.babi_calculate_warnings:
-                            BabiTable.__queue__.compute_warnings(cron.babi_table)
-                    else:
-                        BabiTable.__queue__._compute(cron.babi_table,
-                            compute_warnings=cron.babi_calculate_warnings)
-        return super(Cron, cls).run_once(list(
+                        queue_name=QUEUE_NAME):
+                    BabiTable.__queue__._compute(cron.babi_table,
+                        compute_warnings=cron.babi_calculate_warnings)
+        return super().run_once(list(
                 set(crons) - set(report_crons) - set(table_crons)))
 
     @fields.depends('method')
