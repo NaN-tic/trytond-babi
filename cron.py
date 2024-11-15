@@ -86,7 +86,8 @@ class Cron(metaclass=PoolMeta):
                 with Transaction().set_context(company=company.id,
                         queue_name='babi'):
                     if cron.babi_table.type == 'query':
-                        BabiTable.__queue__.compute_warnings(cron.babi_table)
+                        if cron.babi_calculate_warnings:
+                            BabiTable.__queue__.compute_warnings(cron.babi_table)
                     else:
                         BabiTable.__queue__._compute(cron.babi_table,
                             compute_warnings=cron.babi_calculate_warnings)
