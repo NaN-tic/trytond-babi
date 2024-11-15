@@ -435,7 +435,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         table = []
         table.append([x.internal_name for x in self.fields_])
         try:
-            table += self.execute_query(limit=self.preview_limit)
+            table += self.execute_query()
         except Exception as e:
             raise UserError(gettext('babi.msg_error_obtaining_records',
                     table=self.rec_name, error=str(e)))
