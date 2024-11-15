@@ -11,10 +11,10 @@ class Cron(metaclass=PoolMeta):
     __name__ = "ir.cron"
     babi_report = fields.Many2One('babi.report', 'Babi Report', states={
             'invisible': Eval('method') != 'babi.report|compute',
-            })
+            }, ondelete='CASCADE')
     babi_table = fields.Many2One('babi.table', 'Babi Table', states={
             'invisible': Eval('method') != 'babi.table|compute',
-            })
+            }, ondelete='CASCADE')
     babi_calculate_warnings = fields.Boolean('Calculate Warnings', states={
         'invisible': Eval('method') != 'babi.table|compute',
         })
