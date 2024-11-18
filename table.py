@@ -1863,6 +1863,8 @@ class Pivot(ModelSQL, ModelView):
             return
         order = []
         for item in self.order:
+            if not item.element:
+                continue
             if item.element.__name__ == 'babi.pivot.measure':
                 order.append(((item.element.field.internal_name,
                             item.element.aggregate), item.order))
@@ -1910,6 +1912,7 @@ class Pivot(ModelSQL, ModelView):
         Order = pool.get('babi.pivot.order')
 
         to_save = []
+        to_delete = set()
         for pivot in pivots:
             orders = [x.sequence for x in pivot.order if x.sequence is not None]
             if orders:
@@ -1923,12 +1926,14 @@ class Pivot(ModelSQL, ModelView):
             records += pivot.measures
             existing = [x for x in pivot.order]
 
+            to_delete |= set(existing) - set(records)
             missing = set(records) - set(existing)
             for record in missing:
                 to_save.append(
                     Order(pivot=pivot, element=record, sequence=sequence))
 
         Order.save(to_save)
+        Order.delete(list(to_delete))
 
 
 class RowDimension(sequence_ordered(), ModelSQL, ModelView):
