@@ -725,6 +725,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return
 
         self.compute_error = None
+        self.compute_warning_error = None
         end_time = time.time()
         self.save()
         notify(gettext('babi.msg_table_successful', table=self.rec_name))
