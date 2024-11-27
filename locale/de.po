@@ -858,7 +858,7 @@ msgstr ""
 "- \"w()\": Gibt die Woche zurück (als Zeichen)\n"
 "- \"d()\": Gibt den Tag zurück (als Zeichen)\n"
 "- \"ym()\": Gibt Jahr - Monat zurück (als Zeichen)\n"
-"- \"ymd()\": Gibt Jahr - Monat - Tag zurück (als Zeichen)"
+"- \"ymd()\": Gibt Jahr - Monat - Tag zurück (als Zeichen)\n"
 
 msgctxt "help:babi.filter,python_expression:"
 msgid ""

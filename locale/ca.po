@@ -1181,10 +1181,6 @@ msgctxt "field:www.pivot_header.order,database_name:"
 msgid "Database Name"
 msgstr "Nom de la base de dades"
 
-msgctxt "field:www.pivot_table,database_name:"
-msgid "Database Name"
-msgstr "Nom de la base de dades"
-
 msgctxt "field:www.pivot_header.order,header:"
 msgid "Header"
 msgstr "Capçalera"
