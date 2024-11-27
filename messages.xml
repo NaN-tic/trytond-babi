@@ -144,5 +144,11 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_open_warning_single">
             <field name="text">You can only open records for a single warning.</field>
         </record>
+        <record model="ir.message" id="msg_yes">
+            <field name="text">Yes</field>
+        </record>
+        <record model="ir.message" id="msg_no">
+            <field name="text">No</field>
+        </record>
     </data>
 </tryton>
