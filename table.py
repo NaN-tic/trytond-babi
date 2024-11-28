@@ -6,6 +6,7 @@ import sql
 import unidecode
 import json
 import html
+import urllib.parse
 from simpleeval import EvalWithCompoundTypes
 from trytond import backend
 from trytond.bus import notify
@@ -17,6 +18,7 @@ from trytond.exceptions import UserError
 from trytond.i18n import gettext
 from trytond.pyson import Bool, Eval, PYSONDecoder
 from trytond.config import config
+from trytond.url import http_host
 from trytond.modules.company.model import (
     employee_field, reset_employee, set_employee)
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
@@ -501,10 +503,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return context
 
     def get_url(self, name):
-        hostname = config.get('web', 'hostname')
-        if not hostname:
-            hostname = config.get('web', 'listen')
-        return f'{hostname}/{Transaction().database.name}/babi/pivot/{self.table_name}/null'
+        database = Transaction().database.name
+        return http_host() + urllib.parse.quote(
+            f'/{database}/babi/pivot/{self.table_name}/null')
 
     @property
     def ai_sql_tables(self):
@@ -1320,7 +1321,9 @@ class Pivot(ModelSQL, ModelView):
             order=order,
             )
         properties = cube.encode_properties()
-        return f'{self.table.url}/{properties}'
+        # babi pivot url, require replace null parameter
+        url = self.table.url.replace('/null', '')
+        return f'{url}/{properties}'
 
     @classmethod
     def search_rec_name(cls, name, clause):
@@ -1367,7 +1370,7 @@ class Pivot(ModelSQL, ModelView):
             records += pivot.row_dimensions
             records += pivot.column_dimensions
             records += pivot.measures
-            existing = [x.element for x in pivot.order]
+            existing = [x.element for x in pivot.order if x.element]
 
             to_delete |= set(existing) - set(records)
             missing = set(records) - set(existing)
