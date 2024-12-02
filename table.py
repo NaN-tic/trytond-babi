@@ -9,6 +9,7 @@ import unidecode
 import json
 import tempfile
 import html
+import urllib.parse
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
 from simpleeval import EvalWithCompoundTypes
@@ -21,6 +22,7 @@ from trytond.model import (ModelView, ModelSQL, fields, Unique,
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
 from trytond.pyson import Bool, Eval, PYSONDecoder
+from trytond.url import http_host
 from trytond.config import config
 from trytond.modules.company.model import (
     employee_field, reset_employee, set_employee)
@@ -536,10 +538,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return context
 
     def get_pivot_table(self, name):
-        hostname = config.get('web', 'hostname')
-        if not hostname:
-            hostname = config.get('web', 'listen')
-        return f'{hostname}/{Transaction().database.name}/babi/pivot/{self.table_name}/null'
+        database = Transaction().database.name
+        return http_host() + urllib.parse.quote(
+            f'/{database}/babi/pivot/{self.table_name}/null')
 
     @property
     def ai_sql_tables(self):
@@ -1484,7 +1485,7 @@ class Pivot(ModelSQL, ModelView):
             records += pivot.row_dimensions
             records += pivot.column_dimensions
             records += pivot.measures
-            existing = [x.element for x in pivot.order]
+            existing = [x for x in pivot.order]
 
             to_delete |= set(existing) - set(records)
             missing = set(records) - set(existing)
