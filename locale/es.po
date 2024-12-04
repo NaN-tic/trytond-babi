@@ -1673,10 +1673,6 @@ msgctxt "model:ir.rule.group,name:rule_group_user_warning"
 msgid "User in Warning"
 msgstr "Usuario en aviso"
 
-msgctxt "model:ir.ui.menu,name:"
-msgid "Dashboard"
-msgstr "Tablero"
-
 msgctxt "model:ir.ui.menu,name:menu_action_dashboard"
 msgid "Dashboards"
 msgstr "Tableros"
