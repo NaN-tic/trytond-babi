@@ -2105,7 +2105,7 @@ msgstr "Administració Business Intelligence"
 
 msgctxt "model:res.group,name:group_babi_table"
 msgid "Business Intelligence Table"
-msgstr "Taula d'intel·ligència empresarial"
+msgstr "Taula de Business Intelligence"
 
 msgctxt "model:www.download_report,name:"
 msgid "Download Report"
