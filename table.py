@@ -5,8 +5,11 @@ import logging
 import sql
 import unidecode
 import json
+import tempfile
 import html
 import urllib.parse
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_workbook
 from simpleeval import EvalWithCompoundTypes
 from trytond import backend
 from trytond.bus import notify
@@ -21,6 +24,7 @@ from trytond.config import config
 from trytond.url import http_host
 from trytond.modules.company.model import (
     employee_field, reset_employee, set_employee)
+from trytond.report import Report
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
 from .cube import Cube
@@ -39,6 +43,12 @@ PROPERTY_HTML = '&#x1F6C8'
 PROPERTY = html.unescape(PROPERTY_HTML)
 
 logger = logging.getLogger(__name__)
+
+def save_virtual_workbook(workbook):
+    with tempfile.NamedTemporaryFile() as tmp:
+        save_workbook(workbook, tmp.name)
+        with open(tmp.name, 'rb') as f:
+            return f.read()
 
 def convert_to_symbol(text):
     if not text:
@@ -407,6 +417,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             if self.table_name in table.get_required_table_names():
                 res.add(table.table_name)
         return res
+
+    def get_records(self):
+        table = []
+        table.append([x.internal_name for x in self.fields_])
+        try:
+            table += self.execute_query()
+        except Exception as e:
+            raise UserError(gettext('babi.msg_error_obtaining_records',
+                    table=self.rec_name, error=str(e)))
+        return table
 
     def get_preview(self, name):
         start = time.time()
@@ -1257,6 +1277,35 @@ class Warning(Workflow, ModelSQL, ModelView):
         if self.table.warn and self.table.email_template:
             self.table.email_template.render_and_send(
                 self.table.email_template.id, [self])
+
+
+class Excel(Report):
+    'Table Excel Export'
+    __name__ = 'babi.table.excel'
+
+    @classmethod
+    def execute(cls, ids, data):
+        pool = Pool()
+        Table = pool.get('babi.table')
+
+        if not ids:
+            return
+        cls.check_access()
+
+        tables = Table.browse(ids)
+        wb = Workbook()
+        wb.remove(wb.active)
+        for table in tables:
+            ws = wb.create_sheet(table.name)
+            for record in table.get_records():
+                ws.append(record)
+
+        if len(tables) == 1:
+            table, = tables
+            name = table.name
+        else:
+            name = 'tables'
+        return ('xlsx', save_virtual_workbook(wb), False, name)
 
 
 class Pivot(ModelSQL, ModelView):

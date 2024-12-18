@@ -239,5 +239,19 @@
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_user_warning"/>
         </record>
+
+        <!-- Report -->
+        <record model="ir.action.report" id="report_table_excel">
+            <field name="name">Excel</field>
+            <field name="model">babi.table</field>
+            <field name="report_name">babi.table.excel</field>
+            <field name="extension">xlsx</field>
+            <field name="template_extension">xml</field>
+        </record>
+        <record model="ir.action.keyword" id="report_table_excel_keyword">
+            <field name="keyword">form_print</field>
+            <field name="model">babi.table,-1</field>
+            <field name="action" ref="report_table_excel"/>
+        </record>
     </data>
 </tryton>
