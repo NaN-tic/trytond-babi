@@ -932,7 +932,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             expressions = [x.expression.expression for x in self.fields_]
             index = 0
             count = 0
-            offset = 2000
+            offset = 10000
+            context['_record_cache_size'] = 10000
 
             with Transaction().set_context(**context):
                 try:
