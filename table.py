@@ -10,6 +10,7 @@ import json
 import tempfile
 import html
 import urllib.parse
+from types import SimpleNamespace
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
 from simpleeval import EvalWithCompoundTypes
@@ -442,6 +443,12 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             raise UserError(gettext('babi.msg_error_obtaining_records',
                     table=self.rec_name, error=str(e)))
         return table
+
+    def get_object_records(self):
+        records = self.get_records()
+        fields = records[0]
+        records = records[1:]
+        records = [SimpleNamespace(**dict(zip(fields, x))) for x in records]
 
     def get_preview(self, name):
         start = time.time()
