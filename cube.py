@@ -365,7 +365,7 @@ class Cube:
                     result = [Cell(x) for x in raw_result]
                 coordinates = self.get_value_coordinate(result, rowxcolumn)
 
-                if properties and coordinates[0][-1] is not None:
+                if properties and coordinates[0] and coordinates[0][-1] is not None:
                     coordinates[0][-1].properties = raw_result[-len(properties):]
 
                 # Get the row values from the coordinates
