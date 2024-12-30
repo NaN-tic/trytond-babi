@@ -448,7 +448,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         records = self.get_records()
         fields = records[0]
         records = records[1:]
-        records = [SimpleNamespace(**dict(zip(fields, x))) for x in records]
+        return [SimpleNamespace(**dict(zip(fields, x))) for x in records]
 
     def get_preview(self, name):
         start = time.time()
