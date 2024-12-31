@@ -4,8 +4,8 @@ contains the full copyright notices and license terms. -->
 <form col="6">
     <label name="timestamp"/>
     <field name="timestamp"/>
-    <label name="table"/>
-    <field name="table"/>
+    <label name="table_to_show"/>
+    <field name="table_to_show"/>
     <label name="count"/>
     <field name="count"/>
     <label name="group"/>

@@ -1,7 +1,7 @@
 <tree>
     <field name="timestamp" widget="date"/>
     <field name="timestamp" widget="time"/>
-    <field name="table" expand="1"/>
+    <field name="table_to_show" expand="1"/>
     <field name="count" sum="1"/>
     <field name="state"/>
     <field name="user" optional="1"/>
