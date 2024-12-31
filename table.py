@@ -1133,7 +1133,7 @@ class Warning(Workflow, ModelSQL, ModelView):
     # see the records with warnings (to see the records with warnings you do
     # not need to have permissions on the table).
     table_to_show = fields.Function(
-        fields.Many2One('babi.table', 'Table', readonly=True), 'get_table_to_show')
+        fields.Many2One('babi.table', 'Table'), 'get_table_to_show')
     has_related_records = fields.Function(fields.Boolean('Has Related Field'),
             'get_has_related_records')
     count = fields.Integer('Records found', readonly=True, required=True)
