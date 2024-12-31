@@ -1276,10 +1276,14 @@ class Warning(Workflow, ModelSQL, ModelView):
         return self.table.warning_description
 
     def get_table_to_show(self, name):
-        if any(group in [g.id for g in self.table.access_groups] for group in
-                Transaction().context.get('groups')):
-            return self.table
-        return None
+        pool = Pool()
+        Table = pool.get('babi.table')
+        table = None
+        with Transaction().set_context(_check_access=True):
+            tables = Table.search([('id', '=', self.table.id)], limit=1)
+            if tables:
+                table, = tables
+        return table
 
     def get_ids(self):
         pool = Pool()
