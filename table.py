@@ -313,8 +313,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 values['ai_response'] = None
             if 'internal_name' not in values:
                 continue
-            for table in tables:
-                table._drop()
+            with Transaction().set_context(queue_name=QUEUE_NAME):
+                for table in tables:
+                    cls.__queue__._drop(table)
 
         super().write(*args)
 
@@ -323,12 +324,13 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             for table in tables:
                 table.update_table_dependencies()
                 if 'internal_name' in values:
-                    table._drop()
+                    with Transaction().set_context(queue_name=QUEUE_NAME):
+                        cls.__queue__._drop(table)
 
     @classmethod
     def delete(cls, tables):
         for table in tables:
-            table._drop()
+            cls.__queue__._drop()
         super().delete(tables)
 
     @classmethod
