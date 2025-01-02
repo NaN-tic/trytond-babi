@@ -188,14 +188,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     warning_description = fields.Text('Description', states={
             'invisible': ~Bool(Eval('warn')),
             })
-    calculation_date = fields.DateTime('Date of calculation', readonly=True,
-        states={
-            'invisible': ~Bool(Eval('warn')),
-            })
+    calculation_date = fields.DateTime('Date of calculation', readonly=True)
     calculation_time = fields.Float('Time taken to calculate (in seconds)',
-        digits=(16, 6), readonly=True, states={
-            'invisible': ~Bool(Eval('warn')),
-            })
+        digits=(16, 6), readonly=True)
     last_warning_execution = fields.DateTime('Last Warning Execution',
         readonly=True)
     related_field = fields.Many2One('babi.field', 'Related Field', domain=[
