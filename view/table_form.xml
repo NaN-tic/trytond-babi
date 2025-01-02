@@ -17,7 +17,7 @@
     <newline/>
     <notebook colspan="8">
         <page name="query">
-            <field name="query" colspan="4" height="550" widget="code"/>
+            <field name="query" colspan="4" height="550" widget="code" language="sql"/>
         </page>
         <page name="fields_">
             <field name="fields_" colspan="4" height="550"/>
