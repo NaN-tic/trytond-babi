@@ -1125,6 +1125,14 @@ class Warning(Workflow, ModelSQL, ModelView):
     timestamp = fields.DateTime('Timestamp', required=True, readonly=True)
     table = fields.Many2One('babi.table', 'Table', required=True, readonly=True,
         ondelete='CASCADE')
+    # We can have a warning to a user without acces to the table, we need to
+    # use a function field to only show the table if the user have access to it.
+    # A second "table" field must be used because there are certain fields that
+    # depend on the original table, for example, the button that allows you to
+    # see the records with warnings (to see the records with warnings you do
+    # not need to have permissions on the table).
+    table_to_show = fields.Function(
+        fields.Many2One('babi.table', 'Table'), 'get_table_to_show')
     has_related_records = fields.Function(fields.Boolean('Has Related Field'),
             'get_has_related_records')
     count = fields.Integer('Records found', readonly=True, required=True)
@@ -1265,6 +1273,16 @@ class Warning(Workflow, ModelSQL, ModelView):
 
     def get_description(self, name):
         return self.table.warning_description
+
+    def get_table_to_show(self, name):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        table = None
+        with Transaction().set_context(_check_access=True):
+            tables = Table.search([('id', '=', self.table.id)], limit=1)
+            if tables:
+                table, = tables
+        return table
 
     def get_ids(self):
         pool = Pool()
