@@ -120,6 +120,14 @@ class Cube:
             unlogged = ''
             if backend.name == 'postgresql':
                 unlogged = 'UNLOGGED'
+
+                # Even if we use CREATE TABLE IF NOT EXISTS, we need to do an
+                # explicit lock in order to prevent an error when two transactions
+                # try to create the same table. See:
+                # https://stackoverflow.com/questions/29900845/create-schema-if-not-exists-raises-duplicate-key-error
+                lock_id = int(hashlib.sha1(cache.encode("utf-8")).hexdigest(), 16) % (2 ** 63)
+                cursor.execute(f'SELECT pg_advisory_xact_lock({lock_id})')
+
             # TODO: We could have some performance improvements if we did not
             # depend on the order of the fields in the query. That would probably mean
             # that get_values() should sort groupby fields alphabetically and then
