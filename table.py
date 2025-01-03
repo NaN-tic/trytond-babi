@@ -161,7 +161,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     compute_warning_error = fields.Text('Compute Warning Error', states={
             'invisible': ~Bool(Eval('compute_warning_error')),
             }, readonly=True,)
-    crons = fields.One2Many('ir.cron', 'babi_table', 'Schedulers', context={
+    crons = fields.One2Many('ir.cron', 'babi_table', 'Schedulers', domain=[
+            ('method', '=', 'babi.table|_compute')
+            ], context={
             'babi_table': Eval('id', -1),
             }, depends=['id'])
     requires = fields.One2Many('babi.table.dependency', 'required_by',
