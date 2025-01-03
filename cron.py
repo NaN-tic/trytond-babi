@@ -68,7 +68,7 @@ class Cron(metaclass=PoolMeta):
             res['interval_number'] = 1
             res['minute'] = 0
             res['hour'] = 5
-            res['method'] = 'babi.table|compute'
+            res['method'] = 'babi.table|_compute'
         return res
 
     @dualmethod
