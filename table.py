@@ -1276,12 +1276,11 @@ class Warning(Workflow, ModelSQL, ModelView):
         return self.table.warning_description
 
     @classmethod
-    def get_table_to_show(cls, warnings, names):
+    def get_table_to_show(cls, warnings, name):
         pool = Pool()
         Table = pool.get('babi.table')
 
         result = {}
-        result['table_to_show'] = {}
         with Transaction().set_context(_check_access=True):
             tables = Table.search([
                 ('id', 'in', [x.table.id for x in warnings])])
@@ -1289,13 +1288,10 @@ class Warning(Workflow, ModelSQL, ModelView):
 
             for warning in warnings:
                 if warning.table.id in tables_found:
-                    result['table_to_show'][warning.id] = warning.table.id
+                    result[warning.id] = warning.table.id
                 else:
-                    result['table_to_show'][warning.id] = None
+                    result[warning.id] = None
 
-        for key in list(result.keys()):
-            if key not in names:
-                del result[key]
         return result
 
     def get_ids(self):
