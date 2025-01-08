@@ -792,7 +792,7 @@ class PivotTable(Component):
                 # Handle the headers links
                 if (cell.type == CellType.ROW_HEADER or
                         cell.type == CellType.COLUMN_HEADER):
-                    cell_value = cell.text(language)
+                    cell_value = cell.formatted(language)
                     table_properties = None
                     if (cell.expansion_row and cell.expansion_row in
                             cube.expansions_rows) or (cell.expansion_column and
@@ -824,7 +824,7 @@ class PivotTable(Component):
 
                     if table_properties:
                         cell_value = a(
-                            str(icon) + ' ' + str(cell.text(language)),
+                            str(icon) + ' ' + str(cell.formatted(language)),
                             href="#", hx_target="#pivot_table",
                             hx_post=PivotTable(
                                     database_name=self.database_name,
@@ -837,7 +837,7 @@ class PivotTable(Component):
                     pivot_row.add(td(cell_value, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
 
                 else:
-                    pivot_row.add(td(cell.text(language), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
+                    pivot_row.add(td(cell.formatted(language), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
             pivot_table.add(pivot_row)
 
         loading_div = div(id="loading-state", cls="loading-indicator absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2 w-full bg-gray-800 bg-opacity-50 h-full")
@@ -881,7 +881,7 @@ class DownloadReport(Component):
         wb = Workbook()
         ws = wb.active
         for row in cube.build():
-            ws.append([x.text(language) for x in row])
+            ws.append([x.formatted(language, excel=True) for x in row])
         response = Response(save_virtual_workbook(wb))
         response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
