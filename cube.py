@@ -568,7 +568,7 @@ class Cell:
         self.expansion_column = expansion_column
         self.properties = properties
 
-    def text(self, lang=None):
+    def formatted(self, lang=None, excel=False):
         if not lang:
             return str(self)
 
@@ -576,8 +576,10 @@ class Cell:
         if value is None:
             return '-'
         if isinstance(value, (float, Decimal)):
-            # TODO: Make it configurable
+            # TODO: Make digits configurable
             digits = 2
+            if excel:
+                return round(value, digits)
             return lang.format('%.*f', (digits, value),
                 grouping=True)
         if isinstance(value, bool):
