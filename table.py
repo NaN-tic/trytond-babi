@@ -327,7 +327,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     def delete(cls, tables):
         for table in tables:
-            cls.__queue__._drop()
+            cls.__queue__._drop(table)
         super().delete(tables)
 
     @classmethod
