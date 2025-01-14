@@ -1044,6 +1044,8 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
     def on_change_with_type(self, name=None):
         if self.expression:
             return self.expression.ttype
+        else:
+            return ''
 
     @fields.depends('table', '_parent_table.type')
     def on_change_with_table_type(self, name=None):

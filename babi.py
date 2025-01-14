@@ -45,6 +45,7 @@ from email import encoders
 from trytond.bus import notify
 
 FIELD_TYPES = [
+    ('', ''),
     ('char', 'Char'),
     ('integer', 'Integer'),
     ('float', 'Float'),
