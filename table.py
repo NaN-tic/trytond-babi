@@ -683,7 +683,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return []
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-            cursor.execute('SET statement_timeout TO %s;' % int(timeout * 1000))
+            cursor.execute(f'SET statement_timeout TO {timeout * 1000};')
             query = self.get_query(fields, where=where, groupby=groupby,
                 limit=limit)
             cursor.execute(query)
@@ -885,8 +885,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             cursor = transaction.connection.cursor()
             # We must use a subquery because the _stripped_query may contain a
             # LIMIT clause
+            cursor.execute(f'SET statement_timeout TO {self.timeout * 1000};')
             cursor.execute('SELECT * FROM (%s) AS subquery LIMIT 1' %
                 self._stripped_query)
+            cursor.execute('SET statement_timeout TO 0;')
 
         field_names = [x[0] for x in cursor.description]
         self.update_fields(field_names)
@@ -899,8 +901,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         with Transaction().new_transaction() as transaction:
             self._drop()
             cursor = transaction.connection.cursor()
+            cursor.execute(f'SET statement_timeout TO {self.timeout * 1000};')
             cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
                     self._stripped_query))
+            cursor.execute('SET statement_timeout TO 0;')
             cursor.execute('SELECT * FROM "%s" LIMIT 1' % self.table_name)
 
         field_names = [x[0] for x in cursor.description]
