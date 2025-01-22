@@ -143,9 +143,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     query = fields.Text('Query', states={
             'invisible': ~Eval('type').in_(['table', 'view']),
             }, depends=['type'])
-    timeout = fields.Integer('Timeout', required=True, states={
-            'invisible': ~Eval('type').in_(['model', 'table']),
-            }, help='If table '
+    timeout = fields.Integer('Timeout', required=True, help='If table '
         'calculation should take more than the specified timeout (in seconds) '
         'the process will be stopped automatically.')
     preview_limit = fields.Integer('Preview Limit', required=True)
