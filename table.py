@@ -676,19 +676,17 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def execute_query(self, fields=None, where=None, groupby=None, timeout=None,
             limit=None):
-        if timeout is None:
-            timeout = 10
         if (self.type != 'view'
                 and not backend.TableHandler.table_exist(self.table_name)):
             return []
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-            cursor.execute(f'SET statement_timeout TO {timeout * 1000};')
+            self._set_statement_timeout(timeout)
             query = self.get_query(fields, where=where, groupby=groupby,
                 limit=limit)
             cursor.execute(query)
             records = cursor.fetchall()
-            cursor.execute('SET statement_timeout TO 0;')
+            self._reset_statement_timeout()
         return records
 
     def timeout_exception(self):
@@ -880,15 +878,27 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         else:
             cursor.execute('DROP TABLE IF EXISTS %s CASCADE' % self.table_name)
 
+    def _set_statement_timeout(self, timeout=None):
+        if backend.name != 'postgresql':
+            return
+        cursor = Transaction().connection.cursor()
+        cursor.execute(f'SET statement_timeout TO {self.timeout * 1000};')
+
+    def _reset_statement_timeout(self):
+        if backend.name != 'postgresql':
+            return
+        cursor = Transaction().connection.cursor()
+        cursor.execute('SET statement_timeout TO 0;')
+
     def _compute_view(self):
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
             # We must use a subquery because the _stripped_query may contain a
             # LIMIT clause
-            cursor.execute(f'SET statement_timeout TO {self.timeout * 1000};')
+            self._set_statement_timeout()
             cursor.execute('SELECT * FROM (%s) AS subquery LIMIT 1' %
                 self._stripped_query)
-            cursor.execute('SET statement_timeout TO 0;')
+            self._reset_statement_timeout()
 
         field_names = [x[0] for x in cursor.description]
         self.update_fields(field_names)
@@ -901,10 +911,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         with Transaction().new_transaction() as transaction:
             self._drop()
             cursor = transaction.connection.cursor()
-            cursor.execute(f'SET statement_timeout TO {self.timeout * 1000};')
+            self._set_statement_timeout()
             cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
                     self._stripped_query))
-            cursor.execute('SET statement_timeout TO 0;')
+            self._reset_statement_timeout()
             cursor.execute('SELECT * FROM "%s" LIMIT 1' % self.table_name)
 
         field_names = [x[0] for x in cursor.description]
