@@ -44,6 +44,12 @@ MEASURE_HTML = '&#x1F4CA'
 MEASURE = html.unescape(MEASURE_HTML)
 PROPERTY_HTML = '&#x1F6C8'
 PROPERTY = html.unescape(PROPERTY_HTML)
+FIRE_HTML = '&#x1F525;'
+FIRE = html.unescape(FIRE_HTML)
+TICK_HTML = '&#x2705;'
+TICK = html.unescape(TICK_HTML)
+HOURGLASS_HTML = '&#x231B;'
+HOURGLASS = html.unescape(HOURGLASS_HTML)
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +105,130 @@ def generate_html_table(records):
         table += "</tr>"
     table += "</table>"
     return table
+
+
+class CircularDependencyError(Exception):
+    pass
+
+
+class Cluster(ModelSQL, ModelView):
+    'BABI Table Cluster'
+    __name__ = 'babi.table.cluster'
+    name = fields.Char('Name', required=True, readonly=True)
+    active = fields.Function(fields.Boolean('Active'), 'get_active',
+        searcher="search_active")
+    tables = fields.One2Many('babi.table', 'cluster', 'Tables')
+    computation_start_date = fields.DateTime('Computation Start Date', readonly=True)
+    computation_end_date = fields.DateTime('Computation End Date', readonly=True)
+    elapsed = fields.Function(fields.TimeDelta('Elapsed'), 'get_elapsed')
+    crons = fields.One2Many('ir.cron', 'babi_cluster', 'Schedulers', domain=[
+            ('method', '=', 'babi.table.cluster|_compute')
+            ], context={
+            'babi_cluster': Eval('id', -1),
+            }, depends=['id'])
+    computation_state = fields.Selection([
+            (None, 'Not Computed'),
+            ('computing', HOURGLASS + ' Computing'),
+            ('failed', FIRE + ' Failed'),
+            ('successful', TICK + ' Successful'),
+            ], 'State', readonly=True)
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._order.insert(0, ('name', 'ASC'))
+        cls._buttons.update({
+                'compute': {},
+                })
+
+    @classmethod
+    def copy(cls, clusters, default=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        default.setdefault('tables')
+        return super().copy(clusters, default=default)
+
+    def get_active(self, name):
+        return bool(self.tables)
+
+    @classmethod
+    def search_active(cls, name, clause):
+        if (clause[1] == '=' and clause[2]
+                or clause[1] == '!=' and not clause[2]):
+            domain = [('tables', '!=', None)]
+        else:
+            domain = [('tables', '=', None)]
+        return domain
+
+    def get_elapsed(self, name):
+        if not self.computation_start_date:
+            return
+        end = self.computation_end_date or datetime.now()
+        elapsed = end - self.computation_start_date
+        # round down to seconds
+        elapsed = elapsed - mdatetime.timedelta(microseconds=elapsed.microseconds)
+        return elapsed
+
+    @classmethod
+    @ModelView.button
+    def compute(cls, clusters, compute_warnings=False):
+        Table = Pool().get('babi.table')
+
+        with Transaction().set_context(queue_name=QUEUE_NAME):
+            start = datetime.now()
+            for cluster in clusters:
+                tables = [x for x in cluster.tables if x.active]
+                if not tables:
+                    continue
+                cluster.computation_start_date = start
+                cluster.computation_end_date = None
+                cluster.computation_state = 'computing'
+                cluster.save()
+                Table.compute_cluster(tables)
+
+            cls.save(clusters)
+
+    @classmethod
+    def get_compute_order(cls, tables):
+        """
+        Return the order in which tables should be computed to satisfy
+        dependencies.
+
+        :param tables: Dictionary where keys are tables and values are their
+        dependencies.
+        :return: List with the creation order of tables.
+        """
+        # Calculate the in-degree of each table
+        in_degree = {table: 0 for table in tables}
+        for dependents in tables.values():
+            for dependent in dependents:
+                in_degree[dependent] += 1
+
+        # Add tables with no dependencies (in-degree 0) to the process
+        # Sort them to ensure that the order is always the same for tables in the 0
+        # degree
+        queue = sorted([table for table in in_degree if in_degree[table] == 0])
+
+        order = []
+
+        while queue:
+            table = queue.pop(0)  # Take a table from the queue
+            order.append(table)
+
+            # Reduce the in-degree of tables that depend on this table
+            # Again, sort the tables to ensure the order is always the same for the
+            # tables in the same degree
+            for dependent in sorted(tables[table]):
+                in_degree[dependent] -= 1
+                if in_degree[dependent] == 0:
+                    queue.append(dependent)
+
+        # Check for cycles (if not all tables are processed)
+        if len(order) != len(tables):
+            raise CircularDependencyError(' > '.join(order))
+
+        return order
 
 
 class TableUser(ModelSQL):
@@ -164,10 +294,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ], context={
             'babi_table': Eval('id', -1),
             }, depends=['id'])
+    cluster = fields.Many2One('babi.table.cluster', 'Cluster',
+        ondelete='SET NULL')
     requires = fields.One2Many('babi.table.dependency', 'required_by',
         'Requires', readonly=True)
     required_by = fields.One2Many('babi.table.dependency', 'table',
         'Required By', readonly=True)
+    requires_tables = fields.Function(fields.One2Many('babi.table', None,
+        'Requires Tables'), 'get_requires_tables')
+    required_by_tables = fields.Function(fields.One2Many('babi.table', None,
+        'Required By Tables'), 'get_required_by_tables')
     ai_request = fields.Text('AI Request', states={
             'invisible': Eval('type') == 'model',
             })
@@ -188,6 +324,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     warning_description = fields.Text('Description', states={
             'invisible': ~Bool(Eval('warn')),
             })
+    cluster_date = fields.DateTime('Request Date', readonly=True)
     calculation_date = fields.DateTime('Date of calculation', readonly=True)
     calculation_time = fields.Float('Time taken to calculate (in seconds)',
         digits=(16, 6), readonly=True)
@@ -250,6 +387,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     access_groups = fields.Many2Many('babi.table-res.group', 'babi_table', 'user',
         'Access Groups')
     pivots = fields.One2Many('babi.pivot', 'table', 'Pivot Tables')
+    comment = fields.Text('Comment')
 
     @staticmethod
     def default_timeout():
@@ -317,7 +455,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         actions = iter(args)
         for tables, values in zip(actions, actions):
             for table in tables:
-                table.update_table_dependencies()
+                if tuple(values.keys()) != ('cluster',):
+                    table.update_table_dependencies()
                 if 'internal_name' in values:
                     with Transaction().set_context(queue_name=QUEUE_NAME):
                         cls.__queue__._drop(table)
@@ -385,9 +524,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         if self.company:
             self.company_field = None
 
+    def get_rec_name(self, name):
+        name = self.name
+        if self.compute_error:
+            name = FIRE + ' ' + name
+        return name
+
     def update_table_dependencies(self):
         pool = Pool()
         Dependency = pool.get('babi.table.dependency')
+        Cluster = pool.get('babi.table.cluster')
 
         Dependency.delete(self.requires)
         Dependency.delete(self.required_by)
@@ -412,6 +558,37 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             to_save.append(dependency)
 
         Dependency.save(to_save)
+
+        cluster = self.get_cluster()
+        order = self.get_compute_order(cluster)
+        if len(order) <= 1:
+            if self.cluster:
+                self.cluster = None
+                self.save()
+                for table in cluster.tables:
+                    table.update_table_dependencies()
+            return
+        table = order[0]
+        # TODO: We should handle the case when we need to rename the cluster
+        clusters = Cluster.search([('name', '=', table.table_name)], limit=1)
+        if clusters:
+            cluster = clusters[0]
+        else:
+            cluster = Cluster()
+            cluster.name = table.table_name
+            cluster.save()
+        to_save = []
+        for table in order:
+            if table.cluster != cluster:
+                table.cluster = cluster
+                to_save.append(table)
+        self.__class__.save(to_save)
+
+    def get_requires_tables(self, name):
+        return [x.table for x in self.requires if x.table]
+
+    def get_required_by_tables(self, name):
+        return [x.required_by for x in self.required_by if x.required_by]
 
     def get_required_table_names(self):
         if self.type and self.type == 'model':
@@ -620,7 +797,72 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             for table in tables:
                 if not table.active:
                     continue
+                table.cluster_date = None
                 cls.__queue__._compute(table)
+            cls.save(tables)
+
+    def get_cluster(self, tables=None):
+        if tables is None:
+            tables = {self}
+        for dep in self.requires:
+            table = dep.table
+            if table in tables:
+                continue
+            tables.add(table)
+            table.get_cluster(tables)
+        for dep in self.required_by:
+            table = dep.required_by
+            if table in tables:
+                continue
+            tables.add(table)
+            table.get_cluster(tables)
+        # Return the tables sorted by name so the order is always the same no
+        # matter from which table we get the cluster
+        return sorted(tables, key=lambda x: x.name)
+
+    def get_compute_order(self, cluster=None):
+        Cluster = Pool().get('babi.table.cluster')
+
+        tables = {}
+        mapping = {}
+        if cluster is None:
+            cluster = self.get_cluster()
+        for table in cluster:
+            mapping[table.table_name] = table
+            tables[table.table_name] = [x.required_by.table_name for x in table.required_by]
+        order = Cluster.get_compute_order(tables)
+        return [mapping[x] for x in order]
+
+    def get_next_in_cluster(self):
+        order = self.get_compute_order()
+        if not self in order:
+            return
+        idx = order.index(self) + 1
+        if idx >= len(order):
+            return
+        return order[idx]
+
+    @classmethod
+    def compute_cluster(cls, tables, compute_warnings=False):
+        with Transaction().set_context(queue_name=QUEUE_NAME):
+            all_ = set()
+            to_save = []
+            for table in tables:
+                if table in all_:
+                    continue
+                cluster = table.get_cluster()
+                try:
+                    order = table.get_compute_order()
+                except CircularDependencyError as e:
+                    raise UserError(gettext('babi.msg_circular_dependency',
+                            sequence=e.message))
+                first = order[0]
+                first.cluster_date = datetime.now()
+                to_save.append(first)
+                cls.__queue__._compute(first,
+                    compute_warnings=compute_warnings, cluster=True)
+                all_ |= set(cluster)
+            cls.save(to_save)
 
     @classmethod
     @ModelView.button
@@ -690,15 +932,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def timeout_exception(self):
         raise TimeoutException
 
-    def _compute(self, processed=None, compute_warnings=False):
+    def _compute(self, compute_warnings=False, cluster=False):
         self.clear_cache([self])
         start_time = time.time()
-        if processed is None:
-            processed = []
-        if self in processed:
-            seq = ' > '.join([x.rec_name for x in processed] + [self.rec_name])
-            raise UserError(gettext('babi.msg_circular_dependency',
-                    sequence=seq))
         try:
             if self.type == 'model':
                 if not self.fields_:
@@ -716,8 +952,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             elif self.type == 'view':
                 self._compute_view()
 
-            for dependency in self.required_by:
-                dependency.required_by._compute(processed + [self])
         except Exception as e:
             # In case there is a create view error or SQL typo,
             # we do rollback to obtain a value from the gettext()
@@ -725,7 +959,23 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             notify(gettext('babi.msg_table_failed', table=self.rec_name))
             self.compute_error = f'{e}\n{traceback.format_exc()}'
             self.save()
+            if cluster and self.cluster:
+                self.cluster.computation_end_date = datetime.now()
+                self.cluster.computation_state = 'failed'
+                self.cluster.save()
             return
+
+        if cluster and self.cluster:
+            next_ = self.get_next_in_cluster()
+            if next_:
+                next_.cluster_date = self.cluster_date
+                next_.save()
+                self.__class__.__queue__._compute(next_,
+                    compute_warnings=compute_warnings, cluster=cluster)
+            else:
+                self.cluster.computation_end_date = datetime.now()
+                self.cluster.computation_state = 'successful'
+                self.cluster.save()
 
         self.compute_error = None
         self.compute_warning_error = None
@@ -866,15 +1116,18 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         # postgres complaint (even with the 'IF EXISTS' clause). And the same
         # will happen with DROP TABLE on a VIEW. So we must check if it exists
         # and its type.
-        cursor.execute("SELECT table_type FROM information_schema.tables "
-            "WHERE table_name=%s AND table_schema='public'", (self.table_name,))
+
+        tables = sql.Table('tables', 'information_schema')
+        cursor.execute(*tables.select(tables.table_type,
+                where=(tables.table_name == self.table_name) &
+                (tables.table_schema == 'public')))
         record = cursor.fetchone()
         if not record:
             return
         if record[0] == 'VIEW':
-            cursor.execute('DROP VIEW IF EXISTS "%s" CASCADE' % self.table_name)
+            cursor.execute(f'DROP VIEW IF EXISTS "{self.table_name}" CASCADE')
         else:
-            cursor.execute('DROP TABLE IF EXISTS %s CASCADE' % self.table_name)
+            cursor.execute(f'DROP TABLE IF EXISTS "{self.table_name}" CASCADE')
 
     def _set_statement_timeout(self, timeout=None):
         if backend.name != 'postgresql':

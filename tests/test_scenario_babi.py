@@ -50,11 +50,12 @@ class Test(unittest.TestCase):
         table = Table()
         table.name = 'User'
         self.assertEqual(table.internal_name, 'user')
-        table.type = 'view'
+        table.type = 'table'
         table.query = 'SELECT id, employee, company, name FROM res_user'
         table.save()
         table.click('compute')
         self.assertEqual(len(table.fields_), 4)
+        self.assertIn('>Administrator</td>', str(table.preview))
 
         # Check warnings
         table.warn = 'records'
@@ -81,3 +82,34 @@ class Test(unittest.TestCase):
         warning.click('ignore')
         self.assertEqual(warning.state, 'ignored')
         self.assertEqual(warning.ignored_by.party.name, 'Employee')
+
+        # Create dependent table
+        Table = Model.get('babi.table')
+        count_table = Table()
+        count_table.name = 'User count'
+        count_table.type = 'table'
+        count_table.query = 'SELECT COUNT(*) AS counter FROM __user'
+        count_table.save()
+        self.assertEqual(count_table.requires_tables, [table])
+
+        for field in list(table.fields_):
+            table.fields_.remove(field)
+        table.save()
+        table.reload()
+        self.assertEqual(len(table.fields_), 0)
+
+        Cluster = Model.get('babi.table.cluster')
+        cluster, = Cluster.find([])
+        self.assertSetEqual(set(cluster.tables), set([table, count_table]))
+        cluster.click('compute')
+        self.assertIsNotNone(cluster.computation_start_date)
+        self.assertIsNotNone(cluster.elapsed)
+        self.assertIsNotNone(cluster.computation_end_date)
+
+        table.reload()
+        self.assertEqual(len(table.fields_), 4)
+
+        count_table.reload()
+        self.assertEqual(len(count_table.fields_), 1)
+        self.assertIn('>2</td>', str(count_table.preview))
+
