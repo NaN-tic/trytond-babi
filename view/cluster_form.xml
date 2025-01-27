@@ -1,0 +1,27 @@
+<form col="6">
+    <label name="name"/>
+    <field name="name"/>
+    <group id="checkboxes" colspan="2" col="-1">
+        <label name="active"/>
+        <field name="active"/>
+    </group>
+    <button name="compute" colspan="2"/>
+    <notebook colspan="6">
+        <page name="tables">
+            <field name="tables" colspan="4" height="500"/>
+        </page>
+        <page name="crons">
+            <field name="crons" colspan="4" height="500"/>
+        </page>
+    </notebook>
+    <label name="computation_state"/>
+    <field name="computation_state"/>
+    <group id="start-end" colspan="4" col="6">
+        <label name="elapsed"/>
+        <field name="elapsed"/>
+        <label name="computation_start_date"/>
+        <field name="computation_start_date"/>
+        <label name="computation_end_date"/>
+        <field name="computation_end_date"/>
+    </group>
+</form>
