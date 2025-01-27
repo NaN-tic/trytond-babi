@@ -1,0 +1,10 @@
+<tree>
+    <field name="required_by_tables" tree_invisible="1"/>
+    <field name="requires_tables" tree_invisible="1"/>
+    <field name="name" expand="1"/>
+    <field name="internal_name" expand="1"/>
+    <field name="type"/>
+    <field name="model"/>
+    <field name="filter"/>
+    <button name="compute"/>
+</tree>

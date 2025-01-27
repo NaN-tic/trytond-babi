@@ -52,10 +52,17 @@
             <field name="calculation_time"/>
             <label name="last_warning_execution"/>
             <field name="last_warning_execution"/>
+            <separator name="comment" colspan="6"/>
+            <field name="comment" colspan="6" height="400"/>
         </page>
         <page id="dependencies" string="Dependencies">
-            <field name="requires" colspan="2" height="550"/>
-            <field name="required_by" colspan="2" height="550"/>
+            <label name="cluster"/>
+            <field name="cluster"/>
+            <newline/>
+            <field name="requires" colspan="2" height="225"/>
+            <field name="required_by" colspan="2" height="225"/>
+            <field name="requires_tables" colspan="2" height="225" view_ids="babi.babi_table_tree_requires_view"/>
+            <field name="required_by_tables" colspan="2" height="225" view_ids="babi.babi_table_tree_required_by_view"/>
         </page>
         <page name="ai_request" string="AI" col="3">
             <separator name="ai_request" string="What do you want to show?" colspan="2"/>

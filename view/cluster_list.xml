@@ -1,0 +1,11 @@
+<tree>
+    <field name="name" expand="2"/>
+    <field name="computation_state"/>
+    <field name="computation_start_date" widget="date"/>
+    <field name="computation_start_date" widget="time"/>
+    <field name="elapsed"/>
+    <field name="computation_end_date" widget="date"/>
+    <field name="computation_end_date" widget="time"/>
+    <field name="tables"/>
+    <button name="compute"/>
+</tree>

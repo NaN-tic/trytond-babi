@@ -50,6 +50,7 @@ def register():
         test_model.TestBabiModel,
         table.TableUser,
         table.TableGroup,
+        table.Cluster,
         table.Table,
         table.Field,
         table.TableDependency,
