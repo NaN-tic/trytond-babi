@@ -1689,6 +1689,9 @@ class Pivot(ModelSQL, ModelView):
     table = fields.Many2One('babi.table', 'Table', required=True,
         ondelete='CASCADE')
     name = fields.Char('Name')
+    active = fields.Function(fields.Boolean('Active'), 'get_active',
+        searcher='search_active', setter='set_active')
+    active_stored = fields.Boolean('Active Stored')
     row_dimensions = fields.One2Many('babi.pivot.row_dimension', 'pivot',
         'Row Dimensions')
     column_dimensions = fields.One2Many('babi.pivot.column_dimension', 'pivot',
@@ -1697,6 +1700,10 @@ class Pivot(ModelSQL, ModelView):
     properties = fields.One2Many('babi.pivot.property', 'pivot', 'Properties')
     order = fields.One2Many('babi.pivot.order', 'pivot', 'Order')
     url = fields.Function(fields.Char('URL'), 'on_change_with_url')
+
+    @staticmethod
+    def default_active_stored():
+        return True
 
     def get_rec_name(self, name):
         res = []
@@ -1719,6 +1726,31 @@ class Pivot(ModelSQL, ModelView):
             item += ', '.join([x.field.rec_name for x in self.measures])
             res.append(item)
         return ' '.join(res)
+
+    def get_active(self, name):
+        return self.active_stored and self.table.active
+
+    @classmethod
+    def search_active(cls, name, clause):
+        if ((clause[1] == '=' and clause[2])
+                or (clause[1] == '!=' and clause[2])):
+            domain = [
+                ('active_stored', '=', True),
+                ('table.active', '=', True),
+                ]
+        else:
+            domain = [
+                'OR',
+                ('active_stored', '=', False),
+                ('table.active', '=', False),
+                ]
+        return domain
+
+    @classmethod
+    def set_active(cls, pivots, name, value):
+        for pivot in pivots:
+            pivot.active_stored = value
+        cls.save(pivots)
 
     @fields.depends('table', 'name', 'row_dimensions', 'column_dimensions',
             'measures', 'properties', 'order', '_parent_table.pivot_table')

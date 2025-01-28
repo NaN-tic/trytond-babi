@@ -1,11 +1,13 @@
 <form col="6">
-    <group id="header" colspan="6" col="6">
+    <group id="header" colspan="6" col="8">
         <label name="table"/>
         <field name="table"/>
         <label name="name"/>
         <field name="name"/>
         <label name="url"/>
         <field name="url" widget="url"/>
+        <label name="active"/>
+        <field name="active" xexpand="0" xfill="0"/>
     </group>
     <field name="row_dimensions" colspan="3"/>
     <field name="column_dimensions" colspan="3"/>
