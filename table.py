@@ -118,6 +118,8 @@ class Cluster(ModelSQL, ModelView):
     active = fields.Function(fields.Boolean('Active'), 'get_active',
         searcher="search_active")
     tables = fields.One2Many('babi.table', 'cluster', 'Tables')
+    root_tables = fields.Function(fields.One2Many('babi.table', None,
+        'Tables'), 'get_root_tables')
     computation_start_date = fields.DateTime('Computation Start Date', readonly=True)
     computation_end_date = fields.DateTime('Computation End Date', readonly=True)
     elapsed = fields.Function(fields.TimeDelta('Elapsed'), 'get_elapsed')
@@ -169,6 +171,9 @@ class Cluster(ModelSQL, ModelView):
         # round down to seconds
         elapsed = elapsed - mdatetime.timedelta(microseconds=elapsed.microseconds)
         return elapsed
+
+    def get_root_tables(self, name):
+        return [x for x in self.tables if not x.requires]
 
     @classmethod
     @ModelView.button

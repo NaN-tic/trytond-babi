@@ -7,8 +7,8 @@
     </group>
     <button name="compute" colspan="2"/>
     <notebook colspan="6">
-        <page name="tables">
-            <field name="tables" colspan="4" height="500"/>
+        <page name="root_tables">
+            <field name="root_tables" colspan="4" height="500" view_ids="babi.babi_table_tree_required_by_view"/>
         </page>
         <page name="crons">
             <field name="crons" colspan="4" height="500"/>
