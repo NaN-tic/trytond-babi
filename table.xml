@@ -72,13 +72,13 @@
         <record model="ir.ui.view" id="babi_table_tree_required_by_view">
             <field name="model">babi.table</field>
             <field name="type">tree</field>
-            <field name="field_childs">required_by</field>
+            <field name="field_childs">required_by_tables</field>
             <field name="name">table_tree</field>
         </record>
         <record model="ir.ui.view" id="babi_table_tree_requires_view">
             <field name="model">babi.table</field>
             <field name="type">tree</field>
-            <field name="field_childs">requires</field>
+            <field name="field_childs">requires_tables</field>
             <field name="name">table_tree</field>
         </record>
 
