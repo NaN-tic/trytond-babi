@@ -835,7 +835,7 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
             })
     crons = fields.One2Many('ir.cron', 'babi_report', 'Schedulers',
         domain=[
-            ('method', '=', 'babi.report|calculate_babi_report')
+            ('method', '=', 'babi.report|compute')
             ])
     report_cell_level = fields.Integer('Cell Level',
         help='Start cell level that not has indentation')
