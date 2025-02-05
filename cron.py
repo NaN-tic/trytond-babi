@@ -23,19 +23,31 @@ class Cron(metaclass=PoolMeta):
     def __register__(cls, module_name):
         cursor = Transaction().connection.cursor()
         babi = cls.__table__()
-
         super().__register__(module_name)
         cursor.execute(*babi.update(
                 [babi.method], ['babi.report|calculate_babi_report'],
                 where=(babi.method == 'babi.report|calculate_reports')
                 ))
+        cursor.execute(*babi.update(
+                [babi.method], ['babi.report|compute'],
+                where=(babi.method == 'babi.report|calculate_babi_report')
+                ))
+        cursor.execute(*babi.update(
+                [babi.method], ['babi.table|compute'],
+                where=(babi.method == 'babi.table|calculate_babi_table')
+                ))
+        cursor.execute(*babi.update(
+                [babi.method], ['babi.table|_compute'],
+                where=(babi.method == 'babi.table|compute')
+                ))
+
 
     @classmethod
     def __setup__(cls):
         super(Cron, cls).__setup__()
         cls.method.selection.extend([
-                ('babi.report|calculate_babi_report', 'Calculate Babi Report'),
-                ('babi.table|calculate_babi_table', 'Calculate Babi Table'),
+                ('babi.report|compute', 'Calculate Babi Report'),
+                ('babi.table|_compute', 'Calculate Babi Table'),
                 ('babi.report.execution|clean', 'Clean Babi Excutions'),
                 ])
 
