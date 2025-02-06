@@ -322,7 +322,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ('always', 'Always'),
             ], 'Warn')
     email_template = fields.Many2One('electronic.mail.template',
-        'Email Template', domain=[('model.model', '=', 'babi.warning')],
+        'Email Template', domain=[('model.name', '=', 'babi.warning')],
         states={
             'invisible': ~Bool(Eval('warn')),
             })
@@ -1177,7 +1177,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         self.update_fields(field_names)
 
     def _compute_model(self):
-        Model = Pool().get(self.model.model)
+        Model = Pool().get(self.model.name)
 
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
@@ -1225,7 +1225,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             while records:
                 checker.check()
                 logger.info('Calculated %s, %s records in %s seconds'
-                    % (self.model.model, count, checker.elapsed))
+                    % (self.model.name, count, checker.elapsed))
 
                 to_insert = []
                 for record in records:
@@ -1262,7 +1262,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                         limit=offset)
 
         logger.info('Calculated %s, %s records in %s seconds'
-            % (self.model.model, count, checker.elapsed))
+            % (self.model.name, count, checker.elapsed))
 
     def check_access(self, user=None):
         pool = Pool()
@@ -1614,7 +1614,7 @@ class Warning(Workflow, ModelSQL, ModelView):
 
     def get_records(self, ids=None):
         pool = Pool()
-        Model = pool.get(self.table.related_model.model)
+        Model = pool.get(self.table.related_model.name)
         if ids is None:
             ids = self.get_ids()
         return Model.search([('id', 'in', ids)])
@@ -1639,7 +1639,7 @@ class Warning(Workflow, ModelSQL, ModelView):
                 model_query_count=str(len(records))))
 
         return {
-            'res_model': warning.table.related_model.model,
+            'res_model': warning.table.related_model.name,
             'type': 'ir.action.act_window',
             'name': warning.table.related_model.name,
             'pyson_domain': f'[["id", "in", {ids}]]',

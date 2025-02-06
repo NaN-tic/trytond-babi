@@ -53,7 +53,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                         })
 
         TestModel.create(to_create)
-        model, = Model.search([('model', '=', 'babi.test')])
+        model, = Model.search([('name', '=', 'babi.test')])
         Model.write([model], {
                 'babi_enabled': True
                 })
@@ -123,7 +123,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         company = create_company()
         with set_company(company):
             self.create_data()
-            model, = Model.search([('model', '=', 'babi.test')])
+            model, = Model.search([('name', '=', 'babi.test')])
             menu, = Menu.search([('name', '=', 'Business Intelligence')])
             report, = Report.create([{
                         'name': 'Simple Report',
@@ -174,8 +174,8 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
             execution, = report.executions
 
-            ReportModel = pool.get(execution.babi_model.model)
-            DataModel = pool.get(model.model)
+            ReportModel = pool.get(execution.babi_model.name)
+            DataModel = pool.get(model.name)
 
             total_amount = 0
             odd_amount = 0
@@ -235,12 +235,12 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
             old_execution, execution = sorted(report.executions,
                 key=lambda x: x.internal_name)
-            self.assertEqual(old_execution.babi_model.model,
+            self.assertEqual(old_execution.babi_model.name,
                 ReportModel.__name__)
             old_fields = ReportModel.fields_view_get()['fields']
             self.assertFalse(month.internal_name in old_fields)
 
-            ReportModel = pool.get(execution.babi_model.model)
+            ReportModel = pool.get(execution.babi_model.name)
             new_tree_view = ReportModel.fields_view_get(view_type='tree')
             new_fields = new_tree_view['fields']
             self.assertTrue(month.internal_name in new_fields)
@@ -303,7 +303,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
         company = create_company()
         with set_company(company):
-            model, = Model.search([('model', '=', 'babi.test')])
+            model, = Model.search([('name', '=', 'babi.test')])
             menu, = Menu.search([('name', '=', 'Business Intelligence')])
             report, = Report.create([{
                         'name': 'Simple Report',
@@ -332,8 +332,8 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
             execution, = report.executions
 
-            ReportModel = pool.get(execution.babi_model.model)
-            DataModel = pool.get(model.model)
+            ReportModel = pool.get(execution.babi_model.name)
+            DataModel = pool.get(model.name)
 
             total_count = 0
             odd_count = 0
@@ -371,7 +371,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
         company = create_company()
         with set_company(company):
-            model, = Model.search([('model', '=', 'babi.test')])
+            model, = Model.search([('name', '=', 'babi.test')])
             menu, = Menu.search([('name', '=', 'Business Intelligence')])
             report, = Report.create([{
                         'name': 'Simple Report',
@@ -399,8 +399,8 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
             execution, = report.executions
 
-            ReportModel = pool.get(execution.babi_model.model)
-            DataModel = pool.get(model.model)
+            ReportModel = pool.get(execution.babi_model.name)
+            DataModel = pool.get(model.name)
 
             total = []
             odd = []
@@ -443,7 +443,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
         company = create_company()
         with set_company(company):
-            model, = Model.search([('model', '=', 'babi.test')])
+            model, = Model.search([('name', '=', 'babi.test')])
             menu, = Menu.search([('name', '=', 'Business Intelligence')])
             filter, = Filter.search([('name', '=', 'Odd')])
             report, = Report.create([{
@@ -474,8 +474,8 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
             execution, = report.executions
 
-            ReportModel = pool.get(execution.babi_model.model)
-            DataModel = pool.get(model.model)
+            ReportModel = pool.get(execution.babi_model.name)
+            DataModel = pool.get(model.name)
 
             total_amount = 0
             for record in DataModel.search([]):
@@ -525,8 +525,8 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
             execution, = report.executions
 
-            ReportModel = pool.get(execution.babi_model.model)
-            DataModel = pool.get(model.model)
+            ReportModel = pool.get(execution.babi_model.name)
+            DataModel = pool.get(model.name)
 
             year = datetime.date.today().year
             total_amount = 0
@@ -551,7 +551,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
         company = create_company()
         with set_company(company):
-            model, = Model.search([('model', '=', 'babi.test')])
+            model, = Model.search([('name', '=', 'babi.test')])
             menu, = Menu.search([('name', '=', 'Business Intelligence')])
             report, = Report.create([{
                         'name': 'Column Report',
@@ -588,8 +588,8 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             execution, = report.executions
             self.assertEqual(len(execution.internal_measures), 13)
 
-            ReportModel = pool.get(execution.babi_model.model)
-            DataModel = pool.get(model.model)
+            ReportModel = pool.get(execution.babi_model.name)
+            DataModel = pool.get(model.name)
 
             keys = [x.internal_name for x in execution.internal_measures]
             total_amount = dict.fromkeys(keys, Decimal(0))
@@ -657,10 +657,10 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             ('Decimal(o)', 3.14, Decimal(3.14)),
             ('Decimal(0)', None, Decimal(0)),
         ]
-        models = Model.search([('model', '=', 'babi.test')])
+        models = Model.search([('name', '=', 'babi.test')])
         tests.append(
             ('Pool().get(\'ir.model\').search(['
-                '(\'model\', \'=\', \'babi.test\')])', None, models),
+                '(\'name\', \'=\', \'babi.test\')])', None, models),
             )
         for expression, obj, result in tests:
             self.assertEqual(babi_eval(expression, obj), result)
@@ -730,7 +730,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         table.name = 'Table 1'
         table.on_change_name()
         self.assertEqual(table.internal_name, 'table_1')
-        table.model, = Model.search([('model', '=', 'babi.test')])
+        table.model, = Model.search([('name', '=', 'babi.test')])
 
         fields = []
         names = set([])

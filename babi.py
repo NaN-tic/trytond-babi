@@ -124,7 +124,7 @@ class DynamicModel(ModelSQL, ModelView):
         pool = Pool()
         Execution = pool.get('babi.report.execution')
         executions = Execution.search([
-                ('babi_model.model', '=', cls.__name__),
+                ('babi_model.name', '=', cls.__name__),
                 ])
         if not executions or len(executions) > 1:
             return
@@ -145,7 +145,7 @@ class DynamicModel(ModelSQL, ModelView):
 
         model_name = '_'.join(cls.__name__.split('_')[0:2])
         executions = Execution.search([
-                ('babi_model.model', '=', cls.__name__),
+                ('babi_model.name', '=', cls.__name__),
                 ], limit=1)
         if not executions:
             raise UserError(gettext('babi.report_not_exists',
@@ -308,7 +308,7 @@ def register_class(internal_name, name, dimensions, measures,
     Class.__post_setup__()
     if avoid_registration:
         models = Model.search([
-                ('model', '=', internal_name),
+                ('name', '=', internal_name),
                 ])
         if models:
             return models[0]
@@ -318,7 +318,7 @@ def register_class(internal_name, name, dimensions, measures,
     # register() method updates name and info fields in the database
     Class.__register__('babi')
     model, = Model.search([
-            ('model', '=', internal_name),
+            ('name', '=', internal_name),
             ])
     return model
 
@@ -330,12 +330,12 @@ def create_groups_access(model, groups):
     to_create = []
     for group in groups:
         exists = ModelAccess.search([
-                ('model', '=', model.model),
+                ('model', '=', model.name),
                 ('group', '=', group.id),
                 ])
         if not exists:
             to_create.append({
-                    'model': model.model,
+                    'model': model.name,
                     'group': group.id,
                     'perm_read': True,
                     'perm_create': True,
@@ -436,7 +436,7 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
 
     @depends('model')
     def on_change_with_model_name(self, name=None):
-        return self.model.model if self.model else None
+        return self.model.name if self.model else None
 
     @depends('model')
     def on_change_with_fields(self, name=None):
@@ -508,7 +508,7 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
         if self.parameters:
             return True
 
-        Model = pool.get(self.model.model)
+        Model = pool.get(self.model.name)
         records = None
 
         if self.domain:
@@ -569,7 +569,7 @@ class FilterParameter(ModelSQL, ModelView):
             action = Action(ModelData.get_id('babi', 'open_execution_wizard'))
             keyword = Keyword()
             keyword.keyword = 'form_relate'
-            keyword.model = '%s,-1' % self.related_model.model
+            keyword.model = '%s,-1' % self.related_model.name
             keyword.action = action.action
             keyword.babi_filter_parameter = self
             keyword.save()
@@ -880,7 +880,7 @@ class Report(DeactivableMixin, ModelSQL, ModelView):
 
     @depends('model')
     def on_change_with_model_name(self, name=None):
-        return self.model.model if self.model else None
+        return self.model.name if self.model else None
 
     def get_internal_name(self, name):
         return 'babi_report_%d' % self.id
@@ -1322,7 +1322,7 @@ class ReportExecution(ModelSQL, ModelView):
         pool = Pool()
         Keyword = pool.get('ir.action.keyword')
 
-        models = ['%s,-1' % e.babi_model.model for e in executions
+        models = ['%s,-1' % e.babi_model.name for e in executions
             if e.babi_model]
         keywords = Keyword.search([('model', 'in', models)])
         Keyword.delete(keywords)
@@ -1341,7 +1341,7 @@ class ReportExecution(ModelSQL, ModelView):
 
         executions = cls.search([()])
         Keyword = pool.get('ir.action.keyword')
-        models = ['%s,-1' % e.babi_model.model for e in executions
+        models = ['%s,-1' % e.babi_model.name for e in executions
             if e.babi_model]
         keywords = Keyword.search([('model', 'not in', models),
             ('babi_report', '!=', None)])
@@ -1534,7 +1534,7 @@ class ReportExecution(ModelSQL, ModelView):
         action = Action(ModelData.get_id('babi', 'open_chart_wizard'))
         keyword = Keyword()
         keyword.keyword = 'tree_open'
-        keyword.model = '%s,-1' % self.babi_model.model
+        keyword.model = '%s,-1' % self.babi_model.name
         keyword.action = action.action
         keyword.babi_report = self.report
         keyword.groups = self.report.groups
@@ -1543,16 +1543,16 @@ class ReportExecution(ModelSQL, ModelView):
     def create_data(self):
         "Creates data for this execution"
         pool = Pool()
-        Model = pool.get(self.report.model.model)
+        Model = pool.get(self.report.model.name)
         transaction = Transaction()
         cursor = transaction.connection.cursor()
 
-        BIModel = pool.get(self.babi_model.model)
+        BIModel = pool.get(self.babi_model.name)
         checker = TimeoutChecker(self.timeout, self.timeout_exception)
 
         logger.info('Updating Data of report: %s' % self.rec_name)
         update_start = time.time()
-        model = self.report.model.model
+        model = self.report.model.name
         if not self.report.measures:
             raise UserError(gettext('babi.no_measures', report=self.rec_name))
         if not self.report.dimensions:
@@ -1886,7 +1886,7 @@ class ReportExecution(ModelSQL, ModelView):
             cursor.execute(query)
 
         pool = Pool()
-        BIModel = pool.get(self.babi_model.model)
+        BIModel = pool.get(self.babi_model.name)
 
         if not self.internal_measures:
             return
@@ -1899,7 +1899,7 @@ class ReportExecution(ModelSQL, ModelView):
         extra_data = ",".join([x.internal_name for x in self.report.dimensions
             if not x.group_by])
 
-        table_name = Pool().get(self.babi_model.model)._table
+        table_name = Pool().get(self.babi_model.name)._table
         cursor = Transaction().connection.cursor()
 
         group_by_iterator = group_by[:]
@@ -2061,7 +2061,7 @@ class OpenExecutionFiltered(StateView):
         else:
             # TODO: Report definition add domain for groups
             parameters = Parameter.search([
-                        ('related_model.model', '=',
+                        ('related_model.name', '=',
                             context.get('active_model'))],
                 )
             report_definition['readonly'] = False
@@ -2107,7 +2107,7 @@ class OpenExecutionFiltered(StateView):
                 'required': True,
             }
             if parameter.ttype in ['many2one', 'many2many']:
-                field_definition['relation'] = parameter.related_model.model
+                field_definition['relation'] = parameter.related_model.name
             if parameter2report:
                 field_definition['states'] = {
                     'invisible': Not(In(Eval('report', 0),
@@ -2150,7 +2150,7 @@ class OpenExecutionFiltered(StateView):
             defaults['report'] = menu.babi_report.id
         else:
             parameters = Parameter.search([
-                    ('related_model.model', '=', model),
+                    ('related_model.name', '=', model),
                     ])
             for parameter in parameters:
                 name = '%s_%d' % (parameter.name, parameter.id)
@@ -2320,7 +2320,7 @@ class OpenExecution(Wizard):
             action = Action.get_action_values(action.type, [action.id])[0]
         except ValueError:
             raise UserError(gettext('babi.no_menus', report=report.rec_name))
-        action['res_model'] = execution.babi_model.model
+        action['res_model'] = execution.babi_model.name
         action['name'] = execution.rec_name
         action['context_model'] = None
         return action, {}
@@ -2385,7 +2385,7 @@ class DimensionMixin:
             'expression': self.expression.expression,
             'ttype': self.expression.ttype,
             'related_model': (self.expression.related_model
-                and self.expression.related_model.model),
+                and self.expression.related_model.name),
             'decimal_digits': self.expression.decimal_digits,
             }
 
@@ -2529,7 +2529,7 @@ class Measure(ModelSQL, ModelView):
             'expression': self.expression,
             'ttype': self.ttype,
             'related_model': (self.related_model and
-                self.related_model.model),
+                self.related_model.name),
             'decimal_digits': self.expression.decimal_digits,
             }
 
@@ -2641,7 +2641,7 @@ class InternalMeasure(ModelSQL, ModelView):
             'expression': self.expression,
             'ttype': self.ttype,
             'related_model': (self.related_model and
-                self.related_model.model),
+                self.related_model.name),
             'decimal_digits': self.decimal_digits,
             }
 
@@ -2802,7 +2802,7 @@ class OpenChartStart(ModelView):
         Execution = pool.get('babi.report.execution')
         model_name = Transaction().context.get('active_model')
         executions = Execution.search([
-                ('babi_model.model', '=', model_name),
+                ('babi_model.name', '=', model_name),
                 ], limit=1)
 
         result = super(OpenChartStart, cls).default_get(fields, with_rec_name)
