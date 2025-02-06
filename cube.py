@@ -81,7 +81,9 @@ class Cube:
 
     @staticmethod
     def clear_orphan_caches(tables):
-        # Remove all cache tables that are not in use by any of the tables
+        '''
+        Remove all cache tables that are not in use by any of the tables
+        '''
         prefixes = []
         for table in tables:
             cube = Cube(table)
@@ -386,16 +388,24 @@ class Cube:
                         # menas we try to open the first level, we check if all
                         # elements except the first are None
                         if expansion_row == default_row_coordinates:
-                            if (row_coordinate_values[1:len(expansion_row)] ==
-                                    tuple([None]*(len(self.rows)-1))):
+                            if (row_coordinate_values[0] is not None and
+                                all(v is None for v in row_coordinate_values[1:])):
                                 row_ok = True
                                 break
-                        # In any other case, we check if the expansion is
-                        # inside the coordinate
-                        elif (row_coordinate_values[:len(expansion_row)] ==
-                                expansion_row):
-                            row_ok = True
-                            break
+                        else:
+                            k = len(expansion_row)
+                            if row_coordinate_values[:k] != expansion_row:
+                                continue
+                            remaining = row_coordinate_values[k:]
+                            if not remaining:
+                                row_ok = True
+                                break
+                            if (remaining[0] is not None and
+                                all(v is None for v in remaining[1:])):
+                                row_ok = True
+                                break
+                    if not row_ok and row_coordinate_values in self.expansions_rows:
+                        row_ok = True
                 else:
                     # If we don't have any expansions, we only allow the rows
                     # with the default value
@@ -412,16 +422,24 @@ class Cube:
                         # menas we try to open the first level, we check if all
                         # elements except the first are None
                         if expansion_column == default_column_coordinates:
-                            if (column_coordinate_values[1:len(expansion_column)] ==
-                                    tuple([None]*(len(self.columns)-1))):
+                            if (column_coordinate_values[0] is not None and
+                                all(v is None for v in column_coordinate_values[1:])):
                                 column_ok = True
                                 break
-                        # In any other case, we check if the expansion is
-                        # inside the coordinate
-                        elif (column_coordinate_values[:len(expansion_column)] ==
-                                expansion_column):
-                            column_ok = True
-                            break
+                        else:
+                            k = len(expansion_column)
+                            if column_coordinate_values[:k] != expansion_column:
+                                continue
+                            remaining = column_coordinate_values[k:]
+                            if not remaining:
+                                column_ok = True
+                                break
+                            if (remaining[0] is not None and
+                                all(v is None for v in remaining[1:])):
+                                column_ok = True
+                                break
+                    if not column_ok and column_coordinate_values in self.expansions_columns:
+                        column_ok = True
                 else:
                     # If we don't have any expansions, we only allow the columns
                     # with the default value
