@@ -780,13 +780,13 @@ class PivotTable(Component):
                 database_name=self.database_name, table_name=self.table_name,
                 table_properties=self.table_properties, render=False).url('download'))
 
-        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-gray-600 overflow-x-auto")
+        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
         for row in cube.build():
-            pivot_row = tr()
+            pivot_row = tr(cls="hover:bg-gray-50 transition-colors")
             for cell in row:
                 if download:
                     # Paint the download button in the first cell
-                    pivot_row.add(td(download, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                    pivot_row.add(td(download, cls="text-xs uppercase text-black px-6 py-3 bg-blue-300"))
                     download = None
                     continue
                 # Handle the headers links
@@ -834,10 +834,10 @@ class PivotTable(Component):
                             hx_trigger="click", hx_swap="outerHTML",
                             hx_indicator="#loading-state")
 
-                    pivot_row.add(td(cell_value, cls="text-xs uppercase bg-gray-300 text-gray-900 px-6 py-3"))
+                    pivot_row.add(td(cell_value, cls="text-xs uppercase bg-blue-300 text-black px-6 py-3 border-b-0.5 border-black"))
 
                 else:
-                    pivot_row.add(td(cell.formatted(language), cls="border-b bg-gray-50 border-gray-000 px-6 py-4 text-right"))
+                    pivot_row.add(td(cell.formatted(language), cls="border-b text-black bg-blue-50 border-gray-200 px-6 py-4 text-right"))
             pivot_table.add(pivot_row)
 
         loading_div = div(id="loading-state", cls="loading-indicator absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2 w-full bg-gray-800 bg-opacity-50 h-full")
