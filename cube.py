@@ -466,26 +466,42 @@ class Cube:
         '''
         values, property_values = self.get_values()
 
-        row_elements = []
-        row_elements.append(tuple([None]*len(self.rows)))
-        col_elements = []
-        col_elements.append(tuple([None]*len(self.columns)))
+        def get_rows(values, key, nones, depth, added):
+            res = []
+            for row, col in values.keys():
+                if row.count(None) != nones:
+                    continue
+                rk = row[:len(key)]
+                if rk != key:
+                    continue
+                if row in added:
+                    continue
+                added.add(row)
+                res.append(row)
+                res += get_rows(values, row[:depth], nones-1, depth+1, added)
+            return res
 
-        #TODO: re-implement this loop
-        for key in values.keys():
-            if (key[0].count(None) == len(self.rows)-1 and
-                    key[1].count(None) == len(self.columns)):
-                for sub_key in values.keys():
-                    if (sub_key[0][0] == key[0][0] and
-                            sub_key[1].count(None) == len(self.columns)):
-                        row_elements.append(sub_key[0])
+        def get_cols(values, key, nones, depth, added):
+            res = []
+            for row, col in values.keys():
+                if col.count(None) != nones:
+                    continue
+                ck = col[:len(key)]
+                if ck != key:
+                    continue
+                if col in added:
+                    continue
+                added.add(col)
+                res.append(col)
+                res += get_cols(values, col[:depth], nones-1, depth+1, added)
+            return res
 
-            if (key[0].count(None) == len(self.rows) and
-                    key[1].count(None) == len(self.columns)-1):
-                for sub_key in values.keys():
-                    if (sub_key[0].count(None) == len(self.rows) and
-                            sub_key[1][0] == key[1][0]):
-                        col_elements.append(sub_key[1])
+        added = set()
+        row_elements = [tuple([None]*len(self.rows))]
+        row_elements += get_rows(values, (), len(self.rows)-1, 1, added)
+        added = set()
+        col_elements = [tuple([None]*len(self.columns))]
+        col_elements += get_cols(values, (), len(self.columns)-1, 1, added)
 
         # TODO: for each cell header, know the expansion we need to do
         row_header = self.get_row_header(row_elements, self.rows)
