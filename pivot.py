@@ -1,6 +1,6 @@
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
-    option, main, th, style)
+    option, main, th, style, details, summary)
 from dominate.util import raw
 import logging
 from openpyxl import Workbook
@@ -248,8 +248,19 @@ class Index(Component):
                                 table_properties=self.table_properties)
                         except Exception as e:
                             div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
-                            div(cls="text-center").add(pre(str(e)))
-                            logger.exception(e)
+                            print_trace = True
+                            if 'function avg(' in str(e):
+                                div(cls="text-center").add(_("HINT: You are trying to make average of a text type field, please try with a numeric type field or change the operation."))
+                                print_trace = False
+                            if 'function sum(' in str(e):
+                                div(cls="text-center").add(_("HINT: You are trying to sum a text type field, please try with a numeric type field or change the operation."))
+                                print_trace = False
+                            with details() as traceback_details:
+                                summary(_('Show more details'))
+                                p(pre(str(e)))
+                            div(cls="text-center").add(traceback_details)
+                            if print_trace:
+                                logger.exception(e)
 
         layout = Layout(title=f'{table_name} | Tryton')
         layout.main.add(index_section)
