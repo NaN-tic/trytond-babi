@@ -50,6 +50,7 @@ def register():
         test_model.TestBabiModel,
         table.TableUser,
         table.TableGroup,
+        table.TableParameters,
         table.Cluster,
         table.Table,
         table.Field,
@@ -77,6 +78,7 @@ def register():
         babi.OpenChart,
         babi.OpenExecution,
         babi.CleanExecutions,
+        table.ParametrizeTable,
         module='babi', type_='wizard')
     Pool.register(
         report.BabiHTMLReport,

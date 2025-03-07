@@ -100,7 +100,7 @@
         <record model="ir.action.act_window.domain" id="act_show_all">
             <field name="name">All</field>
             <field name="sequence" eval="10"/>
-            <field name="domain" eval="[]" pyson="1"/>
+            <field name="domain" eval="[('parameters', '=', None)]" pyson="1"/>
             <field name="count" eval="True"/>
             <field name="act_window" ref="act_babi_table"/>
         </record>
@@ -108,7 +108,7 @@
         <record model="ir.action.act_window.domain" id="act_show_warn">
             <field name="name">With Warning</field>
             <field name="sequence" eval="20"/>
-            <field name="domain" eval="[('warn', '!=', None)]" pyson="1"/>
+            <field name="domain" eval="[('parameters', '=', None), ('warn', '!=', None)]" pyson="1"/>
             <field name="count" eval="True"/>
             <field name="act_window" ref="act_babi_table"/>
         </record>
@@ -116,8 +116,15 @@
         <record model="ir.action.act_window.domain" id="act_show_no_warn">
             <field name="name">Without Warning</field>
             <field name="sequence" eval="30"/>
-            <field name="domain" eval="[('warn', '=', None)]" pyson="1"/>
+            <field name="domain" eval="[('parameters', '=', None), ('warn', '=', None)]" pyson="1"/>
             <field name="count" eval="True"/>
+            <field name="act_window" ref="act_babi_table"/>
+        </record>
+
+        <record model="ir.action.act_window.domain" id="act_show_parametrized">
+            <field name="name">Parametrized</field>
+            <field name="sequence" eval="40"/>
+            <field name="domain" eval="[('parameters', '!=', None)]" pyson="1"/>
             <field name="act_window" ref="act_babi_table"/>
         </record>
 
@@ -366,6 +373,30 @@
             <field name="keyword">form_print</field>
             <field name="model">babi.table,-1</field>
             <field name="action" ref="report_table_excel"/>
+        </record>
+
+        <!-- ir.cron -->
+        <record model="ir.cron" id="cron_table_clean">
+            <field name="active" eval="True"/>
+            <field name="interval_number" eval="1"/>
+            <field name="interval_type">days</field>
+            <field name="method">babi.table|clean</field>
+        </record>
+
+        <!-- babi.table.execution -->
+        <record model="ir.action.wizard" id="table_parametrize_wizard">
+            <field name="name">Parametrize Table</field>
+            <field name="wiz_name">babi.table.parametrize</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_babi_table_parametrized">
+            <field name="name">Parametrized Table</field>
+            <field name="res_model">babi.table</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_babi_table_parametrized_view">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="babi_table_form_view"/>
+            <field name="act_window" ref="act_babi_table_parametrized"/>
         </record>
     </data>
 </tryton>
