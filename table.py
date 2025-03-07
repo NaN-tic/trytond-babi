@@ -2,7 +2,7 @@ import csv
 import time
 import traceback
 import datetime as mdatetime
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import sql
 import unidecode
@@ -10,6 +10,7 @@ import json
 import tempfile
 import html
 import urllib.parse
+import secrets
 from types import SimpleNamespace
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
@@ -18,20 +19,23 @@ from trytond import backend
 from trytond.bus import notify
 from trytond.transaction import Transaction
 from trytond.pool import Pool
-from trytond.model import (ModelView, ModelSQL, fields, Unique,
-    DeactivableMixin, sequence_ordered, Workflow)
+from trytond.model import (Model, ModelView, ModelSQL, fields,
+    Unique, DeactivableMixin, sequence_ordered, Workflow)
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
-from trytond.pyson import Bool, Eval, PYSONDecoder
+from trytond.pyson import Bool, Eval, In, Not, PYSONDecoder, PYSONEncoder
 from trytond.url import http_host
 from trytond.config import config
 from trytond.modules.company.model import (
     employee_field, reset_employee, set_employee)
 from trytond.report import Report
+from trytond.wizard import Wizard, StateView, StateAction, Button
+from trytond.rpc import RPC
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
 from .cube import Cube
 
+RETENTION_DAYS = config.getint('babi', 'retention_days', default=30)
 VALID_FIRST_SYMBOLS = '_abcdefghijklmnopqrstuvwxyz'
 VALID_NEXT_SYMBOLS = '_0123456789'
 VALID_SYMBOLS = VALID_FIRST_SYMBOLS + VALID_NEXT_SYMBOLS
@@ -254,6 +258,49 @@ class TableGroup(ModelSQL):
         ondelete='CASCADE')
 
 
+class TableParameters(Model):
+    "Table Parameters"
+    __name__ = 'babi.table.parameters'
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__rpc__.update({
+                'get_keys': RPC(instantiate=0),
+                'search_get_keys': RPC(),
+                })
+
+    @classmethod
+    def get_keys(cls, records):
+        pool = Pool()
+        Parameter = pool.get('babi.filter.parameter')
+
+        keys = []
+        records = Parameter.search([])
+        for record in records:
+            key = {
+                'id': record.id,
+                'name': record.name,
+                'string': record.name,
+                'help': None,
+                'type': record.ttype,
+                'domain': None,
+                'sequence': None,
+                }
+            if record.ttype in ('float', 'numeric'):
+                key['digits'] = (16, record.digits)
+            if record.ttype == 'many2one':
+                key['type'] = 'integer'
+            elif record.ttype == 'many2many':
+                key['type'] = 'char'
+            keys.append(key)
+        return keys
+
+    @classmethod
+    def search_get_keys(cls, domain, limit=None):
+        return cls.get_keys([])
+
+
 class Table(DeactivableMixin, ModelSQL, ModelView):
     'BABI Table'
     __name__ = 'babi.table'
@@ -393,6 +440,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         'Access Groups')
     pivots = fields.One2Many('babi.pivot', 'table', 'Pivot Tables')
     comment = fields.Text('Comment')
+    parameters = fields.Dict('babi.table.parameters', 'Parameters', readonly=True,
+        states={
+            'invisible': ~Bool(Eval('parameters')),
+            })
 
     @staticmethod
     def default_timeout():
@@ -471,6 +522,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         for table in tables:
             cls.__queue__._drop(table)
         super().delete(tables)
+
+    @classmethod
+    def clean(cls, date=None):
+        if date is None:
+            date = datetime.now() - timedelta(days=RETENTION_DAYS)
+        tables = cls.search([
+                ('create_date', '<', date),
+                ('parameters', '!=', None),
+                ])
+        cls.delete(tables)
 
     @classmethod
     def copy(cls, tables, default=None):
@@ -673,33 +734,43 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     @classmethod
     def validate(cls, tables):
-        super(Table, cls).validate(tables)
+        super().validate(tables)
         for table in tables:
             table.check_internal_name()
-            table.check_filter()
 
     def check_internal_name(self):
         if not self.internal_name[0] in VALID_FIRST_SYMBOLS:
             raise UserError(gettext(
-                'babi.msg_invalid_internal_name_first_character',
+                'babi.msg_invalid_table_internal_name_first_character',
                 table=self.rec_name, internal_name=self.internal_name))
         for symbol in self.internal_name:
             if not symbol in VALID_SYMBOLS:
-                raise UserError(gettext('babi.msg_invalid_internal_name',
+                raise UserError(gettext('babi.msg_invalid_table_internal_name',
                         table=self.rec_name, internal_name=self.internal_name))
-
-    def check_filter(self):
-        if self.filter and self.filter.parameters:
-            raise UserError(gettext('babi.msg_filter_with_parameters',
-                    table=self.rec_name))
 
     @fields.depends('name')
     def on_change_name(self):
         self.internal_name = convert_to_symbol(self.name)
 
+    def replace_parameters(self, expression):
+        if not self.filter or not self.filter.parameters or not self.parameters:
+            return expression
+        try:
+            if '%(' in expression:
+                expression = expression % self.parameters
+            else:
+                expression = expression.format(**self.parameters)
+        except KeyError as message:
+            if self.report.babi_raise_user_error:
+                raise UserError(
+                    gettext('babi.invalid_parameters',
+                    key=str(message)))
+            raise
+        return expression
+
     def get_python_filter(self):
         if self.filter and self.filter.python_expression:
-            return self.filter.python_expression
+            return self.replace_parameters(self.filter.python_expression)
 
     def get_domain_filter(self):
         domain = '[]'
@@ -707,6 +778,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             domain = self.filter.domain
             if '__' in domain:
                 domain = str(PYSONDecoder().decode(domain))
+        domain = self.replace_parameters(domain)
         return eval(domain, {
                 'datetime': mdatetime,
                 'false': False,
@@ -714,14 +786,18 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 })
 
     def get_context(self):
-        if self.filter and self.filter.context:
-            context = self.filter.context
-            ev = EvalWithCompoundTypes(names={}, functions={
-                'date': lambda x: datetime.strptime(x, '%Y-%m-%d').date(),
-                'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d'),
-                })
-            context = ev.eval(context)
-            return context
+        pool = Pool()
+        Date = pool.get('ir.date')
+        if not self.filter or not self.filter.context:
+            return
+        context = self.replace_parameters(self.filter.context)
+        ev = EvalWithCompoundTypes(names={}, functions={
+            'date': lambda x: datetime.strptime(x, '%Y-%m-%d').date(),
+            'datetime': lambda x: datetime.strptime(x, '%Y-%m-%d'),
+            'today': Date.today(),
+            })
+        context = ev.eval(context)
+        return context
 
     def get_pivot_table(self, name):
         database = Transaction().database.name
@@ -798,6 +874,21 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def compute(cls, tables):
+        pool = Pool()
+        ModelData = pool.get('ir.model.data')
+        Action = pool.get('ir.action')
+
+        for table in tables:
+            if (table.filter and table.filter.parameters
+                    and not table.parameters):
+                if len(tables) > 1:
+                    raise UserError(gettext('babi.msg_table_parametrize',
+                            table=table.rec_name))
+                action_id = Action.get_action_id(ModelData.get_id('babi',
+                        'table_parametrize_wizard'))
+                values = Action(action_id).get_action_value()
+                return values
+
         with Transaction().set_context(queue_name=QUEUE_NAME):
             for table in tables:
                 if not table.active:
@@ -945,12 +1036,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 if not self.fields_:
                     raise UserError(gettext('babi.msg_table_no_fields',
                             table=self.name))
-
-                if self.filter and self.filter.parameters:
-                    raise UserError(gettext('babi.msg_filter_with_parameters',
-                            table=self.rec_name))
-
-            if self.type == 'model':
                 self._compute_model()
             elif self.type == 'table':
                 self._compute_table()
@@ -1987,3 +2072,164 @@ class Order(sequence_ordered(), ModelSQL, ModelView):
         get_name = Model.get_name
         models = cls._get_elements()
         return [(None, '')] + [(m, get_name(m)) for m in models]
+
+
+class OpenExecutionFiltered(StateView):
+
+    def __init__(self):
+        buttons = [
+                Button('Cancel', 'end', 'tryton-cancel'),
+                Button('Create', 'create_table', 'tryton-ok', True),
+                ]
+        super().__init__('babi.report', 0, buttons)
+
+    def get_view(self, wizard, state_name):
+        pool = Pool()
+        Parameter = pool.get('babi.filter.parameter')
+        Table = pool.get('babi.table')
+
+        context = Transaction().context
+        record = Table(context.get('active_id'))
+
+        result = {}
+        result['type'] = 'form'
+        result['view_id'] = None
+        result['model'] = 'babi.table'
+        result['field_childs'] = None
+        fields = {}
+        parameter2report = {}
+
+        # Check if record has 'filter' field to pass tests in version 7.2
+        if record and hasattr(record, 'filter'):
+            parameters = Parameter.search([('filter', '=', record.filter)])
+        else:
+            parameters = []
+
+        parameters_to_remove = []
+        for parameter in parameters:
+            if not parameter.check_parameter_in_filter():
+                parameters_to_remove.append(parameter)
+        for parameter in parameters_to_remove:
+            parameters.remove(parameter)
+
+        encoder = PYSONEncoder()
+        xml = '<form string="Create Parameterized Table">\n'
+        xml += '<group id="filters" string="Filters" colspan="4">\n'
+        for parameter in parameters:
+            # The wizard breaks with non unicode data
+            name = 'filter_parameter_%d' % parameter.id
+            field_definition = {
+                'loading': 'eager',
+                'name': name,
+                'string': parameter.name,
+                'searchable': True,
+                'create': True,
+                'help': '',
+                'context': {},
+                'delete': True,
+                'type': parameter.ttype,
+                'select': False,
+                'readonly': False,
+                'required': True,
+            }
+            if parameter.ttype in ['many2one', 'many2many']:
+                field_definition['relation'] = parameter.related_model.model
+            if parameter2report:
+                field_definition['states'] = {
+                    'invisible': Not(In(Eval('report', 0),
+                            parameter2report[parameter.filter.id])),
+                    'required': In(Eval('report', 0),
+                        parameter2report[parameter.filter.id]),
+                    }
+            else:
+                field_definition['states'] = {}
+            # Copied from Model.fields_get
+            for attr in ('states', 'domain', 'context', 'digits', 'size',
+                    'add_remove', 'format'):
+                if attr in field_definition:
+                    field_definition[attr] = encoder.encode(
+                        field_definition[attr])
+
+            if parameter.ttype == 'many2many':
+                xml += '<field name="%s" colspan="4"/>\n' % (name)
+            else:
+                xml += '<label name="%s"/>\n' % (name)
+                xml += '<field name="%s" colspan="3"/>\n' % (name)
+            fields[name] = field_definition
+
+        xml += '</group>\n'
+        xml += '</form>\n'
+        result['arch'] = xml
+        result['fields'] = fields
+        return result
+
+    def get_defaults(self, wizard, state_name, fields):
+        pool = Pool()
+        Menu = pool.get('ir.ui.menu')
+        Parameter = pool.get('babi.filter.parameter')
+        context = Transaction().context
+        model = context.get('active_model')
+
+        defaults = {}
+        if model == 'ir.ui.menu':
+            menu = Menu(context.get('active_id'))
+            defaults['report'] = menu.babi_report.id
+        else:
+            parameters = Parameter.search([
+                    ('related_model.model', '=', model),
+                    ])
+            for parameter in parameters:
+                name = '%s_%d' % (parameter.name, parameter.id)
+                defaults[name] = context.get('active_id')
+        return defaults
+
+
+class CustomDict(dict):
+
+    def __getattr__(self, name):
+        return {}
+
+    def __setattr__(self, name, value):
+        self[name] = value
+
+
+class ParametrizeTable(Wizard):
+    'Babi Parametrize Table'
+    __name__ = 'babi.table.parametrize'
+
+    start = OpenExecutionFiltered()
+    create_table = StateAction('babi.act_babi_table_parametrized')
+
+    def __getattribute__(self, name):
+        if name == 'start':
+            if not hasattr(self, 'filter_values'):
+                self.filter_values = CustomDict()
+            name = 'filter_values'
+        return super().__getattribute__(name)
+
+    def do_create_table(self, action):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Parameter = pool.get('babi.filter.parameter')
+
+        data = {}
+        for key, value in self.filter_values.items():
+            # Fields has id of the field appendend, so it must be removed.
+            key = key.split('_')[-1]
+            data[key] = value
+        parameters = {x.id: x.name for x in Parameter.browse(data.keys())}
+        params = {}
+        for key, value in data.items():
+            key = parameters.get(int(key))
+            params[key] = value
+
+        internal_name = 'parametrized_' + secrets.token_hex(8)
+        table, = Table.copy([self.record], default={
+                'internal_name': internal_name,
+                'parameters': params,
+                'crons': [],
+                })
+        with Transaction().set_context(queue_name=QUEUE_NAME):
+            Table.__queue__._compute(table)
+        action['res_id'] = table.id
+        return action, {}

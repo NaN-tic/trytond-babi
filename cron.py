@@ -61,6 +61,7 @@ class Cron(metaclass=PoolMeta):
         cls.method.selection.extend([
                 ('babi.report|compute', 'Compute Business Intelligence Report'),
                 ('babi.table|_compute', 'Compute Business Intelligence Table'),
+                ('babi.table|clean', 'Delete Tables with Parameters'),
                 ('babi.table.cluster|_compute',
                     'Compute Business Intelligence Cluster'),
                 ('babi.report.execution|clean', 'Clean Babi Excutions'),

@@ -78,9 +78,6 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_invalid_field_internal_name">
             <field name="text">Invalid internal name "%(internal_name)s" in field "%(field)s".</field>
         </record>
-        <record model="ir.message" id="msg_filter_with_parameters">
-            <field name="text">Cannot use filters with parameters in table "%(table)s".</field>
-        </record>
         <record model="ir.message" id="msg_table_no_fields">
             <field name="text">Table "%(table)s" cannot be computed because it has no fields.</field>
         </record>
@@ -154,6 +151,9 @@ Exception: %(error)s</field>
         </record>
         <record model="ir.message" id="msg_no">
             <field name="text">No</field>
+        </record>
+        <record model="ir.message" id="msg_only_one_table_with_parameters">
+            <field name="text">Table "%(table)s" requires parameters but you tried to compute more than one table at once. Tables with parameters must be computed individually.</field>
         </record>
     </data>
 </tryton>
