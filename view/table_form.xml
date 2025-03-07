@@ -16,6 +16,9 @@
     <field name="pivot_table" widget="url"/>
     <newline/>
     <notebook colspan="8">
+        <page name="parameters">
+            <field name="parameters" colspan="4" height="550"/>
+        </page>
         <page name="query">
             <field name="query" colspan="4" height="550" widget="code" language="sql"/>
         </page>
