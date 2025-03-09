@@ -31,9 +31,11 @@ def capitalize(string):
 
 
 class Cube:
+    EXPAND_ALL = [('all',)]
+
     def __init__(self, table=None, rows=None, columns=None, measures=None,
-            properties=None, order=None, expansions_rows=None,
-            expansions_columns=None):
+            properties=None, order=None, row_expansions=None,
+            column_expansions=None):
         '''
         order must have the following format:
         [('column_name', 'asc'), ('column_name', 'desc'), (('measure', 'sum'), 'asc')]
@@ -48,10 +50,10 @@ class Cube:
             properties = []
         if order is None:
             order = []
-        if expansions_rows is None:
-            expansions_rows = []
-        if expansions_columns is None:
-            expansions_columns = []
+        if row_expansions is None:
+            row_expansions = []
+        if column_expansions is None:
+            column_expansions = []
 
         assert all(len(x) == 2 for x in order), ('Each order item must '
             'have 2 elements')
@@ -61,8 +63,8 @@ class Cube:
         self.measures = measures
         self.properties = properties
         self.order = order
-        self.expansions_rows = expansions_rows
-        self.expansions_columns = expansions_columns
+        self.row_expansions = row_expansions
+        self.column_expansions = column_expansions
 
     def clear_cache(self):
         cursor = Transaction().connection.cursor()
@@ -220,7 +222,7 @@ class Cube:
                 else:
                     value = ''
                 header_cell = Cell(value, type=CellType.ROW_HEADER)
-                header_cell.expansion_row = tuple([None]*(len(cube_rows)))
+                header_cell.row_expansion = tuple([None]*(len(cube_rows)))
                 row.append(header_cell)
                 row += [Cell('', type=CellType.ROW_HEADER)]*len(cube_rows)
             else:
@@ -246,7 +248,7 @@ class Cube:
                             # r = ['Element1', None] -> ['Element1']
                             element_expansion = tuple([e.value for e in r[:r.index(element)+1]])
                             row.append(element.copy(type=CellType.ROW_HEADER,
-                                expansion_row=element_expansion))
+                                row_expansion=element_expansion))
                     else:
                         row.append(Cell('', type=CellType.ROW_HEADER))
             row_header.append(row)
@@ -274,11 +276,11 @@ class Cube:
         for i in range(len(cube_columns)+1):
             column = []
             for row in columns_in_rows:
-                element_expansion = row[i].expansion_row
+                element_expansion = row[i].row_expansion
                 if element_expansion == tuple([None]*len(self.rows)):
                     element_expansion = tuple([None]*len(self.columns))
                 column.append(Cell(row[i].value, type=CellType.COLUMN_HEADER,
-                    expansion_column=element_expansion))
+                    column_expansion=element_expansion))
                 # We need to substrac 1 to the measure length because the firt
                 # space is were the name of the column go
                 for y in range(len(self.measures)-1):
@@ -388,23 +390,26 @@ class Cube:
                 row_coordinate_values = tuple(
                     [c.value if c else None for c in coordinates[0]])
                 row_ok = False
-                if self.expansions_rows:
-                    for expansion_row in self.expansions_rows:
+                if self.row_expansions:
+                    for row_expansion in self.row_expansions:
+                        if row_expansion == self.EXPAND_ALL[0]:
+                            row_ok = True
+                            break
                         # If the expression is equal to the default coords, it
                         # means we try to open the first level, we check if all
                         # elements except the first are None
-                        if expansion_row == default_row_coordinates:
-                            if (row_coordinate_values[1:len(expansion_row)] ==
+                        if row_expansion == default_row_coordinates:
+                            if (row_coordinate_values[1:len(row_expansion)] ==
                                     tuple([None]*(len(self.rows)-1))):
                                 row_ok = True
                                 break
                         # In any other case, we check if the expansion is
                         # inside the coordinate
-                        elif ((row_coordinate_values[:len(expansion_row)]
-                                == expansion_row)
+                        elif ((row_coordinate_values[:len(row_expansion)]
+                                == row_expansion)
                                 and (len(row_coordinate_values)
                                      - row_coordinate_values.count(None)
-                                     == len(expansion_row) + 1)):
+                                     == len(row_expansion) + 1)):
                             row_ok = True
                             break
                 else:
@@ -417,23 +422,26 @@ class Cube:
                 column_coordinate_values = tuple(
                     [c.value if c else None for c in coordinates[1]])
                 column_ok = False
-                if self.expansions_columns:
-                    for expansion_column in self.expansions_columns:
+                if self.column_expansions:
+                    for column_expansion in self.column_expansions:
+                        if column_expansion == self.EXPAND_ALL[0]:
+                            column_ok = True
+                            break
                         # If the expression is equal to the default coords, it
                         # means we try to open the first level, we check if all
                         # elements except the first are None
-                        if expansion_column == default_column_coordinates:
-                            if (column_coordinate_values[1:len(expansion_column)] ==
+                        if column_expansion == default_column_coordinates:
+                            if (column_coordinate_values[1:len(column_expansion)] ==
                                     tuple([None]*(len(self.columns)-1))):
                                 column_ok = True
                                 break
                         # In any other case, we check if the expansion is
                         # inside the coordinate
-                        elif ((column_coordinate_values[:len(expansion_column)]
-                                == expansion_column)
+                        elif ((column_coordinate_values[:len(column_expansion)]
+                                == column_expansion)
                                 and (len(column_coordinate_values)
                                      - column_coordinate_values.count(None)
-                                     == len(expansion_column) + 1)):
+                                     == len(column_expansion) + 1)):
                             column_ok = True
                             break
                 else:
@@ -567,13 +575,13 @@ class Cube:
             cube_properties['order'] = [
                 ast.literal_eval(m) for m in cube_properties['order']]
 
-        if cube_properties.get('expansions_rows'):
-            cube_properties['expansions_rows'] = [
-                ast.literal_eval(m) for m in cube_properties['expansions_rows']]
+        if cube_properties.get('row_expansions'):
+            cube_properties['row_expansions'] = [
+                ast.literal_eval(m) for m in cube_properties['row_expansions']]
 
-        if cube_properties.get('expansions_columns'):
-            cube_properties['expansions_columns'] = [
-                ast.literal_eval(m) for m in cube_properties['expansions_columns']]
+        if cube_properties.get('column_expansions'):
+            cube_properties['column_expansions'] = [
+                ast.literal_eval(m) for m in cube_properties['column_expansions']]
 
         if table_name:
             cube_properties['table'] = table_name
@@ -587,15 +595,15 @@ class CellType(Enum):
 
 
 class Cell:
-    __slots__ = ('value', 'type', 'expansion_row', 'expansion_column', 'properties')
+    __slots__ = ('value', 'type', 'row_expansion', 'column_expansion', 'properties')
 
-    def __init__(self, value=None, type=CellType.VALUE, expansion_row=None,
-            expansion_column=None, properties=None):
+    def __init__(self, value=None, type=CellType.VALUE, row_expansion=None,
+            column_expansion=None, properties=None):
         self.value = value
         # Use as a type an enum, it is much faster than a dictionary
         self.type = type
-        self.expansion_row = expansion_row
-        self.expansion_column = expansion_column
+        self.row_expansion = row_expansion
+        self.column_expansion = column_expansion
         self.properties = properties
 
     def formatted(self, lang=None, excel=False):
@@ -650,8 +658,8 @@ class Cell:
         return hash((self.value, self.type))
 
     def copy(self, **kwargs):
-        new = Cell(self.value, self.type, self.expansion_row,
-            self.expansion_column, self.properties)
+        new = Cell(self.value, self.type, self.row_expansion,
+            self.column_expansion, self.properties)
         for arg in kwargs:
             setattr(new, arg, kwargs[arg])
         return new
