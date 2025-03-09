@@ -82,5 +82,6 @@ def register():
         module='babi', type_='wizard')
     Pool.register(
         report.BabiHTMLReport,
-        table.Excel,
+        table.TableExcel,
+        table.PivotExcel,
         module='babi', type_='report')

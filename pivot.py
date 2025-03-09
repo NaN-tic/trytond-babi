@@ -32,7 +32,8 @@ COLLAPSE = '➖'
 EXPAND = '➕'
 SWAP_AXIS = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>')
 RELOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>')
-EXPAND_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>')
+EXPAND_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M200-200v-240h80v160h160v80H200Zm480-320v-160H520v-80h240v240h-80Z"/></svg>')
+COLLAPSE_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-440v240h-80v-160H200v-80h240Zm160-320v160h160v80H520v-240h80Z"/></svg>')
 DOWNLOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>')
 ROWS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
 COLUMNS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
@@ -190,29 +191,15 @@ class Index(Component):
         if cube.measures and (cube.rows or cube.columns):
             show_error = False
 
-        # Prepare the cube properties to the expand all cube function
-        auxiliar_expansion_rows = cube.expansions_rows
-        auxiliar_expansions_columns = cube.expansions_columns
-        cube.expansions_rows = 'all'
-        cube.expansions_columns = 'all'
-        cube.expansions_rows = auxiliar_expansion_rows
-        cube.expansions_columns = auxiliar_expansions_columns
-
-        # Prepare the cube properties to the invert cube function
+        # Prepare the cube properties for the invert cube function
         cube.table = table_name
-        axuiliar_row = cube.rows
-        cube.rows = cube.columns
-        cube.columns = axuiliar_row
+        cube.rows, cube.columns = cube.columns, cube.rows
         inverted_table_properties = cube.encode_properties()
 
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-4"):
                 div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
                 # Each button is a 36px width
-                #TODO: Expand all button
-                #with div(cls="col-span-1"):
-                #    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=expansion_cube_properties, render=False).url(),
-                #        cls="absolute right-[84px]").add(EXPAND_ALL)
                 # Invert axis button
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
@@ -772,13 +759,41 @@ class PivotTable(Component):
         DownloadReport = pool.get('www.download_report')
         Language = pool.get('ir.lang')
 
-        cube = Cube.parse_properties(self.table_properties, self.table_name)
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
 
-        download = a(DOWNLOAD, href=DownloadReport(
+        download = a(DOWNLOAD, cls="inline-block p-2", href=DownloadReport(
                 database_name=self.database_name, table_name=self.table_name,
                 table_properties=self.table_properties, render=False).url('download'))
+
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+
+        # Prepare the cube properties for the expand all cube function
+        cube.table = self.table_name
+        cube.row_expansions = Cube.EXPAND_ALL
+        cube.column_expansions = Cube.EXPAND_ALL
+        expanded_table_properties = cube.encode_properties()
+
+        # Prepare the cube properties for the collapse all cube function
+        cube.table = self.table_name
+        cube.row_expansions = []
+        cube.column_expansions = []
+        collapsed_table_properties = cube.encode_properties()
+
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+
+        css = 'text-gray-300'
+        if cube.row_expansions != Cube.EXPAND_ALL or cube.column_expansions != Cube.EXPAND_ALL:
+            css = 'text-black'
+        expand_all = a(cls="inline-block p-2 " + css, href=Index(database_name=self.database_name, table_name=self.table_name,
+                table_properties=expanded_table_properties, render=False).url())
+        expand_all.add(EXPAND_ALL)
+        css = 'text-gray-300'
+        if cube.row_expansions != [] or cube.column_expansions != []:
+            css = 'text-black'
+        collapse_all = a(cls="inline-block p-2 " + css, href=Index(database_name=self.database_name, table_name=self.table_name,
+                table_properties=collapsed_table_properties, render=False).url())
+        collapse_all.add(COLLAPSE_ALL)
 
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
         for row in cube.build():
@@ -786,45 +801,64 @@ class PivotTable(Component):
             for cell in row:
                 if download:
                     # Paint the download button in the first cell
-                    pivot_row.add(td(download, cls="text-xs uppercase text-black px-6 py-3 bg-blue-300"))
+                    first_cell = td(cls="flex items-center gap-2 text-xs uppercase text-black px-6 py-3 bg-blue-300")
+                    first_cell.add(expand_all)
+                    first_cell.add(collapse_all)
+                    first_cell.add(download)
+                    pivot_row.add(first_cell)
                     download = None
                     continue
+
                 # Handle the headers links
                 if (cell.type == CellType.ROW_HEADER or
                         cell.type == CellType.COLUMN_HEADER):
+                    cell_cube = Cube.parse_properties(
+                        self.table_properties, self.table_name)
                     cell_value = cell.formatted(language)
-                    table_properties = None
-                    if (cell.expansion_row and cell.expansion_row in
-                            cube.expansions_rows) or (cell.expansion_column and
-                            cell.expansion_column in cube.expansions_columns):
+
+                    icon = None
+                    if (cell_value and (cube.row_expansions == Cube.EXPAND_ALL or
+                                         cube.column_expansions == Cube.EXPAND_ALL)):
+                        if cell.row_expansion or cell.column_expansion:
+                            icon = COLLAPSE
+                        cell_cube.row_expansions = []
+                        cell_cube.column_expansions = []
+
+                    elif (cell.row_expansion and cell.row_expansion in
+                            cube.row_expansions) or (cell.column_expansion and
+                            cell.column_expansion in cube.column_expansions):
                         # This case handles the collapse action of the headers cells
                         icon = COLLAPSE
 
-                        cell_cube = Cube.parse_properties(
-                            self.table_properties, self.table_name)
                         if cell.type == CellType.ROW_HEADER:
-                            cell_cube.expansions_rows.remove(
-                                cell.expansion_row)
+                            try:
+                                cell_cube.row_expansions.remove(
+                                    cell.row_expansion)
+                            except ValueError:
+                                # row_expansions may be equal to Cube.EXPAND_ALL
+                                pass
                         elif cell.type == CellType.COLUMN_HEADER:
-                            cell_cube.expansions_columns.remove(
-                                cell.expansion_column)
-                        table_properties = cell_cube.encode_properties()
-                    elif cell.expansion_row or cell.expansion_column:
+                            try:
+                                cell_cube.column_expansions.remove(
+                                    cell.column_expansion)
+                            except ValueError:
+                                # row_expansions may be equal to Cube.EXPAND_ALL
+                                pass
+                    elif cell.row_expansion or cell.column_expansion:
                         # This case handles all the expansions
                         icon = EXPAND
 
-                        cell_cube = Cube.parse_properties(
-                            self.table_properties, self.table_name)
                         if cell.type == CellType.ROW_HEADER:
-                            cell_cube.expansions_rows.append(cell.expansion_row)
+                            cell_cube.row_expansions.append(cell.row_expansion)
                         elif cell.type == CellType.COLUMN_HEADER:
-                            cell_cube.expansions_columns.append(
-                                cell.expansion_column)
-                        table_properties = cell_cube.encode_properties()
+                            cell_cube.column_expansions.append(
+                                cell.column_expansion)
+
+                    table_properties = cell_cube.encode_properties()
 
                     if table_properties:
                         cell_value = a(
-                            str(icon) + ' ' + str(cell.formatted(language)),
+                            str(icon or '') + ' ' + str(cell.formatted(language)),
                             href="#", hx_target="#pivot_table",
                             hx_post=PivotTable(
                                     database_name=self.database_name,

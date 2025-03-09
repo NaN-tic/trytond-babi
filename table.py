@@ -1739,7 +1739,7 @@ class Warning(Workflow, ModelSQL, ModelView):
                 self.table.email_template.id, [self])
 
 
-class Excel(Report):
+class TableExcel(Report):
     'Table Excel Export'
     __name__ = 'babi.table.excel'
 
@@ -1763,7 +1763,7 @@ class Excel(Report):
         if len(tables) == 1:
             name = table.name
         else:
-            name = 'tables'
+            name = gettext('babi.msg_tables_filename')
         return ('xlsx', save_virtual_workbook(wb), False, name)
 
 
@@ -1837,9 +1837,17 @@ class Pivot(ModelSQL, ModelView):
             pivot.active_stored = value
         cls.save(pivots)
 
-    @fields.depends('table', 'name', 'row_dimensions', 'column_dimensions',
-            'measures', 'properties', 'order', '_parent_table.pivot_table')
+    @fields.depends('table', '_parent_table.pivot_table', methods=['get_cube'])
     def on_change_with_url(self, name=None):
+        cube = self.get_cube()
+        if not cube:
+            return
+        properties = cube.encode_properties()
+        return f'{self.table.pivot_table.replace("/null", "")}/{properties}'
+
+    @fields.depends('table', 'row_dimensions', 'column_dimensions', 'measures',
+        'properties', 'order')
+    def get_cube(self):
         if not self.table:
             return
         order = []
@@ -1849,8 +1857,7 @@ class Pivot(ModelSQL, ModelView):
                             item.element.aggregate), item.order))
             else:
                 order.append((item.element.field.internal_name, item.order))
-
-        cube = Cube(table=self.table,
+        return Cube(table=self.table.table_name,
             rows=[x.field.internal_name for x in self.row_dimensions if x.field],
             columns=[x.field.internal_name for x in self.column_dimensions if x.field],
             measures=[(x.field.internal_name, x.aggregate)
@@ -1858,8 +1865,6 @@ class Pivot(ModelSQL, ModelView):
             properties=[x.field.internal_name for x in self.properties if x.field],
             order=order,
             )
-        properties = cube.encode_properties()
-        return f'{self.table.pivot_table.replace("/null", "")}/{properties}'
 
     @classmethod
     def search_rec_name(cls, name, clause):
@@ -2069,6 +2074,46 @@ class Order(sequence_ordered(), ModelSQL, ModelView):
         get_name = Model.get_name
         models = cls._get_elements()
         return [(None, '')] + [(m, get_name(m)) for m in models]
+
+
+class PivotExcel(Report):
+    'Pivot Excel Export'
+    __name__ = 'babi.pivot.excel'
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__rpc__['execute'] = RPC(False)
+
+    @classmethod
+    def execute(cls, ids, data):
+        pool = Pool()
+        Pivot = pool.get('babi.pivot')
+        Language = pool.get('ir.lang')
+
+        if not ids:
+            return
+        cls.check_access()
+
+        pivots = Pivot.browse(ids)
+
+        language = Transaction().context.get('language', 'en')
+        language, = Language.search([('code', '=', language)], limit=1)
+        wb = Workbook()
+        wb.remove(wb.active)
+        for pivot in pivots:
+            ws = wb.create_sheet(pivot.table.name)
+            cube = pivot.get_cube()
+            cube.column_expansions = Cube.EXPAND_ALL
+            cube.row_expansions = Cube.EXPAND_ALL
+            for row in cube.build():
+                ws.append([x.formatted(language, excel=True) for x in row])
+
+        if len(pivots) == 1:
+            name = pivot.table.name
+        else:
+            name = gettext('babi.msg_pivots_filename')
+        return ('xlsx', save_virtual_workbook(wb), False, name)
 
 
 class OpenExecutionFiltered(StateView):
