@@ -155,5 +155,11 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_only_one_table_with_parameters">
             <field name="text">Table "%(table)s" requires parameters but you tried to compute more than one table at once. Tables with parameters must be computed individually.</field>
         </record>
+        <record model="ir.message" id="msg_tables_filename">
+            <field name="text">tables</field>
+        </record>
+        <record model="ir.message" id="msg_pivots_filename">
+            <field name="text">pivot-tables</field>
+        </record>
     </data>
 </tryton>
