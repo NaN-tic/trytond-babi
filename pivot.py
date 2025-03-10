@@ -157,7 +157,8 @@ class Index(Component):
             table_name = table_name.split('__')[-1]
 
         babi_table = BabiTable.search([
-            ('internal_name', '=', table_name)], limit=1)
+                ('internal_name', '=', table_name),
+                ], limit=1)
 
         # Check if the user can see the table, if not, return an error page
         access = False
@@ -171,7 +172,7 @@ class Index(Component):
             with main(cls="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8") as error_section:
                 with div(cls="text-center"):
                     p(_('404'), cls="text-base font-semibold text-indigo-600")
-                    h1(_('Page not found'), cls="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl")
+                    h1(_("Page not found or you don't have access to it"), cls="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl")
                     p(_('Sorry, we couldn’t find the page you’re looking for.'), cls="mt-6 text-base leading-7 text-gray-600")
             layout = Layout(title=_('Page not found | Tryton'))
             layout.main.add(error_section)
