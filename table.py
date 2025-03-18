@@ -1785,6 +1785,10 @@ class Pivot(ModelSQL, ModelView):
     url = fields.Function(fields.Char('URL'), 'on_change_with_url')
 
     @staticmethod
+    def default_active():
+        return True
+
+    @staticmethod
     def default_active_stored():
         return True
 
