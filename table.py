@@ -1846,7 +1846,7 @@ class Pivot(ModelSQL, ModelView):
         return f'{self.table.pivot_table.replace("/null", "")}/{properties}'
 
     @fields.depends('table', 'row_dimensions', 'column_dimensions', 'measures',
-        'properties', 'order')
+        'properties', 'order', '_parent_table.table_name')
     def get_cube(self):
         if not self.table:
             return
