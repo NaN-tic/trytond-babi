@@ -312,6 +312,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ('view', 'View'),
             ], 'Type', required=True)
     internal_name = fields.Char('Internal Name', required=True)
+    table_name = fields.Function(fields.Char('Table Name'),
+        'on_change_with_table_name')
     model = fields.Many2One('ir.model', 'Model', states={
             'invisible': Eval('type') != 'model',
             'required': Eval('type') == 'model',
@@ -980,8 +982,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         tables = cls.search([])
         Cube.clear_orphan_caches([x.table_name for x in tables])
 
-    @property
-    def table_name(self):
+    @fields.depends('internal_name')
+    def on_change_with_table_name(self, name=None):
+        if not self.internal_name:
+            return
         # Add a suffix to the table name to prevent removing production tables
         return '__' + self.internal_name
 
