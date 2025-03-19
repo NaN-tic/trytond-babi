@@ -513,9 +513,9 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
 
         if self.domain:
             domain = self.domain
-            if '__' in domain:
-                domain = str(PYSONDecoder().decode(domain))
             try:
+                if '__' in domain:
+                    domain = str(PYSONDecoder().decode(domain))
                 domain = eval(domain, {
                         'datetime': mdatetime,
                         'false': False,
