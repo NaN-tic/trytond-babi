@@ -35,12 +35,6 @@ def add_field(fields, table, record):
 counter = 0
 total = len(reports)
 for report in reports:
-    # TODO: How do we use filters with parameters?
-    if report.filter and report.filter.parameters:
-        continue
-
-    # TODO: Què passa amb l'enviament dels correus electrònics?
-
     counter += 1
     print('Working on report: %s (%s/%s)' % (report.name, counter, total))
     table = Table()
