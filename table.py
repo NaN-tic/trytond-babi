@@ -2,7 +2,7 @@ import csv
 import time
 import traceback
 import datetime as mdatetime
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 import logging
 import sql
 import unidecode
@@ -1754,13 +1754,18 @@ class TableExcel(Report):
             return
         cls.check_access()
 
+        def _convert_to_string(value):
+            if isinstance(value, (str, date, datetime, time, bool)):
+                return value
+            return str(value) if value is not None else ''
+
         tables = Table.browse(ids)
         wb = Workbook()
         wb.remove(wb.active)
         for table in tables:
             ws = wb.create_sheet(table.name)
             for record in table.get_records():
-                ws.append(record)
+                ws.append([_convert_to_string(item) for item in record])
 
         if len(tables) == 1:
             name = table.name
