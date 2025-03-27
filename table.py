@@ -1702,6 +1702,8 @@ class Warning(Workflow, ModelSQL, ModelView):
         return ids
 
     def get_records(self, ids=None):
+        if not self.table.related_model:
+            return []
         pool = Pool()
         Model = pool.get(self.table.related_model.name)
         if ids is None:
