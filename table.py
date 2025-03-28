@@ -2,7 +2,7 @@ import csv
 import time
 import traceback
 import datetime as mdatetime
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time as dt_time, timedelta
 import logging
 import sql
 import unidecode
@@ -1755,9 +1755,9 @@ class TableExcel(Report):
         cls.check_access()
 
         def _convert_to_string(value):
-            if isinstance(value, (str, date, datetime, time, bool)):
+            if isinstance(value, (str, int, float, date, datetime, dt_time, bool)):
                 return value
-            return str(value) if value is not None else ''
+            return str(value) if value is not None else None
 
         tables = Table.browse(ids)
         wb = Workbook()
