@@ -1294,7 +1294,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
             table = sql.Table(self.table_name)
             columns = [sql.Column(table, x.internal_name) for x in self.fields_]
-            expressions = [x.expression.expression for x in self.fields_]
+            expressions = [(x.expression.expression, x.expression.decimal_digits)
+                for x in self.fields_]
             index = 0
             count = 0
             offset = 10000
@@ -1322,10 +1323,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                         if not babi_eval(python_filter, record, convert_none=None):
                             continue
                     values = []
-                    for expression in expressions:
+                    for expression, digits in expressions:
                         try:
                             values.append(babi_eval(expression, record,
-                                    convert_none=None))
+                                    convert_none=None, digits=digits))
                         except Exception as message:
                             notify(gettext('babi.msg_compute_table_exception',
                                     table=self.name, field=field.name,
