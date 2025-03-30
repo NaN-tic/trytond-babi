@@ -3111,10 +3111,6 @@ msgid "Properties"
 msgstr "Propietats"
 
 msgctxt "voyager:v:"
-msgid "Properties"
-msgstr "Propietats"
-
-msgctxt "voyager:v:"
 msgid "Rows"
 msgstr "Files"
 

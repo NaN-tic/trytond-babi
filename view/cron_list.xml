@@ -1,6 +1,5 @@
 <data>
     <xpath expr="/tree" position="inside">
-        <field name="babi_report"/>
         <field name="babi_table"/>
         <field name="babi_cluster"/>
         <field name="babi_compute_warnings"/>
