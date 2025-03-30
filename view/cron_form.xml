@@ -1,9 +1,6 @@
 <data>
     <xpath expr="/form/group[@id='checkboxes']/field[@name='active']" position="after">
         <newline/>
-        <label name="babi_report"/>
-        <field name="babi_report"/>
-        <newline/>
         <label name="babi_table"/>
         <field name="babi_table"/>
         <newline/>

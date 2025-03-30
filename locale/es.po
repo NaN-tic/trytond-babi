@@ -1997,10 +1997,6 @@ msgctxt "model:ir.message,text:msg_yes"
 msgid "Yes"
 msgstr "Sí"
 
-msgctxt "model:ir.message,text:msg_yes"
-msgid "Yes"
-msgstr "Sí"
-
 msgctxt "model:ir.message,text:no_dimensions"
 msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
 msgstr ""

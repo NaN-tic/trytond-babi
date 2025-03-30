@@ -5,7 +5,6 @@ from . import configuration
 from . import cron
 from . import babi
 from . import test_model
-from . import report
 from . import table
 from . import dashboard
 from . import action
@@ -21,24 +20,8 @@ def register():
         babi.Filter,
         babi.FilterParameter,
         babi.Expression,
-        babi.Report,
-        babi.ReportExecution,
-        babi.ReportGroup,
-        babi.Dimension,
-        babi.DimensionColumn,
-        babi.Measure,
-        babi.InternalMeasure,
-        babi.Order,
-        babi.ActWindow,
-        babi.Menu,
-        babi.Keyword,
         babi.Model,
         cron.Cron,
-        babi.OpenChartStart,
-        babi.OpenExecutionSelect,
-        babi.UpdateDataWizardStart,
-        babi.UpdateDataWizardUpdated,
-        babi.CleanExecutionsStart,
         dashboard.Dashboard,
         dashboard.DashboardItem,
         dashboard.Widget,
@@ -75,13 +58,9 @@ def register():
         pivot.DownloadReport,
         module='babi', type_='model')
     Pool.register(
-        babi.OpenChart,
-        babi.OpenExecution,
-        babi.CleanExecutions,
         table.ParametrizeTable,
         module='babi', type_='wizard')
     Pool.register(
-        report.BabiHTMLReport,
         table.TableExcel,
         table.PivotExcel,
         module='babi', type_='report')

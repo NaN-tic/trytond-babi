@@ -1404,8 +1404,6 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
     def on_change_with_type(self, name=None):
         if self.expression:
             return self.expression.ttype
-        else:
-            return ''
 
     @fields.depends('table', '_parent_table.type')
     def on_change_with_table_type(self, name=None):
@@ -2139,7 +2137,7 @@ class OpenExecutionFiltered(StateView):
                 Button('Cancel', 'end', 'tryton-cancel'),
                 Button('Create', 'create_table', 'tryton-ok', True),
                 ]
-        super().__init__('babi.report', 0, buttons)
+        super().__init__('babi.table', 0, buttons)
 
     def get_view(self, wizard, state_name):
         pool = Pool()
@@ -2223,22 +2221,17 @@ class OpenExecutionFiltered(StateView):
 
     def get_defaults(self, wizard, state_name, fields):
         pool = Pool()
-        Menu = pool.get('ir.ui.menu')
         Parameter = pool.get('babi.filter.parameter')
         context = Transaction().context
         model = context.get('active_model')
 
         defaults = {}
-        if model == 'ir.ui.menu':
-            menu = Menu(context.get('active_id'))
-            defaults['report'] = menu.babi_report.id
-        else:
-            parameters = Parameter.search([
-                    ('related_model.model', '=', model),
-                    ])
-            for parameter in parameters:
-                name = '%s_%d' % (parameter.name, parameter.id)
-                defaults[name] = context.get('active_id')
+        parameters = Parameter.search([
+                ('related_model.model', '=', model),
+                ])
+        for parameter in parameters:
+            name = '%s_%d' % (parameter.name, parameter.id)
+            defaults[name] = context.get('active_id')
         return defaults
 
 
