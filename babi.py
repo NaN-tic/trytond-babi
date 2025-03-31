@@ -279,21 +279,6 @@ class FilterParameter(ModelSQL, ModelView):
             'readonly': Not(Eval('ttype').in_(['many2one', 'many2many'])),
             })
 
-    def create_keyword(self):
-        pool = Pool()
-        Action = pool.get('ir.action.wizard')
-        ModelData = pool.get('ir.model.data')
-        Keyword = pool.get('ir.action.keyword')
-
-        if self.ttype in ['many2one', 'many2many']:
-            action = Action(ModelData.get_id('babi', 'open_execution_wizard'))
-            keyword = Keyword()
-            keyword.keyword = 'form_relate'
-            keyword.model = '%s,-1' % self.related_model.name
-            keyword.action = action.action
-            keyword.babi_filter_parameter = self
-            keyword.save()
-
     @classmethod
     def __register__(cls, module_name):
         super(FilterParameter, cls).__register__(module_name)
@@ -323,41 +308,6 @@ class FilterParameter(ModelSQL, ModelView):
 
             return False
         return True
-
-    @classmethod
-    def create(cls, vlist):
-        filters = super(FilterParameter, cls).create(vlist)
-        with Transaction().set_context(_check_access=False):
-            for filter in filters:
-                filter.create_keyword()
-        return filters
-
-    @classmethod
-    def write(cls, *args):
-        pool = Pool()
-        Keyword = pool.get('ir.action.keyword')
-        super(FilterParameter, cls).write(*args)
-        actions = iter(args)
-        with Transaction().set_context(_check_access=False):
-            for filters, values in zip(actions, actions):
-                if 'related_model' in values:
-                    filter_ids = [f.id for f in filters]
-                    Keyword.delete(Keyword.search([
-                                ('babi_filter_parameter', 'in', filter_ids),
-                            ]))
-                    for filter in filters:
-                        filter.create_keyword()
-
-    @classmethod
-    def delete(cls, filters):
-        pool = Pool()
-        Keyword = pool.get('ir.action.keyword')
-        with Transaction().set_context(_check_access=False):
-            Keyword.delete(Keyword.search([
-                        ('babi_filter_parameter', 'in',
-                            [f.id for f in filters]),
-                    ]))
-        super(FilterParameter, cls).delete(filters)
 
 
 class Expression(DeactivableMixin, ModelSQL, ModelView):
@@ -494,4 +444,3 @@ class Model(metaclass=PoolMeta):
 
     babi_enabled = fields.Boolean('BI Enabled', help='Check if you want '
         'this model to be available in Business Intelligence reports.')
-
