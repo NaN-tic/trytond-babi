@@ -11,6 +11,7 @@ import tempfile
 import html
 import urllib.parse
 import secrets
+from decimal import Decimal
 from types import SimpleNamespace
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
@@ -1755,7 +1756,8 @@ class TableExcel(Report):
         cls.check_access()
 
         def _convert_to_string(value):
-            if isinstance(value, (str, int, float, date, datetime, dt_time, bool)):
+            if isinstance(value, (Decimal, str, int, float, date, datetime,
+                    dt_time, bool)):
                 return value
             return str(value) if value is not None else None
 
