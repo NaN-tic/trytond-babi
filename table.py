@@ -1357,24 +1357,26 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def check_access(self, user=None):
         pool = Pool()
         User = pool.get('res.user')
+        ModelData = pool.get('ir.model.data')
+
 
         if not user:
             user = User(Transaction().user)
-
-        access = True
         if not user:
-            access = False
-        if access and user and self.access_users:
-            if user not in self.access_users:
-                access = False
-        if access and user and self.access_groups:
-            access = False
+            return False
+
+        group_babi_admin = ModelData.get_id('babi', 'group_babi_admin')
+        for group in user.groups:
+            if group.id == group_babi_admin:
+                return True
+        if self.access_groups:
             for group in user.groups:
                 if group in self.access_groups:
-                    access = True
-                    break
-
-        return access
+                    return True
+        if self.access_users:
+            if user not in self.access_users:
+                return False
+        return True
 
 
 class Field(sequence_ordered(), ModelSQL, ModelView):
