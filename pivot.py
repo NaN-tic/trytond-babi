@@ -164,7 +164,6 @@ class Index(Component):
         access = False
         if babi_table:
             babi_table, = babi_table
-            table_name = babi_table.name
             access = babi_table.check_access()
 
         if not access or not babi_table:
@@ -177,6 +176,8 @@ class Index(Component):
             layout = Layout(title=_('Page not found | Tryton'))
             layout.main.add(error_section)
             return layout.tag()
+
+        table_name = babi_table.name
 
         # Ensure we have a value in table_properties
         if not hasattr(self, 'table_properties'):
