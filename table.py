@@ -904,7 +904,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             tables = {self}
         for dep in self.requires:
             table = dep.table
-            if table in tables:
+            if not table or table in tables:
                 continue
             tables.add(table)
             table.get_cluster(tables)
