@@ -5,7 +5,7 @@
 import datetime
 import random
 from decimal import Decimal
-
+from trytond import backend
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
@@ -207,5 +207,45 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         fields = sorted([x.internal_name for x in table.fields_])
         self.assertEqual(fields, ['amount', 'date'])
 
+    @with_transaction()
+    def test_table_xls_report(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        TableExcel = pool.get('babi.table.excel', type='report')
+
+        table = Table()
+        table.type = 'view'
+        table.name = 'Table View'
+        table.on_change_name()
+
+        if backend.name == 'sqlite':
+            table.query = """
+                SELECT
+                    'Hello World' AS text_value,
+                    42 AS int_value,
+                    3.14 AS float_value,
+                    DATE('now') AS date_value,
+                    DATETIME('now') AS datetime_value,
+                    TIME('now') AS time_value,
+                    1 AS bool_value,
+                    NULL AS null_value;
+                """
+        else:
+            table.query = """
+                SELECT
+                    'Hello World' AS text_value,           -- str (text)
+                    42 AS int_value,                       -- int
+                    3.14 AS float_value,                   -- float
+                    CURRENT_DATE AS date_value,            -- date
+                    NOW()::timestamp AS datetime_value,    -- datetime (timestamp without time zone)
+                    CURRENT_TIME::time AS time_value,      -- time (time without time zone)
+                    TRUE AS bool_value,                    -- bool
+                    NULL AS null_value;
+                """
+        table.save()
+        self.assertIn('Hello World', str(table.preview))
+
+        oext, _, _, _ = TableExcel.execute([table.id], {})
+        self.assertEqual(oext, 'xlsx')
 
 del ModuleTestCase
