@@ -534,7 +534,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 ('create_date', '<', date),
                 ('parameters', '!=', None),
                 ])
-        cls.delete(tables)
+        # We need to use the queue to delete the tables because if we try to
+        # delete during a cron call, it will wait forever given that a ir.cron
+        # record is being locked by the process and the ir.cron table has a m2o
+        # to the babi.table table.
+        cls.__queue__.delete(tables)
 
     @classmethod
     def copy(cls, tables, default=None):
