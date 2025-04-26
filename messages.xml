@@ -150,5 +150,10 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_no">
             <field name="text">No</field>
         </record>
+        <record model="ir.message" id="msg_error_obtaining_records">
+            <field name="text">An error occurred while obtaining the records for table "%(table)s":
+
+%(error)s</field>
+        </record>
     </data>
 </tryton>
