@@ -98,7 +98,6 @@ class Layout(Component):
                 if site.author:
                     meta(name='author', content=site.author)
                 comment('CSS')
-                link(href="/static/output.css", rel="stylesheet")
                 style('.loading-indicator{visibility: hidden;}'
                     '.htmx-request .loading-indicator{visibility: visible; transition: opacity 200ms ease-in;}'
                     '.htmx-request.loading-indicator{visibility: visible; transition: opacity 200ms ease-in;}')
