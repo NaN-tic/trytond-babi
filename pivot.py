@@ -236,7 +236,7 @@ class Index(Component):
                             PivotTable(database_name=self.database_name, table_name=self.table_name,
                                 table_properties=self.table_properties)
                         except UndefinedTable:
-                            div(cls="text-center").add(_("Before accessing the data, you must calculate the data"))
+                            div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
                         except Exception as e:
                             div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
                             print_trace = True
