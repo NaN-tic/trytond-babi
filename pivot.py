@@ -1,11 +1,12 @@
+import logging
+import tempfile
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
     option, main, th, style, details, summary)
 from dominate.util import raw
-import logging
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
-import tempfile
+from psycopg2.errors import UndefinedTable
 from werkzeug.routing import Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -234,6 +235,8 @@ class Index(Component):
                         try:
                             PivotTable(database_name=self.database_name, table_name=self.table_name,
                                 table_properties=self.table_properties)
+                        except UndefinedTable:
+                            div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
                         except Exception as e:
                             div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
                             print_trace = True
