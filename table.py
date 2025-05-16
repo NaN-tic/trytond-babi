@@ -898,6 +898,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 table.calculation_date = None
                 table.calculation_time = None
                 table.save()
+                table.clear_cache([table])
+                table._drop()
                 action_id = Action.get_action_id(ModelData.get_id('babi',
                         'table_parametrize_wizard'))
                 values = Action(action_id).get_action_value()
