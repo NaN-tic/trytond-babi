@@ -11,6 +11,8 @@ import tempfile
 import html
 import urllib.parse
 import secrets
+from sql import Literal
+from sql.operators import Equal
 from decimal import Decimal
 from types import SimpleNamespace
 from openpyxl import Workbook
@@ -20,7 +22,7 @@ from trytond import backend
 from trytond.bus import notify
 from trytond.transaction import Transaction
 from trytond.pool import Pool
-from trytond.model import (Model, ModelView, ModelSQL, fields,
+from trytond.model import (Exclude, Model, ModelView, ModelSQL, fields,
     Unique, DeactivableMixin, sequence_ordered, Workflow)
 from trytond.exceptions import UserError
 from trytond.i18n import gettext
@@ -462,6 +464,15 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls._order.insert(0, ('name', 'ASC'))
+        # Make internal_name unique
+        t = cls.__table__()
+        cls._sql_constraints = [
+            ('internal_name_exclude', Exclude(t, (t.internal_name, Equal),
+                    where=(t.active == Literal(True))
+                    & (t.internal_name != '')),
+                'babi.msg_table_internal_name_unique'),
+            ]
+
         cls._buttons.update({
                 'ai': {},
                 'compute': {},
@@ -549,6 +560,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             default = {}
 
         default = default.copy()
+        default.setdefault('name',
+            lambda x: x['name'] + ' (%s)' % gettext('babi.copy'))
+        default.setdefault('internal_name', lambda x: (
+                convert_to_symbol(x['name'] + ' (%s)' % gettext('babi.copy'))))
         default.setdefault('pivots')
         default.setdefault('related_field')
         default.setdefault('user_field')
