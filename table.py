@@ -891,6 +891,13 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 if len(tables) > 1:
                     raise UserError(gettext('babi.msg_table_parametrize',
                             table=table.rec_name))
+                # Clear table data that may exist if the table did not have
+                # parameters before
+                table.compute_error = None
+                table.compute_warning_error = None
+                table.calculation_date = None
+                table.calculation_time = None
+                table.save()
                 action_id = Action.get_action_id(ModelData.get_id('babi',
                         'table_parametrize_wizard'))
                 values = Action(action_id).get_action_value()
