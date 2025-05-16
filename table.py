@@ -542,6 +542,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     @classmethod
     def copy(cls, tables, default=None):
+        pool = Pool()
+        Pivot = pool.get('babi.pivot')
+
         if default is None:
             default = {}
 
@@ -564,6 +567,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             new.company_field = (old.company_field
                 and rel.get(old.company_field.internal_name))
             to_save.append(new)
+            Pivot.copy(old.pivots, default={
+                    'table': new,
+                    })
+
         cls.save(to_save)
         return new_tables
 
@@ -1875,6 +1882,59 @@ class Pivot(ModelSQL, ModelView):
             return
         properties = cube.encode_properties()
         return f'{self.table.pivot_table.replace("/null", "")}/{properties}'
+
+    @classmethod
+    def copy(cls, pivots, default=None):
+        pool = Pool()
+        RowDimension = pool.get('babi.pivot.row_dimension')
+        ColumnDimension = pool.get('babi.pivot.column_dimension')
+        Measure = pool.get('babi.pivot.measure')
+        Property = pool.get('babi.pivot.property')
+
+        if default is None:
+            default = {}
+        else:
+            default = default.copy()
+        default.setdefault('row_dimensions', [])
+        default.setdefault('column_dimensions', [])
+        default.setdefault('measures', [])
+        default.setdefault('properties', [])
+        default.setdefault('order', [])
+        new_pivots = super().copy(pivots, default)
+
+        rd_to_save = []
+        cd_to_save = []
+        m_to_save = []
+        p_to_save = []
+        for old, new in zip(pivots, new_pivots):
+            rel = {x.internal_name: x for x in new.table.fields_}
+            for dimension in old.row_dimensions:
+                record = RowDimension()
+                record.pivot = new
+                record.field = rel[dimension.field.internal_name]
+                rd_to_save.append(record)
+            for dimension in old.column_dimensions:
+                record = ColumnDimension()
+                record.pivot = new
+                record.field = rel[dimension.field.internal_name]
+                cd_to_save.append(record)
+            for measure in old.measures:
+                record = Measure()
+                record.pivot = new
+                record.field = rel[measure.field.internal_name]
+                record.aggregate = measure.aggregate
+                m_to_save.append(record)
+            for property_ in old.properties:
+                record = Property()
+                record.pivot = new
+                record.field = rel[property_.field.internal_name]
+                p_to_save.append(record)
+        RowDimension.save(rd_to_save)
+        ColumnDimension.save(cd_to_save)
+        Measure.save(m_to_save)
+        Property.save(p_to_save)
+        cls.update_order(new_pivots)
+        return new_pivots
 
     @fields.depends('table', 'row_dimensions', 'column_dimensions', 'measures',
         'properties', 'order', '_parent_table.table_name')
