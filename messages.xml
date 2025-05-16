@@ -161,5 +161,11 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_pivots_filename">
             <field name="text">pivot-tables</field>
         </record>
+        <record model="ir.message" id="msg_copy">
+            <field name="text">copy</field>
+        </record>
+        <record model="ir.message" id="msg_table_internal_name_unique">
+            <field name="text">Table's internal name must be unique.</field>
+        </record>
     </data>
 </tryton>
