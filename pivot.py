@@ -1,7 +1,7 @@
 import logging
 import tempfile
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
-    tbody, tr, td, head, html, meta, link, title, script, h3, comment, select,
+    tbody, tr, td, head, html, meta, title, script, h3, comment, select,
     option, main, th, style, details, summary)
 from dominate.util import raw
 from openpyxl import Workbook
