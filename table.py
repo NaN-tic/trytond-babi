@@ -1,4 +1,5 @@
 import csv
+import pytz
 import time
 import traceback
 import datetime as mdatetime
@@ -554,16 +555,34 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     def copy(cls, tables, default=None):
         pool = Pool()
+        Company = pool.get('company.company')
         Pivot = pool.get('babi.pivot')
+        Lang = pool.get('ir.lang')
 
         if default is None:
             default = {}
 
+        locale = Transaction().context.get(
+            'report_lang', Transaction().language).split('_')[0]
+        lang, = Lang.search([
+                ('code', '=', locale or 'en'),
+                ])
+
+        now = datetime.now()
+        company_id = Transaction().context.get('company')
+        if company_id:
+            company = Company(company_id)
+            if company.timezone:
+                timezone = pytz.timezone(company.timezone)
+                now = timezone.localize(now)
+                now = now + now.utcoffset()
+        now = lang.strftime(now)
+
+
         default = default.copy()
-        default.setdefault('name',
-            lambda x: x['name'] + ' (%s)' % gettext('babi.copy'))
+        default.setdefault('name', lambda x: x['name'] + f' ({now})')
         default.setdefault('internal_name', lambda x: (
-                convert_to_symbol(x['name'] + ' (%s)' % gettext('babi.copy'))))
+                convert_to_symbol(x['name'] + f' ({now})')))
         default.setdefault('pivots')
         default.setdefault('related_field')
         default.setdefault('user_field')
