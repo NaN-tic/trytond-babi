@@ -59,6 +59,12 @@ class Site(metaclass=PoolMeta):
         super().__setup__()
         cls.type.selection += [('babi_pivot', 'Pivot')]
 
+    def get_cache(self):
+        if self.type == 'babi_pivot':
+            # Disable cache
+            return
+        return super().get_cache()
+
     @classmethod
     def dispatch(cls, site_type, site_id, request, user):
         with Transaction().set_context(language=Transaction().language):
