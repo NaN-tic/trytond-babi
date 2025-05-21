@@ -63,7 +63,7 @@ class Site(metaclass=PoolMeta):
         if self.type == 'babi_pivot':
             # Disable cache
             return
-        return super().get_cache()
+        return super().get_cache(session, request)
 
     @classmethod
     def dispatch(cls, site_type, site_id, request, user):
