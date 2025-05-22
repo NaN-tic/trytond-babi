@@ -1082,6 +1082,26 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             cursor.execute(query)
             records = cursor.fetchall()
             self._reset_statement_timeout()
+        if self.type == 'model':
+            # Sort records based on the order and descending fields from fields_
+            headers = fields
+            if not headers:
+                headers = [x.internal_name for x in self.fields_]
+            sort_key = []
+            for field in self.fields_:
+                if not field.order:
+                    continue
+                if not field.internal_name in headers:
+                    continue
+                sort_key.append((field.order,
+                        headers.index(field.internal_name),
+                        field.descending or False))
+            sort_key.sort()
+            if sort_key:
+                # Sort on reverse order taking advantage of the stability of
+                # the sort method
+                for item in reversed(sort_key):
+                    records.sort(key=lambda x: x[item[1]], reverse=item[2])
         return records
 
     def timeout_exception(self):
@@ -1447,6 +1467,15 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
             }, domain=[
             ('model', '=', Eval('model')),
             ])
+    order = fields.Integer('Order', domain=[
+        'OR',
+        ('order', '>', 0),
+        ('order', '=', None),
+        ], help='Positive integer. Indicates if the field must be sorted '
+            'and in which position. Field with order 1 will be sorted before '
+            '2, etc. Order is computed in memory so it can be slow with many '
+            'records.')
+    descending = fields.Boolean('Descending')
     model = fields.Function(fields.Many2One('ir.model', 'Model'),
         'on_change_with_model')
     type = fields.Function(fields.Selection(FIELD_TYPES, 'Type'),

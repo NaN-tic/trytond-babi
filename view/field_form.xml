@@ -8,4 +8,8 @@
     <field name="internal_name"/>
     <label name="expression"/>
     <field name="expression"/>
+    <label name="order"/>
+    <field name="order"/>
+    <label name="descending"/>
+    <field name="descending"/>
 </form>
