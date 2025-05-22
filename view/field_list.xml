@@ -3,4 +3,6 @@
     <field name="expression"/>
     <field name="name"/>
     <field name="internal_name"/>
+    <field name="order"/>
+    <field name="descending"/>
 </tree>
