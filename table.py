@@ -729,11 +729,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 res.add(table.table_name)
         return res
 
-    def get_records(self):
+    def get_records(self, where=None):
         table = []
         table.append([x.internal_name for x in self.fields_])
         try:
-            table += self.execute_query()
+            table += self.execute_query(where=where)
         except Exception as e:
             raise UserError(gettext('babi.msg_error_obtaining_records',
                     table=self.rec_name, error=str(e)))
@@ -745,11 +745,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         records = records[1:]
         return [SimpleNamespace(**dict(zip(fields, x))) for x in records]
 
-    def get_html(self, limit=None):
+    def get_html(self, where=None, limit=None):
         start = time.time()
         content = None
         try:
-            records = self.execute_query(limit=limit)
+            records = self.execute_query(where=None, limit=limit)
         except Exception as e:
             content = str(e)
 
@@ -1620,6 +1620,12 @@ class Warning(Workflow, ModelSQL, ModelView):
     done_by = employee_field("Done By", states=['pending', 'done', 'ignored'])
     ignored_by = employee_field("Ignored By",
         states=['pending', 'done', 'ignored'])
+    preview = fields.Function(fields.Binary('Preview',
+        filename='preview_filename', states={
+            'invisible': ~Bool(Eval('preview')),
+            }), 'get_preview')
+    preview_filename = fields.Function(fields.Char('Preview Filename'),
+        'get_preview_filename')
 
     def get_rec_name(self, name):
         return f'{self.count} - {self.table.name}'
@@ -1842,6 +1848,27 @@ class Warning(Workflow, ModelSQL, ModelView):
             self.table.email_template.render_and_send(
                 self.table.email_template.id, [self])
 
+    def query_where(self):
+        if not self.table.related_model:
+            return None
+        ids = self.get_ids()
+        if not ids:
+            return None
+        ids = ','.join([str(x) for x in ids])
+        return f'"{self.table.related_field.internal_name}" IN ({ids})'
+
+    def get_html(self, limit=None):
+        where = self.query_where()
+        if not where:
+            return ''
+        return self.table.get_html(where=where, limit=limit)
+
+    def get_preview(self, name):
+        return self.get_html().encode()
+
+    def get_preview_filename(self, name):
+        return self.table.internal_name + '.html'
+
 
 class TableExcel(Report):
     'Table Excel Export'
@@ -1858,28 +1885,39 @@ class TableExcel(Report):
         action, model = cls.get_action(data)
         cls.check_access(action, model, ids)
 
+        def _convert_to_title(value):
+            # Replace symbols that are not allowed in the sheet name
+            title = value.replace('/', '_').replace(':', '_')
+            # Excel has a limit of 31 characters for the sheet name
+            title = title[:31]
+            return
+
         def _convert_to_string(value):
             if isinstance(value, (Decimal, str, int, float, date, datetime,
                     dt_time, bool)):
                 return value
             return str(value) if value is not None else None
 
-        tables = Table.browse(ids)
         wb = Workbook()
         wb.remove(wb.active)
-        for table in tables:
-            # Replace symbols that are not allowed in the sheet name
-            title = table.name.replace('/', '_').replace(':', '_')
-            # Excel has a limit of 31 characters for the sheet name
-            title = title[:31]
-            ws = wb.create_sheet(title)
-            for record in table.get_records():
-                ws.append([_convert_to_string(item) for item in record])
 
-        if len(tables) == 1:
-            name = table.name
-        else:
-            name = gettext('babi.msg_tables_filename')
+        name = gettext('babi.msg_tables_filename')
+        if data.get('model') == 'babi.table':
+            tables = Table.browse(ids)
+            for table in tables:
+                ws = wb.create_sheet(_convert_to_title(table.name))
+                for record in table.get_records():
+                    ws.append([_convert_to_string(item) for item in record])
+            if len(tables) == 1:
+                name = table.name
+        elif data.get('model') == 'babi.warning':
+            warnings = Warning.browse(ids)
+            for warning in warnings:
+                ws = wb.create_sheet(_convert_to_title(warning.table.name))
+                for record in warning.table.get_records(where=warning.query_where()):
+                    ws.append([_convert_to_string(item) for item in record])
+            if len(warnings) == 1:
+                name = warning.table.name
         return ('xlsx', save_virtual_workbook(wb), False, name)
 
 
