@@ -83,5 +83,6 @@ def register():
     Pool.register(
         report.BabiHTMLReport,
         table.TableExcel,
+        table.WarningExcel,
         table.PivotExcel,
         module='babi', type_='report')

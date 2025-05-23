@@ -1870,6 +1870,20 @@ class Warning(Workflow, ModelSQL, ModelView):
         return self.table.internal_name + '.html'
 
 
+def _convert_to_title(value):
+    # Replace symbols that are not allowed in the sheet name
+    title = value.replace('/', '_').replace(':', '_')
+    # Excel has a limit of 31 characters for the sheet name
+    title = title[:31]
+    return
+
+def _convert_to_string(value):
+    if isinstance(value, (Decimal, str, int, float, date, datetime,
+            dt_time, bool)):
+        return value
+    return str(value) if value is not None else None
+
+
 class TableExcel(Report):
     'Table Excel Export'
     __name__ = 'babi.table.excel'
@@ -1884,39 +1898,46 @@ class TableExcel(Report):
 
         cls.check_access()
 
-        def _convert_to_title(value):
-            # Replace symbols that are not allowed in the sheet name
-            title = value.replace('/', '_').replace(':', '_')
-            # Excel has a limit of 31 characters for the sheet name
-            title = title[:31]
+        wb = Workbook()
+        wb.remove(wb.active)
+        tables = Table.browse(ids)
+        for table in tables:
+            ws = wb.create_sheet(_convert_to_title(table.name))
+            for record in table.get_records():
+                ws.append([_convert_to_string(item) for item in record])
+        if len(tables) == 1:
+            name = table.name
+        else:
+            name = gettext('babi.msg_tables_filename')
+        return ('xlsx', save_virtual_workbook(wb), False, name)
+
+
+class WarningExcel(Report):
+    'Warning Excel Export'
+    __name__ = 'babi.warning.excel'
+
+    @classmethod
+    def execute(cls, ids, data):
+        pool = Pool()
+        Warning = pool.get('babi.warning')
+
+        if not ids:
             return
 
-        def _convert_to_string(value):
-            if isinstance(value, (Decimal, str, int, float, date, datetime,
-                    dt_time, bool)):
-                return value
-            return str(value) if value is not None else None
+        cls.check_access()
 
         wb = Workbook()
         wb.remove(wb.active)
 
-        name = gettext('babi.msg_tables_filename')
-        if data.get('model') == 'babi.table':
-            tables = Table.browse(ids)
-            for table in tables:
-                ws = wb.create_sheet(_convert_to_title(table.name))
-                for record in table.get_records():
-                    ws.append([_convert_to_string(item) for item in record])
-            if len(tables) == 1:
-                name = table.name
-        elif data.get('model') == 'babi.warning':
-            warnings = Warning.browse(ids)
-            for warning in warnings:
-                ws = wb.create_sheet(_convert_to_title(warning.table.name))
-                for record in warning.table.get_records(where=warning.query_where()):
-                    ws.append([_convert_to_string(item) for item in record])
-            if len(warnings) == 1:
-                name = warning.table.name
+        warnings = Warning.browse(ids)
+        for warning in warnings:
+            ws = wb.create_sheet(_convert_to_title(warning.table.name))
+            for record in warning.table.get_records(where=warning.query_where()):
+                ws.append([_convert_to_string(item) for item in record])
+        if len(warnings) == 1:
+            name = warning.table.name
+        else:
+            name = gettext('babi.msg_tables_filename')
         return ('xlsx', save_virtual_workbook(wb), False, name)
 
 
