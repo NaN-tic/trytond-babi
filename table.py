@@ -90,6 +90,12 @@ def convert_to_symbol(text):
     return symbol
 
 def generate_html_table(records):
+    pool = Pool()
+    Lang = pool.get('ir.lang')
+
+    language = Transaction().context.get('language', 'en')
+    language, = Lang.search([('code', '=', language)], limit=1)
+
     table = "<table>"
     tag = 'th'
     for row in records:
@@ -99,13 +105,13 @@ def generate_html_table(records):
             if cell is None:
                 cell = '<i>NULL</i>'
             elif isinstance(cell, datetime):
-                cell = cell.strftime('%Y-%m-%d %H:%M:%S')
+                cell = language.strftime(cell)
             elif isinstance(cell, mdatetime.date):
-                cell = cell.strftime('%Y-%m-%d')
+                cell = language.strftime(cell)
             elif isinstance(cell, mdatetime.time):
                 cell = cell.strftime('%H:%M:%S')
-            elif isinstance(cell, (float, int)):
-                cell = str(cell)
+            elif isinstance(cell, (float, int, Decimal)):
+                cell = language.format_number(cell)
             else:
                 cell = str(cell)
                 align = 'left'
@@ -567,7 +573,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             'report_lang', Transaction().language).split('_')[0]
         lang, = Lang.search([
                 ('code', '=', locale or 'en'),
-                ])
+                ], limit=1)
 
         now = datetime.now()
         company_id = Transaction().context.get('company')
