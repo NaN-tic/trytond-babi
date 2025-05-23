@@ -1858,7 +1858,11 @@ class TableExcel(Report):
         wb = Workbook()
         wb.remove(wb.active)
         for table in tables:
-            ws = wb.create_sheet(table.name)
+            # Replace symbols that are not allowed in the sheet name
+            title = table.name.replace('/', '_').replace(':', '_')
+            # Excel has a limit of 31 characters for the sheet name
+            title = title[:31]
+            ws = wb.create_sheet(title)
             for record in table.get_records():
                 ws.append([_convert_to_string(item) for item in record])
 
