@@ -738,16 +738,15 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         records = records[1:]
         return [SimpleNamespace(**dict(zip(fields, x))) for x in records]
 
-    def get_preview(self, name):
+    def get_html(self, limit=None):
         start = time.time()
         content = None
         try:
-            records = self.execute_query(limit=self.preview_limit)
+            records = self.execute_query(limit=limit)
         except Exception as e:
-            content = str(e).encode('utf-8')
+            content = str(e)
 
         elapsed = time.time() - start
-
         if not content:
             table = []
             row = [x.internal_name for x in self.fields_]
@@ -759,7 +758,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 'elapsed': elapsed * 1000,
                 }
 
-        preview = '''<!DOCTYPE html>
+        html = '''<!DOCTYPE html>
              <html>
              <head>
              <style>
@@ -775,7 +774,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
              </head>
              <body>%s</body></html>
         ''' % content
-        return preview.encode()
+        return html
+
+    def get_preview(self, name):
+        return self.get_html(self.preview_limit).encode()
 
     def get_preview_filename(self, name):
         return self.internal_name + '.html'
