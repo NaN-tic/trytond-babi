@@ -1869,7 +1869,6 @@ class Warning(Workflow, ModelSQL, ModelView):
     def get_preview_filename(self, name):
         return self.table.internal_name + '.html'
 
-
 def _convert_to_title(value):
     # Replace symbols that are not allowed in the sheet name
     title = value.replace('/', '_').replace(':', '_')
