@@ -1104,7 +1104,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 # Sort on reverse order taking advantage of the stability of
                 # the sort method
                 for item in reversed(sort_key):
-                    records.sort(key=lambda x: x[item[1]], reverse=item[2])
+                    # En order to ensure sort does not raise an exception
+                    # when the field is None, we sort first by the presence
+                    # of None and then by the field value
+                    records.sort(key=lambda x: (x[item[1]] is not None,
+                        x[item[1]]), reverse=item[2])
         return records
 
     def timeout_exception(self):
