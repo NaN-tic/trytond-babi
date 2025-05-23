@@ -1883,6 +1883,20 @@ def _convert_to_string(value):
     return str(value) if value is not None else None
 
 
+def _convert_to_title(value):
+    # Replace symbols that are not allowed in the sheet name
+    title = value.replace('/', '_').replace(':', '_')
+    # Excel has a limit of 31 characters for the sheet name
+    title = title[:31]
+    return
+
+def _convert_to_string(value):
+    if isinstance(value, (Decimal, str, int, float, date, datetime,
+            dt_time, bool)):
+        return value
+    return str(value) if value is not None else None
+
+
 class TableExcel(Report):
     'Table Excel Export'
     __name__ = 'babi.table.excel'
