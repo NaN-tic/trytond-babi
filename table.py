@@ -70,6 +70,7 @@ def save_virtual_workbook(workbook):
 def convert_to_symbol(text):
     if not text:
         return 'x'
+    text = text.replace('%', 'percent')
     text = unidecode.unidecode(text)
     text = text.lower()
     if text[0] not in VALID_FIRST_SYMBOLS:
