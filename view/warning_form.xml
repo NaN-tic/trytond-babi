@@ -22,8 +22,14 @@ contains the full copyright notices and license terms. -->
     <field name="done_by"/>
     <label name="ignored_by"/>
     <field name="ignored_by"/>
-    <separator name="description" colspan="6"/>
-    <field name="description" colspan="6"/>
+    <notebook colspan="6">
+        <page name="preview">
+            <field name="preview" colspan="4" height="450" widget="document"/>
+        </page>
+        <page name="description">
+            <field name="description" colspan="4" height="450"/>
+        </page>
+    </notebook>
     <label name="state"/>
     <field name="state"/>
     <group colspan="4" id="state">

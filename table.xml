@@ -374,6 +374,11 @@
             <field name="model">babi.table,-1</field>
             <field name="action" ref="report_table_excel"/>
         </record>
+        <record model="ir.action.keyword" id="report_warning_excel_keyword">
+            <field name="keyword">form_print</field>
+            <field name="model">babi.warning,-1</field>
+            <field name="action" ref="report_table_excel"/>
+        </record>
 
         <!-- Pivot Report -->
         <record model="ir.action.report" id="report_pivot_excel">
