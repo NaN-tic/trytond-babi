@@ -12,4 +12,6 @@
     <field name="order"/>
     <label name="descending"/>
     <field name="descending"/>
+    <label name="show"/>
+    <field name="show"/>
 </form>
