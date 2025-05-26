@@ -805,6 +805,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                     NULL AS null_value;
                 """
         table.save()
+        table._compute()
         self.assertIn('Hello World', str(table.preview))
 
         oext, _, _, _ = TableExcel.execute([table.id], {})
