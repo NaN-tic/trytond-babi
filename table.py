@@ -2330,7 +2330,8 @@ class PivotExcel(Report):
 
         if not ids:
             return
-        cls.check_access()
+        action, model = cls.get_action(data)
+        cls.check_access(action, model, ids)
 
         pivots = Pivot.browse(ids)
 
