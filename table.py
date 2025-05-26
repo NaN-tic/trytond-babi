@@ -731,9 +731,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def get_records(self, where=None):
         table = []
-        table.append([x.internal_name for x in self.fields_])
+        fields = [x.internal_name for x in self.fields_ if x.show]
+        labels = [x.name for x in self.fields_ if x.show]
+        table.append(labels)
         try:
-            table += self.execute_query(where=where)
+            table += self.execute_query(fields=fields, where=where)
         except Exception as e:
             raise UserError(gettext('babi.msg_error_obtaining_records',
                     table=self.rec_name, error=str(e)))
@@ -748,16 +750,17 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def get_html(self, where=None, limit=None):
         start = time.time()
         content = None
+        fields = [x.internal_name for x in self.fields_ if x.show]
+        labels = [x.name for x in self.fields_ if x.show]
         try:
-            records = self.execute_query(where=None, limit=limit)
+            records = self.execute_query(fields=fields, where=None, limit=limit)
         except Exception as e:
             content = str(e)
 
         elapsed = time.time() - start
         if not content:
             table = []
-            row = [x.internal_name for x in self.fields_]
-            table.append(row)
+            table.append(labels)
             for record in records:
                 table.append(record)
             content = '%(table)s<br/>%(elapsed).2fms' % {
@@ -1056,7 +1059,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     def get_query(self, fields=None, where=None, groupby=None, limit=None):
         query = 'SELECT '
         if fields:
-            query += ', '.join(fields) + ' '
+            query += ', '.join([f'"{x}"' for x in fields]) + ' '
         else:
             query += '* '
 
@@ -1072,7 +1075,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             query += 'GROUP BY %s ' % ', '.join(groupby) + ' '
 
         if fields:
-            query += 'ORDER BY %s' % ', '.join(fields)
+            query += 'ORDER BY %s' % ', '.join([f'"{x}"' for x in fields])
 
         if limit:
             query += ' LIMIT %d' % limit
@@ -1082,6 +1085,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             limit=None):
         if (self.type != 'view'
                 and not backend.TableHandler.table_exist(self.table_name)):
+            return []
+        if fields == []:
             return []
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
@@ -1498,6 +1503,13 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
             ('table', 'Table'),
             ('view', 'View'),
             ], 'Table Type'), 'on_change_with_table_type')
+    show = fields.Boolean('Show',
+        help='Indicates if the field must be shown in the preview and exported '
+        'in the Excel report.')
+
+    @staticmethod
+    def default_show():
+        return True
 
     @fields.depends('expression')
     def on_change_with_type(self, name=None):
