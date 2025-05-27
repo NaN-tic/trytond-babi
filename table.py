@@ -2041,6 +2041,7 @@ class Pivot(ModelSQL, ModelView):
         ColumnDimension = pool.get('babi.pivot.column_dimension')
         Measure = pool.get('babi.pivot.measure')
         Property = pool.get('babi.pivot.property')
+        Order = pool.get('babi.pivot.order')
 
         if default is None:
             default = {}
@@ -2085,6 +2086,37 @@ class Pivot(ModelSQL, ModelView):
         Measure.save(m_to_save)
         Property.save(p_to_save)
         cls.update_order(new_pivots)
+        o_to_save = []
+        for old, new in zip(pivots, new_pivots):
+            rel = {}
+            for old_dimension, new_dimension in zip(old.row_dimensions, new.row_dimensions):
+                assert old_dimension.field.internal_name == new_dimension.field.internal_name
+                rel[new_dimension] = old_dimension
+            for old_dimension, new_dimension in zip(old.column_dimensions, new.column_dimensions):
+                assert old_dimension.field.internal_name == new_dimension.field.internal_name
+                rel[new_dimension] = old_dimension
+            for old_measure, new_measure in zip(old.measures, new.measures):
+                assert old_measure.field.internal_name == new_measure.field.internal_name
+                rel[new_measure] = old_measure
+            for old_property, new_property in zip(old.properties, new.properties):
+                assert old_property.field.internal_name == new_property.field.internal_name
+                rel[new_property] = old_property
+
+            mapping = {}
+            sequence = 0
+            for order in old.order:
+                # Don't use old.order.sequence because it may be None
+                # or be the same on multiple records in which case it falls
+                # back to the ID
+                sequence += 1
+                mapping[order.element] = (sequence, order.order)
+
+            for order in new.order:
+                order.sequence, order.order = mapping.get(rel.get(
+                    order.element))
+                o_to_save.append(order)
+
+        Order.save(o_to_save)
         return new_pivots
 
     @fields.depends('table', 'row_dimensions', 'column_dimensions', 'measures',
