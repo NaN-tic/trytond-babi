@@ -2155,7 +2155,7 @@ class Pivot(ModelSQL, ModelView):
             records += pivot.row_dimensions
             records += pivot.column_dimensions
             records += pivot.measures
-            existing = [x for x in pivot.order]
+            existing = [x.element for x in pivot.order]
 
             to_delete |= set(existing) - set(records)
             missing = set(records) - set(existing)
