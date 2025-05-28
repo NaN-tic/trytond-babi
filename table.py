@@ -2435,7 +2435,7 @@ class PivotExcel(Report):
         wb = Workbook()
         wb.remove(wb.active)
         for pivot in pivots:
-            ws = wb.create_sheet(pivot.table.name)
+            ws = wb.create_sheet(_convert_to_title(pivot.rec_name))
             cube = pivot.get_cube()
             cube.column_expansions = Cube.EXPAND_ALL
             cube.row_expansions = Cube.EXPAND_ALL
