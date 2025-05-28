@@ -1889,7 +1889,7 @@ def _convert_to_title(value):
     title = value.replace('/', '_').replace(':', '_')
     # Excel has a limit of 31 characters for the sheet name
     title = title[:31]
-    return
+    return title
 
 def _convert_to_string(value):
     if isinstance(value, (Decimal, str, int, float, date, datetime,
