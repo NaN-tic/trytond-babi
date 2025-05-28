@@ -1058,8 +1058,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def get_query(self, fields=None, where=None, groupby=None, limit=None):
         query = 'SELECT '
+        # Add double quotes if fields don't have them
+        fields = [x if '"' in x else f'"{x}"' for x in fields or []]
         if fields:
-            query += ', '.join([f'"{x}"' for x in fields]) + ' '
+            query += ', '.join(fields) + ' '
         else:
             query += '* '
 
@@ -1075,7 +1077,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             query += 'GROUP BY %s ' % ', '.join(groupby) + ' '
 
         if fields:
-            query += 'ORDER BY %s' % ', '.join([f'"{x}"' for x in fields])
+            query += 'ORDER BY %s' % ', '.join(fields)
 
         if limit:
             query += ' LIMIT %d' % limit
