@@ -1954,6 +1954,53 @@ class WarningExcel(Report):
         return ('xlsx', save_virtual_workbook(wb), False, name)
 
 
+class WarningPivotExcel(Report):
+    'Warning Pivot Excel Export'
+    __name__ = 'babi.warning.pivot.excel'
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        # Make transaction read-write as Cube can create cache tables
+        cls.__rpc__['execute'] = RPC(False)
+
+    @classmethod
+    def execute(cls, ids, data):
+        pool = Pool()
+        ActionReport = pool.get('ir.action.report')
+        PivotExcel = pool.get('babi.pivot.excel', type='report')
+
+        if not ids:
+            return
+
+        action, model = cls.get_action(data)
+        cls.check_access(action, model, ids)
+
+        wb = Workbook()
+        wb.remove(wb.active)
+
+        warnings = Warning.browse(ids)
+        pivots = []
+        for warning in warnings:
+            pivots += list(warning.table.pivots)
+        pivot_ids = [x.id for x in pivots]
+
+        if data:
+            data = data.copy()
+        else:
+            data = {}
+        reports = ActionReport.search([
+                ('report_name', '=', 'babi.pivot.excel'),
+                ], limit=1)
+        assert reports, 'Report "babi.pivot.excel" not found'
+        report, = reports
+        data['action_id'] = report.action.id
+        data['ids'] = pivot_ids
+        data['model_name'] = 'babi.pivot'
+        data['report_name'] = 'babi.pivot.excel'
+        return PivotExcel.execute(pivot_ids, data)
+
+
 class Pivot(ModelSQL, ModelView):
     'Pivot Table'
     __name__ = 'babi.pivot'
@@ -2364,6 +2411,7 @@ class PivotExcel(Report):
     @classmethod
     def __setup__(cls):
         super().__setup__()
+        # Make transaction read-write as Cube can create cache tables
         cls.__rpc__['execute'] = RPC(False)
 
     @classmethod
