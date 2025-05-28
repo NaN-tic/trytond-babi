@@ -388,6 +388,7 @@
             <field name="action" ref="report_warning_excel"/>
         </record>
 
+
         <!-- Pivot Report -->
         <record model="ir.action.report" id="report_pivot_excel">
             <field name="name">Excel</field>
@@ -400,6 +401,19 @@
             <field name="keyword">form_print</field>
             <field name="model">babi.pivot,-1</field>
             <field name="action" ref="report_pivot_excel"/>
+        </record>
+
+        <record model="ir.action.report" id="report_warning_pivot_excel">
+            <field name="name">Pivot Excel</field>
+            <field name="model">babi.warning</field>
+            <field name="report_name">babi.warning.pivot.excel</field>
+            <field name="extension">xlsx</field>
+            <field name="template_extension">xml</field>
+        </record>
+        <record model="ir.action.keyword" id="report_warning_pivot_excel_keyword">
+            <field name="keyword">form_print</field>
+            <field name="model">babi.warning,-1</field>
+            <field name="action" ref="report_warning_pivot_excel"/>
         </record>
 
         <!-- ir.cron -->
