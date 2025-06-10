@@ -2216,7 +2216,7 @@ class Pivot(ModelSQL, ModelView):
     @classmethod
     def write(cls, *args):
         super().write(*args)
-        cls.update_order(cls.browse([x[0] for x in args[::2]]))
+        cls.update_order(cls.browse(sum([x for x in args[::2]])))
 
     @classmethod
     def update_order(cls, pivots):
