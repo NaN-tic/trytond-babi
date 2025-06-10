@@ -2238,7 +2238,10 @@ class Pivot(ModelSQL, ModelView):
             records += pivot.measures
             existing = [x.element for x in pivot.order]
 
-            to_delete |= set(existing) - set(records)
+            elements_to_delete = set(existing) - set(records)
+            to_delete = [x for x in pivot.order if x.element in
+                 elements_to_delete]
+
             missing = set(records) - set(existing)
             for record in missing:
                 to_save.append(
