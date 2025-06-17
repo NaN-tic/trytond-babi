@@ -11,8 +11,11 @@ Measure = pool.get('babi.pivot.measure')
 Property = pool.get('babi.pivot.property')
 Order = pool.get('babi.pivot.order')
 Cron = pool.get('ir.cron')
+Lang = pool.get('ir.lang')
+Configuration = pool.get('ir.configuration')
 
-reports = Report.search([])
+configuration = Configuration(1)
+transaction.set_context(language=configuration.language)
 
 def add_field(fields, table, record):
     field = Field()
@@ -32,9 +35,23 @@ def add_field(fields, table, record):
     fields.append(field)
     return field
 
+langs = Lang.search([('translatable', '=', True)])
+tables_names = [t.name for t in Table.search([])]
+
+reports = Report.search([])
 counter = 0
 total = len(reports)
 for report in reports:
+    report_names = []
+    for lang in langs:
+        with transaction.set_context(language=lang.code):
+            report_names += [Report(report.id).name]
+
+    for report_name in report_names:
+        if report_name in tables_names:
+            print('Report %s (ID %s) is available in table names' % (report.name, report.id))
+            continue
+
     counter += 1
     print('Working on report: %s (%s/%s)' % (report.name, counter, total))
     table = Table()
@@ -83,8 +100,17 @@ for report in reports:
 
     for cron in report.crons:
         Cron.copy([cron], default={
-                'babi_report': report.id,
+                'method': 'babi.table|_compute',
                 'babi_table': table.id,
+                'babi_report': None,
                 })
+
+# deactivate, remove crons and menus (all reports)
+with transaction.set_context(active_test=False):
+    reports = Report.search([])
+
+Report.write(reports, {'active': False})
+Report.remove_menus(reports)
+Report.remove_crons(reports)
 
 transaction.commit()
