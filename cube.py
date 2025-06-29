@@ -2,6 +2,7 @@ import ast
 import binascii
 import hashlib
 import sql
+from collections import defaultdict
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 from itertools import product
@@ -470,42 +471,68 @@ class Cube:
         '''
         values, property_values = self.get_values()
 
-        def get_rows(values, key, nones, depth, added):
-            res = []
-            for row, col in values.keys():
-                if row.count(None) != nones:
-                    continue
-                rk = row[:len(key)]
-                if rk != key:
-                    continue
-                if row in added:
-                    continue
-                added.add(row)
-                res.append(row)
-                res += get_rows(values, row[:depth], nones-1, depth+1, added)
-            return res
+        def build_rows_index(values):
+            """
+            Build a dict that maps each count of None
+            to the list of rows that contain exactly that many,
+            preserving the insertion order of values.keys().
+            """
+            rows_by_nones = defaultdict(list)
+            for (row, _) in values.keys():
+                cnt = row.count(None)
+                rows_by_nones[cnt].append(row)
+            return rows_by_nones
 
-        def get_cols(values, key, nones, depth, added):
-            res = []
-            for row, col in values.keys():
-                if col.count(None) != nones:
-                    continue
-                ck = col[:len(key)]
-                if ck != key:
-                    continue
-                if col in added:
-                    continue
-                added.add(col)
-                res.append(col)
-                res += get_cols(values, col[:depth], nones-1, depth+1, added)
-            return res
+        def get_rows(values, key, nones, depth):
+            rows_by_nones = build_rows_index(values)
+            added = set()
 
-        added = set()
+            def helper(cur_key, cur_nones, cur_depth):
+                res = []
+                for row in rows_by_nones.get(cur_nones, []):
+                    if row[:len(cur_key)] != cur_key:
+                        continue
+                    if row in added:
+                        continue
+                    added.add(row)
+                    res.append(row)
+                    res.extend(helper(row[:cur_depth], cur_nones - 1, cur_depth + 1))
+                return res
+            return helper(key, nones, depth)
+
+        def build_cols_index(values):
+            """
+            Build a dict that maps each count of None
+            to the list of columns that contain exactly that many,
+            preserving the insertion order of values.keys().
+            """
+            cols_by_nones = defaultdict(list)
+            for (_, col) in values.keys():
+                cnt = col.count(None)
+                cols_by_nones[cnt].append(col)
+            return cols_by_nones
+
+        def get_cols(values, key, nones, depth):
+            cols_by_nones = build_cols_index(values)
+            added = set()
+
+            def helper(cur_key, cur_nones, cur_depth):
+                res = []
+                for col in cols_by_nones.get(cur_nones, []):
+                    if col[:len(cur_key)] != cur_key:
+                        continue
+                    if col in added:
+                        continue
+                    added.add(col)
+                    res.append(col)
+                    res.extend(helper(col[:cur_depth], cur_nones - 1, cur_depth + 1))
+                return res
+            return helper(key, nones, depth)
+
         row_elements = [tuple([None]*len(self.rows))]
-        row_elements += get_rows(values, (), len(self.rows)-1, 1, added)
-        added = set()
+        row_elements += get_rows(values, (), len(self.rows)-1, 1)
         col_elements = [tuple([None]*len(self.columns))]
-        col_elements += get_cols(values, (), len(self.columns)-1, 1, added)
+        col_elements += get_cols(values, (), len(self.columns)-1, 1)
 
         # TODO: for each cell header, know the expansion we need to do
         row_header = self.get_row_header(row_elements, self.rows)
