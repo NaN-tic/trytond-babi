@@ -205,8 +205,9 @@ class Index(Component):
         inverted_table_properties = cube.encode_properties()
 
         with main() as index_section:
-            with div(cls="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 grid grid-cols-4"):
-                div(cls="col-span-1").add(h3(table_name, cls="text-base font-semibold leading-6 text-gray-900"))
+            with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
+                with div(cls="col-span-1"):
+                    h3(table_name, cls="text-base font-semibold leading-6 text-gray-900")
                 # Each button is a 36px width
                 # Invert axis button
                 with div(cls="col-span-1"):
@@ -216,22 +217,26 @@ class Index(Component):
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
                         cls="absolute right-3").add(RELOAD)
-            with div(cls="grid grid-cols-12"):
-                PivotHeaderAxis(database_name=self.database_name,
-                    table_name=self.table_name, axis='x',
-                    table_properties=self.table_properties)
-                PivotHeaderAxis(database_name=self.database_name,
-                    table_name=self.table_name, axis='y',
-                    table_properties=self.table_properties)
-                PivotHeaderMeasure(database_name=self.database_name,
-                    table_name=self.table_name,
-                    table_properties=self.table_properties)
-                PivotHeaderAxis(database_name=self.database_name,
-                    table_name=self.table_name, axis='property',
-                    table_properties=self.table_properties)
-                PivotHeaderOrder(database_name=self.database_name,
-                    table_name=self.table_name,
-                    table_properties=self.table_properties)
+
+            # Details always opened by default
+            with details(cls="m-2", open=True):
+                summary(cls="text-sm font-semibold text-gray-900").add(_('Configuration'))
+                with div(cls="grid grid-cols-12 px-2"):
+                    PivotHeaderAxis(database_name=self.database_name,
+                        table_name=self.table_name, axis='x',
+                        table_properties=self.table_properties)
+                    PivotHeaderAxis(database_name=self.database_name,
+                        table_name=self.table_name, axis='y',
+                        table_properties=self.table_properties)
+                    PivotHeaderMeasure(database_name=self.database_name,
+                        table_name=self.table_name,
+                        table_properties=self.table_properties)
+                    PivotHeaderAxis(database_name=self.database_name,
+                        table_name=self.table_name, axis='property',
+                        table_properties=self.table_properties)
+                    PivotHeaderOrder(database_name=self.database_name,
+                        table_name=self.table_name,
+                        table_properties=self.table_properties)
 
             with div(cls="mt-8 flow-root"):
                 with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
@@ -313,18 +318,18 @@ class PivotHeaderAxis(Component):
                 fields = cube.properties
 
         self.header = self.axis
-        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-2", id=f'header_{self.axis}') as header_axis:
+        with div(cls="px-1 mt-2 flow-root col-span-2", id=f'header_{self.axis}') as header_axis:
             div(id=f'field_selection_{self.axis}')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                 with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
                     with table(cls="min-w-full divide-y divide-gray-300"):
                         with thead():
                             with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(icon)
-                                th(name, scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
-                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(icon)
+                                th(name, scope="col", cls="py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
+                                with th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-900",
                                         hx_target=f"#field_selection_{self.axis}",
                                         hx_post=PivotHeaderSelection(header=self.axis, database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
@@ -333,16 +338,16 @@ class PivotHeaderAxis(Component):
                         with tbody(cls="divide-y divide-gray-200"):
                             for field in fields:
                                 with tr():
-                                    td(capitalize(field), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                    td(capitalize(field), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[-1]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, render=False).url('remove_field'),
                                             cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_axis
@@ -376,17 +381,17 @@ class PivotHeaderMeasure(Component):
                 self.table_name)
             fields = cube.measures
         self.header = 'measures'
-        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id='header_measure') as header_measure:
+        with div(cls="px-1 mt-2 flow-root col-span-3", id='header_measure') as header_measure:
             div(id='field_selection_measure')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                 with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
                     with table(cls="min-w-full divide-y divide-gray-300"):
                         with thead():
                             with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(MEASURE_ICON)
-                                th(_('Measure fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
-                                with th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0"):
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(MEASURE_ICON)
+                                th(_('Measure fields'), scope="col", cls="py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
+                                with th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-900",
                                         hx_target="#field_selection_measure",
                                         hx_post=PivotHeaderSelection(header='measure', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
@@ -395,8 +400,8 @@ class PivotHeaderMeasure(Component):
                         with tbody(cls="divide-y divide-gray-200"):
                             for field in fields:
                                 with tr():
-                                    td(capitalize(field[0]), colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                    td(capitalize(field[0]), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         match field[1]:
                                             case 'sum':
                                                 p(_('Sum'))
@@ -408,7 +413,7 @@ class PivotHeaderMeasure(Component):
                                                 p(_('Minimum'))
                                             case 'max':
                                                 p(_('Maximum'))
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field[0], table_properties=self.table_properties, render=False).url('remove_field'),
                                             cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_measure
@@ -443,17 +448,17 @@ class PivotHeaderOrder(Component):
                 self.table_name)
             items = cube.order
         self.header = 'order'
-        with div(cls="px-4 sm:px-6 lg:px-8 mt-8 flow-root col-span-3", id='header_order') as header_order:
+        with div(cls="px-1 mt-2 flow-root col-span-3", id='header_order') as header_order:
             div(id='field_selection_order')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                 with div(cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"):
                     with table(cls="min-w-full divide-y divide-gray-300"):
                         with thead():
                             with tr():
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(ORDER_ICON)
-                                th(_('Order fields'), scope="col", cls="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
-                                th(scope="col", cls="relative py-3.5 pl-3 pr-4 sm:pr-0")
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(ORDER_ICON)
+                                th(_('Order fields'), scope="col", cls="py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0")
                         with tbody(cls="divide-y divide-gray-200"):
                             for item in items:
                                 with tr():
@@ -463,8 +468,8 @@ class PivotHeaderOrder(Component):
                                     else:
                                         value = capitalize(item[0])
                                         field = item[0]
-                                    td(value, colspan="2", cls="whitespace-nowrap px-3py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                    td(value, colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         cube = Cube.parse_properties(self.table_properties,
                                             self.table_name)
                                         auxiliar_position = cube.order.index(item)
@@ -484,11 +489,11 @@ class PivotHeaderOrder(Component):
                                         else:
                                             a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties, render=False).url(),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(ORDER_ASC_ICON)
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if item != items[0]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
-                                    with td(cls="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if item != items[-1]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
@@ -822,7 +827,7 @@ class PivotTable(Component):
             for cell in row:
                 if download:
                     # Paint the download button in the first cell
-                    first_cell = td(cls="flex items-center gap-2 text-xs uppercase text-black px-6 py-3 bg-blue-300")
+                    first_cell = td(cls="flex items-center gap-2 text-xs uppercase text-black px-6 py-1.5 bg-blue-300")
                     first_cell.add(expand_all)
                     first_cell.add(collapse_all)
                     first_cell.add(download)
@@ -889,10 +894,10 @@ class PivotTable(Component):
                             hx_trigger="click", hx_swap="outerHTML",
                             hx_indicator="#loading-state")
 
-                    pivot_row.add(td(cell_value, cls="text-xs uppercase bg-blue-300 text-black px-6 py-3 border-b-0.5 border-black"))
+                    pivot_row.add(td(cell_value, cls="text-xs uppercase bg-blue-300 text-black px-2 py-1 border-b-0.5 border-black", style="white-space: nowrap"))
 
                 else:
-                    pivot_row.add(td(cell.formatted(language), cls="border-b text-black bg-blue-50 border-gray-200 px-6 py-4 text-right"))
+                    pivot_row.add(td(cell.formatted(language), cls="border-b text-black bg-blue-50 border-gray-200 px-2 py-1 text-right", style="white-space: nowrap"))
             pivot_table.add(pivot_row)
 
         loading_div = div(id="loading-state", cls="loading-indicator absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2 w-full bg-gray-800 bg-opacity-50 h-full")
