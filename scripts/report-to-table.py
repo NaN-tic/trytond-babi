@@ -1,6 +1,9 @@
 pool = globals().get('pool', None)
 transaction = globals().get('transaction', None)
 
+import uuid
+import hashlib
+
 Report = pool.get('babi.report')
 Table = pool.get('babi.table')
 Field = pool.get('babi.field')
@@ -36,7 +39,10 @@ def add_field(fields, table, record):
     return field
 
 langs = Lang.search([('translatable', '=', True)])
-tables_names = [t.name for t in Table.search([])]
+
+tables = Table.search([])
+tables_names = [t.name for t in tables]
+internal_names = [t.internal_name for t in tables]
 
 reports = Report.search([])
 counter = 0
@@ -57,11 +63,17 @@ for report in reports:
     table = Table()
     table.name = report.name
     table.on_change_name()
+    internal_name = table.internal_name
+    if internal_name in internal_names:
+        internal_name += hashlib.md5(str(uuid.uuid4()).encode()).hexdigest()[:6]
+        table.internal_name = internal_name
     table.type = 'model'
     table.model = report.model
     table.filter = report.filter
     table.timeout = report.timeout
     table.save()
+
+    internal_names.append(internal_name)
 
     pivot = Pivot()
     pivot.table = table
