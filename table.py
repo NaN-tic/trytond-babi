@@ -1974,7 +1974,7 @@ class WarningPivotExcel(Report):
             return
 
         action, model = cls.get_action(data)
-        cls.check_access(action, model, ids)
+        cls.check_access()
 
         wb = Workbook()
         wb.remove(wb.active)
