@@ -1873,8 +1873,6 @@ class Warning(Workflow, ModelSQL, ModelView):
 
     def get_html(self, limit=None):
         where = self.query_where()
-        if not where:
-            return ''
         return self.table.get_html(where=where, limit=limit)
 
     def get_preview(self, name):
