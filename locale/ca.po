@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Last-Translator: albert\n"
-"PO-Revision-Date: 2025-05-20 14:58+0200\n"
+"PO-Revision-Date: 2025-07-14 09:43+0200\n"
 "Project-Id-Version: \n"
 "Language-Team: Catalan <>\n"
 "Language: ca_ES\n"
@@ -48,10 +48,6 @@ msgstr "Tipus"
 msgctxt "field:babi.action.dashboard,usage:"
 msgid "Usage"
 msgstr "Ús"
-
-msgctxt "field:babi.clean_executions.start,date:"
-msgid "Date"
-msgstr "Data"
 
 msgctxt "field:babi.configuration,default_timeout:"
 msgid "Timeout (s)"
@@ -97,70 +93,6 @@ msgctxt "field:babi.dashboard.item,widget:"
 msgid "Widget"
 msgstr "Gràfica"
 
-msgctxt "field:babi.dimension,expand:"
-msgid "Expand"
-msgstr "Expandir"
-
-msgctxt "field:babi.dimension,expression:"
-msgid "Expression"
-msgstr "Expressió"
-
-msgctxt "field:babi.dimension,group_by:"
-msgid "Group By This Dimension"
-msgstr "Agrupa per aquesta dimensió"
-
-msgctxt "field:babi.dimension,internal_name:"
-msgid "Internal Name"
-msgstr "Nom intern"
-
-msgctxt "field:babi.dimension,name:"
-msgid "Name"
-msgstr "Nom"
-
-msgctxt "field:babi.dimension,report:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "field:babi.dimension,sequence:"
-msgid "Sequence"
-msgstr "Seqüència"
-
-msgctxt "field:babi.dimension,width:"
-msgid "Width"
-msgstr "Amplada"
-
-msgctxt "field:babi.dimension.column,expand:"
-msgid "Expand"
-msgstr "Expandir"
-
-msgctxt "field:babi.dimension.column,expression:"
-msgid "Expression"
-msgstr "Expressió"
-
-msgctxt "field:babi.dimension.column,group_by:"
-msgid "Group By This Dimension"
-msgstr "Agrupa per aquesta dimensió"
-
-msgctxt "field:babi.dimension.column,internal_name:"
-msgid "Internal Name"
-msgstr "Nom intern"
-
-msgctxt "field:babi.dimension.column,name:"
-msgid "Name"
-msgstr "Nom"
-
-msgctxt "field:babi.dimension.column,report:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "field:babi.dimension.column,sequence:"
-msgid "Sequence"
-msgstr "Seqüència"
-
-msgctxt "field:babi.dimension.column,width:"
-msgid "Width"
-msgstr "Amplada"
-
 msgctxt "field:babi.expression,checked:"
 msgid "Checked"
 msgstr "Comprovat"
@@ -197,6 +129,10 @@ msgctxt "field:babi.expression,ttype:"
 msgid "Field Type"
 msgstr "Tipus de camp"
 
+msgctxt "field:babi.field,descending:"
+msgid "Descending"
+msgstr "Descendent"
+
 msgctxt "field:babi.field,expression:"
 msgid "Expression"
 msgstr "Expressió"
@@ -212,6 +148,14 @@ msgstr "Model"
 msgctxt "field:babi.field,name:"
 msgid "Name"
 msgstr "Nom"
+
+msgctxt "field:babi.field,order:"
+msgid "Order"
+msgstr "Ordre"
+
+msgctxt "field:babi.field,show:"
+msgid "Show"
+msgstr "Mostra"
 
 msgctxt "field:babi.field,table:"
 msgid "Table"
@@ -288,142 +232,6 @@ msgstr "Model relacionat"
 msgctxt "field:babi.filter.parameter,ttype:"
 msgid "Field Type"
 msgstr "Tipus de camp"
-
-msgctxt "field:babi.internal.measure,aggregate:"
-msgid "Aggregate"
-msgstr "Agregat"
-
-msgctxt "field:babi.internal.measure,decimal_digits:"
-msgid "Decimal Digits"
-msgstr "Dígits decimals"
-
-msgctxt "field:babi.internal.measure,execution:"
-msgid "Report Execution"
-msgstr "Execució d'informe"
-
-msgctxt "field:babi.internal.measure,expand:"
-msgid "Expand"
-msgstr "Expandir"
-
-msgctxt "field:babi.internal.measure,expression:"
-msgid "Expression"
-msgstr "Expressió"
-
-msgctxt "field:babi.internal.measure,internal_name:"
-msgid "Internal Name"
-msgstr "Nom intern"
-
-msgctxt "field:babi.internal.measure,measure:"
-msgid "Measure"
-msgstr "Mesura"
-
-msgctxt "field:babi.internal.measure,name:"
-msgid "Name"
-msgstr "Nom"
-
-msgctxt "field:babi.internal.measure,related_model:"
-msgid "Related Model"
-msgstr "Model relacionat"
-
-msgctxt "field:babi.internal.measure,sequence:"
-msgid "Sequence"
-msgstr "Seqüència"
-
-msgctxt "field:babi.internal.measure,ttype:"
-msgid "Field Type"
-msgstr "Tipus de camp"
-
-msgctxt "field:babi.internal.measure,width:"
-msgid "Width"
-msgstr "Amplada"
-
-msgctxt "field:babi.measure,aggregate:"
-msgid "Aggregate"
-msgstr "Agregat"
-
-msgctxt "field:babi.measure,expand:"
-msgid "Expand"
-msgstr "Expandir"
-
-msgctxt "field:babi.measure,expression:"
-msgid "Expression"
-msgstr "Expressió"
-
-msgctxt "field:babi.measure,internal_measures:"
-msgid "Internal Measures"
-msgstr "Mesures internes"
-
-msgctxt "field:babi.measure,internal_name:"
-msgid "Internal Name"
-msgstr "Nom intern"
-
-msgctxt "field:babi.measure,name:"
-msgid "Name"
-msgstr "Nom"
-
-msgctxt "field:babi.measure,report:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "field:babi.measure,sequence:"
-msgid "Sequence"
-msgstr "Seqüència"
-
-msgctxt "field:babi.measure,width:"
-msgid "Width"
-msgstr "Amplada"
-
-msgctxt "field:babi.open_chart.start,dimension:"
-msgid "Dimension"
-msgstr "Dimensió"
-
-msgctxt "field:babi.open_chart.start,execution:"
-msgid "Execution"
-msgstr "Execució"
-
-msgctxt "field:babi.open_chart.start,execution_date:"
-msgid "Execution Time"
-msgstr "Data d'execució"
-
-msgctxt "field:babi.open_chart.start,graph_type:"
-msgid "Graph"
-msgstr "Gràfica"
-
-msgctxt "field:babi.open_chart.start,graph_type_report:"
-msgid "Report Format"
-msgstr "Format informe"
-
-msgctxt "field:babi.open_chart.start,interpolation:"
-msgid "Interpolation"
-msgstr "Interpolació"
-
-msgctxt "field:babi.open_chart.start,measures:"
-msgid "Measures"
-msgstr "Mesures"
-
-msgctxt "field:babi.open_chart.start,report:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "field:babi.open_chart.start,show_legend:"
-msgid "Show Legend"
-msgstr "Mostra la llegenda"
-
-msgctxt "field:babi.order,dimension:"
-msgid "Dimension"
-msgstr "Dimensió"
-
-msgctxt "field:babi.order,measure:"
-msgid "Measure"
-msgstr "Mesura"
-
-msgctxt "field:babi.order,order:"
-msgid "Order"
-msgstr "Ordre"
-
-msgctxt "field:babi.order,report:"
-msgid "Report"
-msgstr "Informe"
 
 msgctxt "field:babi.pivot,active:"
 msgid "Active"
@@ -532,182 +340,6 @@ msgstr "Taula dinàmica"
 msgctxt "field:babi.pivot.row_dimension,table:"
 msgid "Table"
 msgstr "Taula"
-
-msgctxt "field:babi.report,actions:"
-msgid "Actions"
-msgstr "Accions"
-
-msgctxt "field:babi.report,babi_raise_user_error:"
-msgid "Raise User Error"
-msgstr "Mostrar l'error a l'usuari"
-
-msgctxt "field:babi.report,columns:"
-msgid "Dimensions on Columns"
-msgstr "Dimensions en columnes"
-
-msgctxt "field:babi.report,crons:"
-msgid "Schedulers"
-msgstr "Tasques planificades"
-
-msgctxt "field:babi.report,dimensions:"
-msgid "Dimensions"
-msgstr "Dimensions"
-
-msgctxt "field:babi.report,email:"
-msgid "E-mail"
-msgstr "E-mail"
-
-msgctxt "field:babi.report,executions:"
-msgid "Executions"
-msgstr "Execucions"
-
-msgctxt "field:babi.report,filter:"
-msgid "Filter"
-msgstr "Filtre"
-
-msgctxt "field:babi.report,groups:"
-msgid "Groups"
-msgstr "Grups"
-
-msgctxt "field:babi.report,internal_name:"
-msgid "Internal Name"
-msgstr "Nom intern"
-
-msgctxt "field:babi.report,keywords:"
-msgid "Keywords"
-msgstr "Accions de teclat"
-
-msgctxt "field:babi.report,measures:"
-msgid "Measures"
-msgstr "Mesures"
-
-msgctxt "field:babi.report,menus:"
-msgid "Menus"
-msgstr "Menús"
-
-msgctxt "field:babi.report,model:"
-msgid "Model"
-msgstr "Model"
-
-msgctxt "field:babi.report,model_name:"
-msgid "Model Name"
-msgstr "Nom model"
-
-msgctxt "field:babi.report,name:"
-msgid "Name"
-msgstr "Nom"
-
-msgctxt "field:babi.report,order:"
-msgid "Order"
-msgstr "Ordre"
-
-msgctxt "field:babi.report,parent_menu:"
-msgid "Parent Menu"
-msgstr "Menú pare"
-
-msgctxt "field:babi.report,report_cell_level:"
-msgid "Cell Level"
-msgstr "Nivell cel·la"
-
-msgctxt "field:babi.report,smtp:"
-msgid "SMTP"
-msgstr "SMTP"
-
-msgctxt "field:babi.report,subject:"
-msgid "Subject"
-msgstr "Assumpte"
-
-msgctxt "field:babi.report,timeout:"
-msgid "Timeout"
-msgstr "Temps d'espera (s)"
-
-msgctxt "field:babi.report,to:"
-msgid "To"
-msgstr "Per a"
-
-msgctxt "field:babi.report-res.group,group:"
-msgid "Group"
-msgstr "Grup"
-
-msgctxt "field:babi.report-res.group,report:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "field:babi.report.execution,babi_model:"
-msgid "BI Model"
-msgstr "Model BI"
-
-msgctxt "field:babi.report.execution,company:"
-msgid "Company"
-msgstr "Empresa"
-
-msgctxt "field:babi.report.execution,date:"
-msgid "Execution Date"
-msgstr "Data execució"
-
-msgctxt "field:babi.report.execution,duration:"
-msgid "Duration"
-msgstr "Duració"
-
-msgctxt "field:babi.report.execution,filter_values:"
-msgid "Filter Values"
-msgstr "Filtra valors"
-
-msgctxt "field:babi.report.execution,filtered:"
-msgid "Filtered"
-msgstr "Filtrat"
-
-msgctxt "field:babi.report.execution,internal_measures:"
-msgid "Internal Measures"
-msgstr "Mesures internes"
-
-msgctxt "field:babi.report.execution,internal_name:"
-msgid "Internal Name"
-msgstr "Nom intern"
-
-msgctxt "field:babi.report.execution,pid:"
-msgid "Pid"
-msgstr "Pid"
-
-msgctxt "field:babi.report.execution,report:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "field:babi.report.execution,report_model:"
-msgid "Report Model"
-msgstr "Model de l'informe"
-
-msgctxt "field:babi.report.execution,state:"
-msgid "State"
-msgstr "Estat"
-
-msgctxt "field:babi.report.execution,timeout:"
-msgid "Timeout"
-msgstr "Temps esgotat"
-
-msgctxt "field:babi.report.execution,traceback:"
-msgid "Traceback"
-msgstr "Traça enrere"
-
-msgctxt "field:babi.report.execution.open.select,execution:"
-msgid "Execution"
-msgstr "Execució"
-
-msgctxt "field:babi.report.execution.open.select,execution_readonly:"
-msgid "Execution Readonly"
-msgstr "Execució només lectura"
-
-msgctxt "field:babi.report.execution.open.select,report:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "field:babi.report.execution.open.select,report_readonly:"
-msgid "Report Readonly"
-msgstr "Informe"
-
-msgctxt "field:babi.report.execution.open.select,view_type:"
-msgid "View type"
-msgstr "Tipus de vista"
 
 msgctxt "field:babi.table,access_groups:"
 msgid "Access Groups"
@@ -1013,6 +645,14 @@ msgctxt "field:babi.warning,party:"
 msgid "Party"
 msgstr "Tercer"
 
+msgctxt "field:babi.warning,preview:"
+msgid "Preview"
+msgstr "Vista prèvia"
+
+msgctxt "field:babi.warning,preview_filename:"
+msgid "Preview Filename"
+msgstr "Nom del fitxer de vista prèvia"
+
 msgctxt "field:babi.warning,state:"
 msgid "State"
 msgstr "Estat"
@@ -1129,18 +769,6 @@ msgctxt "field:babi.widget.parameter,widget:"
 msgid "Widget"
 msgstr "Gràfica"
 
-msgctxt "field:ir.action.act_window,babi_report:"
-msgid "BABI Report"
-msgstr "Informe BABI"
-
-msgctxt "field:ir.action.keyword,babi_filter_parameter:"
-msgid "BABI Filter Parameter"
-msgstr "Paràmetres de filtre del BABI"
-
-msgctxt "field:ir.action.keyword,babi_report:"
-msgid "BABI Report"
-msgstr "Informe BABI"
-
 msgctxt "field:ir.cron,babi_cluster:"
 msgid "Cluster"
 msgstr "Clúster"
@@ -1149,10 +777,6 @@ msgctxt "field:ir.cron,babi_compute_warnings:"
 msgid "Compute Warnings"
 msgstr "Calcular avisos"
 
-msgctxt "field:ir.cron,babi_report:"
-msgid "Babi Report"
-msgstr "Informe Babi"
-
 msgctxt "field:ir.cron,babi_table:"
 msgid "Table"
 msgstr "Taula"
@@ -1160,14 +784,6 @@ msgstr "Taula"
 msgctxt "field:ir.model,babi_enabled:"
 msgid "BI Enabled"
 msgstr "Habilitat per BI"
-
-msgctxt "field:ir.ui.menu,babi_report:"
-msgid "BABI Report"
-msgstr "Informe BABI"
-
-msgctxt "field:ir.ui.menu,babi_type:"
-msgid "BABI Type"
-msgstr "Tipus BABI"
 
 msgctxt "field:www.download_report,database_name:"
 msgid "Database Name"
@@ -1321,28 +937,13 @@ msgctxt "help:babi.dashboard.item,height:"
 msgid "The default is 450px"
 msgstr "El valor predeterminat és de 450 píxels"
 
-msgctxt "help:babi.dimension,expand:"
-msgid "Column expand attribute for tree view"
-msgstr "Atribut d'ampliació de columna per a la vista d'arbre"
-
-msgctxt "help:babi.dimension,width:"
-msgid "Width report columns (%)"
-msgstr "Amplada de les columnes de l'informe (%)"
-
-msgctxt "help:babi.dimension.column,expand:"
-msgid "Column expand attribute for tree view"
-msgstr "Atribut d'ampliació de columna per a la vista d'arbre"
-
-msgctxt "help:babi.dimension.column,width:"
-msgid "Width report columns (%)"
-msgstr "Amplada de les columnes de l'informe (%)"
-
 msgctxt "help:babi.expression,expression:"
 msgid ""
 "Python expression that will return the value to be used.\n"
 "The expression can include the following variables:\n"
 "\n"
-"- \"o\": A reference to the current record being processed. For  example: \"o.party.name\"\n"
+"- \"o\": A reference to the current record being processed. For  example:"
+" \"o.party.name\"\n"
 "\n"
 "And the following functions apply to dates and timestamps:\n"
 "\n"
@@ -1356,7 +957,8 @@ msgstr ""
 "Expressió Python que returnarà el valor  utilitzar.\n"
 "L'expressió pot incloure les següent variables:\n"
 "\n"
-"- \"o\": Referència al registre que s'està tractant actualment. Per exemple: \"o.party.name\"\n"
+"- \"o\": Referència al registre que s'està tractant actualment. Per exemple:"
+" \"o.party.name\"\n"
 "\n"
 "I les següents funcions apliquen a camps de data: \n"
 "\n"
@@ -1366,6 +968,24 @@ msgstr ""
 "- \"d()\": Retorna el dia (com a text)\n"
 "- \"ym()\": Retorna l'any-mes (com a text)\n"
 "- \"ymd()\": Retorna l'any-mes-dia (com a text).\n"
+
+msgctxt "help:babi.field,order:"
+msgid ""
+"Positive integer. Indicates if the field must be sorted and in which "
+"position. Field with order 1 will be sorted before 2, etc. Order is computed"
+" in memory so it can be slow with many records."
+msgstr ""
+"Enter positiu. Indica si el camp s'ha d'ordenar i en quina posició. El camp "
+"amb ordre 1 s'ordenarà abans del 2, etc. L'ordre es calcula a la memòria, de"
+" manera que pot ser lent si hi ha molts registres."
+
+msgctxt "help:babi.field,show:"
+msgid ""
+"Indicates if the field must be shown in the preview and exported in the "
+"Excel report."
+msgstr ""
+"Indica si el camp s'ha de mostrar a la vista prèvia i s'ha d'exportar a "
+"Excel."
 
 msgctxt "help:babi.filter,context:"
 msgid ""
@@ -1397,68 +1017,6 @@ msgctxt "help:babi.filter.parameter,name:"
 msgid "Name used on the domain substitution"
 msgstr "Nom utilitzat a la substitució del domini"
 
-msgctxt "help:babi.measure,expand:"
-msgid "Column expand attribute for tree view"
-msgstr "Atribut d'ampliació de columna per a la vista d'arbre"
-
-msgctxt "help:babi.measure,width:"
-msgid "Width report columns (%)"
-msgstr "Amplada de les columnes de l'informe (%)"
-
-msgctxt "help:babi.report,babi_raise_user_error:"
-msgid "Will raise a UserError in case of error in report."
-msgstr "Es generarà un error a l'usuari en cas d'error a l'informe."
-
-msgctxt "help:babi.report,email:"
-msgid "Mark to see the options to send an email when executing the cron"
-msgstr ""
-"Marcar per veure les opcions per enviar un correu electrònic quan s'executi "
-"la programació"
-
-msgctxt "help:babi.report,groups:"
-msgid "User groups that will be able to see use this report."
-msgstr "Grups d'usuaris que podran veure aquest informe."
-
-msgctxt "help:babi.report,model:"
-msgid "Model for data extraction"
-msgstr "Model per l'extracció de dades"
-
-msgctxt "help:babi.report,name:"
-msgid "New virtual model name."
-msgstr "Nom del nou model virtual"
-
-msgctxt "help:babi.report,report_cell_level:"
-msgid "Start cell level that not has indentation"
-msgstr "Nivell d'inici de cel·la no té sagnat."
-
-msgctxt "help:babi.report,timeout:"
-msgid ""
-"If report calculation should take more than the specified timeout (in "
-"seconds) the process will be stopped automatically."
-msgstr ""
-"Si el càlcul de l'informe ha de tardar més que el temps d'espera (en segons)"
-" indicat, el procés es pararà automàticament."
-
-msgctxt "help:babi.report.execution,babi_model:"
-msgid "Link to new model instance"
-msgstr "Enllaç al nou model"
-
-msgctxt "help:babi.report.execution,duration:"
-msgid "Number of seconds the calculation took."
-msgstr "Nombre de segons que ha tardat la execució."
-
-msgctxt "help:babi.report.execution,filtered:"
-msgid "Used to mark executions with parameter filters evaluated"
-msgstr "Utilitzat per marcar les execucions amb filtres avaluats."
-
-msgctxt "help:babi.report.execution,timeout:"
-msgid ""
-"If report calculation should take more than the specified timeout (in "
-"seconds) the process will be stopped automatically."
-msgstr ""
-"Si el càlcul de l'informe ha de tardar més que el temps d'espera (en segons)"
-" indicat, el procés es pararà automàticament."
-
 msgctxt "help:babi.table,babi_raise_user_error:"
 msgid "Will raise a UserError in case of an error in the table."
 msgstr "Generarà un error d'usuari en cas d'error a la taula."
@@ -1487,10 +1045,6 @@ msgctxt "model:babi.action.dashboard,name:"
 msgid "Action Act Dashboard"
 msgstr "Acció de tauler de control"
 
-msgctxt "model:babi.clean_executions.start,name:"
-msgid "Clean Execution Start"
-msgstr "Inici Eliminar Execucions"
-
 msgctxt "model:babi.configuration,name:"
 msgid "Business Intelligence Configuration"
 msgstr "Configuració Business Intelligence"
@@ -1502,14 +1056,6 @@ msgstr "Panell de control"
 msgctxt "model:babi.dashboard.item,name:"
 msgid "Dashboard Item"
 msgstr "Element del tauler de control"
-
-msgctxt "model:babi.dimension,name:"
-msgid "Dimension"
-msgstr "Dimensió"
-
-msgctxt "model:babi.dimension.column,name:"
-msgid "Column Dimension"
-msgstr "Dimensió de columna"
 
 msgctxt "model:babi.expression,name:"
 msgid "Expression"
@@ -1526,22 +1072,6 @@ msgstr "Filtre"
 msgctxt "model:babi.filter.parameter,name:"
 msgid "Filter Parameter"
 msgstr "Paràmetre del filtre"
-
-msgctxt "model:babi.internal.measure,name:"
-msgid "Internal Measure"
-msgstr "Mesura interna"
-
-msgctxt "model:babi.measure,name:"
-msgid "Measure"
-msgstr "Mesura"
-
-msgctxt "model:babi.open_chart.start,name:"
-msgid "Open Chart Start"
-msgstr "Obre la gràfica: Inici"
-
-msgctxt "model:babi.order,name:"
-msgid "Order"
-msgstr "Ordre"
 
 msgctxt "model:babi.pivot,name:"
 msgid "Pivot Table"
@@ -1566,22 +1096,6 @@ msgstr "Propietat de taula dinàmica"
 msgctxt "model:babi.pivot.row_dimension,name:"
 msgid "Pivot Row Dimension"
 msgstr "Dimensions de la fila de taula dinàmica"
-
-msgctxt "model:babi.report,name:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "model:babi.report-res.group,name:"
-msgid "Report - Group"
-msgstr "Informe - Grup"
-
-msgctxt "model:babi.report.execution,name:"
-msgid "Report Execution"
-msgstr "Execució d'informe"
-
-msgctxt "model:babi.report.execution.open.select,name:"
-msgid "Open Report Execution - Select Values"
-msgstr "Obre execució - Selecció de valors"
 
 msgctxt "model:babi.table,name:"
 msgid "BABI Table"
@@ -1611,14 +1125,6 @@ msgctxt "model:babi.test,name:"
 msgid "Test BABI Model"
 msgstr "Model de proves BABI"
 
-msgctxt "model:babi.update_data.wizard.done,name:"
-msgid "Update Data Wizard Done"
-msgstr "Final Actualitza la informació d'un informe"
-
-msgctxt "model:babi.update_data.wizard.start,name:"
-msgid "Update Data Wizard Start"
-msgstr "Inici Actualitza la informació d'un informe"
-
 msgctxt "model:babi.warning,name:"
 msgid "BABI Warning"
 msgstr "Avís BABI"
@@ -1630,6 +1136,10 @@ msgstr "Gràfica"
 msgctxt "model:babi.widget.parameter,name:"
 msgid "Widget Parameter"
 msgstr "Paràmetre de la gràfica"
+
+msgctxt "model:ir.action,name:"
+msgid "Executions"
+msgstr "Execucions"
 
 msgctxt "model:ir.action,name:act_action_dashboard_form"
 msgid "Dashboards"
@@ -1647,10 +1157,6 @@ msgctxt "model:ir.action,name:act_babi_dashboard_item"
 msgid "Dashboard Items"
 msgstr "Elements del tauler de control"
 
-msgctxt "model:ir.action,name:act_babi_execution"
-msgid "Executions"
-msgstr "Execucions"
-
 msgctxt "model:ir.action,name:act_babi_expression"
 msgid "Expressions"
 msgstr "Expressions"
@@ -1666,18 +1172,6 @@ msgstr "Filtres"
 msgctxt "model:ir.action,name:act_babi_pivot"
 msgid "Pivot Tables"
 msgstr "Taules dinàmiques"
-
-msgctxt "model:ir.action,name:act_babi_report"
-msgid "Reports"
-msgstr "Informes"
-
-msgctxt "model:ir.action,name:act_babi_report_cron_form"
-msgid "Crons"
-msgstr "Crons"
-
-msgctxt "model:ir.action,name:act_babi_report_execution_form"
-msgid "Executions"
-msgstr "Execucions"
 
 msgctxt "model:ir.action,name:act_babi_table"
 msgid "Tables"
@@ -1707,22 +1201,6 @@ msgctxt "model:ir.action,name:act_widget_table"
 msgid "Widgets"
 msgstr "Ginys"
 
-msgctxt "model:ir.action,name:clear_executions_wizard"
-msgid "Clean Executions"
-msgstr "Eliminar Execucions"
-
-msgctxt "model:ir.action,name:open_chart_wizard"
-msgid "open chart"
-msgstr "Obre gràfica"
-
-msgctxt "model:ir.action,name:open_execution_wizard"
-msgid "Business Intelligence Report"
-msgstr "Informe de Business Intelligence"
-
-msgctxt "model:ir.action,name:report_babi_html_report"
-msgid "Report"
-msgstr "Informe"
-
 msgctxt "model:ir.action,name:report_pivot_excel"
 msgid "Excel"
 msgstr "Excel"
@@ -1730,6 +1208,14 @@ msgstr "Excel"
 msgctxt "model:ir.action,name:report_table_excel"
 msgid "Excel"
 msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_warning_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_warning_pivot_excel"
+msgid "Pivot Excel"
+msgstr "Excel de taula dinàmica"
 
 msgctxt "model:ir.action,name:table_parametrize_wizard"
 msgid "Parametrize Table"
@@ -1773,18 +1259,22 @@ msgstr "S'ha produït una excepció: %(error)s"
 
 msgctxt "model:ir.message,text:create_data_exception_dimension"
 msgid ""
-"An Exception Occurred: On dimensions, with expression %(expression)s on record %(record)s.\n"
+"An Exception Occurred: On dimensions, with expression %(expression)s on"
+" record %(record)s.\n"
 "Exception: %(error)s"
 msgstr ""
-"S'ha produït una excepció: a les dimensions, amb l'expressió %(expression)s al registre %(record)s.\n"
+"S'ha produït una excepció: a les dimensions, amb l'expressió %(expression)s"
+" al registre %(record)s.\n"
 "Excepció: %(error)s"
 
 msgctxt "model:ir.message,text:create_data_exception_measures"
 msgid ""
-"An Exception Occurred: On measures, with expression %(expression)s on record %(record)s.\n"
+"An Exception Occurred: On measures, with expression %(expression)s on record "
+"%(record)s.\n"
 "Exception: %(error)s"
 msgstr ""
-"S'ha produït una excepció: a les mesures, amb l'expressió %(expression)s al registre %(record)s.\n"
+"S'ha produït una excepció: a les mesures, amb l'expressió %(expression)s al"
+" registre %(record)s.\n"
 "Excepció: %(error)s"
 
 msgctxt "model:ir.message,text:false"
@@ -1821,11 +1311,13 @@ msgid ""
 "Circular dependency with the following table sequence:\n"
 "\n"
 "\"%(sequence)s\""
-msgstr "Dependència circular amb la següent seqüència de taules: \"%(sequence)s\""
+msgstr ""
+"Dependència circular amb la següent seqüència de taules: \"%(sequence)s\""
 
 msgctxt "model:ir.message,text:msg_compute_table_exception"
 msgid ""
-"An exception occurred while computing the value for field \"%(field)s\" in table \"%(table)s\", record \"%(record)s\". The error was:\n"
+"An exception occurred while computing the value for field \"%(field)s\" in"
+" table \"%(table)s\", record \"%(record)s\". The error was:\n"
 "\n"
 "%(error)s"
 msgstr ""
@@ -1858,8 +1350,7 @@ msgctxt "model:ir.message,text:msg_invalid_field_internal_name"
 msgid "Invalid internal name \"%(internal_name)s\" in field \"%(field)s\"."
 msgstr "El nom intern \"%(internal_name)s\" no és vàlid al camp \"%(field)s\"."
 
-msgctxt ""
-"model:ir.message,text:msg_invalid_field_internal_name_first_character"
+msgctxt "model:ir.message,text:msg_invalid_field_internal_name_first_character"
 msgid ""
 "Invalid first character in internal name \"%(internal_name)s\" in field "
 "\"%(field)s\"."
@@ -1877,10 +1368,10 @@ msgstr ""
 
 msgctxt "model:ir.message,text:msg_invalid_table_internal_name"
 msgid "Invalid internal name \"%(internal_name)s\" in table \"%(table)s\"."
-msgstr "El nom intern \"%(internal_name)s\" no és vàlid a la taula \"%(table)s\"."
+msgstr ""
+"El nom intern \"%(internal_name)s\" no és vàlid a la taula \"%(table)s\"."
 
-msgctxt ""
-"model:ir.message,text:msg_invalid_table_internal_name_first_character"
+msgctxt "model:ir.message,text:msg_invalid_table_internal_name_first_character"
 msgid ""
 "Invalid first character in internal name \"%(internal_name)s\" in table "
 "\"%(table)s\"."
@@ -1987,21 +1478,27 @@ msgstr ""
 
 msgctxt "model:ir.message,text:msg_widget_help"
 msgid ""
-"The following is the list of valid parameter types wth the number of minimum and maximum occurrences allowed:\n"
+"The following is the list of valid parameter types wth the number of minimum"
+" and maximum occurrences allowed:\n"
 "\n"
 "%(list)s"
 msgstr ""
-"La següent és la llista de tipus de paràmetres vàlids amb el nombre d'ocurrències mínim i màxim permesos:\n"
+"La següent és la llista de tipus de paràmetres vàlids amb el nombre"
+" d'ocurrències mínim i màxim permesos:\n"
 "\n"
 "%(list)s"
 
 msgctxt "model:ir.message,text:msg_wrong_info"
 msgid ""
-"The information returned from the field %(field)s is not correct or you don't have enough permissions to access it.             Records found by query: %(query_count)s\n"
+"The information returned from the field %(field)s is not correct or you don't"
+" have enough permissions to access it.             Records found by query: "
+"%(query_count)s\n"
 "            Records found by Model: %(model_query_count)s\n"
 "            "
 msgstr ""
-"La informació retornada del camp %(field)s no és correcta o no teniu prou permisos per accedir-hi. Registres trobats per la consulta: %(query_count)s Registres trobats pel model: %(model_query_count)s\n"
+"La informació retornada del camp %(field)s no és correcta o no teniu prou"
+" permisos per accedir-hi. Registres trobats per la consulta: %(query_count)s"
+" Registres trobats pel model: %(model_query_count)s\n"
 "            "
 
 msgctxt "model:ir.message,text:msg_yes"
@@ -2064,7 +1561,8 @@ msgctxt "model:ir.message,text:report_not_exists"
 msgid ""
 "Report \"%(report)s\" no longer exists or you do not have the rights to "
 "access it."
-msgstr "L’informe \"%(report)s\" ja no existeix o no teniu els permissos d'accés."
+msgstr ""
+"L’informe \"%(report)s\" ja no existeix o no teniu els permissos d'accés."
 
 msgctxt "model:ir.message,text:timeout_exception"
 msgid ""
@@ -2078,14 +1576,6 @@ msgctxt "model:ir.message,text:true"
 msgid "True"
 msgstr "Cert"
 
-msgctxt "model:ir.model.button,string:babi_execution_cancel_button"
-msgid "Cancel"
-msgstr "Cancel·lat"
-
-msgctxt "model:ir.model.button,string:babi_execution_open_button"
-msgid "Open"
-msgstr "Pendent"
-
 msgctxt "model:ir.model.button,string:babi_expression_check_button"
 msgid "Check"
 msgstr "Comprovar"
@@ -2093,18 +1583,6 @@ msgstr "Comprovar"
 msgctxt "model:ir.model.button,string:babi_filter_check_button"
 msgid "Check"
 msgstr "Comprovar"
-
-msgctxt "model:ir.model.button,string:babi_report_compute_button"
-msgid "Compute"
-msgstr "Calcular"
-
-msgctxt "model:ir.model.button,string:babi_report_create_menus_button"
-msgid "Create Menus"
-msgstr "Crea menús"
-
-msgctxt "model:ir.model.button,string:babi_report_remove_menus_button"
-msgid "Remove Menus"
-msgstr "Elimina menús"
 
 msgctxt "model:ir.model.button,string:babi_table_ai_button"
 msgid "AI"
@@ -2146,7 +1624,7 @@ msgctxt "model:ir.model.button,string:show_dashboard_button"
 msgid "Show"
 msgstr "Mostra"
 
-msgctxt "model:ir.rule.group,name:rule_group_babi_execution"
+msgctxt "model:ir.rule.group,name:"
 msgid "Babi Execution"
 msgstr "Execució Babi"
 
@@ -2158,6 +1636,10 @@ msgctxt "model:ir.rule.group,name:rule_group_user_warning"
 msgid "User in Warning"
 msgstr "Usuari en avís"
 
+msgctxt "model:ir.ui.menu,name:"
+msgid "Clean Executions"
+msgstr "Eliminar Execucions"
+
 msgctxt "model:ir.ui.menu,name:menu_action_dashboard"
 msgid "Dashboards"
 msgstr "Taulers de control"
@@ -2166,17 +1648,9 @@ msgctxt "model:ir.ui.menu,name:menu_babi"
 msgid "Business Intelligence"
 msgstr "Business Intelligence"
 
-msgctxt "model:ir.ui.menu,name:menu_babi_clean_execution"
-msgid "Clean Executions"
-msgstr "Eliminar Execucions"
-
 msgctxt "model:ir.ui.menu,name:menu_babi_configuration"
 msgid "Configuration"
 msgstr "Configuració"
-
-msgctxt "model:ir.ui.menu,name:menu_babi_execution"
-msgid "Executions"
-msgstr "Execucions"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_expression"
 msgid "Expressions"
@@ -2193,10 +1667,6 @@ msgstr "Filtre"
 msgctxt "model:ir.ui.menu,name:menu_babi_pivot"
 msgid "Pivot Tables"
 msgstr "Taula dinàmica"
-
-msgctxt "model:ir.ui.menu,name:menu_babi_report"
-msgid "Reports"
-msgstr "Informes"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_table"
 msgid "Tables"
@@ -2217,14 +1687,6 @@ msgstr "Configuració"
 msgctxt "model:ir.ui.menu,name:menu_dashboard"
 msgid "Dashboards"
 msgstr "Taulers de control"
-
-msgctxt "model:ir.ui.menu,name:menu_historical_data"
-msgid "View historical data"
-msgstr "Veure historial"
-
-msgctxt "model:ir.ui.menu,name:menu_update_data"
-msgid "Update data"
-msgstr "Actualitza informació"
 
 msgctxt "model:ir.ui.menu,name:menu_widget"
 msgid "Widgets"
@@ -2414,134 +1876,6 @@ msgctxt "selection:babi.filter.parameter,ttype:"
 msgid "Numeric"
 msgstr "Numèric"
 
-msgctxt "selection:babi.internal.measure,aggregate:"
-msgid "Average"
-msgstr "Mitjana"
-
-msgctxt "selection:babi.internal.measure,aggregate:"
-msgid "Count"
-msgstr "Comptador"
-
-msgctxt "selection:babi.internal.measure,aggregate:"
-msgid "Max"
-msgstr "Màxim"
-
-msgctxt "selection:babi.internal.measure,aggregate:"
-msgid "Min"
-msgstr "Mínim"
-
-msgctxt "selection:babi.internal.measure,aggregate:"
-msgid "Sum"
-msgstr "Suma"
-
-msgctxt "selection:babi.internal.measure,ttype:"
-msgid "Boolean"
-msgstr "Booleà"
-
-msgctxt "selection:babi.internal.measure,ttype:"
-msgid "Char"
-msgstr "Caràcter"
-
-msgctxt "selection:babi.internal.measure,ttype:"
-msgid "Date"
-msgstr "Data"
-
-msgctxt "selection:babi.internal.measure,ttype:"
-msgid "Date & Time"
-msgstr "Data i hora"
-
-msgctxt "selection:babi.internal.measure,ttype:"
-msgid "Float"
-msgstr "Coma flotant"
-
-msgctxt "selection:babi.internal.measure,ttype:"
-msgid "Integer"
-msgstr "Enter"
-
-msgctxt "selection:babi.internal.measure,ttype:"
-msgid "Many To One"
-msgstr "Molts a un"
-
-msgctxt "selection:babi.internal.measure,ttype:"
-msgid "Numeric"
-msgstr "Numèric"
-
-msgctxt "selection:babi.measure,aggregate:"
-msgid "Average"
-msgstr "Mitjana"
-
-msgctxt "selection:babi.measure,aggregate:"
-msgid "Count"
-msgstr "Comptador"
-
-msgctxt "selection:babi.measure,aggregate:"
-msgid "Max"
-msgstr "Màxim"
-
-msgctxt "selection:babi.measure,aggregate:"
-msgid "Min"
-msgstr "Mínim"
-
-msgctxt "selection:babi.measure,aggregate:"
-msgid "Sum"
-msgstr "Suma"
-
-msgctxt "selection:babi.open_chart.start,graph_type:"
-msgid "Horizontal Bars"
-msgstr "Barres horitzontals"
-
-msgctxt "selection:babi.open_chart.start,graph_type:"
-msgid "Line"
-msgstr "Línia"
-
-msgctxt "selection:babi.open_chart.start,graph_type:"
-msgid "Pie"
-msgstr "Formatge"
-
-msgctxt "selection:babi.open_chart.start,graph_type:"
-msgid "Report"
-msgstr "Informe"
-
-msgctxt "selection:babi.open_chart.start,graph_type:"
-msgid "Vertical Bars"
-msgstr "Barres verticals"
-
-msgctxt "selection:babi.open_chart.start,graph_type_report:"
-msgid "Excel"
-msgstr "Excel"
-
-msgctxt "selection:babi.open_chart.start,graph_type_report:"
-msgid "HTML"
-msgstr "HTML"
-
-msgctxt "selection:babi.open_chart.start,graph_type_report:"
-msgid "PDF"
-msgstr "PDF"
-
-msgctxt "selection:babi.open_chart.start,interpolation:"
-msgid "Constant Center"
-msgstr "Constant pel centre"
-
-msgctxt "selection:babi.open_chart.start,interpolation:"
-msgid "Constant Left"
-msgstr "Constant per l'esquerra"
-
-msgctxt "selection:babi.open_chart.start,interpolation:"
-msgid "Constant Right"
-msgstr "Constant per la dreta"
-
-msgctxt "selection:babi.open_chart.start,interpolation:"
-msgid "Linear"
-msgstr "De línies"
-
-msgctxt "selection:babi.order,order:"
-msgid "Ascending"
-msgstr "Ascendent"
-
-msgctxt "selection:babi.order,order:"
-msgid "Descending"
-msgstr "Descendent"
-
 msgctxt "selection:babi.pivot.measure,aggregate:"
 msgid "Average"
 msgstr "Mitjana"
@@ -2569,38 +1903,6 @@ msgstr "Ascendent"
 msgctxt "selection:babi.pivot.order,order:"
 msgid "Descending"
 msgstr "Descendent"
-
-msgctxt "selection:babi.report.execution,state:"
-msgid "Calculated"
-msgstr "Calcul·lat"
-
-msgctxt "selection:babi.report.execution,state:"
-msgid "Cancelled"
-msgstr "Cancelat"
-
-msgctxt "selection:babi.report.execution,state:"
-msgid "Failed"
-msgstr "Fallada"
-
-msgctxt "selection:babi.report.execution,state:"
-msgid "In progress"
-msgstr "En progrés"
-
-msgctxt "selection:babi.report.execution,state:"
-msgid "Pending"
-msgstr "Pendent"
-
-msgctxt "selection:babi.report.execution,state:"
-msgid "Timeout"
-msgstr "Temps esgotat"
-
-msgctxt "selection:babi.report.execution.open.select,view_type:"
-msgid "List"
-msgstr "Llista"
-
-msgctxt "selection:babi.report.execution.open.select,view_type:"
-msgid "Tree"
-msgstr "Arbre"
 
 msgctxt "selection:babi.table,type:"
 msgid "Model"
@@ -2847,16 +2149,8 @@ msgid "Z"
 msgstr "Z"
 
 msgctxt "selection:ir.cron,method:"
-msgid "Clean Babi Excutions"
-msgstr "Netejar execucions Babi"
-
-msgctxt "selection:ir.cron,method:"
 msgid "Compute Business Intelligence Cluster"
 msgstr "Calcula clúster de Business Intelligence"
-
-msgctxt "selection:ir.cron,method:"
-msgid "Compute Business Intelligence Report"
-msgstr "Calcula Informe Business Intelligence"
 
 msgctxt "selection:ir.cron,method:"
 msgid "Compute Business Intelligence Table"
@@ -2866,22 +2160,6 @@ msgctxt "selection:ir.cron,method:"
 msgid "Delete Tables with Parameters"
 msgstr "Eliminar taules amb paràmetres"
 
-msgctxt "selection:ir.ui.menu,babi_type:"
-msgid "History"
-msgstr "Historial"
-
-msgctxt "selection:ir.ui.menu,babi_type:"
-msgid "List"
-msgstr "Llista"
-
-msgctxt "selection:ir.ui.menu,babi_type:"
-msgid "Tree"
-msgstr "Arbre"
-
-msgctxt "selection:ir.ui.menu,babi_type:"
-msgid "Wizard"
-msgstr "Assistent"
-
 msgctxt "selection:www.site,type:"
 msgid "Pivot"
 msgstr "Taula dinàmica"
@@ -2890,21 +2168,9 @@ msgctxt "view:babi.action.dashboard:"
 msgid "General"
 msgstr "General"
 
-msgctxt "view:babi.clean_executions.start:"
-msgid "Clean babi execution data until"
-msgstr "Eliminar la informació de les execucions fins a "
-
 msgctxt "view:babi.configuration:"
 msgid "Business Intelligence Configuration"
 msgstr "Configuració Business Intelligence"
-
-msgctxt "view:babi.dimension.column:"
-msgid "Column Dimension"
-msgstr "Dimensió en columnes"
-
-msgctxt "view:babi.dimension:"
-msgid "Dimension"
-msgstr "Dimensió"
 
 msgctxt "view:babi.expression:"
 msgid "Expression"
@@ -2917,62 +2183,6 @@ msgstr "Paràmetre del filtre"
 msgctxt "view:babi.filter:"
 msgid "Filter"
 msgstr "Filtre"
-
-msgctxt "view:babi.internal.measure:"
-msgid "Internal Measure"
-msgstr "Mesura Interna"
-
-msgctxt "view:babi.measure:"
-msgid "Measure"
-msgstr "Mesura"
-
-msgctxt "view:babi.open_chart.start:"
-msgid "Not recommended when report has dimension columns."
-msgstr "No es recomana quan l'informe té columnes de dimensió."
-
-msgctxt "view:babi.open_chart.start:"
-msgid "This is an autogenerated report."
-msgstr "Aquest és un informe autogenerat."
-
-msgctxt "view:babi.open_chart.start:"
-msgid "This report may not fit correctly on a page."
-msgstr "Aquest informe pot no encaixar correctament en una pàgina."
-
-msgctxt "view:babi.open_chart.start:"
-msgid "You can adjust width on report dimensions and mesures."
-msgstr "Podeu ajustar l'amplada en les dimensions i mesures de l'informe."
-
-msgctxt "view:babi.order:"
-msgid "Order"
-msgstr "Ordre"
-
-msgctxt "view:babi.report.execution.open.select:"
-msgid "Open Execution"
-msgstr "Obre execució"
-
-msgctxt "view:babi.report.execution:"
-msgid "Time"
-msgstr "Temps"
-
-msgctxt "view:babi.report.execution:"
-msgid "s"
-msgstr "s"
-
-msgctxt "view:babi.report:"
-msgid "Executions"
-msgstr "Execucions"
-
-msgctxt "view:babi.report:"
-msgid "Extra Information"
-msgstr "Informació extra"
-
-msgctxt "view:babi.report:"
-msgid "General"
-msgstr "General"
-
-msgctxt "view:babi.report:"
-msgid "Schedulers"
-msgstr "Tasques planificades"
 
 msgctxt "view:babi.table:"
 msgid "AI"
@@ -3010,18 +2220,6 @@ msgctxt "view:babi.table:"
 msgid "What do you want to show?"
 msgstr "Què vols mostrar?"
 
-msgctxt "view:babi.update_data.wizard.done:"
-msgid "The data for the report has been calculated"
-msgstr "S'ha calculat la informació de l'informe."
-
-msgctxt "view:babi.update_data.wizard.start:"
-msgid "Note that this operation may take a few minutes."
-msgstr "Tingueu en compte que aquesta operació pot trigar uns minuts."
-
-msgctxt "view:babi.update_data.wizard.start:"
-msgid "The data for the report will be calculated"
-msgstr "Es calcularà la informació d'aquest informe."
-
 msgctxt "view:babi.widget:"
 msgid "Settings"
 msgstr "Configuració"
@@ -3049,6 +2247,10 @@ msgstr "Tancar"
 msgctxt "voyager:v:"
 msgid "Columns"
 msgstr "Columnes"
+
+msgctxt "voyager:v:"
+msgid "Configuration"
+msgstr "Configuració"
 
 msgctxt "voyager:v:"
 msgid "Count"
@@ -3147,9 +2349,9 @@ msgid ""
 "Table has not been computed. Click on the 'Compute' button or wait until the"
 " process has finished. Also ensure there is no 'Errors' tab in the table."
 msgstr ""
-"La taula no s'ha calculat. Fes clic al botó \"Calcula\" o espera fins que "
-"el procés hagi acabat. Assegura't també que no hi hagi cap pestanya "
-"\"Errors\" a la taula."
+"La taula no s'ha calculat. Fes clic al botó \"Calcula\" o espera fins que el"
+" procés hagi acabat. Assegura't també que no hi hagi cap pestanya \"Errors\""
+" a la taula."
 
 msgctxt "voyager:v:"
 msgid "Up"
@@ -3162,54 +2364,6 @@ msgid ""
 msgstr ""
 "Heu de seleccionar almenys una mesura i una fila o una columna per mostrar "
 "la taula."
-
-msgctxt "wizard_button:babi.clean_executions,start,clean:"
-msgid "Ok"
-msgstr "D'acord"
-
-msgctxt "wizard_button:babi.clean_executions,start,end:"
-msgid "Cancel"
-msgstr "Cancel·lat"
-
-msgctxt "wizard_button:babi.open_chart,start,end:"
-msgid "Cancel"
-msgstr "Cancel·la"
-
-msgctxt "wizard_button:babi.open_chart,start,open_:"
-msgid "Open"
-msgstr "Obre"
-
-msgctxt "wizard_button:babi.open_chart,start,print_:"
-msgid "Print"
-msgstr "Imprimir"
-
-msgctxt "wizard_button:babi.report.execution.open,filtered,create_execution:"
-msgid "Open"
-msgstr "Obre"
-
-msgctxt "wizard_button:babi.report.execution.open,filtered,end:"
-msgid "Cancel"
-msgstr "Cancel·la"
-
-msgctxt "wizard_button:babi.report.execution.open,select,end:"
-msgid "Cancel"
-msgstr "Cancel·la"
-
-msgctxt "wizard_button:babi.report.execution.open,select,open_view:"
-msgid "Open"
-msgstr "Obre"
-
-msgctxt "wizard_button:babi.report.execution.open,update_done,end:"
-msgid "Ok"
-msgstr "D'acord"
-
-msgctxt "wizard_button:babi.report.execution.open,update_start,end:"
-msgid "Cancel"
-msgstr "Cancel·la"
-
-msgctxt "wizard_button:babi.report.execution.open,update_start,update:"
-msgid "Ok"
-msgstr "D'acord"
 
 msgctxt "wizard_button:babi.table.parametrize,start,create_table:"
 msgid "Create"
