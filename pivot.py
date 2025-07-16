@@ -143,7 +143,7 @@ class Index(Component):
     def render(self):
         pool = Pool()
         BabiTable = pool.get('babi.table')
-        # Components
+        Language = pool.get('ir.lang')
         Layout = pool.get('www.layout.pivot')
         PivotHeaderAxis = pool.get('www.pivot_header.axis')
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
@@ -162,17 +162,17 @@ class Index(Component):
         if table_name.startswith('__'):
             table_name = table_name.split('__')[-1]
 
-        babi_table = BabiTable.search([
+        tables = BabiTable.search([
                 ('internal_name', '=', table_name),
                 ], limit=1)
 
         # Check if the user can see the table, if not, return an error page
         access = False
-        if babi_table:
-            babi_table, = babi_table
-            access = babi_table.check_access()
+        if tables:
+            table, = tables
+            access = table.check_access()
 
-        if not access or not babi_table:
+        if not access or not tables:
             # TODO: move the error page to a component, this way we call the same error in multiple places
             with main(cls="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8") as error_section:
                 with div(cls="text-center"):
@@ -183,8 +183,6 @@ class Index(Component):
             layout.main.add(error_section)
             return layout.tag()
 
-        table_name = babi_table.name
-
         # Ensure we have a value in table_properties
         if not hasattr(self, 'table_properties'):
             self.table_properties = 'null'
@@ -192,22 +190,47 @@ class Index(Component):
         # Check if we have the cube properties to see the table, if not, show a messagge
         show_error = True
         if self.table_properties == 'null':
-            cube = Cube(table=babi_table.name)
+            cube = Cube(table=table.name)
         else:
-            cube = Cube.parse_properties(self.table_properties, table_name)
+            cube = Cube.parse_properties(self.table_properties, table.name)
 
         if cube.measures and (cube.rows or cube.columns):
             show_error = False
 
         # Prepare the cube properties for the invert cube function
-        cube.table = table_name
+        cube.table = table.name
         cube.rows, cube.columns = cube.columns, cube.rows
         inverted_table_properties = cube.encode_properties()
 
+
+        language = Transaction().context.get('language', 'en')
+        language, = Language.search([('code', '=', language)], limit=1)
+
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
-                with div(cls="col-span-1"):
-                    h3(table_name, cls="text-base font-semibold leading-6 text-gray-900")
+                with div(cls="col-span-2"):
+                    span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
+                    # TODO: Those timestamps are not exactly right because a
+                    # table may depend on other tables so even if this table
+                    # has been recently computed it may depend on old data.
+                    # Even if that seems correct (the table does not currently
+                    # depend on other tables) it may happen that the table did
+                    # depend on other tables when it was computed for the last
+                    # time and at that moment those other tables where not up
+                    # to date.
+                    # All of this is solvable but requires more infrastructure,
+                    # that should probably be implemented in the babi.table
+                    # model.
+                    if table.type in ('model', 'table'):
+                        if table.calculation_date:
+                            timestamp = _('data from %s') % language.strftime(table.calculation_date)
+                        else:
+                            timestamp = _('not calculated yet')
+                    else:
+                        timestamp = _('current data')
+                    timestamp = f'({timestamp})'
+                    # Use a smaller text
+                    span(timestamp, cls="text-sm text-gray-500 ml-2")
                 # Each button is a 36px width
                 # Invert axis button
                 with div(cls="col-span-1"):
@@ -264,7 +287,7 @@ class Index(Component):
                             if print_trace:
                                 logger.exception(e)
 
-        layout = Layout(title=f'{table_name} | Tryton')
+        layout = Layout(title=f'{table.name} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
 
