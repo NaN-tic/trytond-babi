@@ -821,7 +821,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             else:
                 expression = expression.format(**self.parameters)
         except KeyError as message:
-            if self.report.babi_raise_user_error:
+            if self.babi_raise_user_error:
                 raise UserError(
                     gettext('babi.invalid_parameters',
                     key=str(message)))
