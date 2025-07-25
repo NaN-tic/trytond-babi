@@ -89,6 +89,24 @@ def convert_to_symbol(text):
         symbol = symbol[:-1]
     return symbol
 
+def datetime_to_company_tz(value):
+    pool = Pool()
+    Company = pool.get('company.company')
+    Lang = pool.get('ir.lang')
+
+    company_id = Transaction().context.get('company')
+    locale = Transaction().context.get('language')
+    lang, = Lang.search([
+            ('code', '=', locale or 'en'),
+            ], limit=1)
+    if company_id:
+        company = Company(company_id)
+        if company.timezone:
+            timezone = pytz.timezone(company.timezone)
+            value = timezone.localize(value)
+            value = value + value.utcoffset()
+    return lang.strftime(value)
+
 def generate_html_table(records):
     pool = Pool()
     Lang = pool.get('ir.lang')
@@ -562,29 +580,12 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     def copy(cls, tables, default=None):
         pool = Pool()
-        Company = pool.get('company.company')
         Pivot = pool.get('babi.pivot')
-        Lang = pool.get('ir.lang')
 
         if default is None:
             default = {}
 
-        locale = Transaction().context.get(
-            'report_lang', Transaction().language).split('_')[0]
-        lang, = Lang.search([
-                ('code', '=', locale or 'en'),
-                ], limit=1)
-
-        now = datetime.now()
-        company_id = Transaction().context.get('company')
-        if company_id:
-            company = Company(company_id)
-            if company.timezone:
-                timezone = pytz.timezone(company.timezone)
-                now = timezone.localize(now)
-                now = now + now.utcoffset()
-        now = lang.strftime(now)
-
+        now = datetime_to_company_tz(datetime.now())
 
         default = default.copy()
         default.setdefault('name', lambda x: x['name'] + f' ({now})')
