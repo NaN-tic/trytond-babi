@@ -16,6 +16,7 @@ from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
 from .cube import Cube, CellType, capitalize
+from .table import datetime_to_company_tz
 
 
 logger = logging.getLogger(__name__)
@@ -143,7 +144,6 @@ class Index(Component):
     def render(self):
         pool = Pool()
         BabiTable = pool.get('babi.table')
-        Language = pool.get('ir.lang')
         Layout = pool.get('www.layout.pivot')
         PivotHeaderAxis = pool.get('www.pivot_header.axis')
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
@@ -202,10 +202,6 @@ class Index(Component):
         cube.rows, cube.columns = cube.columns, cube.rows
         inverted_table_properties = cube.encode_properties()
 
-
-        language = Transaction().context.get('language', 'en')
-        language, = Language.search([('code', '=', language)], limit=1)
-
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
                 with div(cls="col-span-2"):
@@ -223,7 +219,8 @@ class Index(Component):
                     # model.
                     if table.type in ('model', 'table'):
                         if table.calculation_date:
-                            timestamp = _('data from %s') % language.strftime(table.calculation_date)
+
+                            timestamp = _('data from %s') % datetime_to_company_tz(table.calculation_date)
                         else:
                             timestamp = _('not calculated yet')
                     else:
