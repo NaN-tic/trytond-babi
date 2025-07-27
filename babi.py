@@ -13,7 +13,7 @@ from datetime import datetime
 
 from trytond.model import DeactivableMixin, ModelSQL, ModelView, fields
 from trytond.model.fields import depends
-from trytond.pyson import Bool, Eval, Id, Not, PYSONDecoder
+from trytond.pyson import Bool, Eval, Not, PYSONDecoder
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.config import config as config_
@@ -146,11 +146,7 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
         "- today: eval current date\n"
         "  Example: {'stock_date_end': today}")
     parameters = fields.One2Many('babi.filter.parameter', 'filter',
-        'Parameters',
-        states={
-            'invisible': Not(Eval('context', {}).get('groups', []).contains(
-                Id('babi', 'group_babi_admin'))),
-            })
+        'Parameters')
     fields = fields.Function(fields.Many2Many('ir.model.field', None, None,
             'Model Fields'), 'on_change_with_fields')
 
@@ -278,6 +274,11 @@ class FilterParameter(ModelSQL, ModelView):
             'required': Eval('ttype').in_(['many2one', 'many2many']),
             'readonly': Not(Eval('ttype').in_(['many2one', 'many2many'])),
             })
+
+    @classmethod
+    def __setup__(cls):
+        cls.__setup__()
+        cls.__access__.add('filter')
 
     @classmethod
     def __register__(cls, module_name):
