@@ -425,11 +425,7 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
         "- today: eval current date\n"
         "  Example: {'stock_date_end': today}")
     parameters = fields.One2Many('babi.filter.parameter', 'filter',
-        'Parameters',
-        states={
-            'invisible': Not(Eval('context', {}).get('groups', []).contains(
-                Id('babi', 'group_babi_admin'))),
-            })
+        'Parameters')
     fields = fields.Function(fields.Many2Many('ir.model.field', None, None,
             'Model Fields'), 'on_change_with_fields')
 
@@ -557,6 +553,11 @@ class FilterParameter(ModelSQL, ModelView):
             'required': Eval('ttype').in_(['many2one', 'many2many']),
             'readonly': Not(Eval('ttype').in_(['many2one', 'many2many'])),
             })
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls.__access__.add('filter')
 
     def create_keyword(self):
         pool = Pool()

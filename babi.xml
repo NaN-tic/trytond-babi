@@ -226,23 +226,6 @@ contains the full copyright notices and license terms. -->
             <field name="name">filter_parameter_tree</field>
         </record>
 
-        <record model="ir.model.access" id="access_babi_filter_parameter">
-            <field name="model">babi.filter.parameter</field>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_delete" eval="False"/>
-        </record>
-
-        <record model="ir.model.access" id="access_babi_filter_parameter_admin">
-            <field name="model">babi.filter.parameter</field>
-            <field name="group" ref="group_babi_admin"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_delete" eval="True"/>
-        </record>
-
         <!-- babi.internal.measure -->
         <record model="ir.ui.view" id="babi_internal_measure_form_view">
             <field name="model">babi.internal.measure</field>
