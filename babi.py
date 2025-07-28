@@ -277,7 +277,7 @@ class FilterParameter(ModelSQL, ModelView):
 
     @classmethod
     def __setup__(cls):
-        cls.__setup__()
+        super().__setup__()
         cls.__access__.add('filter')
 
     @classmethod
