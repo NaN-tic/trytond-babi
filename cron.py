@@ -64,7 +64,7 @@ class Cron(metaclass=PoolMeta):
                 ('babi.table|clean', 'Delete Tables with Parameters'),
                 ('babi.table.cluster|_compute',
                     'Compute Business Intelligence Cluster'),
-                ('babi.report.execution|clean', 'Clean Babi Excutions'),
+                ('babi.report.execution|clean', 'Clean Babi Executions'),
                 ])
 
     @classmethod
