@@ -780,8 +780,13 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             table.append(labels)
             for record in records:
                 table.append(record)
-            content = '%(table)s<br/>%(elapsed).2fms' % {
+            limited = ''
+            if limit:
+                limited = gettext('babi.msg_table_limit', number=limit)
+            content = ('%(table)s<br/>%(rows)s%(limit)s<br/>%(elapsed).2fms') % {
                 'table': generate_html_table(table),
+                'rows': gettext('babi.msg_table_rows', count=len(records)),
+                'limit': limited,
                 'elapsed': elapsed * 1000,
                 }
 
