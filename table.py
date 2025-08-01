@@ -12,6 +12,7 @@ import tempfile
 import html
 import urllib.parse
 import secrets
+import psycopg2
 from sql import Literal
 from sql.operators import Equal
 from decimal import Decimal
@@ -149,6 +150,10 @@ def generate_html_table(records):
 
 
 class CircularDependencyError(Exception):
+    pass
+
+
+class NoWaitError(Exception):
     pass
 
 
@@ -756,13 +761,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         records = records[1:]
         return [SimpleNamespace(**dict(zip(fields, x))) for x in records]
 
-    def get_html(self, where=None, limit=None):
+    def get_html(self, where=None, limit=None, wait=True):
         start = time.time()
         content = None
         fields = [x.internal_name for x in self.fields_ if x.show]
         labels = [x.name for x in self.fields_ if x.show]
         try:
-            records = self.execute_query(fields=fields, where=None, limit=limit)
+            records = self.execute_query(fields=fields, where=None,
+                limit=limit, wait=wait)
+        except NoWaitError:
+            content = gettext('babi.msg_waiting_for_computation')
         except Exception as e:
             content = str(e)
 
@@ -796,7 +804,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         return html
 
     def get_preview(self, name):
-        return self.get_html(limit=self.preview_limit).encode()
+        return self.get_html(limit=self.preview_limit, wait=False).encode()
 
     def get_preview_filename(self, name):
         return self.internal_name + '.html'
@@ -1093,7 +1101,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         return query
 
     def execute_query(self, fields=None, where=None, groupby=None, timeout=None,
-            limit=None):
+            limit=None, wait=True):
         if (self.type != 'view'
                 and not backend.TableHandler.table_exist(self.table_name)):
             return []
@@ -1101,12 +1109,21 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return []
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-            self._set_statement_timeout(timeout)
-            query = self.get_query(fields, where=where, groupby=groupby,
-                limit=limit)
-            cursor.execute(query)
-            records = cursor.fetchall()
-            self._reset_statement_timeout()
+            if not wait:
+                try:
+                    cursor.execute(f'LOCK TABLE {self.table_name} IN ACCESS '
+                        'SHARE MODE NOWAIT')
+                    wait = True
+                except psycopg2.errors.LockNotAvailable:
+                    transaction.connection.rollback()
+                    raise NoWaitError
+            if wait:
+                self._set_statement_timeout(timeout)
+                query = self.get_query(fields, where=where, groupby=groupby,
+                    limit=limit)
+                cursor.execute(query)
+                records = cursor.fetchall()
+                self._reset_statement_timeout()
         if self.type == 'model':
             # Sort records based on the order and descending fields from fields_
             headers = fields
