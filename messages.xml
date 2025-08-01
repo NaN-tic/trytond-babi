@@ -170,5 +170,11 @@ Exception: %(error)s</field>
         <record model="ir.message" id="msg_waiting_for_computation">
             <field name="text">Waiting for computation of table to finish.</field>
         </record>
+        <record model="ir.message" id="msg_table_rows">
+            <field name="text">%(count)s rows</field>
+        </record>
+        <record model="ir.message" id="msg_table_limit">
+            <field name="text">(limited to %(number)s)</field>
+        </record>
     </data>
 </tryton>
