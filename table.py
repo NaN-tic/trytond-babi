@@ -1114,7 +1114,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             return []
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-            if not wait:
+            if not wait and backend.name == 'postgresql':
                 try:
                     cursor.execute(f'LOCK TABLE {self.table_name} IN ACCESS '
                         'SHARE MODE NOWAIT')
