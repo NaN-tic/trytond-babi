@@ -128,6 +128,14 @@ def generate_html_table(records):
                 cell = language.strftime(cell)
             elif isinstance(cell, mdatetime.time):
                 cell = cell.strftime('%H:%M:%S')
+            elif isinstance(cell, bool):
+                # It is important to check bool before int
+                # because isinstance(True, int) is True
+                if cell:
+                    cell = gettext('babi.msg_yes')
+                else:
+                    cell = gettext('babi.msg_no')
+                align = 'left'
             elif isinstance(cell, (float, int, Decimal)):
                 cell = language.format_number(cell)
             else:
