@@ -796,7 +796,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         return html
 
     def get_preview(self, name):
-        return self.get_html(self.preview_limit).encode()
+        return self.get_html(limit=self.preview_limit).encode()
 
     def get_preview_filename(self, name):
         return self.internal_name + '.html'
