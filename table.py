@@ -1118,17 +1118,16 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 try:
                     cursor.execute(f'LOCK TABLE {self.table_name} IN ACCESS '
                         'SHARE MODE NOWAIT')
-                    wait = True
                 except psycopg2.errors.LockNotAvailable:
                     transaction.connection.rollback()
                     raise NoWaitError
-            if wait:
-                self._set_statement_timeout(timeout)
-                query = self.get_query(fields, where=where, groupby=groupby,
-                    limit=limit)
-                cursor.execute(query)
-                records = cursor.fetchall()
-                self._reset_statement_timeout()
+
+            self._set_statement_timeout(timeout)
+            query = self.get_query(fields, where=where, groupby=groupby,
+                limit=limit)
+            cursor.execute(query)
+            records = cursor.fetchall()
+            self._reset_statement_timeout()
         if self.type == 'model':
             # Sort records based on the order and descending fields from fields_
             headers = fields
