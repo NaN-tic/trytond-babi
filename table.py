@@ -96,17 +96,13 @@ def datetime_to_company_tz(value):
     Lang = pool.get('ir.lang')
 
     company_id = Transaction().context.get('company')
-    locale = Transaction().context.get('language')
-    lang, = Lang.search([
-            ('code', '=', locale or 'en'),
-            ], limit=1)
     if company_id:
         company = Company(company_id)
         if company.timezone:
             timezone = pytz.timezone(company.timezone)
             value = timezone.localize(value)
             value = value + value.utcoffset()
-    return lang.strftime(value)
+    return Lang.get().strftime(value)
 
 def generate_html_table(records):
     pool = Pool()
