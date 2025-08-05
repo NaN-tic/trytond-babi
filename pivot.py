@@ -17,6 +17,7 @@ from trytond.modules.voyager.voyager import Component
 from trytond.modules.voyager.i18n import _
 from .cube import Cube, CellType, capitalize
 from .table import datetime_to_company_tz
+from .tools import adjust_column_widths
 
 
 logger = logging.getLogger(__name__)
@@ -962,6 +963,7 @@ class DownloadReport(Component):
         ws = wb.active
         for row in cube.build():
             ws.append([x.formatted(language, excel=True) for x in row])
+        adjust_column_widths(ws, max_width=30)
         response = Response(save_virtual_workbook(wb))
         response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

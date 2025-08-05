@@ -39,6 +39,7 @@ from trytond.rpc import RPC
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval
 from .cube import Cube
+from .tools import adjust_column_widths
 
 RETENTION_DAYS = config.getint('babi', 'retention_days', default=30)
 VALID_FIRST_SYMBOLS = '_abcdefghijklmnopqrstuvwxyz'
@@ -1942,6 +1943,7 @@ class TableExcel(Report):
             ws = wb.create_sheet(_convert_to_title(table.name))
             for record in table.get_records():
                 ws.append([_convert_to_string(item) for item in record])
+            adjust_column_widths(ws, max_width=30)
         if len(tables) == 1:
             name = table.name
         else:
@@ -1971,6 +1973,7 @@ class WarningExcel(Report):
             ws = wb.create_sheet(_convert_to_title(warning.table.name))
             for record in warning.table.get_records(where=warning.query_where()):
                 ws.append([_convert_to_string(item) for item in record])
+            adjust_column_widths(ws, max_width=30)
         if len(warnings) == 1:
             name = warning.table.name
         else:
@@ -1999,9 +2002,6 @@ class WarningPivotExcel(Report):
 
         action, model = cls.get_action(data)
         cls.check_access()
-
-        wb = Workbook()
-        wb.remove(wb.active)
 
         warnings = Warning.browse(ids)
         pivots = []
