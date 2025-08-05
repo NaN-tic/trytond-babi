@@ -2,6 +2,7 @@ import ast
 import binascii
 import hashlib
 import sql
+import openpyxl
 from collections import defaultdict
 from datetime import datetime, date, timedelta
 from decimal import Decimal
@@ -633,20 +634,35 @@ class Cell:
         self.column_expansion = column_expansion
         self.properties = properties
 
-    def formatted(self, lang=None, excel=False):
+    def formatted(self, lang=None, worksheet=None):
         if not lang:
             return str(self)
 
         value = self.value
         if value is None:
             return '-'
-        if isinstance(value, (float, Decimal)):
+        if isinstance(value, float):
             # TODO: Make digits configurable
             digits = 2
-            if excel:
+            if worksheet:
                 return round(value, digits)
             return lang.format('%.*f', (digits, value),
                 grouping=True)
+        if isinstance(value, Decimal):
+            exp = value.as_tuple().exponent
+            if exp < 0:
+                digits = -exp
+            else:
+                digits = 0
+            if worksheet:
+                if digits:
+                    fmt = '0.' + '0' * digits
+                else:
+                    fmt = '0'
+                cell = openpyxl.cell.Cell(worksheet, value=value)
+                cell.number_format = fmt
+                return cell
+            return lang.format_number(value, grouping=True, digits=digits)
         if isinstance(value, bool):
             return (gettext('babi.msg_yes') if value else
                 gettext('babi.msg_no'))
