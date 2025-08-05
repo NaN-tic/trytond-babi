@@ -19,6 +19,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
+from openpyxl.cell import Cell
 from simpleeval import EvalWithCompoundTypes
 from trytond import backend
 from trytond.bus import notify
@@ -1416,7 +1417,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
             table = sql.Table(self.table_name)
             columns = [sql.Column(table, x.internal_name) for x in self.fields_]
-            expressions = [(x.expression.expression, x.expression.decimal_digits)
+            expressions = [(x.expression.expression, x.expression.ttype, x.expression.decimal_digits)
                 for x in self.fields_]
             index = 0
             count = 0
@@ -1445,10 +1446,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                         if not babi_eval(python_filter, record, convert_none=None):
                             continue
                     values = []
-                    for expression, digits in expressions:
+                    for expression, ttype, digits in expressions:
                         try:
                             values.append(babi_eval(expression, record,
-                                    convert_none=None, digits=digits))
+                                    convert_none=None, digits=digits, ttype=ttype))
                         except Exception as message:
                             notify(gettext('babi.msg_compute_table_exception',
                                     table=self.name, field=field.name,
@@ -1916,8 +1917,17 @@ def _convert_to_title(value):
     title = title[:31]
     return title
 
-def _convert_to_string(value):
-    if isinstance(value, (Decimal, str, int, float, date, datetime,
+def _convert_to_cell(value, ws):
+    if isinstance(value, Decimal):
+        exp = value.as_tuple().exponent
+        if exp < 0:
+            fmt = '0.' + '0' * (-exp)
+        else:
+            fmt = '0'
+        cell = Cell(ws, value=value)
+        cell.number_format = fmt
+        return cell
+    if isinstance(value, (str, int, float, date, datetime,
             dt_time, bool)):
         return value
     return str(value) if value is not None else None
@@ -1944,7 +1954,7 @@ class TableExcel(Report):
         for table in tables:
             ws = wb.create_sheet(_convert_to_title(table.name))
             for record in table.get_records():
-                ws.append([_convert_to_string(item) for item in record])
+                ws.append([_convert_to_cell(item, ws) for item in record])
             adjust_column_widths(ws, max_width=30)
         if len(tables) == 1:
             name = table.name
@@ -1975,7 +1985,7 @@ class WarningExcel(Report):
         for warning in warnings:
             ws = wb.create_sheet(_convert_to_title(warning.table.name))
             for record in warning.table.get_records(where=warning.query_where()):
-                ws.append([_convert_to_string(item) for item in record])
+                ws.append([_convert_to_cell(item, ws) for item in record])
             adjust_column_widths(ws, max_width=30)
         if len(warnings) == 1:
             name = warning.table.name

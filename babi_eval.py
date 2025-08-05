@@ -56,7 +56,7 @@ def date(text):
     return datetime.datetime.strptime(year_month_day(text), '%Y-%m-%d').date()
 
 
-def babi_eval(expression, obj, convert_none='empty', digits=None):
+def babi_eval(expression, obj, convert_none='empty', digits=None, ttype=None):
     objects = {
         'o': obj,
         'Pool': Pool,
@@ -90,6 +90,8 @@ def babi_eval(expression, obj, convert_none='empty', digits=None):
         else:
             value = convert_none
     if digits:
+        if isinstance(value, (int, float)) and ttype == 'numeric':
+            value = Decimal(value)
         if isinstance(value, Decimal):
             quantize = Decimal(10) ** -Decimal(digits)
             value = value.quantize(quantize)
