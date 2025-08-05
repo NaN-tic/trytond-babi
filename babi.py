@@ -412,7 +412,7 @@ class Expression(DeactivableMixin, ModelSQL, ModelView):
 
         count = 0
         for key, group in itertools.groupby(expressions, key=lambda x: x.model):
-            Model = pool.get(key.model)
+            Model = pool.get(key.name)
 
             group = list(group)
             count += len(list(group))
