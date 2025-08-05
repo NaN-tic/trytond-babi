@@ -962,7 +962,7 @@ class DownloadReport(Component):
         wb = Workbook()
         ws = wb.active
         for row in cube.build():
-            ws.append([x.formatted(language, excel=True) for x in row])
+            ws.append([x.formatted(language, worksheet=ws) for x in row])
         adjust_column_widths(ws, max_width=30)
         response = Response(save_virtual_workbook(wb))
         response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
