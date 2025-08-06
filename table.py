@@ -781,7 +781,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             limited = ''
             if limit:
                 limited = gettext('babi.msg_table_limit', number=limit)
-            content = ('%(table)s<br/>%(rows)s%(limit)s<br/>%(elapsed).2fms') % {
+            content = ('%(table)s<br/>%(rows)s %(limit)s<br/>%(elapsed).2fms') % {
                 'table': generate_html_table(table),
                 'rows': gettext('babi.msg_table_rows', count=len(records)),
                 'limit': limited,
