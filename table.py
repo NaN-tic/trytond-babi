@@ -62,6 +62,8 @@ TICK = html.unescape(TICK_HTML)
 HOURGLASS_HTML = '&#x231B;'
 HOURGLASS = html.unescape(HOURGLASS_HTML)
 
+API_KEY = config.get('openai', 'api_key')
+
 logger = logging.getLogger(__name__)
 
 def save_virtual_workbook(workbook):
@@ -906,13 +908,12 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def ai(cls, tables):
+        if not API_KEY:
+            return
         cursor = Transaction().connection.cursor()
 
         from openai import OpenAI
-        client = OpenAI(
-            organization=config.get('openai', 'organization'),
-            api_key=config.get('openai', 'api_key')
-            )
+        client = OpenAI(api_key=API_KEY)
         for table in tables:
             sqltables = dict.fromkeys(table.ai_sql_tables)
 
