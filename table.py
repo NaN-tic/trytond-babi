@@ -164,7 +164,7 @@ class Cluster(ModelSQL, ModelView):
     active = fields.Function(fields.Boolean('Active'), 'get_active',
         searcher="search_active")
     tables = fields.One2Many('babi.table', 'cluster', 'Tables')
-    root_tables = fields.Function(fields.One2Many('babi.table', None,
+    root_tables = fields.Function(fields.Many2Many('babi.table', None, None,
         'Tables'), 'get_root_tables', setter='set_root_tables')
     computation_start_date = fields.DateTime('Computation Start Date', readonly=True)
     computation_end_date = fields.DateTime('Computation End Date', readonly=True)
@@ -400,9 +400,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         'Requires', readonly=True)
     required_by = fields.One2Many('babi.table.dependency', 'table',
         'Required By', readonly=True)
-    requires_tables = fields.Function(fields.One2Many('babi.table', None,
+    requires_tables = fields.Function(fields.Many2Many('babi.table', None, None,
         'Requires Tables'), 'get_requires_tables')
-    required_by_tables = fields.Function(fields.One2Many('babi.table', None,
+    required_by_tables = fields.Function(fields.Many2Many('babi.table', None, None,
         'Required By Tables'), 'get_required_by_tables')
     ai_request = fields.Text('AI Request', states={
             'invisible': Eval('type') == 'model',
@@ -1864,8 +1864,13 @@ class Warning(Workflow, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def open(cls, warnings):
-        if len(set([x.table for x in warnings])) > 1:
+        if not warnings:
+            return
+
+        tables = set([x.table for x in warnings])
+        if len(tables) > 1:
             raise UserError(gettext('babi.msg_open_warning_single'))
+        table = tables[0]
 
         ids = []
         records = []
@@ -1876,14 +1881,14 @@ class Warning(Workflow, ModelSQL, ModelView):
 
         if len(records) != len(ids):
             raise UserError(gettext('babi.msg_wrong_info',
-                field=warning.table.related_field.rec_name,
+                field=table.related_field.rec_name,
                 query_count=str(len(ids)),
                 model_query_count=str(len(records))))
 
         return {
-            'res_model': warning.table.related_model.model,
+            'res_model': table.related_model.name,
             'type': 'ir.action.act_window',
-            'name': warning.table.related_model.name,
+            'name': table.related_model.name,
             'pyson_domain': f'[["id", "in", {ids}]]',
             'pyson_context': '{}',
             'pyson_order': '[]',
