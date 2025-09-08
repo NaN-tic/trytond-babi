@@ -2486,7 +2486,7 @@ class PivotExcel(Report):
             cube.column_expansions = Cube.EXPAND_ALL
             cube.row_expansions = Cube.EXPAND_ALL
             for row in cube.build():
-                ws.append([x.formatted(language, excel=True) for x in row])
+                ws.append([x.formatted(language, worksheet=True) for x in row])
 
         if len(pivots) == 1:
             name = pivot.table.name
