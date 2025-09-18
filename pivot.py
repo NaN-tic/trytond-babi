@@ -1,5 +1,6 @@
 import logging
 import tempfile
+import unicodedata
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
     option, main, th, style, details, summary)
@@ -184,6 +185,13 @@ class Index(Component):
             layout.main.add(error_section)
             return layout.tag()
 
+        heading = table.excel_heading()
+        page_name = table.name or table.internal_name
+        if heading:
+            contextual_title = f"{page_name} — " + " | ".join(heading)
+        else:
+            contextual_title = page_name
+
         # Ensure we have a value in table_properties
         if not hasattr(self, 'table_properties'):
             self.table_properties = 'null'
@@ -259,6 +267,13 @@ class Index(Component):
                         table_name=self.table_name,
                         table_properties=self.table_properties)
 
+            if heading:
+                with details(cls="m-2 border border-gray-200 rounded bg-white"):
+                    summary(cls="text-sm font-semibold text-gray-900").add(_('Parameters'))
+                    with div(cls="px-4 pb-2 text-sm text-gray-700 space-y-1"):
+                        for item in heading:
+                            p(item, cls="m-0")
+
             with div(cls="mt-8 flow-root"):
                 with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                     if show_error == True:
@@ -285,7 +300,7 @@ class Index(Component):
                             if print_trace:
                                 logger.exception(e)
 
-        layout = Layout(title=f'{table.name} | Tryton')
+        layout = Layout(title=f'{contextual_title} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
 
@@ -954,17 +969,43 @@ class DownloadReport(Component):
     def download(self):
         pool = Pool()
         Language = pool.get('ir.lang')
+        Table = pool.get('babi.table')
 
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
-
         cube = Cube.parse_properties(self.table_properties, self.table_name)
+
         wb = Workbook()
         ws = wb.active
+        heading = []
+        display_name = self.table_name
+        if self.table_name.startswith('__'):
+            internal_name = self.table_name[2:]
+        else:
+            internal_name = self.table_name
+
+        tables = Table.search([('internal_name', '=', internal_name)], limit=1)
+        if tables:
+            table, = tables
+            display_name = table.name or self.table_name
+            heading = table.excel_heading() or []
+        if heading:
+            ws.append(heading)
         for row in cube.build():
             ws.append([x.formatted(language, worksheet=ws) for x in row])
         adjust_column_widths(ws, max_width=30)
+
+        tab_title = (" | ".join(heading) + " — " + display_name) if heading else display_name
+        tab_sanitized = ''.join('_' if c in '[]:*?/\\' else c for c in tab_title)
+        ws.title = (tab_sanitized[:31] or 'Sheet1')
+
+        file_title = display_name + ((' — ' + ' | '.join(heading)) if heading else '')
+        file_sanitized = ''.join('_' if c in '[]:*?/\\' else c for c in file_title)
+        filename = (file_sanitized or display_name) + '.xlsx'
+        normalized_filname = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
+
+
         response = Response(save_virtual_workbook(wb))
-        response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
+        response.headers['Content-Disposition'] = f'attachment; filename={normalized_filname}'
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         return response
