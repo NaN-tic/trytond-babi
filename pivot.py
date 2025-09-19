@@ -213,7 +213,7 @@ class Index(Component):
 
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
-                with div(cls="col-span-2"):
+                with div(cls="col-span-2 flex items-center"):
                     span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
                     # TODO: Those timestamps are not exactly right because a
                     # table may depend on other tables so even if this table
@@ -237,13 +237,19 @@ class Index(Component):
                     timestamp = f'({timestamp})'
                     # Use a smaller text
                     span(timestamp, cls="text-sm text-gray-500 ml-2")
+
+                    if heading:
+                        with details(cls="ml-5", open=False):
+                            summary(cls="text-sm font-semibold text-gray-900").add(_('Parameters'))
+                            with div(cls="px-4 pb-2 text-sm text-gray-700 space-y-1"):
+                                for item in heading:
+                                    p(item, cls="m-0")
                 # Each button is a 36px width
                 # Invert axis button
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
                         cls="absolute right-12").add(SWAP_AXIS)
                 # Empty cube properties
-                with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
                         cls="absolute right-3").add(RELOAD)
 
@@ -266,13 +272,6 @@ class Index(Component):
                     PivotHeaderOrder(database_name=self.database_name,
                         table_name=self.table_name,
                         table_properties=self.table_properties)
-
-            if heading:
-                with details(cls="m-2 border border-gray-200 rounded bg-white"):
-                    summary(cls="text-sm font-semibold text-gray-900").add(_('Parameters'))
-                    with div(cls="px-4 pb-2 text-sm text-gray-700 space-y-1"):
-                        for item in heading:
-                            p(item, cls="m-0")
 
             with div(cls="mt-8 flow-root"):
                 with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):

@@ -2262,6 +2262,10 @@ msgid "Configuration"
 msgstr "Configuración"
 
 msgctxt "voyager:v:"
+msgid "Parameters"
+msgstr "Parametros"
+
+msgctxt "voyager:v:"
 msgid "Count"
 msgstr "Contar"
 
