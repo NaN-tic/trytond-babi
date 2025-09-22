@@ -1870,7 +1870,7 @@ class Warning(Workflow, ModelSQL, ModelView):
         tables = set([x.table for x in warnings])
         if len(tables) > 1:
             raise UserError(gettext('babi.msg_open_warning_single'))
-        table = tables[0]
+        table, = tables
 
         ids = []
         records = []
