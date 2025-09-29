@@ -2206,7 +2206,7 @@ class Pivot(ModelSQL, ModelView):
 
             for order in new.order:
                 order.sequence, order.order = mapping.get(rel.get(
-                    order.element))
+                    order.element), (None, 'asc'))
                 o_to_save.append(order)
 
         Order.save(o_to_save)
@@ -2482,8 +2482,11 @@ class PivotExcel(Report):
             cube = pivot.get_cube()
             cube.column_expansions = Cube.EXPAND_ALL
             cube.row_expansions = Cube.EXPAND_ALL
-            for row in cube.build():
-                ws.append([x.formatted(language, worksheet=True) for x in row])
+            try:
+                for row in cube.build():
+                    ws.append([x.formatted(language, worksheet=True) for x in row])
+            except psycopg2.errors.UndefinedTable:
+                continue
 
         if len(pivots) == 1:
             name = pivot.table.name
