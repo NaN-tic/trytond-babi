@@ -6,4 +6,5 @@ contains the full copyright notices and license terms. -->
     <field name="name"/>
     <field name="ttype"/>
     <field name="related_model"/>
+    <field name="digits"/>
 </tree>
