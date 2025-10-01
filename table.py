@@ -702,7 +702,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             if self.cluster:
                 self.cluster = None
                 self.save()
-                for table in cluster.tables:
+                for table in cluster:
                     table.update_table_dependencies()
             return
         table = order[0]
