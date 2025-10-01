@@ -10,4 +10,7 @@ contains the full copyright notices and license terms. -->
     <field name="ttype"/>
     <label name="related_model"/>
     <field name="related_model"/>
+    <newline/>
+    <label name="digits"/>
+    <field name="digits"/>
 </form>

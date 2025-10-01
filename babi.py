@@ -553,6 +553,10 @@ class FilterParameter(ModelSQL, ModelView):
             'required': Eval('ttype').in_(['many2one', 'many2many']),
             'readonly': Not(Eval('ttype').in_(['many2one', 'many2many'])),
             })
+    digits = fields.Integer('Digits', states={
+            'invisible': ~Eval('ttype').in_(['float', 'numeric']),
+            'required': Eval('ttype').in_(['float', 'numeric']),
+            })
 
     @classmethod
     def __setup__(cls):
