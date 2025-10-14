@@ -2487,7 +2487,7 @@ class PivotExcel(Report):
             cube.row_expansions = Cube.EXPAND_ALL
             try:
                 for row in cube.build():
-                    ws.append([x.formatted(language, worksheet=True) for x in row])
+                    ws.append([x.formatted(language, worksheet=ws) for x in row])
             except psycopg2.errors.UndefinedTable:
                 continue
 
