@@ -1616,7 +1616,7 @@ class TableDependency(ModelSQL, ModelView):
     required_by = fields.Many2One('babi.table', 'Required By', required=True,
         ondelete='CASCADE')
     name = fields.Char('Name')
-    table = fields.Many2One('babi.table', 'Requires', ondelete='SET NULL')
+    table = fields.Many2One('babi.table', 'Requires', required=True, ondelete='SET NULL')
 
     @classmethod
     def __setup__(cls):
