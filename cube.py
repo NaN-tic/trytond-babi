@@ -658,7 +658,7 @@ class Cell:
                     fmt = '0.' + '0' * digits
                 else:
                     fmt = '0'
-                cell = worksheet.cell(row=1, column=1, value=value)
+                cell = openpyxl.cell.Cell(worksheet, value=value)
                 cell.number_format = fmt
                 return cell
             return lang.format_number(value, grouping=True, digits=digits)
