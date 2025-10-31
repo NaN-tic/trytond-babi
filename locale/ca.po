@@ -1674,7 +1674,7 @@ msgstr "Filtre"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_pivot"
 msgid "Pivot Tables"
-msgstr "Taula dinàmica"
+msgstr "Taules dinàmiques"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_table"
 msgid "Tables"
