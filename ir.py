@@ -21,6 +21,6 @@ class Rule(metaclass=PoolMeta):
         pool = Pool()
         User = pool.get('res.user')
         key = super()._get_cache_key(model_name)
-        if model_name == 'babi.warning':
+        if model_name & {'babi.warning'}:
             key = (*key, User.get_employees(), Transaction().user)
         return key
