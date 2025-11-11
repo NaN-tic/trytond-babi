@@ -797,6 +797,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         html = '''<!DOCTYPE html>
              <html>
              <head>
+             <meta charset="utf-8">
              <style>
              table, th, td {
                 border: 1px solid black;
