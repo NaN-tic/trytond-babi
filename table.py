@@ -1595,8 +1595,10 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
                 raise UserError(gettext('babi.msg_invalid_field_internal_name',
                         field=self.name, internal_name=self.internal_name))
 
-    @fields.depends('name')
+    @fields.depends('name', 'table_type')
     def on_change_name(self):
+        if self.table_type == 'table':
+            return
         self.internal_name = convert_to_symbol(self.name)
 
     @fields.depends('name', 'expression', methods=['on_change_name'])
