@@ -312,6 +312,7 @@ class PivotHeaderAxis(Component):
         pool = Pool()
         PivotHeader = pool.get('www.pivot_header')
         PivotHeaderSelection = pool.get('www.pivot_header.selection')
+        Table = pool.get('babi.table')
 
         if not self.axis or self.axis not in ['x', 'y', 'property']:
             #TODO: add error "Page not found"
@@ -338,6 +339,9 @@ class PivotHeaderAxis(Component):
             if cube:
                 fields = cube.properties
 
+        btable, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
+        field_names = dict((x.internal_name, x.name) for x in btable.fields_)
+
         self.header = self.axis
         with div(cls="px-1 mt-2 flow-root col-span-2", id=f'header_{self.axis}') as header_axis:
             div(id=f'field_selection_{self.axis}')
@@ -359,7 +363,7 @@ class PivotHeaderAxis(Component):
                         with tbody(cls="divide-y divide-gray-200"):
                             for field in fields:
                                 with tr():
-                                    td(capitalize(field), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    td(capitalize(field_names[field]), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
                                             a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
@@ -395,6 +399,10 @@ class PivotHeaderMeasure(Component):
         pool = Pool()
         PivotHeader = pool.get('www.pivot_header')
         PivotHeaderSelection = pool.get('www.pivot_header.selection')
+        Table = pool.get('babi.table')
+        btable, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
+        field_names = dict((x.internal_name, x.name) for x in btable.fields_)
+
 
         fields = []
         if self.table_properties != 'null':
@@ -421,7 +429,7 @@ class PivotHeaderMeasure(Component):
                         with tbody(cls="divide-y divide-gray-200"):
                             for field in fields:
                                 with tr():
-                                    td(capitalize(field[0]), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
+                                    td(capitalize(field_names[field[0]]), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         match field[1]:
                                             case 'sum':
@@ -462,6 +470,9 @@ class PivotHeaderOrder(Component):
         # Components
         Index = pool.get('www.index.pivot')
         PivotHeader = pool.get('www.pivot_header')
+        Table = pool.get('babi.table')
+        btable, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
+        field_names = dict((x.internal_name, x.name) for x in btable.fields_)
 
         items = []
         if self.table_properties != 'null':
@@ -484,10 +495,10 @@ class PivotHeaderOrder(Component):
                             for item in items:
                                 with tr():
                                     if isinstance(item[0], tuple):
-                                        value = f'{capitalize(item[0][1])}({capitalize(item[0][0])})'
+                                        value = f'{field_names.get(item[0][1], item[0][1])}({field_names.get(item[0][0], item[0][0])})'
                                         field = '__'.join(item[0])
                                     else:
-                                        value = capitalize(item[0])
+                                        value = capitalize(field_names[item[0]])
                                         field = item[0]
                                     td(value, colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
@@ -572,6 +583,7 @@ class PivotHeaderSelection(Component):
 
         table, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
         fields = [x.internal_name for x in table.fields_]
+        field_names = dict((x.internal_name, x.name) for x in table.fields_)
 
         with div(id=name, cls="relative z-10", aria_labelledby="modal-title", role="dialog", aria_modal="true") as field_selection:
             div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
@@ -594,14 +606,16 @@ class PivotHeaderSelection(Component):
                                         if self.header != 'order':
                                             for field in sorted(fields):
                                                 if field not in fields_used:
-                                                    option(capitalize(field), value=field)
+                                                    option(capitalize(field_names[field]), value=field)
                                         else:
                                             for field in fields_used:
                                                 if field not in order_fields:
                                                     if isinstance(field, tuple):
-                                                        name_ = f'{capitalize(field[1])}({capitalize(field[0])})'
+                                                        field_1 = field_names[field[0]]
+                                                        field_0 = field_names[field[1]]
+                                                        name_ = f'{field_1}({field_0})'
                                                     else:
-                                                        name_ = capitalize(field)
+                                                        name_ = field_names[field]
                                                     option(name_, value=field)
 
                                     if self.header == 'measure':
@@ -805,6 +819,10 @@ class PivotTable(Component):
         # Component
         DownloadReport = pool.get('www.download_report')
         Language = pool.get('ir.lang')
+        Table = pool.get('babi.table')
+
+        btable, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
+        field_names = dict((x.internal_name, x.name) for x in btable.fields_)
 
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
@@ -848,7 +866,7 @@ class PivotTable(Component):
             for cell in row:
                 if download:
                     # Paint the download button in the first cell
-                    first_cell = td(cls="flex items-center gap-2 text-xs uppercase text-black px-6 py-1.5 bg-blue-300")
+                    first_cell = td(cls="flex items-center gap-2 text-xs text-black px-6 py-1.5 bg-blue-300")
                     first_cell.add(expand_all)
                     first_cell.add(collapse_all)
                     first_cell.add(download)
@@ -904,8 +922,10 @@ class PivotTable(Component):
                     table_properties = cell_cube.encode_properties()
 
                     if table_properties:
+                        field = str(cell.formatted(language))
+                        field = field_names.get(field, field)
                         cell_value = a(
-                            str(icon or '') + ' ' + str(cell.formatted(language)),
+                            str(icon or '') + ' ' + field,
                             href="#", hx_target="#pivot_table",
                             hx_post=PivotTable(
                                     database_name=self.database_name,
@@ -915,7 +935,7 @@ class PivotTable(Component):
                             hx_trigger="click", hx_swap="outerHTML",
                             hx_indicator="#loading-state")
 
-                    pivot_row.add(td(cell_value, cls="text-xs uppercase bg-blue-300 text-black px-2 py-1 border-b-0.5 border-black", style="white-space: nowrap"))
+                    pivot_row.add(td(cell_value, cls="text-xs bg-blue-300 text-black px-2 py-1 border-b-0.5 border-black", style="white-space: nowrap"))
 
                 else:
                     pivot_row.add(td(cell.formatted(language), cls="border-b text-black bg-blue-50 border-gray-200 px-2 py-1 text-right", style="white-space: nowrap"))
