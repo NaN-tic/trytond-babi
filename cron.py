@@ -25,7 +25,7 @@ class Cron(metaclass=PoolMeta):
     @classmethod
     def __register__(cls, module_name):
         cursor = Transaction().connection.cursor()
-        babi = cls.__table__()
+        cron = cls.__table__()
         handler = cls.__table_handler__(module_name)
 
         # Tryton 7.2: Rename babi_calculate_warnings to babi_compute_warnings
@@ -34,13 +34,17 @@ class Cron(metaclass=PoolMeta):
             handler.column_rename(
                 'babi_calculate_warnings', 'babi_compute_warnings')
         super().__register__(module_name)
-        cursor.execute(*babi.update(
-                [babi.method], ['babi.table|compute'],
-                where=(babi.method == 'babi.table|calculate_babi_table')
+        cursor.execute(*cron.update(
+                [cron.method], ['babi.table|compute'],
+                where=(cron.method == 'babi.table|calculate_babi_table')
                 ))
-        cursor.execute(*babi.update(
-                [babi.method], ['babi.table|_compute'],
-                where=(babi.method == 'babi.table|compute')
+        cursor.execute(*cron.update(
+                [cron.method], ['babi.table|_compute'],
+                where=(cron.method == 'babi.table|compute')
+                ))
+        cursor.execute(*cron.update(
+                [cron.method], ['babi.table.cluster|compute'],
+                where=(cron.method == 'babi.table.cluster|_compute')
                 ))
 
     @classmethod
@@ -49,7 +53,7 @@ class Cron(metaclass=PoolMeta):
         cls.method.selection.extend([
                 ('babi.table|_compute', 'Compute Business Intelligence Table'),
                 ('babi.table|clean', 'Delete Tables with Parameters'),
-                ('babi.table.cluster|_compute',
+                ('babi.table.cluster|compute',
                     'Compute Business Intelligence Cluster'),
                 ])
 
