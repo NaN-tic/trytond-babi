@@ -228,19 +228,18 @@ class Cluster(ModelSQL, ModelView):
     def compute(cls, clusters, compute_warnings=False):
         Table = Pool().get('babi.table')
 
-        with Transaction().set_context(queue_name=QUEUE_NAME):
-            start = datetime.now()
-            for cluster in clusters:
-                tables = [x for x in cluster.tables if x.active]
-                if not tables:
-                    continue
-                cluster.computation_start_date = start
-                cluster.computation_end_date = None
-                cluster.computation_state = 'computing'
-                cluster.save()
-                Table.compute_cluster(tables)
+        start = datetime.now()
+        for cluster in clusters:
+            tables = [x for x in cluster.tables if x.active]
+            if not tables:
+                continue
+            cluster.computation_start_date = start
+            cluster.computation_end_date = None
+            cluster.computation_state = 'computing'
+            cluster.save()
+            Table.compute_cluster(tables)
 
-            cls.save(clusters)
+        cls.save(clusters)
 
     @classmethod
     def get_compute_order(cls, tables):
