@@ -28,6 +28,7 @@ from trytond.pool import Pool
 from trytond.model import (Exclude, Model, ModelView, ModelSQL, fields,
     Unique, DeactivableMixin, sequence_ordered, Workflow)
 from trytond.exceptions import UserError
+from trytond.model.exceptions import ValidationError
 from trytond.i18n import gettext
 from trytond.pyson import Bool, Eval, In, Not, PYSONDecoder, PYSONEncoder
 from trytond.url import http_host
@@ -824,12 +825,12 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def check_internal_name(self):
         if not self.internal_name[0] in VALID_FIRST_SYMBOLS:
-            raise UserError(gettext(
+            raise ValidationError(gettext(
                 'babi.msg_invalid_table_internal_name_first_character',
                 table=self.rec_name, internal_name=self.internal_name))
         for symbol in self.internal_name:
             if not symbol in VALID_SYMBOLS:
-                raise UserError(gettext('babi.msg_invalid_table_internal_name',
+                raise ValidationError(gettext('babi.msg_invalid_table_internal_name',
                         table=self.rec_name, internal_name=self.internal_name))
 
     @fields.depends('name')
