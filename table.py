@@ -2598,7 +2598,7 @@ class OpenExecutionFiltered(StateView):
 
         defaults = {}
         parameters = Parameter.search([
-                ('related_model.model', '=', model),
+                ('related_model.name', '=', model),
                 ])
         for parameter in parameters:
             name = '%s_%d' % (parameter.name, parameter.id)
