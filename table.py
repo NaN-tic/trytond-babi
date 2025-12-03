@@ -1573,6 +1573,7 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
             babi_field.check_internal_name()
 
     def sql_type(self):
+        datetime_type = 'TIMESTAMP' if backend.name == 'postgresql' else 'DATETIME'
         mapping = {
             'char': 'VARCHAR',
             'integer': 'INTEGER',
@@ -1581,7 +1582,7 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
             'boolean': 'BOOLEAN',
             'many2one': 'INTEGER',
             'date': 'DATE',
-            'datetime': 'DATETIME',
+            'datetime': datetime_type,
             }
         return mapping[self.expression.ttype]
 
