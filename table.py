@@ -2558,6 +2558,8 @@ class OpenExecutionFiltered(StateView):
             }
             if parameter.ttype in ['many2one', 'many2many']:
                 field_definition['relation'] = parameter.related_model.model
+            if parameter.ttype == 'datetime':
+                field_definition['format'] = '%H:%M:%S'
             if parameter2report:
                 field_definition['states'] = {
                     'invisible': Not(In(Eval('report', 0),
