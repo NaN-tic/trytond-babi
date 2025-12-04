@@ -7,6 +7,7 @@ from trytond.model import ModelSQL, ModelView, sequence_ordered, fields
 from trytond.pyson import Eval, Bool
 from trytond.transaction import Transaction
 from trytond.exceptions import UserError
+from trytond.model.exceptions import ValidationError
 from trytond.i18n import gettext
 from .table import convert_to_symbol
 
@@ -297,10 +298,10 @@ class Widget(ModelSQL, ModelView):
             setting = settings.get(key)
             if setting:
                 if count > setting['max']:
-                    raise UserError(gettext('babi.msg_too_many_parameters',
+                    raise ValidationError(gettext('babi.msg_too_many_parameters',
                             widget=self.rec_name, type=key, max=setting['max']))
                 if count < setting['min']:
-                    raise UserError(gettext('babi.msg_not_enough_parameters',
+                    raise ValidationError(gettext('babi.msg_not_enough_parameters',
                             widget=self.rec_name, type=key, min=setting['min']))
 
     @fields.depends('type')
@@ -942,13 +943,13 @@ class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
         if self.aggregate in ('sum', 'avg', 'median'):
             if (self.field and self.field.type
                     and self.field.type not in ('integer', 'float', 'numeric')):
-                raise UserError(gettext('babi.msg_invalid_aggregate',
+                raise ValidationError(gettext('babi.msg_invalid_aggregate',
                     parameter=self.rec_name, widget=self.widget.rec_name))
 
     def check_type(self):
         settings = self.widget.parameter_settings()
         if self.type not in settings:
-            raise UserError(gettext('babi.msg_invalid_parameter_type',
+            raise ValidationError(gettext('babi.msg_invalid_parameter_type',
                 parameter=self.rec_name, widget=self.widget.rec_name,
                 types=', '.join(settings.keys())))
 
