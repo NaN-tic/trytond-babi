@@ -1588,11 +1588,11 @@ class Field(sequence_ordered(), ModelSQL, ModelView):
 
     def check_internal_name(self):
         if not self.internal_name[0] in VALID_FIRST_SYMBOLS:
-            raise UserError(gettext('babi.msg_invalid_field_internal_name',
+            raise ValidationError(gettext('babi.msg_invalid_field_internal_name',
                     field=self.name, internal_name=self.internal_name))
         for symbol in self.internal_name:
             if not symbol in VALID_SYMBOLS:
-                raise UserError(gettext('babi.msg_invalid_field_internal_name',
+                raise ValidationError(gettext('babi.msg_invalid_field_internal_name',
                         field=self.name, internal_name=self.internal_name))
 
     @fields.depends('name', 'table_type')
