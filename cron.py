@@ -68,7 +68,7 @@ class Cron(metaclass=PoolMeta):
         if context.get('babi_table'):
             res['method'] = 'babi.table|_compute'
         if context.get('babi_cluster'):
-            res['method'] = 'babi.table.cluster|_compute'
+            res['method'] = 'babi.table.cluster|compute'
         return res
 
     @dualmethod
