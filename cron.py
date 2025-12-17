@@ -62,7 +62,7 @@ class Cron(metaclass=PoolMeta):
                 ('babi.report|compute', 'Compute Business Intelligence Report'),
                 ('babi.table|_compute', 'Compute Business Intelligence Table'),
                 ('babi.table|clean', 'Delete Tables with Parameters'),
-                ('babi.table.cluster|_compute',
+                ('babi.table.cluster|compute',
                     'Compute Business Intelligence Cluster'),
                 ('babi.report.execution|clean', 'Clean Babi Executions'),
                 ])
@@ -80,7 +80,7 @@ class Cron(metaclass=PoolMeta):
         if context.get('babi_table'):
             res['method'] = 'babi.table|_compute'
         if context.get('babi_cluster'):
-            res['method'] = 'babi.table.cluster|_compute'
+            res['method'] = 'babi.table.cluster|compute'
         return res
 
     @dualmethod
