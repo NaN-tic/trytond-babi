@@ -541,6 +541,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                     })
             ]
 
+    def excel_heading(self):
+        params = self.parameters or {}
+        return [f"{k}: {v}" for k, v in params.items() if v not in (None, '')]
+
     @classmethod
     def create(cls, vlist):
         tables = super().create(vlist)
@@ -1964,13 +1968,20 @@ class TableExcel(Report):
         wb = Workbook()
         wb.remove(wb.active)
         tables = Table.browse(ids)
+        last_table_title = None
         for table in tables:
             ws = wb.create_sheet(_convert_to_title(table.name))
+            heading = table.excel_heading()
+            tab_title = f"{table.name} — " + " | ".join(heading) if heading else table.name
+            if heading:
+                ws.append(heading)
+            ws.title = _convert_to_title(tab_title)
             for record in table.get_records():
                 ws.append([_convert_to_cell(item, ws) for item in record])
             adjust_column_widths(ws, max_width=30)
+            last_table_title = tab_title
         if len(tables) == 1:
-            name = table.name
+            name = last_table_title
         else:
             name = gettext('babi.msg_tables_filename')
         return ('xlsx', save_virtual_workbook(wb), False, name)
@@ -2484,8 +2495,15 @@ class PivotExcel(Report):
         language, = Language.search([('code', '=', language)], limit=1)
         wb = Workbook()
         wb.remove(wb.active)
+        last_table_title = None
         for pivot in pivots:
             ws = wb.create_sheet(_convert_to_title(pivot.rec_name))
+            heading = pivot.table.excel_heading()
+            table_title = (f"{pivot.rec_name} — " + " | ".join(heading)) if heading else pivot.rec_name
+            if heading:
+                ws.append(heading)
+            ws.title = _convert_to_title(table_title)
+
             cube = pivot.get_cube()
             cube.column_expansions = Cube.EXPAND_ALL
             cube.row_expansions = Cube.EXPAND_ALL
@@ -2495,8 +2513,11 @@ class PivotExcel(Report):
             except psycopg2.errors.UndefinedTable:
                 continue
 
+            adjust_column_widths(ws, max_width=30)
+            last_table_title = table_title
+
         if len(pivots) == 1:
-            name = pivot.table.name
+            name = last_table_title
         else:
             name = gettext('babi.msg_pivots_filename')
         return ('xlsx', save_virtual_workbook(wb), False, name)

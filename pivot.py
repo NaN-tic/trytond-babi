@@ -1,5 +1,6 @@
 import logging
 import tempfile
+import unicodedata
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
     option, main, th, style, details, summary)
@@ -184,6 +185,13 @@ class Index(Component):
             layout.main.add(error_section)
             return layout.tag()
 
+        heading = table.excel_heading()
+        page_name = table.name or table.internal_name
+        if heading:
+            contextual_title = f"{page_name} — " + " | ".join(heading)
+        else:
+            contextual_title = page_name
+
         # Ensure we have a value in table_properties
         if not hasattr(self, 'table_properties'):
             self.table_properties = 'null'
@@ -205,7 +213,7 @@ class Index(Component):
 
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
-                with div(cls="col-span-2"):
+                with div(cls="col-span-2 flex items-center"):
                     span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
                     # TODO: Those timestamps are not exactly right because a
                     # table may depend on other tables so even if this table
@@ -229,13 +237,19 @@ class Index(Component):
                     timestamp = f'({timestamp})'
                     # Use a smaller text
                     span(timestamp, cls="text-sm text-gray-500 ml-2")
+
+                    if heading:
+                        with details(cls="ml-5", open=False):
+                            summary(cls="text-sm font-semibold text-gray-900").add(_('Parameters'))
+                            with div(cls="px-4 pb-2 text-sm text-gray-700 space-y-1"):
+                                for item in heading:
+                                    p(item, cls="m-0")
                 # Each button is a 36px width
                 # Invert axis button
                 with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
                         cls="absolute right-12").add(SWAP_AXIS)
                 # Empty cube properties
-                with div(cls="col-span-1"):
                     a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
                         cls="absolute right-3").add(RELOAD)
 
@@ -285,7 +299,7 @@ class Index(Component):
                             if print_trace:
                                 logger.exception(e)
 
-        layout = Layout(title=f'{table.name} | Tryton')
+        layout = Layout(title=f'{contextual_title} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
 
@@ -974,17 +988,43 @@ class DownloadReport(Component):
     def download(self):
         pool = Pool()
         Language = pool.get('ir.lang')
+        Table = pool.get('babi.table')
 
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
-
         cube = Cube.parse_properties(self.table_properties, self.table_name)
+
         wb = Workbook()
         ws = wb.active
+        heading = []
+        display_name = self.table_name
+        if self.table_name.startswith('__'):
+            internal_name = self.table_name[2:]
+        else:
+            internal_name = self.table_name
+
+        tables = Table.search([('internal_name', '=', internal_name)], limit=1)
+        if tables:
+            table, = tables
+            display_name = table.name or self.table_name
+            heading = table.excel_heading() or []
+        if heading:
+            ws.append(heading)
         for row in cube.build():
             ws.append([x.formatted(language, worksheet=ws) for x in row])
         adjust_column_widths(ws, max_width=30)
+
+        tab_title = (" | ".join(heading) + " — " + display_name) if heading else display_name
+        tab_sanitized = ''.join('_' if c in '[]:*?/\\' else c for c in tab_title)
+        ws.title = (tab_sanitized[:31] or 'Sheet1')
+
+        file_title = display_name + ((' — ' + ' | '.join(heading)) if heading else '')
+        file_sanitized = ''.join('_' if c in '[]:*?/\\' else c for c in file_title)
+        filename = (file_sanitized or display_name) + '.xlsx'
+        normalized_filname = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
+
+
         response = Response(save_virtual_workbook(wb))
-        response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
+        response.headers['Content-Disposition'] = f'attachment; filename={normalized_filname}'
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         return response
