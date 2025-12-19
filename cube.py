@@ -291,7 +291,9 @@ class Cube:
 
         # Add the measure information row
         measure_names = [Cell(m[0], type=CellType.COLUMN_HEADER) for m in self.measures]
-        column_length = len(column_header[0])-(len(self.rows)+1)
+        column_length = column_header and len(column_header[0])-(len(self.rows)+1)
+        if not measure_names or not isinstance(column_length, int) or column_length < 0:
+            return column_header
         new_list = ((measure_names * (column_length // len(measure_names))) +
             measure_names[:column_length % len(measure_names)])
         column_header.append(row_extra_space + new_list)
