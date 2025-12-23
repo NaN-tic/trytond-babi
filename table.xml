@@ -181,11 +181,6 @@
             <field name="string">Compute Warning</field>
             <field name="model">babi.table</field>
         </record>
-        <record model="ir.model.button" id="babi_table_ai_button">
-            <field name="name">ai</field>
-            <field name="string">AI</field>
-            <field name="model">babi.table</field>
-        </record>
         <record model="ir.model.button" id="babi_table_clear_cache_button">
             <field name="name">clear_cache</field>
             <field name="string">Clear Cache</field>

@@ -7,7 +7,6 @@ from datetime import date, datetime, time as dt_time, timedelta
 import logging
 import sql
 import unidecode
-import json
 import tempfile
 import html
 import urllib.parse
@@ -61,8 +60,6 @@ TICK_HTML = '&#x2705;'
 TICK = html.unescape(TICK_HTML)
 HOURGLASS_HTML = '&#x231B;'
 HOURGLASS = html.unescape(HOURGLASS_HTML)
-
-API_KEY = config.get('openai', 'api_key')
 
 logger = logging.getLogger(__name__)
 
@@ -403,12 +400,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         'Requires Tables'), 'get_requires_tables')
     required_by_tables = fields.Function(fields.Many2Many('babi.table', None, None,
         'Required By Tables'), 'get_required_by_tables')
-    ai_request = fields.Text('AI Request', states={
-            'invisible': Eval('type') == 'model',
-            })
-    ai_response = fields.Text('AI Response', readonly=True, states={
-            'invisible': Eval('type') == 'model',
-            })
     warn = fields.Selection([
             (None, 'Never'),
             ('records', 'Records Found'),
@@ -516,7 +507,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ]
 
         cls._buttons.update({
-                'ai': {},
                 'compute': {},
                 'compute_warning': {
                     'invisible': ~Bool(Eval('warn')),
@@ -554,8 +544,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         args = [x.copy() for x in args]
         actions = iter(args)
         for tables, values in zip(actions, actions):
-            if 'ai_request' in values and not 'ai_response' in values:
-                values['ai_response'] = None
             if 'internal_name' not in values:
                 continue
             with Transaction().set_context(queue_name=QUEUE_NAME):
@@ -890,10 +878,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         return http_host() + urllib.parse.quote(
             f'/{database}/babi/pivot/{self.table_name}/null')
 
-    @property
-    def ai_sql_tables(self):
-        return {'account_invoice', 'account_invoice_line'}
-
     @classmethod
     @ModelView.button
     def csv(cls, tables):
@@ -907,54 +891,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             with open(filename, 'w', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerows(records)
-
-
-    @classmethod
-    @ModelView.button
-    def ai(cls, tables):
-        if not API_KEY:
-            return
-        cursor = Transaction().connection.cursor()
-
-        from openai import OpenAI
-        client = OpenAI(api_key=API_KEY)
-        for table in tables:
-            sqltables = dict.fromkeys(table.ai_sql_tables)
-
-            t = sql.Table('columns', schema='information_schema')
-            query = t.select(t.table_name, t.column_name,
-                t.data_type)
-            query.where = (t.table_schema == 'public') & \
-                (t.table_name.in_(tuple(sqltables.keys())))
-            cursor.execute(*query)
-            for table_name, column_name, data_type in cursor.fetchall():
-                sqltables[table_name] = sqltables[table_name] or {}
-                sqltables[table_name][column_name] = data_type
-
-            request = '''Given the following tables:
-
-            %s
-
-            Write an SQL query that returns the following information:
-
-            %s
-
-            Query:''' % (json.dumps(sqltables), table.ai_request)
-            messages = [{
-                'role': 'system',
-                'content': 'Always return an SQL query that is suitable for PostgreSQL',
-                }, {
-                'role': 'user',
-                'content': request,
-                }]
-            response = client.chat.completions.create(model="gpt-3.5-turbo",
-            messages=messages)
-            if response.choices:
-                query = response.choices[0].message.content
-                if not table.query:
-                    table.query = query
-                table.ai_response = query
-                table.save()
 
     @classmethod
     @ModelView.button
