@@ -67,13 +67,6 @@
             <field name="requires_tables" colspan="2" height="225" view_ids="babi.babi_table_tree_requires_view"/>
             <field name="required_by_tables" colspan="2" height="225" view_ids="babi.babi_table_tree_required_by_view"/>
         </page>
-        <page name="ai_request" string="AI" col="3">
-            <separator name="ai_request" string="What do you want to show?" colspan="2"/>
-            <separator name="ai_response" string="AI Response:"/>
-            <field name="ai_request" height="450"/>
-            <button name="ai" string="AI >>"/>
-            <field name="ai_response" height="450"/>
-        </page>
         <page id="warning" string="Warning" col="8">
             <label name="related_field"/>
             <field name="related_field"/>
