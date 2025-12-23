@@ -958,7 +958,7 @@ class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
             return
         if self.aggregate:
             return
-        return self.field.internal_name
+        return f'"{self.field.internal_name}"'
 
     @property
     def select_expression(self):
