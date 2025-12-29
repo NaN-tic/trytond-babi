@@ -91,7 +91,7 @@ class Cron(metaclass=PoolMeta):
             for company in cron.companies:
                 with Transaction().set_context(company=company.id,
                         queue_name=QUEUE_NAME):
-                    Cluster.__queue__.compute(cron.babi_cluster,
+                    Cluster.__queue__.compute([cron.babi_cluster],
                         compute_warnings=cron.babi_compute_warnings)
         return super().run_once(list(
                 set(crons) - set(table_crons) - set(cluster_crons)))
