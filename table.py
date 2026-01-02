@@ -1902,7 +1902,12 @@ class TableExcel(Report):
             ws = wb.create_sheet(_convert_to_title(table.name))
             for record in table.get_records():
                 ws.append([_convert_to_cell(item, ws) for item in record])
-            adjust_column_widths(ws, max_width=30)
+            # try/except openpyxl/worksheet/worksheet.py _get_cell() raise:
+            # ValueError: Row numbers must be between 1 and 1048576. Row number supplied was 1048577
+            try:
+                adjust_column_widths(ws, max_width=30)
+            except ValueError:
+                continue
         if len(tables) == 1:
             name = table.name
         else:
@@ -1932,7 +1937,10 @@ class WarningExcel(Report):
             ws = wb.create_sheet(_convert_to_title(warning.table.name))
             for record in warning.table.get_records(where=warning.query_where()):
                 ws.append([_convert_to_cell(item, ws) for item in record])
-            adjust_column_widths(ws, max_width=30)
+            try:
+                adjust_column_widths(ws, max_width=30)
+            except ValueError as e:
+                raise UserError(str(e))
         if len(warnings) == 1:
             name = warning.table.name
         else:
