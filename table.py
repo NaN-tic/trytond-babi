@@ -1871,9 +1871,9 @@ def _convert_to_cell(value, ws):
     if isinstance(value, Decimal):
         exp = value.as_tuple().exponent
         if exp < 0:
-            fmt = '0.' + '0' * (-exp)
+            fmt = '#,##0.' + '0' * (-exp)
         else:
-            fmt = '0'
+            fmt = '#,##0'
         cell = Cell(ws, value=value)
         cell.number_format = fmt
         return cell
