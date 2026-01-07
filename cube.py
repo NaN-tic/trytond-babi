@@ -658,9 +658,9 @@ class Cell:
                 digits = 0
             if worksheet:
                 if digits:
-                    fmt = '0.' + '0' * digits
+                    fmt = '#,##0.' + '0' * digits
                 else:
-                    fmt = '0'
+                    fmt = '#,##0'
                 cell = openpyxl.cell.Cell(worksheet, value=value)
                 cell.number_format = fmt
                 return cell
