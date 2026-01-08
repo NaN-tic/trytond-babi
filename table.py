@@ -2434,6 +2434,10 @@ class PivotExcel(Report):
                     ws.append([x.formatted(language, worksheet=ws) for x in row])
             except psycopg2.errors.UndefinedTable:
                 continue
+            try:
+                adjust_column_widths(ws, max_width=30)
+            except ValueError as e:
+                raise UserError(str(e))
 
         if len(pivots) == 1:
             name = pivot.table.name
