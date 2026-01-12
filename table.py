@@ -167,7 +167,7 @@ class Cluster(ModelSQL, ModelView):
     computation_end_date = fields.DateTime('Computation End Date', readonly=True)
     elapsed = fields.Function(fields.TimeDelta('Elapsed'), 'get_elapsed')
     crons = fields.One2Many('ir.cron', 'babi_cluster', 'Schedulers', domain=[
-            ('method', '=', 'babi.table.cluster|_compute')
+            ('method', '=', 'babi.table.cluster|compute')
             ], context={
             'babi_cluster': Eval('id', -1),
             }, depends=['id'])
