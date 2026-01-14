@@ -13,7 +13,7 @@ from werkzeug.wrappers import Response
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
-from trytond.modules.voyager.voyager import Component
+from trytond.modules.voyager.voyager import Component, Endpoint
 from trytond.modules.voyager.i18n import _
 from .cube import Cube, CellType, capitalize
 from .table import datetime_to_company_tz
@@ -121,26 +121,18 @@ class Layout(Component):
         return html_layout
 
 
-class Index(Component):
-    'Index'
-    __name__ = 'www.index.pivot'
-    _path = None
+class IndexMixin(object):
+    __slots__ = ()
 
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
 
-    @classmethod
-    def get_url_map(cls):
-        #TODO: we need to hande multiple URLs with the same endpoint
-        return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>', endpoint='render_null'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>'),
-        ]
-
-    # Temporal solution to have differents urls with the same endpoint
-    def render_null(self):
-        return self.render()
+class Index(IndexMixin, Endpoint):
+    'Index'
+    __name__ = 'www.index.pivot'
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>'
+    _type = 'babi_pivot'
 
     def render(self):
         pool = Pool()
@@ -232,11 +224,12 @@ class Index(Component):
                 # Each button is a 36px width
                 # Invert axis button
                 with div(cls="col-span-1"):
-                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
+                    #import pdb; pdb.set_trace()
+                    a(href=Index.url(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties),
                         cls="absolute right-12").add(SWAP_AXIS)
                 # Empty cube properties
                 with div(cls="col-span-1"):
-                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
+                    a(href=Index.url(database_name=self.database_name, table_name=self.table_name, table_properties='null'),
                         cls="absolute right-3").add(RELOAD)
 
             # Details always opened by default
@@ -290,11 +283,24 @@ class Index(Component):
         return layout.tag()
 
 
+class IndexNull(IndexMixin, Endpoint):
+    'Index Null'
+    __name__ = 'www.index.pivot.null'
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>'
+    _type = 'babi_pivot'
+
+    def render(self):
+        pool = Pool()
+        Index = pool.get('www.index.pivot')
+        return Index(self.database_name, self.table_name)
+
+
 # This class handle the row/columns table headers
-class PivotHeaderAxis(Component):
+class PivotHeaderAxis(Endpoint):
     'Pivot Header Axis'
     __name__ = 'www.pivot_header.axis'
-    _path = None
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/header/<string:axis>/<string:table_properties>'
+    _type = 'babi_pivot'
 
     header = fields.Char('Header')
     database_name = fields.Char('Database Name')
@@ -302,16 +308,11 @@ class PivotHeaderAxis(Component):
     table_properties = fields.Char('Table Properties')
     axis = fields.Char('Axis')
 
-    @classmethod
-    def get_url_map(cls):
-        return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header/<string:axis>/<string:table_properties>'),
-        ]
-
     def render(self):
         pool = Pool()
-        PivotHeader = pool.get('www.pivot_header')
         PivotHeaderSelection = pool.get('www.pivot_header.selection')
+        PivotHeaderLevelField = pool.get('www.pivot_header.level_field')
+        PivotHeaderRemoveField = pool.get('www.pivot_header.remove_field')
         Table = pool.get('babi.table')
 
         if not self.axis or self.axis not in ['x', 'y', 'property']:
@@ -357,7 +358,7 @@ class PivotHeaderAxis(Component):
                                 with th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-900",
                                         hx_target=f"#field_selection_{self.axis}",
-                                        hx_post=PivotHeaderSelection(header=self.axis, database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
+                                        hx_post=PivotHeaderSelection.url(header=self.axis, database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties),
                                         hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
                                     span(_('Add'), cls="sr-only")
                         with tbody(cls="divide-y divide-gray-200"):
@@ -366,40 +367,35 @@ class PivotHeaderAxis(Component):
                                     td(capitalize(field_names[field]), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
+                                            a(href=PivotHeaderLevelField.url(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='up'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[-1]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
+                                            a(href=PivotHeaderLevelField.url(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='down'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, render=False).url('remove_field'),
+                                        a(href=PivotHeaderRemoveField.url(database_name=self.database_name, table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties),
                                             cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_axis
 
 
 # This class handle the measure table header
-class PivotHeaderMeasure(Component):
+class PivotHeaderMeasure(Endpoint):
     'Pivot Header Measure'
     __name__ = 'www.pivot_header.measure'
-    _path = None
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/header_measure/<string:table_properties>'
+    _type = 'babi_pivot'
 
     header = fields.Char('Header')
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
 
-    @classmethod
-    def get_url_map(cls):
-        return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_measure/<string:table_properties>'),
-        ]
-
     def render(self):
         pool = Pool()
-        PivotHeader = pool.get('www.pivot_header')
         PivotHeaderSelection = pool.get('www.pivot_header.selection')
         Table = pool.get('babi.table')
+        PivotHeaderRemoveField = pool.get('www.pivot_header.remove_field')
         btable, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
         field_names = dict((x.internal_name, x.name) for x in btable.fields_)
 
@@ -423,7 +419,7 @@ class PivotHeaderMeasure(Component):
                                 with th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-900",
                                         hx_target="#field_selection_measure",
-                                        hx_post=PivotHeaderSelection(header='measure', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False).url(),
+                                        hx_post=PivotHeaderSelection.url(header='measure', database_name=self.database_name, table_name=self.table_name, table_properties=self.table_properties, render=False),
                                         hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
                                     span(_('Add'), cls="sr-only")
                         with tbody(cls="divide-y divide-gray-200"):
@@ -443,34 +439,29 @@ class PivotHeaderMeasure(Component):
                                             case 'max':
                                                 p(_('Maximum'))
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field[0], table_properties=self.table_properties, render=False).url('remove_field'),
+                                        a(href=PivotHeaderRemoveField.url(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field[0], table_properties=self.table_properties),
                                             cls="text-indigo-600 hover:text-indigo-900").add(REMOVE_ICON)
         return header_measure
 
 
 # This class handle the order table header
-class PivotHeaderOrder(Component):
+class PivotHeaderOrder(Endpoint):
     'Pivot Header Component'
     __name__ = 'www.pivot_header.order'
-    _path = None
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/header_order/<string:table_properties>'
+    _type = 'babi_pivot'
 
     header = fields.Char('Header')
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
 
-    @classmethod
-    def get_url_map(cls):
-        return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/header_order/<string:table_properties>'),
-        ]
-
     def render(self):
         pool = Pool()
         # Components
         Index = pool.get('www.index.pivot')
-        PivotHeader = pool.get('www.pivot_header')
         Table = pool.get('babi.table')
+        PivotHeaderLevelField = pool.get('www.pivot_header.level_field')
         btable, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
         field_names = dict((x.internal_name, x.name) for x in btable.fields_)
 
@@ -516,47 +507,46 @@ class PivotHeaderOrder(Component):
                                         invert_table_properties = cube.encode_properties()
 
                                         if item[1] == 'desc':
-                                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties, render=False).url(),
+                                            a(href=Index.url(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(ORDER_DESC_ICON)
                                         else:
-                                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties, render=False).url(),
+                                            a(href=Index.url(database_name=self.database_name, table_name=self.table_name, table_properties=invert_table_properties),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(ORDER_ASC_ICON)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if item != items[0]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='up', render=False).url('level_field'),
+                                            a(href=PivotHeaderLevelField.url(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='up'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(UP_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if item != items[-1]:
-                                            a(href=PivotHeader(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='down', render=False).url('level_field'),
+                                            a(href=PivotHeaderLevelField.url(database_name=self.database_name, table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='down'),
                                                 cls="text-indigo-600 hover:text-indigo-900").add(DOWN_ARROW)
         return header_order
 
 
 # This function handles the pup up that is show in every header table and add
 # the item to the table properties
-class PivotHeaderSelection(Component):
-    'Pivot Header Selection'
-    __name__ = 'www.pivot_header.selection'
-    _path = None
+class PivotHeaderSelectionMixin(object):
+    __slots__ = ()
 
     header = fields.Char('Header')
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
-    field = fields.Char('Field')
     measure = fields.Char('Measure')
 
-    @classmethod
-    def get_url_map(cls):
-        return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/open_field_selection/<string:header>/<string:table_properties>'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/close_field_selection/<string:header>/<string:table_properties>', endpoint='close_field_selection'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/add_field_selection/<string:header>/<string:table_properties>', endpoint='add_field_selection'),
-        ]
+
+class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
+    'Pivot Header Selection'
+    __name__ = 'www.pivot_header.selection'
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/open_field_selection/<string:header>/<string:table_properties>'
+    _type = 'babi_pivot'
+
 
     def render(self):
         pool = Pool()
         Table = pool.get('babi.table')
+        PivotHeaderSelectionAddField = pool.get('www.pivot_header.selection.add_field')
+        PivotHeaderSelectionCloseField = pool.get('www.pivot_header.selection.close_field')
 
         name = None
         match self.header:
@@ -589,11 +579,14 @@ class PivotHeaderSelection(Component):
             div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
             with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
                 with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
-                    with form(action=self.url('add_field_selection') ,method="POST", cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
+                    with form(action=PivotHeaderSelectionAddField.url(header=self.header, database_name=self.database_name,
+                            table_name=self.table_name, table_properties=self.table_properties),
+                            method="POST", cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
                         with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
                             with a(href="#",
                                     hx_target=f"#{name}",
-                                    hx_post=self.url('close_field_selection'),
+                                    hx_post=PivotHeaderSelectionCloseField.url(header=self.header, database_name=self.database_name,
+                                        table_name=self.table_name, table_properties=self.table_properties),
                                     hx_trigger="click", hx_swap="outerHTML",
                                     cls="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2").add(CLOSE_ICON):
                                 span(_('Close'), cls="sr-only")
@@ -629,12 +622,20 @@ class PivotHeaderSelection(Component):
                             button(_('Add'), type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
                             a(_('Cancel'), href="#",
                                 hx_target=f"#{name}",
-                                hx_post=self.url('close_field_selection'),
+                                hx_post=PivotHeaderSelectionCloseField.url(header=self.header, database_name=self.database_name,
+                                    table_name=self.table_name, table_properties=self.table_properties),
                                 hx_trigger="click", hx_swap="outerHTML",
                                 cls="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto")
         return field_selection
 
-    def close_field_selection(self):
+
+class PivotHeaderSelectionCloseField(PivotHeaderSelectionMixin, Endpoint):
+    'Pivot Header Selection Close Field'
+    __name__ = 'www.pivot_header.selection.close_field'
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/close_field_selection/<string:header>/<string:table_properties>'
+    _type = 'babi_pivot'
+
+    def render(self):
         name = None
         match self.header:
             case 'x':
@@ -651,7 +652,16 @@ class PivotHeaderSelection(Component):
         field_selection = div(id=name)
         return field_selection
 
-    def add_field_selection(self):
+
+class PivotHeaderSelectionAddField(PivotHeaderSelectionMixin, Endpoint):
+    'Pivot Header Selection Add Field'
+    __name__ = 'www.pivot_header.selection.add_field'
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/add_field_selection/<string:header>/<string:table_properties>'
+    _type = 'babi_pivot'
+
+    field = fields.Char('Field')
+
+    def render(self):
         pool = Pool()
         Index = pool.get('www.index.pivot')
 
@@ -683,34 +693,28 @@ class PivotHeaderSelection(Component):
                 if self.field not in cube.properties:
                     cube.properties.append(self.field)
 
-        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=cube.encode_properties(), render=False).url())
+        return redirect(Index.url(database_name=self.database_name, table_name=self.table_name, table_properties=cube.encode_properties()))
 
 
 # In this function we have some default options available in all the PivotHeader components (handle levels, remove items from header)
-class PivotHeader(Component):
-    'Pivot Header'
-    __name__ = 'www.pivot_header'
-    _path = None
+class PivotHeaderMixin(object):
+    __slots__ = ()
 
     header = fields.Char('Header')
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
     level_action = fields.Char('Level Action')
-
     field = fields.Char('Field')
 
-    @classmethod
-    def get_url_map(cls):
-        return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/remove_field/<string:header>/<string:field>/<string:table_properties>', endpoint='remove_field'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/level/<string:level_action>/<string:header>/<string:field>/<string:table_properties>', endpoint='level_field'),
-        ]
+
+class PivotHeaderRemoveField(PivotHeaderMixin, Endpoint):
+    'Pivot Header'
+    __name__ = 'www.pivot_header.remove_field'
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/remove_field/<string:header>/<string:field>/<string:table_properties>'
+    _type = 'babi_pivot'
 
     def render(self):
-        pass
-
-    def remove_field(self):
         pool = Pool()
         # Component
         Index = pool.get('www.index.pivot')
@@ -750,9 +754,16 @@ class PivotHeader(Component):
         # multiple URLs with the same endpoint
         if not cube.rows and not cube.columns and not cube.measures and not cube.order:
             table_properties = 'null'
-        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
+        return redirect(Index.url(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties))
 
-    def level_field(self):
+
+class PivotHeaderLevelField(PivotHeaderMixin, Endpoint):
+    'Pivot Header'
+    __name__ = 'www.pivot_header.level_field'
+    _url = '/<string:database_name>/babi/pivot/<string:table_name>/level/<string:level_action>/<string:header>/<string:field>/<string:table_properties>'
+    _type = 'babi_pivot'
+
+    def render(self):
         pool = Pool()
         Index = pool.get('www.index.pivot')
 
@@ -795,24 +806,19 @@ class PivotHeader(Component):
                 cube_attribute.insert(auxiliar_position+1, auxiliar_value)
 
         table_properties = cube.encode_properties()
-        return redirect(Index(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties, render=False).url())
+        return redirect(Index.url(database_name=self.database_name, table_name=self.table_name, table_properties=table_properties))
 
 
 #This function handles the render of the cube into a table and the download button
-class PivotTable(Component):
+class PivotTable(Endpoint):
     'Pivot Table'
     __name__ = 'www.pivot_table'
-    _path = None
+    _url = '/<string:database_name>/babi/pivot/table/<string:table_name>/<string:table_properties>'
+    _type = 'babi_pivot'
 
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
-
-    @classmethod
-    def get_url_map(cls):
-        return [
-            Rule('/<string:database_name>/babi/pivot/table/<string:table_name>/<string:table_properties>'),
-        ]
 
     def render(self):
         pool = Pool()
@@ -827,9 +833,9 @@ class PivotTable(Component):
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
 
-        download = a(DOWNLOAD, cls="inline-block p-2", href=DownloadReport(
+        download = a(DOWNLOAD, cls="inline-block p-2", href=DownloadReport.url(
                 database_name=self.database_name, table_name=self.table_name,
-                table_properties=self.table_properties, render=False).url('download'))
+                table_properties=self.table_properties))
 
         cube = Cube.parse_properties(self.table_properties, self.table_name)
 
@@ -850,14 +856,14 @@ class PivotTable(Component):
         css = 'text-gray-300'
         if cube.row_expansions != Cube.EXPAND_ALL or cube.column_expansions != Cube.EXPAND_ALL:
             css = 'text-black'
-        expand_all = a(cls="inline-block p-2 " + css, href=Index(database_name=self.database_name, table_name=self.table_name,
-                table_properties=expanded_table_properties, render=False).url())
+        expand_all = a(cls="inline-block p-2 " + css, href=Index.url(database_name=self.database_name, table_name=self.table_name,
+                table_properties=expanded_table_properties))
         expand_all.add(EXPAND_ALL)
         css = 'text-gray-300'
         if cube.row_expansions != [] or cube.column_expansions != []:
             css = 'text-black'
-        collapse_all = a(cls="inline-block p-2 " + css, href=Index(database_name=self.database_name, table_name=self.table_name,
-                table_properties=collapsed_table_properties, render=False).url())
+        collapse_all = a(cls="inline-block p-2 " + css, href=Index.url(database_name=self.database_name, table_name=self.table_name,
+                table_properties=collapsed_table_properties))
         collapse_all.add(COLLAPSE_ALL)
 
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
@@ -927,11 +933,10 @@ class PivotTable(Component):
                         cell_value = a(
                             str(icon or '') + ' ' + field,
                             href="#", hx_target="#pivot_table",
-                            hx_post=PivotTable(
+                            hx_post=PivotTable.url(
                                     database_name=self.database_name,
                                     table_name=self.table_name,
-                                    table_properties=table_properties,
-                                    render=False).url(),
+                                    table_properties=table_properties),
                             hx_trigger="click", hx_swap="outerHTML",
                             hx_indicator="#loading-state")
 
@@ -953,25 +958,17 @@ class PivotTable(Component):
         return pivot_div
 
 
-class DownloadReport(Component):
+class DownloadReport(Endpoint):
     'Download Report'
     __name__ = 'www.download_report'
-    _path = None
+    _url = '/<string:database_name>/babi/pivot/download/<string:table_name>/<string:table_properties>/'
+    _type = 'babi_pivot'
 
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
 
-    @classmethod
-    def get_url_map(cls):
-        return [
-            Rule('/<string:database_name>/babi/pivot/download/<string:table_name>/<string:table_properties>/', endpoint="download")
-        ]
-
     def render(self):
-        pass
-
-    def download(self):
         pool = Pool()
         Language = pool.get('ir.lang')
 
