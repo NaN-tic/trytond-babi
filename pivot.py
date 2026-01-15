@@ -68,7 +68,7 @@ class Site(metaclass=PoolMeta):
         return super().get_cache(session, request)
 
     @classmethod
-    def dispatch(cls, site_type, site_id, request, user, web_prefix):
+    def dispatch(cls, site_type, site_id, request, user, web_prefix=None):
         with Transaction().set_context(language=Transaction().language):
             return super().dispatch(site_type, site_id, request, user,
                 web_prefix)
