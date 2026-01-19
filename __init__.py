@@ -73,6 +73,9 @@ def register():
         pivot.PivotHeaderSelection,
         pivot.PivotTable,
         pivot.DownloadReport,
+        pivot.SavePivot,
+        pivot.FlashClear,
+        pivot.UpdatePivotTitle,
         module='babi', type_='model')
     Pool.register(
         babi.OpenChart,

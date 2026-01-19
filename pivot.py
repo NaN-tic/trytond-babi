@@ -2,7 +2,7 @@ import logging
 import tempfile
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
-    option, main, th, style, details, summary)
+    option, main, th, style, details, summary, input_ as input_, label)
 from dominate.util import raw
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
@@ -38,6 +38,7 @@ RELOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 2
 EXPAND_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M200-200v-240h80v160h160v80H200Zm480-320v-160H520v-80h240v240h-80Z"/></svg>')
 COLLAPSE_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-440v240h-80v-160H200v-80h240Zm160-320v160h160v80H520v-240h80Z"/></svg>')
 DOWNLOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>')
+PENCIL = raw('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4"><path d="M16.862 3.487a1.875 1.875 0 0 1 2.651 2.651l-9.75 9.75a4.5 4.5 0 0 1-1.897 1.13l-2.697.9a.75.75 0 0 1-.949-.95l.9-2.696a4.5 4.5 0 0 1 1.13-1.897l9.75-9.75Z"/><path d="M18.75 8.25 15.75 5.25"/></svg>')
 ROWS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
 COLUMNS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
 PROPERTY_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M160-760v560h240v-560H160ZM80-120v-720h720v160h-80v-80H480v560h240v-80h80v160H80Zm400-360Zm-80 0h80-80Zm0 0Zm320 120v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/></svg>')
@@ -51,6 +52,51 @@ ORDER_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0
 ORDER_ASC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" /></svg>')
 ORDER_DESC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>')
 LOADING_SPINNER = raw('<svg aria-hidden="true" class="m-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>')
+
+
+def build_pivot_title(database_name, table_name, table_properties, title_value):
+    title_wrapper = div(id="pivot-title", cls="inline-flex items-center gap-2")
+    title_toggle = input_(
+        type="checkbox",
+        id="pivot-title-edit",
+        cls="pivot-title-toggle")
+    title_wrapper.add(title_toggle)
+    title_wrapper.add(span(
+        title_value,
+        cls="pivot-title-display text-base font-semibold leading-6 text-gray-900"))
+    title_form = form(
+        cls="pivot-title-input items-center",
+        action=UpdatePivotTitle(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('update'),
+        hx_post=UpdatePivotTitle(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('update'),
+        hx_trigger="change delay:300ms, blur",
+        hx_target="#pivot-title",
+        hx_swap="outerHTML",
+        method="post")
+    title_form.add(input_(
+        type="text",
+        name="name",
+        value=title_value,
+        cls=("text-base font-semibold leading-6 text-gray-900 "
+             "bg-transparent border-b border-gray-300 "
+             "focus:border-gray-500 focus:outline-none w-72")))
+    title_form.add(button(
+        _('Save title'),
+        type="submit",
+        cls="sr-only"))
+    title_wrapper.add(title_form)
+    title_wrapper.add(label(
+        PENCIL,
+        **{'for': 'pivot-title-edit'},
+        cls="cursor-pointer text-gray-500 hover:text-gray-800"))
+    return title_wrapper
 
 
 class Site(metaclass=PoolMeta):
@@ -109,12 +155,33 @@ class Layout(Component):
                 comment('CSS')
                 style('.loading-indicator{visibility: hidden;}'
                     '.htmx-request .loading-indicator{visibility: visible; transition: opacity 200ms ease-in;}'
-                    '.htmx-request.loading-indicator{visibility: visible; transition: opacity 200ms ease-in;}')
+                    '.htmx-request.loading-indicator{visibility: visible; transition: opacity 200ms ease-in;}'
+                    '.pivot-table{border-collapse: separate; border-spacing: 0;}'
+                    '.pivot-header-cell{white-space: nowrap;}'
+                    '.pivot-header-empty{padding-left:0.15rem !important; padding-right:0.15rem !important;'
+                    'width:0.5rem; min-width:0.5rem; max-width:0.5rem;}'
+                    '.pivot-row-level-1{padding-left:0.25rem !important;}'
+                    '.pivot-title-toggle{display:none;}'
+                    '.pivot-title-input{display:none;}'
+                    '.pivot-title-toggle:checked ~ .pivot-title-input{display:inline-flex;}'
+                    '.pivot-title-toggle:checked ~ .pivot-title-display{display:none;}'
+                    '@keyframes pivotFlashFade{to{opacity:0;}}'
+                    '.pivot-flash{animation:pivotFlashFade 0.4s ease-in 9.6s forwards;}')
+                script('function pivotSavePrompt(btn){'
+                    'var form=btn.closest("form");'
+                    'if(!form){return false;}'
+                    'var input=document.querySelector("#pivot-title input[name=\\"name\\"]");'
+                    'var current=input?input.value:"";'
+                    'var name=window.prompt("Nombre para guardar la configuracion", current);'
+                    'if(name===null){return false;}'
+                    'if(input){input.value=name;}'
+                    'return true;'
+                    '}')
                 script(src='https://unpkg.com/htmx.org@2.0.0')
                 script(src="https://cdn.tailwindcss.com")
             main_body = div(id='main', cls='bg-white')
             flash_div = div(id='flash_messages',
-                cls="flex w-full flex-col items-center space-y-4 sm:items-end")
+                cls="flex w-full flex-col items-center space-y-4")
             flash_div['hx-swap-oob'] = "afterbegin"
             main_body += flash_div
             main_body += self.main
@@ -129,6 +196,8 @@ class Index(Component):
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
+    name = fields.Char('Name')
+    overwrite = fields.Char('Overwrite')
 
     @classmethod
     def get_url_map(cls):
@@ -206,7 +275,23 @@ class Index(Component):
         with main() as index_section:
             with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
                 with div(cls="col-span-2"):
-                    span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
+                    title_value = table.name
+                    if self.table_properties != 'null':
+                        cube.table = table.name
+                        target_props = cube.encode_properties()
+                        for existing in table.pivots:
+                            existing_cube = existing.get_cube()
+                            if not existing_cube:
+                                continue
+                            if existing_cube.encode_properties() == target_props:
+                                title_value = existing.name or table.name
+                                break
+                    div(cls="inline-flex items-center").add(
+                        build_pivot_title(
+                            self.database_name,
+                            self.table_name,
+                            self.table_properties,
+                            title_value))
                     # TODO: Those timestamps are not exactly right because a
                     # table may depend on other tables so even if this table
                     # has been recently computed it may depend on old data.
@@ -229,6 +314,22 @@ class Index(Component):
                     timestamp = f'({timestamp})'
                     # Use a smaller text
                     span(timestamp, cls="text-sm text-gray-500 ml-2")
+                    save_form = form(action=SavePivot(database_name=self.database_name,
+                            table_name=self.table_name,
+                            table_properties=self.table_properties,
+                            render=False).url('save'),
+                        method='post',
+                        hx_post=SavePivot(database_name=self.database_name,
+                            table_name=self.table_name,
+                            table_properties=self.table_properties,
+                            render=False).url('save'),
+                        hx_include="#pivot-title input[name='name']",
+                        hx_target="#flash_messages",
+                        hx_swap="afterbegin")
+                    save_form.add(button(_('Save'),
+                        cls="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-gray-900 shadow-sm hover:bg-gray-50 ml-3",
+                        type="submit", onclick="return pivotSavePrompt(this);"))
+                    div(cls="inline-flex items-center").add(save_form)
                 # Each button is a 36px width
                 # Invert axis button
                 with div(cls="col-span-1"):
@@ -860,20 +961,15 @@ class PivotTable(Component):
                 table_properties=collapsed_table_properties, render=False).url())
         collapse_all.add(COLLAPSE_ALL)
 
-        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
+        actions_div = div(cls="flex items-center gap-2 text-xs text-black px-6 py-1.5 bg-blue-300 rounded-t-lg")
+        actions_div.add(expand_all)
+        actions_div.add(collapse_all)
+        actions_div.add(download)
+
+        pivot_table = table(cls="pivot-table table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
         for row in cube.build():
             pivot_row = tr(cls="hover:bg-gray-50 transition-colors")
             for cell in row:
-                if download:
-                    # Paint the download button in the first cell
-                    first_cell = td(cls="flex items-center gap-2 text-xs text-black px-6 py-1.5 bg-blue-300")
-                    first_cell.add(expand_all)
-                    first_cell.add(collapse_all)
-                    first_cell.add(download)
-                    pivot_row.add(first_cell)
-                    download = None
-                    continue
-
                 # Handle the headers links
                 if (cell.type == CellType.ROW_HEADER or
                         cell.type == CellType.COLUMN_HEADER):
@@ -935,7 +1031,14 @@ class PivotTable(Component):
                             hx_trigger="click", hx_swap="outerHTML",
                             hx_indicator="#loading-state")
 
-                    pivot_row.add(td(cell_value, cls="text-xs bg-blue-300 text-black px-2 py-1 border-b-0.5 border-black", style="white-space: nowrap"))
+                    header_cls = "pivot-header-cell text-xs bg-blue-300 text-black px-2 py-1 border-b-0.5 border-black"
+                    if (cell.type == CellType.ROW_HEADER and cell.value
+                            and isinstance(cell.row_expansion, tuple)
+                            and len(cell.row_expansion) == 1):
+                        header_cls += " pivot-row-level-1"
+                    if cell.value in (None, ''):
+                        header_cls += " pivot-header-empty"
+                    pivot_row.add(td(cell_value, cls=header_cls, style="white-space: nowrap"))
 
                 else:
                     pivot_row.add(td(cell.formatted(language), cls="border-b text-black bg-blue-50 border-gray-200 px-2 py-1 text-right", style="white-space: nowrap"))
@@ -949,6 +1052,7 @@ class PivotTable(Component):
 
         pivot_div = div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 relative max-w-sm")
         pivot_div.add(loading_div)
+        pivot_div.add(actions_div)
         pivot_div.add(pivot_table)
         return pivot_div
 
@@ -988,3 +1092,341 @@ class DownloadReport(Component):
         response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         return response
+
+
+class SavePivot(Component):
+    'Save Pivot Configuration'
+    __name__ = 'www.save_pivot'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    name = fields.Char('Name')
+    overwrite = fields.Boolean('Overwrite')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/save/<string:table_name>/<string:table_properties>', endpoint="save"),
+        ]
+
+    def save(self):
+        if self.table_properties == 'null':
+            return redirect(Index(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=self.table_properties,
+                    render=False).url())
+
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+        RowDimension = pool.get('babi.pivot.row_dimension')
+        ColumnDimension = pool.get('babi.pivot.column_dimension')
+        Measure = pool.get('babi.pivot.measure')
+        Property = pool.get('babi.pivot.property')
+        Order = pool.get('babi.pivot.order')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([('internal_name', '=', table_name)], limit=1)
+        if not tables:
+            return redirect(Index(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=self.table_properties,
+                    render=False).url())
+        table, = tables
+
+        if not self.name or not self.name.strip():
+            notice = div(
+                _('Please provide a title before saving.'),
+                span(
+                    '',
+                    hx_get=FlashClear(render=False).url('clear'),
+                    hx_trigger='load delay:10s',
+                    hx_target='closest .pivot-flash',
+                    hx_swap='outerHTML'),
+                cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                    "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+            return Response(str(notice), content_type='text/html')
+
+        existing_title_pivot = None
+        for existing in table.pivots:
+            if (existing.name or '').strip() == self.name.strip():
+                existing_title_pivot = existing
+                break
+
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+        field_by_name = {field.internal_name: field for field in table.fields_}
+        target_props = cube.encode_properties()
+        existing_title_cube = None
+        if existing_title_pivot:
+            existing_title_cube = existing_title_pivot.get_cube()
+
+        if (existing_title_pivot and existing_title_cube
+                and existing_title_cube.encode_properties() != target_props
+                and not getattr(self, 'overwrite', False)):
+            confirm_notice = div(
+                _('A configuration with this title already exists. Overwrite it?'),
+                span(
+                    '',
+                    hx_get=FlashClear(render=False).url('clear'),
+                    hx_trigger='load delay:10s',
+                    hx_target='closest .pivot-flash',
+                    hx_swap='outerHTML'),
+                form(
+                    input_(type="hidden", name="name",
+                        value=self.name.strip()),
+                    input_(type="hidden", name="overwrite", value="1"),
+                    button(
+                        _('Overwrite'),
+                        type="submit",
+                        cls=("inline-flex items-center rounded-md bg-white "
+                             "px-2 py-0.5 text-[11px] font-semibold text-gray-900 "
+                             "shadow-sm hover:bg-gray-50")),
+                    hx_post=SavePivot(database_name=self.database_name,
+                        table_name=self.table_name,
+                        table_properties=self.table_properties,
+                        render=False).url('save'),
+                    hx_target="#flash_messages",
+                    hx_swap="afterbegin",
+                    method="post",
+                    cls="mt-2 inline-flex items-center justify-center"),
+                button(
+                    _('Cancel'),
+                    type="button",
+                    hx_get=FlashClear(render=False).url('clear'),
+                    hx_target='closest .pivot-flash',
+                    hx_swap='outerHTML',
+                    cls=("ml-2 inline-flex items-center rounded-md "
+                         "bg-transparent px-2 py-0.5 text-[11px] "
+                         "font-semibold text-gray-700 hover:text-gray-900")),
+                cls=("pivot-flash mx-4 mt-2 rounded-md border border-green-200 "
+                     "bg-green-50 px-4 py-2 text-sm text-center text-green-800 "
+                     "flex flex-col items-center"))
+            return Response(str(confirm_notice), content_type='text/html')
+
+        for existing in table.pivots:
+            existing_cube = existing.get_cube()
+            if not existing_cube:
+                continue
+            if existing_cube.encode_properties() == target_props:
+                notice = div(
+                    _('This configuration already exists.'),
+                    span(
+                        '',
+                        hx_get=FlashClear(render=False).url('clear'),
+                        hx_trigger='load delay:10s',
+                        hx_target='closest .pivot-flash',
+                        hx_swap='outerHTML'),
+                    cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                        "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+                return Response(str(notice), content_type='text/html')
+
+        if existing_title_pivot and getattr(self, 'overwrite', False):
+            pivot = existing_title_pivot
+            Order.delete(list(pivot.order))
+            RowDimension.delete(list(pivot.row_dimensions))
+            ColumnDimension.delete(list(pivot.column_dimensions))
+            Measure.delete(list(pivot.measures))
+            Property.delete(list(pivot.properties))
+            pivot.name = self.name.strip()
+            Pivot.save([pivot])
+        else:
+            pivot_vals = {'table': table.id, 'name': self.name.strip()}
+            pivot, = Pivot.create([pivot_vals])
+
+        row_values = []
+        for sequence, field in enumerate(cube.rows, start=1):
+            field_rec = field_by_name.get(field)
+            if field_rec:
+                row_values.append({
+                    'pivot': pivot.id,
+                    'field': field_rec.id,
+                    'sequence': sequence,
+                    })
+        row_dimensions = RowDimension.create(row_values) if row_values else []
+
+        col_values = []
+        for sequence, field in enumerate(cube.columns, start=1):
+            field_rec = field_by_name.get(field)
+            if field_rec:
+                col_values.append({
+                    'pivot': pivot.id,
+                    'field': field_rec.id,
+                    'sequence': sequence,
+                    })
+        column_dimensions = ColumnDimension.create(col_values) if col_values else []
+
+        measure_values = []
+        for sequence, (field, aggregate) in enumerate(cube.measures, start=1):
+            field_rec = field_by_name.get(field)
+            if field_rec:
+                measure_values.append({
+                    'pivot': pivot.id,
+                    'field': field_rec.id,
+                    'aggregate': aggregate,
+                    'sequence': sequence,
+                    })
+        measures = Measure.create(measure_values) if measure_values else []
+
+        property_values = []
+        for sequence, field in enumerate(cube.properties, start=1):
+            field_rec = field_by_name.get(field)
+            if field_rec:
+                property_values.append({
+                    'pivot': pivot.id,
+                    'field': field_rec.id,
+                    'sequence': sequence,
+                    })
+        properties = Property.create(property_values) if property_values else []
+
+        row_map = {item.field.internal_name: item for item in row_dimensions}
+        col_map = {item.field.internal_name: item for item in column_dimensions}
+        measure_map = {(item.field.internal_name, item.aggregate): item
+            for item in measures}
+        property_map = {item.field.internal_name: item for item in properties}
+
+        order_values = []
+        for sequence, item in enumerate(cube.order, start=1):
+            element = None
+            field = item[0]
+            if isinstance(field, tuple):
+                element = measure_map.get((field[0], field[1]))
+            else:
+                element = (row_map.get(field) or col_map.get(field)
+                    or property_map.get(field))
+            if element:
+                order_values.append({
+                    'pivot': pivot.id,
+                    'element': element,
+                    'order': item[1],
+                    'sequence': sequence,
+                    })
+        if order_values:
+            Order.create(order_values)
+
+        notice_text = _('Configuration saved.')
+        if existing_title_pivot:
+            notice_text = _('Configuration updated.')
+        notice = div(
+            notice_text,
+            span(
+                '',
+                hx_get=FlashClear(render=False).url('clear'),
+                hx_trigger='load delay:10s',
+                hx_target='closest .pivot-flash',
+                hx_swap='outerHTML'),
+            cls="pivot-flash mx-4 mt-2 rounded-md border border-green-200 "
+                "bg-green-50 px-4 py-2 text-sm text-center text-green-800")
+        return Response(str(notice), content_type='text/html')
+
+    def render(self):
+        pass
+
+
+class UpdatePivotTitle(Component):
+    'Update Pivot Title'
+    __name__ = 'www.update_pivot_title'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    name = fields.Char('Name')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/title/<string:table_name>/<string:table_properties>', endpoint="update"),
+        ]
+
+    def update(self):
+        if not self.name or not self.name.strip():
+            return Response('', content_type='text/html')
+
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([('internal_name', '=', table_name)], limit=1)
+        if not tables or self.table_properties == 'null':
+            return Response('', content_type='text/html')
+        table, = tables
+
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+        target_props = cube.encode_properties()
+
+        for existing in table.pivots:
+            existing_cube = existing.get_cube()
+            if not existing_cube:
+                continue
+            if existing_cube.encode_properties() == target_props:
+                existing.name = self.name.strip()
+                Pivot.save([existing])
+                updated_title = build_pivot_title(
+                    self.database_name,
+                    self.table_name,
+                    self.table_properties,
+                    existing.name or '')
+                notice = div(
+                    _('Title updated.'),
+                    span(
+                        '',
+                        hx_get=FlashClear(render=False).url('clear'),
+                        hx_trigger='load delay:10s',
+                        hx_target='closest .pivot-flash',
+                        hx_swap='outerHTML'),
+                    id='flash_messages',
+                    **{'hx-swap-oob': 'afterbegin'},
+                    cls="pivot-flash mx-4 mt-2 rounded-md border border-green-200 "
+                        "bg-green-50 px-4 py-2 text-sm text-center text-green-800")
+                return Response(str(updated_title) + str(notice),
+                    content_type='text/html')
+
+        notice = div(
+            _('Save this configuration before renaming.'),
+            span(
+                '',
+                hx_get=FlashClear(render=False).url('clear'),
+                hx_trigger='load delay:10s',
+                hx_target='closest .pivot-flash',
+                hx_swap='outerHTML'),
+            id='flash_messages',
+            **{'hx-swap-oob': 'afterbegin'},
+            cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+        updated_title = build_pivot_title(
+            self.database_name,
+            self.table_name,
+            self.table_properties,
+            self.name.strip())
+        return Response(str(updated_title) + str(notice),
+            content_type='text/html')
+
+    def render(self):
+        pass
+
+
+class FlashClear(Component):
+    'Clear Flash Message'
+    __name__ = 'www.flash_clear'
+    _path = None
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/babi/pivot/flash/clear', endpoint='clear'),
+        ]
+
+    def clear(self):
+        return Response('', content_type='text/html')
+
+    def render(self):
+        pass
