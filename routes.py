@@ -12,4 +12,5 @@ from trytond.transaction import Transaction
 def pivot(request, pool, path):
     Site = pool.get('www.site')
     site_type = 'babi_pivot'
-    return Site.dispatch(site_type, None, request, Transaction().user)
+    return Site.dispatch(site_type, None, request, Transaction().user,
+        f'/{Transaction().database.name}/babi/pivot')
