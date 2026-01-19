@@ -2,7 +2,7 @@ import logging
 import tempfile
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
-    option, main, th, style, details, summary, input_ as input_, label)
+    option, main, th, style, details, summary, input_ as input_, label, ul)
 from dominate.util import raw
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
@@ -219,6 +219,7 @@ class Index(Component):
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
         PivotHeaderOrder = pool.get('www.pivot_header.order')
         PivotTable = pool.get('www.pivot_table')
+        Pivot = pool.get('babi.pivot')
 
         '''
         We need to:
@@ -271,120 +272,158 @@ class Index(Component):
         cube.table = table.name
         cube.rows, cube.columns = cube.columns, cube.rows
         inverted_table_properties = cube.encode_properties()
+        current_props = None
+        if self.table_properties != 'null':
+            current_props = Cube.parse_properties(
+                self.table_properties, table.name).encode_properties()
 
         with main() as index_section:
-            with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
-                with div(cls="col-span-2"):
-                    title_value = table.name
-                    if self.table_properties != 'null':
-                        cube.table = table.name
-                        target_props = cube.encode_properties()
-                        for existing in table.pivots:
-                            existing_cube = existing.get_cube()
-                            if not existing_cube:
-                                continue
-                            if existing_cube.encode_properties() == target_props:
-                                title_value = existing.name or table.name
-                                break
-                    div(cls="inline-flex items-center").add(
-                        build_pivot_title(
-                            self.database_name,
-                            self.table_name,
-                            self.table_properties,
-                            title_value))
-                    # TODO: Those timestamps are not exactly right because a
-                    # table may depend on other tables so even if this table
-                    # has been recently computed it may depend on old data.
-                    # Even if that seems correct (the table does not currently
-                    # depend on other tables) it may happen that the table did
-                    # depend on other tables when it was computed for the last
-                    # time and at that moment those other tables where not up
-                    # to date.
-                    # All of this is solvable but requires more infrastructure,
-                    # that should probably be implemented in the babi.table
-                    # model.
-                    if table.type in ('model', 'table'):
-                        if table.calculation_date:
+            with div(cls="grid grid-cols-12 gap-4"):
+                with div(cls="col-span-12 lg:col-span-3"):
+                    with div(cls="border border-gray-200 rounded-lg bg-white p-3"):
+                        h3(_('Pivot tables'), cls="text-sm font-semibold text-gray-900 mb-2")
+                        with div(cls="max-h-[70vh] overflow-y-auto pr-1"):
+                            with ul(cls="space-y-1 text-sm"):
+                                pivots = Pivot.search([], order=[('name', 'ASC')])
+                                rendered_any = False
+                                for pivot in pivots:
+                                    if not pivot.table or not pivot.table.check_access():
+                                        continue
+                                    if not pivot.url:
+                                        continue
+                                    rendered_any = True
+                                    label = pivot.name or pivot.table.name
+                                    is_active = False
+                                    if current_props:
+                                        pivot_cube = pivot.get_cube()
+                                        if pivot_cube and pivot_cube.encode_properties() == current_props:
+                                            is_active = True
+                                    item_cls = ("block rounded px-2 py-1 text-gray-700 "
+                                        "hover:bg-gray-100 hover:border-blue-300 "
+                                        "border-l-4 border-transparent")
+                                    if is_active:
+                                        item_cls = ("block rounded px-2 py-1 "
+                                            "bg-blue-50 text-blue-800 font-semibold "
+                                            "border-l-4 border-blue-500")
+                                    a(p(label, cls="truncate"),
+                                        href=pivot.url,
+                                        cls=item_cls)
+                                if not rendered_any:
+                                    p(_('No saved pivots'),
+                                        cls="text-xs text-gray-500")
+                with div(cls="col-span-12 lg:col-span-9"):
+                    with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
+                        with div(cls="col-span-2"):
+                            title_value = table.name
+                            if self.table_properties != 'null':
+                                cube.table = table.name
+                                target_props = cube.encode_properties()
+                                for existing in table.pivots:
+                                    existing_cube = existing.get_cube()
+                                    if not existing_cube:
+                                        continue
+                                    if existing_cube.encode_properties() == target_props:
+                                        title_value = existing.name or table.name
+                                        break
+                            div(cls="inline-flex items-center").add(
+                                build_pivot_title(
+                                    self.database_name,
+                                    self.table_name,
+                                    self.table_properties,
+                                    title_value))
+                            # TODO: Those timestamps are not exactly right because a
+                            # table may depend on other tables so even if this table
+                            # has been recently computed it may depend on old data.
+                            # Even if that seems correct (the table does not currently
+                            # depend on other tables) it may happen that the table did
+                            # depend on other tables when it was computed for the last
+                            # time and at that moment those other tables where not up
+                            # to date.
+                            # All of this is solvable but requires more infrastructure,
+                            # that should probably be implemented in the babi.table
+                            # model.
+                            if table.type in ('model', 'table'):
+                                if table.calculation_date:
 
-                            timestamp = _('data from %s') % datetime_to_company_tz(table.calculation_date)
-                        else:
-                            timestamp = _('not calculated yet')
-                    else:
-                        timestamp = _('current data')
-                    timestamp = f'({timestamp})'
-                    # Use a smaller text
-                    span(timestamp, cls="text-sm text-gray-500 ml-2")
-                    save_form = form(action=SavePivot(database_name=self.database_name,
-                            table_name=self.table_name,
-                            table_properties=self.table_properties,
-                            render=False).url('save'),
-                        method='post',
-                        hx_post=SavePivot(database_name=self.database_name,
-                            table_name=self.table_name,
-                            table_properties=self.table_properties,
-                            render=False).url('save'),
-                        hx_include="#pivot-title input[name='name']",
-                        hx_target="#flash_messages",
-                        hx_swap="afterbegin")
-                    save_form.add(button(_('Save'),
-                        cls="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-gray-900 shadow-sm hover:bg-gray-50 ml-3",
-                        type="submit", onclick="return pivotSavePrompt(this);"))
-                    div(cls="inline-flex items-center").add(save_form)
-                # Each button is a 36px width
-                # Invert axis button
-                with div(cls="col-span-1"):
-                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
-                        cls="absolute right-12").add(SWAP_AXIS)
-                # Empty cube properties
-                with div(cls="col-span-1"):
-                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
-                        cls="absolute right-3").add(RELOAD)
+                                    timestamp = _('data from %s') % datetime_to_company_tz(table.calculation_date)
+                                else:
+                                    timestamp = _('not calculated yet')
+                            else:
+                                timestamp = _('current data')
+                            timestamp = f'({timestamp})'
+                            # Use a smaller text
+                            span(timestamp, cls="text-sm text-gray-500 ml-2")
+                            save_form = form(action=SavePivot(database_name=self.database_name,
+                                    table_name=self.table_name,
+                                    table_properties=self.table_properties,
+                                    render=False).url('save'),
+                                method='post',
+                                hx_post=SavePivot(database_name=self.database_name,
+                                    table_name=self.table_name,
+                                    table_properties=self.table_properties,
+                                    render=False).url('save'),
+                                hx_include="#pivot-title input[name='name']",
+                                hx_target="#flash_messages",
+                                hx_swap="afterbegin")
+                            save_form.add(button(_('Save'),
+                                cls="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-gray-900 shadow-sm hover:bg-gray-50 ml-3",
+                                type="submit", onclick="return pivotSavePrompt(this);"))
+                            div(cls="inline-flex items-center").add(save_form)
+                        # Each button is a 36px width
+                        # Invert axis button
+                        with div(cls="col-span-1"):
+                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
+                                cls="absolute right-12").add(SWAP_AXIS)
+                        # Empty cube properties
+                        with div(cls="col-span-1"):
+                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
+                                cls="absolute right-3").add(RELOAD)
 
-            # Details always opened by default
-            with details(cls="m-2", open=True):
-                summary(cls="text-sm font-semibold text-gray-900").add(_('Configuration'))
-                with div(cls="grid grid-cols-12 px-2"):
-                    PivotHeaderAxis(database_name=self.database_name,
-                        table_name=self.table_name, axis='x',
-                        table_properties=self.table_properties)
-                    PivotHeaderAxis(database_name=self.database_name,
-                        table_name=self.table_name, axis='y',
-                        table_properties=self.table_properties)
-                    PivotHeaderMeasure(database_name=self.database_name,
-                        table_name=self.table_name,
-                        table_properties=self.table_properties)
-                    PivotHeaderAxis(database_name=self.database_name,
-                        table_name=self.table_name, axis='property',
-                        table_properties=self.table_properties)
-                    PivotHeaderOrder(database_name=self.database_name,
-                        table_name=self.table_name,
-                        table_properties=self.table_properties)
-
-            with div(cls="mt-8 flow-root"):
-                with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                    if show_error == True:
-                        div(cls="text-center").add(p(_('You need to select at least one measure and one row or one column to show the table.'), cls="mt-1 text-sm text-gray-500"))
-                    else:
-                        try:
-                            PivotTable(database_name=self.database_name, table_name=self.table_name,
+                    # Details always opened by default
+                    with details(cls="m-2", open=True):
+                        summary(cls="text-sm font-semibold text-gray-900").add(_('Configuration'))
+                        with div(cls="grid grid-cols-12 px-2"):
+                            PivotHeaderAxis(database_name=self.database_name,
+                                table_name=self.table_name, axis='x',
                                 table_properties=self.table_properties)
-                        except UndefinedTable:
-                            div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
-                        except Exception as e:
-                            div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
-                            print_trace = True
-                            if 'function avg(' in str(e):
-                                div(cls="text-center").add(_("HINT: You are trying to make average of a text type field, please try with a numeric type field or change the operation."))
-                                print_trace = False
-                            if 'function sum(' in str(e):
-                                div(cls="text-center").add(_("HINT: You are trying to sum a text type field, please try with a numeric type field or change the operation."))
-                                print_trace = False
-                            with details() as traceback_details:
-                                summary(_('Show more details'))
-                                p(pre(str(e)))
-                            div(cls="text-center").add(traceback_details)
-                            if print_trace:
-                                logger.exception(e)
+                            PivotHeaderAxis(database_name=self.database_name,
+                                table_name=self.table_name, axis='y',
+                                table_properties=self.table_properties)
+                            PivotHeaderMeasure(database_name=self.database_name,
+                                table_name=self.table_name,
+                                table_properties=self.table_properties)
+                            PivotHeaderAxis(database_name=self.database_name,
+                                table_name=self.table_name, axis='property',
+                                table_properties=self.table_properties)
+                            PivotHeaderOrder(database_name=self.database_name,
+                                table_name=self.table_name,
+                                table_properties=self.table_properties)
+
+                    with div(cls="mt-8 flow-root"):
+                        with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                            if show_error == True:
+                                div(cls="text-center").add(p(_('You need to select at least one measure and one row or one column to show the table.'), cls="mt-1 text-sm text-gray-500"))
+                            else:
+                                try:
+                                    PivotTable(database_name=self.database_name, table_name=self.table_name,
+                                        table_properties=self.table_properties)
+                                except UndefinedTable:
+                                    div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
+                                except Exception as e:
+                                    div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
+                                    print_trace = True
+                                    if 'function avg(' in str(e):
+                                        div(cls="text-center").add(_("HINT: You are trying to make average of a text type field, please try with a numeric type field or change the operation."))
+                                        print_trace = False
+                                    if 'function sum(' in str(e):
+                                        div(cls="text-center").add(_("HINT: You are trying to sum a text type field, please try with a numeric type field or change the operation."))
+                                        print_trace = False
+                                    with details() as traceback_details:
+                                        summary(_('Show more details'))
+                                        p(pre(str(e)))
+                                    div(cls="text-center").add(traceback_details)
+                                    if print_trace:
+                                        logger.exception(e)
 
         layout = Layout(title=f'{table.name} | Tryton')
         layout.main.add(index_section)
