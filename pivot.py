@@ -278,8 +278,8 @@ class Index(Component):
                 self.table_properties, table.name).encode_properties()
 
         with main() as index_section:
-            with div(cls="grid grid-cols-12 gap-4"):
-                with div(cls="col-span-12 lg:col-span-3"):
+            with div(cls="flex gap-4 items-start"):
+                with div(cls="w-64 shrink-0"):
                     with div(cls="border border-gray-200 rounded-lg bg-white p-3"):
                         h3(_('Pivot tables'), cls="text-sm font-semibold text-gray-900 mb-2")
                         with div(cls="max-h-[70vh] overflow-y-auto pr-1"):
@@ -311,9 +311,9 @@ class Index(Component):
                                 if not rendered_any:
                                     p(_('No saved pivots'),
                                         cls="text-xs text-gray-500")
-                with div(cls="col-span-12 lg:col-span-9"):
-                    with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
-                        with div(cls="col-span-2"):
+                with div(cls="flex-1 min-w-0"):
+                    with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 flex items-center justify-between gap-4"):
+                        with div(cls="flex items-center gap-2"):
                             title_value = table.name
                             if self.table_properties != 'null':
                                 cube.table = table.name
@@ -352,7 +352,8 @@ class Index(Component):
                                 timestamp = _('current data')
                             timestamp = f'({timestamp})'
                             # Use a smaller text
-                            span(timestamp, cls="text-sm text-gray-500 ml-2")
+                            header_actions = div(cls="inline-flex items-center")
+                            header_actions.add(span(timestamp, cls="text-sm text-gray-500"))
                             save_form = form(action=SavePivot(database_name=self.database_name,
                                     table_name=self.table_name,
                                     table_properties=self.table_properties,
@@ -368,16 +369,32 @@ class Index(Component):
                             save_form.add(button(_('Save'),
                                 cls="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-gray-900 shadow-sm hover:bg-gray-50 ml-3",
                                 type="submit", onclick="return pivotSavePrompt(this);"))
-                            div(cls="inline-flex items-center").add(save_form)
-                        # Each button is a 36px width
-                        # Invert axis button
-                        with div(cls="col-span-1"):
+                            header_actions.add(save_form)
+                            compute_form = form(action=ComputeTable(
+                                    database_name=self.database_name,
+                                    table_name=self.table_name,
+                                    render=False).url('compute'),
+                                method='post',
+                                hx_post=ComputeTable(
+                                    database_name=self.database_name,
+                                    table_name=self.table_name,
+                                    render=False).url('compute'),
+                                hx_target="#flash_messages",
+                                hx_swap="afterbegin",
+                                hx_disabled_elt="button")
+                            compute_form.add(button(_('Compute'),
+                                cls=("inline-flex items-center rounded-md bg-white px-2 "
+                                     "py-0.5 text-[11px] font-semibold text-gray-900 "
+                                     "shadow-sm hover:bg-gray-50 ml-2 "
+                                     "disabled:opacity-50 disabled:cursor-not-allowed"),
+                                type="submit"))
+                            header_actions.add(compute_form)
+                            div(cls="inline-flex items-center").add(header_actions)
+                        with div(cls="flex items-center gap-2"):
                             a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
-                                cls="absolute right-12").add(SWAP_AXIS)
-                        # Empty cube properties
-                        with div(cls="col-span-1"):
+                                cls="p-1").add(SWAP_AXIS)
                             a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
-                                cls="absolute right-3").add(RELOAD)
+                                cls="p-1").add(RELOAD)
 
                     # Details always opened by default
                     with details(cls="m-2", open=True):
@@ -1352,6 +1369,52 @@ class SavePivot(Component):
             notice_text = _('Configuration updated.')
         notice = div(
             notice_text,
+            span(
+                '',
+                hx_get=FlashClear(render=False).url('clear'),
+                hx_trigger='load delay:10s',
+                hx_target='closest .pivot-flash',
+                hx_swap='outerHTML'),
+            cls="pivot-flash mx-4 mt-2 rounded-md border border-green-200 "
+                "bg-green-50 px-4 py-2 text-sm text-center text-green-800")
+        return Response(str(notice), content_type='text/html')
+
+    def render(self):
+        pass
+
+
+class ComputeTable(Component):
+    'Compute Pivot Table'
+    __name__ = 'www.compute_table'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/compute/<string:table_name>', endpoint='compute'),
+        ]
+
+    def compute(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([('internal_name', '=', table_name)], limit=1)
+        if not tables:
+            return Response('', content_type='text/html')
+        table, = tables
+        if not table.check_access():
+            return Response('', content_type='text/html')
+
+        Table.compute([table])
+        notice = div(
+            _('Compute started.'),
             span(
                 '',
                 hx_get=FlashClear(render=False).url('clear'),

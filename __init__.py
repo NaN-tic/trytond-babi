@@ -74,6 +74,7 @@ def register():
         pivot.PivotTable,
         pivot.DownloadReport,
         pivot.SavePivot,
+        pivot.ComputeTable,
         pivot.FlashClear,
         pivot.UpdatePivotTitle,
         module='babi', type_='model')
