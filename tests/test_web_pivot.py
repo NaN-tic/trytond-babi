@@ -2,7 +2,7 @@ import os
 import logging
 from playwright.sync_api import expect, sync_playwright
 from trytond.config import config
-from trytond.modules.nantic_connection.tests.tools import WebTestCase
+from trytond.modules.voyager.tests.tools import WebTestCase
 from proteus import Model
 from trytond.modules.company.tests.tools import create_company, get_company
 from trytond.tests.tools import  set_user
