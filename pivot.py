@@ -219,7 +219,6 @@ class Index(Component):
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
         PivotHeaderOrder = pool.get('www.pivot_header.order')
         PivotTable = pool.get('www.pivot_table')
-        Pivot = pool.get('babi.pivot')
 
         '''
         We need to:
@@ -272,10 +271,6 @@ class Index(Component):
         cube.table = table.name
         cube.rows, cube.columns = cube.columns, cube.rows
         inverted_table_properties = cube.encode_properties()
-        current_props = None
-        if self.table_properties != 'null':
-            current_props = Cube.parse_properties(
-                self.table_properties, table.name).encode_properties()
 
         with main(cls="min-h-screen") as index_section:
             with div(cls="flex gap-4 items-stretch"):
@@ -286,32 +281,25 @@ class Index(Component):
                         h3(_('Pivot tables'), cls="text-sm font-semibold text-gray-900 mb-2")
                         with div(cls="flex-1 overflow-y-auto pr-1"):
                             with ul(cls="space-y-1 text-sm"):
-                                pivots = Pivot.search([], order=[('name', 'ASC')])
                                 rendered_any = False
-                                for pivot in pivots:
-                                    if not pivot.table or not pivot.table.check_access():
+                                tables = BabiTable.search([('parameters', '=', None)],
+                                    order=[('name', 'ASC')])
+                                for table_ in tables:
+                                    if not table_.check_access():
                                         continue
-                                    if not pivot.url:
+                                    url = table_.pivot_table
+                                    if not url:
                                         continue
                                     rendered_any = True
-                                    label = pivot.name or pivot.table.name
-                                    is_active = False
-                                    if current_props:
-                                        pivot_cube = pivot.get_cube()
-                                        if pivot_cube and pivot_cube.encode_properties() == current_props:
-                                            is_active = True
+                                    label = table_.name or table_.internal_name
                                     item_cls = ("block rounded px-2 py-1 text-gray-700 "
                                         "hover:bg-gray-100 hover:border-blue-300 "
                                         "border-l-4 border-transparent")
-                                    if is_active:
-                                        item_cls = ("block rounded px-2 py-1 "
-                                            "bg-blue-50 text-blue-800 font-semibold "
-                                            "border-l-4 border-blue-500")
                                     a(p(label, cls="truncate"),
-                                        href=pivot.url,
+                                        href=url,
                                         cls=item_cls)
                                 if not rendered_any:
-                                    p(_('No saved pivots'),
+                                    p(_('No tables'),
                                         cls="text-xs text-gray-500")
                 with div(cls="flex-1 min-w-0"):
                     with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 flex items-center justify-between gap-4"):
