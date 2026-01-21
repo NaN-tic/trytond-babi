@@ -277,12 +277,14 @@ class Index(Component):
             current_props = Cube.parse_properties(
                 self.table_properties, table.name).encode_properties()
 
-        with main() as index_section:
-            with div(cls="flex gap-4 items-start"):
-                with div(cls="w-64 shrink-0"):
-                    with div(cls="border border-gray-200 rounded-lg bg-white p-3"):
+        with main(cls="min-h-screen") as index_section:
+            with div(cls="flex gap-4 items-stretch"):
+                with div(cls="relative shrink-0 h-screen min-w-[220px] max-w-[60vw]", style="resize: horizontal; overflow: hidden;"):
+                    div(cls="absolute right-0 top-0 h-full w-2 cursor-col-resize")
+                    div(cls="absolute right-0 top-0 h-full w-px bg-gray-300 pointer-events-none")
+                    with div(cls="border border-gray-200 rounded-lg bg-white p-3 h-full flex flex-col"):
                         h3(_('Pivot tables'), cls="text-sm font-semibold text-gray-900 mb-2")
-                        with div(cls="max-h-[70vh] overflow-y-auto pr-1"):
+                        with div(cls="flex-1 overflow-y-auto pr-1"):
                             with ul(cls="space-y-1 text-sm"):
                                 pivots = Pivot.search([], order=[('name', 'ASC')])
                                 rendered_any = False
