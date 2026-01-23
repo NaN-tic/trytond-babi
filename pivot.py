@@ -644,59 +644,84 @@ class Index(Component):
                         Parameter = pool.get('babi.filter.parameter')
                         params = Parameter.search([('filter', '=', param_table.filter.id)])
                     if params:
+                        compute_action = ParametrizePivotTable(
+                            database_name=self.database_name,
+                            table_name=self.table_name,
+                            table_properties=self.table_properties,
+                            render=False).url('apply')
                         with div(cls="mx-4 mt-3"):
-                            label(_('Parameters'),
-                                cls="block text-xs font-semibold text-gray-700 mb-1")
-                            with div(id="pivot-params",
-                                    cls="grid grid-cols-1 gap-3 sm:grid-cols-2"):
-                                for param in params:
-                                    value = None
-                                    if table.parameters:
-                                        value = table.parameters.get(param.name)
-                                    value = format_param_value(param.ttype, value)
-                                    with div(cls="flex flex-col gap-1"):
+                            label(_('Slicers'),
+                                cls="block text-xs font-semibold text-gray-700 mb-2")
+                            with form(
+                                    action=compute_action,
+                                    method="post",
+                                    hx_post=compute_action,
+                                    hx_swap="none",
+                                    hx_disabled_elt="button",
+                                    cls="rounded-lg border border-gray-200 bg-gray-50 p-3"):
+                                with div(id="pivot-params",
+                                        cls="grid grid-cols-1 gap-3 sm:grid-cols-2"):
+                                    for param in params:
+                                        value = None
+                                        if table.parameters:
+                                            value = table.parameters.get(param.name)
+                                        value = format_param_value(param.ttype, value)
                                         type_label = get_param_type_label(param.ttype)
-                                        label(f"{param.name} ({type_label})",
-                                            cls="text-xs text-gray-600")
-                                        if param.ttype == 'boolean':
-                                            input_(
-                                                type="checkbox",
-                                                name=f'param_{param.id}',
-                                                value="1",
-                                                checked=bool(value),
-                                                required=True)
-                                        else:
-                                            options = fetch_param_options(table, param)
-                                            input_type = "text"
-                                            if param.ttype in ('integer', 'many2one', 'float', 'numeric'):
-                                                input_type = "number"
-                                            elif param.ttype == 'date':
-                                                input_type = "date"
-                                            elif param.ttype == 'datetime':
-                                                input_type = "datetime-local"
-                                            elif param.ttype == 'time':
-                                                input_type = "time"
-                                            if options:
-                                                select(
-                                                    *[
-                                                        option(
-                                                            str(label),
-                                                            value=str(option_value),
-                                                            selected=(value is not None and str(option_value) == str(value)))
-                                                        for option_value, label in options
-                                                    ],
-                                                    name=f'param_{param.id}',
-                                                    required=True,
-                                                    cls=("w-full rounded-md border border-gray-300 px-2 "
-                                                         "py-1 text-xs text-gray-900"))
-                                            else:
+                                        with div(cls=("flex flex-col gap-1 rounded-md "
+                                                     "border border-gray-200 bg-white px-3 py-2 "
+                                                     "shadow-sm")):
+                                            label(f"{param.name} ({type_label})",
+                                                cls="text-[11px] uppercase tracking-wide text-gray-500")
+                                            if param.ttype == 'boolean':
                                                 input_(
-                                                    type=input_type,
+                                                    type="checkbox",
                                                     name=f'param_{param.id}',
-                                                    value='' if value is None else value,
+                                                    value="1",
+                                                    checked=bool(value),
                                                     required=True,
-                                                    cls=("w-full rounded-md border border-gray-300 px-2 "
-                                                         "py-1 text-xs text-gray-900"))
+                                                    cls="h-4 w-4")
+                                            else:
+                                                options = fetch_param_options(table, param)
+                                                input_type = "text"
+                                                if param.ttype in ('integer', 'many2one', 'float', 'numeric'):
+                                                    input_type = "number"
+                                                elif param.ttype == 'date':
+                                                    input_type = "date"
+                                                elif param.ttype == 'datetime':
+                                                    input_type = "datetime-local"
+                                                elif param.ttype == 'time':
+                                                    input_type = "time"
+                                                if options:
+                                                    select(
+                                                        *[
+                                                            option(
+                                                                str(label),
+                                                                value=str(option_value),
+                                                                selected=(value is not None and str(option_value) == str(value)))
+                                                            for option_value, label in options
+                                                        ],
+                                                        name=f'param_{param.id}',
+                                                        required=True,
+                                                        cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                             "py-1 text-xs text-gray-900"))
+                                                else:
+                                                    input_(
+                                                        type=input_type,
+                                                        name=f'param_{param.id}',
+                                                        value='' if value is None else value,
+                                                        required=True,
+                                                        cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                             "py-1 text-xs text-gray-900"))
+                                with div(cls="mt-3 flex items-center gap-2"):
+                                    button(_('Apply'),
+                                        type="submit",
+                                        cls=("rounded-md bg-blue-600 px-3 py-1.5 text-xs "
+                                             "font-semibold text-white shadow hover:bg-blue-500"))
+                                    button(_('Reset'),
+                                        type="reset",
+                                        cls=("rounded-md border border-gray-300 bg-white px-3 "
+                                             "py-1.5 text-xs font-semibold text-gray-700 "
+                                             "hover:bg-gray-50"))
 
                     if saved_pivots:
                         with div(cls="mx-4 mt-3"):
