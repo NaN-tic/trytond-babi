@@ -51,6 +51,7 @@ def register():
         table.TableUser,
         table.TableGroup,
         table.TableParameters,
+        table.TableParameter,
         table.Cluster,
         table.Table,
         table.Field,

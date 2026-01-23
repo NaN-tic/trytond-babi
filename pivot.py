@@ -1,4 +1,5 @@
 import logging
+import datetime as mdatetime
 import urllib.parse
 import secrets
 import tempfile
@@ -111,6 +112,46 @@ def get_param_type_label(ttype):
     return _('text')
 
 
+def format_param_value(ttype, value):
+    if value is None:
+        return ''
+    if ttype == 'date' and isinstance(value, mdatetime.date):
+        return value.strftime('%Y-%m-%d')
+    if ttype == 'time' and isinstance(value, mdatetime.time):
+        return value.strftime('%H:%M:%S')
+    if ttype == 'datetime' and isinstance(value, mdatetime.datetime):
+        return value.strftime('%Y-%m-%dT%H:%M:%S')
+    return value
+
+
+def fetch_param_options(table, param):
+    query = (param.values_query or '').strip().rstrip(';')
+    if not query:
+        return []
+    try:
+        query = table.replace_parameters(query)
+    except Exception:
+        query = (param.values_query or '').strip().rstrip(';')
+    if not query:
+        return []
+    cursor = Transaction().connection.cursor()
+    wrapped_query = f'SELECT * FROM ({query}) AS babi_param_values LIMIT 200'
+    try:
+        cursor.execute(wrapped_query)
+        rows = cursor.fetchall()
+    except Exception:
+        logger.exception('Error fetching parameter values for %s', param.name)
+        return []
+    options = []
+    for row in rows:
+        if not row:
+            continue
+        value = row[0]
+        label = row[1] if len(row) > 1 else row[0]
+        options.append((value, label))
+    return options
+
+
 def build_pivot_actions(database_name, table_name, table_properties, btable,
         has_saved_pivots):
     pool = Pool()
@@ -172,7 +213,8 @@ def build_pivot_actions(database_name, table_name, table_properties, btable,
     actions_div.add(expand_all)
     actions_div.add(collapse_all)
     actions_div.add(download)
-    if btable.filter and btable.filter.parameters:
+    if (btable.query_parameters
+            or (btable.filter and btable.filter.parameters)):
         compute_action = ParametrizePivotTable(
             database_name=database_name,
             table_name=table_name,
@@ -574,43 +616,74 @@ class Index(Component):
                                 selected_pivot_id = pivot.id
                                 break
 
-                    if table.filter and table.filter.parameters:
+                    params = []
+                    if table.query_parameters:
+                        TableParameter = pool.get('babi.table.parameter')
+                        params = TableParameter.search([('table', '=', table.id)])
+                    elif table.parameters and table.type in ('table', 'view'):
+                        TableParameter = pool.get('babi.table.parameter')
+                        base_tables = BabiTable.search([
+                                ('name', '=', table.name),
+                                ('parameters', '=', None),
+                                ('active', '=', True),
+                                ], limit=1)
+                        if base_tables and base_tables[0].query_parameters:
+                            params = TableParameter.search([('table', '=', base_tables[0].id)])
+                    elif table.filter and table.filter.parameters:
                         Parameter = pool.get('babi.filter.parameter')
                         params = Parameter.search([('filter', '=', table.filter.id)])
-                        if params:
-                            with div(cls="mx-4 mt-3"):
-                                label(_('Parameters'),
-                                    cls="block text-xs font-semibold text-gray-700 mb-1")
-                                with div(id="pivot-params",
-                                        cls="grid grid-cols-1 gap-3 sm:grid-cols-2"):
-                                    for param in params:
-                                        value = None
-                                        if table.parameters:
-                                            value = table.parameters.get(param.name)
-                                        with div(cls="flex flex-col gap-1"):
-                                            type_label = get_param_type_label(param.ttype)
-                                            label(f"{param.name} ({type_label})",
-                                                cls="text-xs text-gray-600")
-                                            if param.ttype == 'boolean':
-                                                input_(
-                                                    type="checkbox",
+                    if params:
+                        with div(cls="mx-4 mt-3"):
+                            label(_('Parameters'),
+                                cls="block text-xs font-semibold text-gray-700 mb-1")
+                            with div(id="pivot-params",
+                                    cls="grid grid-cols-1 gap-3 sm:grid-cols-2"):
+                                for param in params:
+                                    value = None
+                                    if table.parameters:
+                                        value = table.parameters.get(param.name)
+                                    value = format_param_value(param.ttype, value)
+                                    with div(cls="flex flex-col gap-1"):
+                                        type_label = get_param_type_label(param.ttype)
+                                        label(f"{param.name} ({type_label})",
+                                            cls="text-xs text-gray-600")
+                                        if param.ttype == 'boolean':
+                                            input_(
+                                                type="checkbox",
+                                                name=f'param_{param.id}',
+                                                value="1",
+                                                checked=bool(value),
+                                                required=True)
+                                        else:
+                                            options = fetch_param_options(table, param)
+                                            input_type = "text"
+                                            if param.ttype in ('integer', 'many2one', 'float', 'numeric'):
+                                                input_type = "number"
+                                            elif param.ttype == 'date':
+                                                input_type = "date"
+                                            elif param.ttype == 'datetime':
+                                                input_type = "datetime-local"
+                                            elif param.ttype == 'time':
+                                                input_type = "time"
+                                            if options:
+                                                select(
+                                                    *[
+                                                        option(
+                                                            str(label),
+                                                            value=str(option_value),
+                                                            selected=(value is not None and str(option_value) == str(value)))
+                                                        for option_value, label in options
+                                                    ],
                                                     name=f'param_{param.id}',
-                                                    value="1",
-                                                    checked=bool(value))
+                                                    required=True,
+                                                    cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                         "py-1 text-xs text-gray-900"))
                                             else:
-                                                input_type = "text"
-                                                if param.ttype in ('integer', 'many2one', 'float', 'numeric'):
-                                                    input_type = "number"
-                                                elif param.ttype == 'date':
-                                                    input_type = "date"
-                                                elif param.ttype == 'datetime':
-                                                    input_type = "datetime-local"
-                                                elif param.ttype == 'time':
-                                                    input_type = "time"
                                                 input_(
                                                     type=input_type,
                                                     name=f'param_{param.id}',
                                                     value='' if value is None else value,
+                                                    required=True,
                                                     cls=("w-full rounded-md border border-gray-300 px-2 "
                                                          "py-1 text-xs text-gray-900"))
 
@@ -2006,7 +2079,8 @@ class ParametrizePivotTable(Component):
     def apply(self):
         pool = Pool()
         Table = pool.get('babi.table')
-        Parameter = pool.get('babi.filter.parameter')
+        FilterParameter = pool.get('babi.filter.parameter')
+        TableParameter = pool.get('babi.table.parameter')
 
         table_name = self.table_name
         if table_name.startswith('__'):
@@ -2018,22 +2092,44 @@ class ParametrizePivotTable(Component):
         table, = tables
         if not table.check_access():
             return Response('', content_type='text/html')
-        if not table.filter or not table.filter.parameters:
+        use_query_params = bool(table.query_parameters)
+        param_table = table
+        if not use_query_params and table.parameters and table.type in ('table', 'view'):
+            base_tables = Table.search([
+                    ('name', '=', table.name),
+                    ('parameters', '=', None),
+                    ('active', '=', True),
+                    ], limit=1)
+            if base_tables and base_tables[0].query_parameters:
+                param_table = base_tables[0]
+                use_query_params = True
+        if not use_query_params and not (table.filter and table.filter.parameters):
             return Response('', content_type='text/html')
 
         params = {}
-        for param in Parameter.search([('filter', '=', table.filter.id)]):
+        missing = []
+        if use_query_params:
+            parameters = TableParameter.search([('table', '=', param_table.id)])
+        else:
+            parameters = FilterParameter.search([('filter', '=', table.filter.id)])
+        for param in parameters:
             raw_value = self._param_values.get(f'param_{param.id}')
             if raw_value is None:
-                continue
-            value = self._coerce_value(param, raw_value)
+                if param.ttype == 'boolean':
+                    value = False
+                else:
+                    missing.append(param.name)
+                    continue
+            else:
+                value = self._coerce_value(param, raw_value)
             if value is None:
+                missing.append(param.name)
                 continue
             params[param.name] = value
 
-        if not params:
+        if missing:
             notice = div(
-                _('Please provide at least one parameter.'),
+                _('Please provide all parameters.'),
                 span(
                     '',
                     hx_get=FlashClear(render=False).url('clear'),
