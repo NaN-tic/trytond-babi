@@ -101,6 +101,148 @@ def build_pivot_title(database_name, table_name, table_properties, title_value):
     return title_wrapper
 
 
+def build_pivot_actions(database_name, table_name, table_properties, btable,
+        has_saved_pivots):
+    pool = Pool()
+    DownloadReport = pool.get('www.download_report')
+    ParametrizePivotTable = pool.get('www.parametrize_pivot_table')
+    ComputeTable = pool.get('www.compute_table')
+    PivotSaveModal = pool.get('www.pivot_save_modal')
+    SaveSelectedPivot = pool.get('www.save_selected_pivot')
+    Index = pool.get('www.index.pivot')
+
+    download = a(DOWNLOAD,
+        cls="inline-flex h-8 w-8 items-center justify-center",
+        href=DownloadReport(
+            database_name=database_name, table_name=table_name,
+            table_properties=table_properties, render=False).url('download'))
+
+    if table_properties == 'null':
+        cube = Cube(table=table_name)
+    else:
+        cube = Cube.parse_properties(table_properties, table_name)
+
+    cube.table = table_name
+    cube.row_expansions = Cube.EXPAND_ALL
+    cube.column_expansions = Cube.EXPAND_ALL
+    expanded_table_properties = cube.encode_properties()
+
+    cube.table = table_name
+    cube.row_expansions = []
+    cube.column_expansions = []
+    collapsed_table_properties = cube.encode_properties()
+
+    if table_properties == 'null':
+        cube = Cube(table=table_name)
+    else:
+        cube = Cube.parse_properties(table_properties, table_name)
+
+    css = 'text-gray-300'
+    if cube.row_expansions != Cube.EXPAND_ALL or cube.column_expansions != Cube.EXPAND_ALL:
+        css = 'text-black'
+    expand_all = a(cls=("inline-flex h-8 w-8 items-center justify-center "
+            + css), href=Index(
+                database_name=database_name,
+                table_name=table_name,
+                table_properties=expanded_table_properties,
+                render=False).url())
+    expand_all.add(EXPAND_ALL)
+    css = 'text-gray-300'
+    if cube.row_expansions != [] or cube.column_expansions != []:
+        css = 'text-black'
+    collapse_all = a(cls=("inline-flex h-8 w-8 items-center justify-center "
+            + css), href=Index(
+                database_name=database_name,
+                table_name=table_name,
+                table_properties=collapsed_table_properties,
+                render=False).url())
+    collapse_all.add(COLLAPSE_ALL)
+
+    actions_div = div(cls="flex items-center gap-2 text-xs text-black px-6 py-1.5 bg-blue-300 rounded-t-lg")
+    actions_div.add(expand_all)
+    actions_div.add(collapse_all)
+    actions_div.add(download)
+    if btable.filter and btable.filter.parameters:
+        compute_action = ParametrizePivotTable(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('apply')
+        compute_form = form(
+            action=compute_action,
+            method='post',
+            hx_post=compute_action,
+            hx_include=("#pivot-params input, #pivot-params select, "
+                        "#pivot-params textarea"),
+            hx_swap="none",
+            hx_disabled_elt="button")
+    else:
+        compute_form = form(
+            action=ComputeTable(
+                database_name=database_name,
+                table_name=table_name,
+                render=False).url('compute'),
+            method='post',
+            hx_post=ComputeTable(
+                database_name=database_name,
+                table_name=table_name,
+                render=False).url('compute'),
+            hx_target="#flash_messages",
+            hx_swap="afterbegin",
+            hx_disabled_elt="button")
+    compute_form.add(
+        button(_('Compute'),
+            cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
+                 "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
+                 "leading-none h-8 box-border relative -top-px "
+                 "disabled:opacity-50 disabled:cursor-not-allowed"),
+            type="submit"))
+    save_selected_form = form(
+        action=SaveSelectedPivot(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('save'),
+        method='post',
+        hx_post=SaveSelectedPivot(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('save'),
+        hx_include="#pivot-saved-select",
+        hx_target="#flash_messages",
+        hx_swap="afterbegin",
+        hx_disabled_elt="button")
+    save_selected_button = button(
+        _('Save'),
+        cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
+             "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
+             "leading-none h-8 box-border relative -top-px "
+             "disabled:opacity-50 disabled:cursor-not-allowed"),
+        type="submit",
+        disabled=not has_saved_pivots,
+        title=_('Select a saved pivot to enable') if not has_saved_pivots else None)
+    save_selected_form.add(save_selected_button)
+    actions_div.add(
+        div(
+            save_selected_form,
+            button(_('Save as'),
+                cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
+                     "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
+                     "leading-none h-8 box-border relative -top-px"),
+                type="button",
+                hx_get=PivotSaveModal(
+                    database_name=database_name,
+                    table_name=table_name,
+                    table_properties=table_properties,
+                    render=False).url('open'),
+                hx_target="#pivot-save-modal",
+                hx_swap="outerHTML"),
+            compute_form,
+            cls="inline-flex items-center gap-2"))
+    return actions_div
+
+
 class Site(metaclass=PoolMeta):
     __name__ = 'www.site'
 
@@ -406,6 +548,7 @@ class Index(Component):
 
                     saved_pivots = [p for p in base_table.pivots if p.active]
                     saved_pivots.sort(key=lambda p: (p.name or '').lower())
+                    has_saved_pivots = bool(saved_pivots)
                     selected_pivot_id = None
                     cookie_pivot_id = None
                     voyager_context = Transaction().context.get('voyager_context')
@@ -418,12 +561,6 @@ class Index(Component):
                     if cookie_pivot_id:
                         for pivot in saved_pivots:
                             if pivot.id == cookie_pivot_id:
-                                selected_pivot_id = pivot.id
-                                break
-                    if not selected_pivot_id and current_props:
-                        for pivot in saved_pivots:
-                            pivot_cube = pivot.get_cube()
-                            if pivot_cube and pivot_cube.encode_properties() == current_props:
                                 selected_pivot_id = pivot.id
                                 break
 
@@ -507,7 +644,18 @@ class Index(Component):
                     with div(cls="mt-8 flow-root"):
                         with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
                             if show_error == True:
-                                div(cls="text-center").add(p(_('You need to select at least one measure and one row or one column to show the table.'), cls="mt-1 text-sm text-gray-500"))
+                                actions_div = build_pivot_actions(
+                                    self.database_name,
+                                    self.table_name,
+                                    self.table_properties,
+                                    table,
+                                    has_saved_pivots)
+                                actions_div.add(
+                                    div(
+                                        p(_('You need to select at least one measure and one row or one column to show the table.'),
+                                            cls="mt-2 text-sm text-gray-500 text-center"),
+                                        cls="px-6 pb-3"))
+                                div(actions_div)
                             else:
                                 try:
                                     PivotTable(database_name=self.database_name, table_name=self.table_name,
@@ -1062,9 +1210,7 @@ class PivotTable(Component):
     def render(self):
         pool = Pool()
         # Component
-        DownloadReport = pool.get('www.download_report')
         Language = pool.get('ir.lang')
-        ParametrizePivotTable = pool.get('www.parametrize_pivot_table')
         Table = pool.get('babi.table')
 
         btable, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
@@ -1072,12 +1218,6 @@ class PivotTable(Component):
 
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
-
-        download = a(DOWNLOAD,
-            cls="inline-flex h-8 w-8 items-center justify-center",
-            href=DownloadReport(
-                database_name=self.database_name, table_name=self.table_name,
-                table_properties=self.table_properties, render=False).url('download'))
 
         base_table = btable
         if btable.parameters and btable.filter:
@@ -1089,120 +1229,17 @@ class PivotTable(Component):
                 base_table = base_tables[0]
         saved_pivots = [p for p in base_table.pivots if p.active]
         has_saved_pivots = bool(saved_pivots)
+        actions_div = build_pivot_actions(
+            self.database_name,
+            self.table_name,
+            self.table_properties,
+            btable,
+            has_saved_pivots)
 
-        cube = Cube.parse_properties(self.table_properties, self.table_name)
-
-        # Prepare the cube properties for the expand all cube function
-        cube.table = self.table_name
-        cube.row_expansions = Cube.EXPAND_ALL
-        cube.column_expansions = Cube.EXPAND_ALL
-        expanded_table_properties = cube.encode_properties()
-
-        # Prepare the cube properties for the collapse all cube function
-        cube.table = self.table_name
-        cube.row_expansions = []
-        cube.column_expansions = []
-        collapsed_table_properties = cube.encode_properties()
-
-        cube = Cube.parse_properties(self.table_properties, self.table_name)
-
-        css = 'text-gray-300'
-        if cube.row_expansions != Cube.EXPAND_ALL or cube.column_expansions != Cube.EXPAND_ALL:
-            css = 'text-black'
-        expand_all = a(cls=("inline-flex h-8 w-8 items-center justify-center "
-                + css), href=Index(database_name=self.database_name, table_name=self.table_name,
-                table_properties=expanded_table_properties, render=False).url())
-        expand_all.add(EXPAND_ALL)
-        css = 'text-gray-300'
-        if cube.row_expansions != [] or cube.column_expansions != []:
-            css = 'text-black'
-        collapse_all = a(cls=("inline-flex h-8 w-8 items-center justify-center "
-                + css), href=Index(database_name=self.database_name, table_name=self.table_name,
-                table_properties=collapsed_table_properties, render=False).url())
-        collapse_all.add(COLLAPSE_ALL)
-
-        actions_div = div(cls="flex items-center gap-2 text-xs text-black px-6 py-1.5 bg-blue-300 rounded-t-lg")
-        actions_div.add(expand_all)
-        actions_div.add(collapse_all)
-        actions_div.add(download)
-        if btable.filter and btable.filter.parameters:
-            compute_action = ParametrizePivotTable(
-                database_name=self.database_name,
-                table_name=self.table_name,
-                table_properties=self.table_properties,
-                render=False).url('apply')
-            compute_form = form(
-                action=compute_action,
-                method='post',
-                hx_post=compute_action,
-                hx_include=("#pivot-params input, #pivot-params select, "
-                            "#pivot-params textarea"),
-                hx_swap="none",
-                hx_disabled_elt="button")
+        if self.table_properties == 'null':
+            cube = Cube(table=self.table_name)
         else:
-            compute_form = form(
-                action=ComputeTable(
-                    database_name=self.database_name,
-                    table_name=self.table_name,
-                    render=False).url('compute'),
-                method='post',
-                hx_post=ComputeTable(
-                    database_name=self.database_name,
-                    table_name=self.table_name,
-                    render=False).url('compute'),
-                hx_target="#flash_messages",
-                hx_swap="afterbegin",
-                hx_disabled_elt="button")
-        compute_form.add(
-            button(_('Compute'),
-                cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
-                     "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
-                     "leading-none h-8 box-border relative -top-px "
-                     "disabled:opacity-50 disabled:cursor-not-allowed"),
-                type="submit"))
-        save_selected_form = form(
-            action=SaveSelectedPivot(
-                database_name=self.database_name,
-                table_name=self.table_name,
-                table_properties=self.table_properties,
-                render=False).url('save'),
-            method='post',
-            hx_post=SaveSelectedPivot(
-                database_name=self.database_name,
-                table_name=self.table_name,
-                table_properties=self.table_properties,
-                render=False).url('save'),
-            hx_include="#pivot-saved-select",
-            hx_target="#flash_messages",
-            hx_swap="afterbegin",
-            hx_disabled_elt="button")
-        save_selected_button = button(
-            _('Save'),
-            cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
-                 "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
-                 "leading-none h-8 box-border relative -top-px "
-                 "disabled:opacity-50 disabled:cursor-not-allowed"),
-            type="submit",
-            disabled=not has_saved_pivots,
-            title=_('Select a saved pivot to enable') if not has_saved_pivots else None)
-        save_selected_form.add(save_selected_button)
-        actions_div.add(
-            div(
-                save_selected_form,
-                button(_('Save as'),
-                    cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
-                         "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
-                         "leading-none h-8 box-border relative -top-px"),
-                    type="button",
-                    hx_get=PivotSaveModal(
-                        database_name=self.database_name,
-                        table_name=self.table_name,
-                        table_properties=self.table_properties,
-                        render=False).url('open'),
-                    hx_target="#pivot-save-modal",
-                    hx_swap="outerHTML"),
-                compute_form,
-                cls="inline-flex items-center gap-2"))
+            cube = Cube.parse_properties(self.table_properties, self.table_name)
 
         pivot_table = table(cls="pivot-table table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
         for row in cube.build():
