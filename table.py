@@ -327,24 +327,48 @@ class TableParameters(Model):
             except Exception:
                 table = None
 
-        if table and table.query_parameters:
-            records = TableParameter.search([('table', '=', table.id)])
+        source_table = table
+        if table and table.base_table and table.base_table.check_access():
+            source_table = table.base_table
+
+        if source_table and source_table.query_parameters:
+            records = TableParameter.search([('table', '=', source_table.id)])
         elif table and table.parameters and table.type in ('table', 'view'):
             base_tables = Table.search([
-                    ('name', '=', table.name),
+                    ('query', '=', table.query),
+                    ('type', '=', table.type),
                     ('parameters', '=', None),
                     ('active', '=', True),
                     ], limit=1)
             if base_tables and base_tables[0].query_parameters:
                 records = TableParameter.search([('table', '=', base_tables[0].id)])
-            elif table.filter and table.filter.parameters:
-                records = FilterParameter.search([('filter', '=', table.filter.id)])
+                if table and not table.base_table:
+                    with Transaction().set_context(_check_access=False):
+                        table.base_table = base_tables[0]
+                        table.save()
+            elif source_table and source_table.filter and source_table.filter.parameters:
+                records = FilterParameter.search([('filter', '=', source_table.filter.id)])
             else:
                 records = FilterParameter.search([])
-        elif table and table.filter and table.filter.parameters:
-            records = FilterParameter.search([('filter', '=', table.filter.id)])
+        elif source_table and source_table.filter and source_table.filter.parameters:
+            records = FilterParameter.search([('filter', '=', source_table.filter.id)])
         else:
             records = FilterParameter.search([])
+
+        if table and records:
+            existing = table.parameters or {}
+            updated = False
+            for record in records:
+                if record.name not in existing:
+                    if record.ttype == 'boolean':
+                        existing[record.name] = False
+                    else:
+                        existing[record.name] = None
+                    updated = True
+            if updated:
+                with Transaction().set_context(_check_access=False):
+                    table.parameters = existing
+                    table.save()
 
         keys = []
         for record in records:
@@ -421,6 +445,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             ], states={
             'invisible': Eval('type') != 'model',
             })
+    base_table = fields.Many2One('babi.table', 'Base Table', readonly=True,
+        ondelete='SET NULL')
     query_parameters = fields.One2Many('babi.table.parameter', 'table',
         'Query Parameters', states={
             'invisible': ~Eval('type').in_(['table', 'view']),
@@ -2717,9 +2743,12 @@ class ParametrizeTable(Wizard):
             raise UserError(gettext('babi.msg_parameters_required'))
 
         internal_name = 'parametrized_' + secrets.token_hex(8)
+        base_table_id = (self.record.base_table.id
+            if self.record.base_table else self.record.id)
         table, = Table.copy([self.record], default={
                 'internal_name': internal_name,
                 'parameters': params,
+                'base_table': base_table_id,
                 'crons': [],
                 })
         with Transaction().set_context(queue_name=QUEUE_NAME):

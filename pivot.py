@@ -125,6 +125,8 @@ def format_param_value(ttype, value):
 
 
 def fetch_param_options(table, param):
+    if not hasattr(param, 'values_query'):
+        return []
     query = (param.values_query or '').strip().rstrip(';')
     if not query:
         return []
@@ -213,8 +215,11 @@ def build_pivot_actions(database_name, table_name, table_properties, btable,
     actions_div.add(expand_all)
     actions_div.add(collapse_all)
     actions_div.add(download)
-    if (btable.query_parameters
-            or (btable.filter and btable.filter.parameters)):
+    param_table = btable
+    if btable.base_table and btable.base_table.check_access():
+        param_table = btable.base_table
+    if (param_table.query_parameters
+            or (param_table.filter and param_table.filter.parameters)):
         compute_action = ParametrizePivotTable(
             database_name=database_name,
             table_name=table_name,
@@ -590,7 +595,9 @@ class Index(Component):
                     div(id="pivot-save-modal")
 
                     base_table = table
-                    if table.parameters and table.filter:
+                    if table.base_table and table.base_table.check_access():
+                        base_table = table.base_table
+                    elif table.parameters and table.filter:
                         base_tables = BabiTable.search([
                                 ('filter', '=', table.filter.id),
                                 ('parameters', '=', None),
@@ -617,21 +624,25 @@ class Index(Component):
                                 break
 
                     params = []
-                    if table.query_parameters:
+                    param_table = table
+                    if table.base_table and table.base_table.check_access():
+                        param_table = table.base_table
+                    if param_table.query_parameters:
                         TableParameter = pool.get('babi.table.parameter')
-                        params = TableParameter.search([('table', '=', table.id)])
+                        params = TableParameter.search([('table', '=', param_table.id)])
                     elif table.parameters and table.type in ('table', 'view'):
                         TableParameter = pool.get('babi.table.parameter')
                         base_tables = BabiTable.search([
-                                ('name', '=', table.name),
+                                ('query', '=', table.query),
+                                ('type', '=', table.type),
                                 ('parameters', '=', None),
                                 ('active', '=', True),
                                 ], limit=1)
                         if base_tables and base_tables[0].query_parameters:
                             params = TableParameter.search([('table', '=', base_tables[0].id)])
-                    elif table.filter and table.filter.parameters:
+                    elif param_table.filter and param_table.filter.parameters:
                         Parameter = pool.get('babi.filter.parameter')
-                        params = Parameter.search([('filter', '=', table.filter.id)])
+                        params = Parameter.search([('filter', '=', param_table.filter.id)])
                     if params:
                         with div(cls="mx-4 mt-3"):
                             label(_('Parameters'),
@@ -1314,7 +1325,9 @@ class PivotTable(Component):
         language, = Language.search([('code', '=', language)], limit=1)
 
         base_table = btable
-        if btable.parameters and btable.filter:
+        if btable.base_table and btable.base_table.check_access():
+            base_table = btable.base_table
+        elif btable.parameters and btable.filter:
             base_tables = Table.search([
                     ('filter', '=', btable.filter.id),
                     ('parameters', '=', None),
@@ -1602,7 +1615,9 @@ class SavePivot(Component):
             return pivot
 
         pivot_table = table
-        if table.parameters and table.filter:
+        if table.base_table and table.base_table.check_access():
+            pivot_table = table.base_table
+        elif table.parameters and table.filter:
             base_tables = Table.search([
                     ('filter', '=', table.filter.id),
                     ('parameters', '=', None),
@@ -1995,7 +2010,9 @@ class PivotSelectRedirect(Component):
             tables = Table.search([('internal_name', '=', table_name)], limit=1)
             if tables:
                 base_table = tables[0]
-                if base_table.parameters and base_table.filter:
+                if base_table.base_table and base_table.base_table.check_access():
+                    base_table = base_table.base_table
+                elif base_table.parameters and base_table.filter:
                     base_tables = Table.search([
                             ('filter', '=', base_table.filter.id),
                             ('parameters', '=', None),
@@ -2020,7 +2037,9 @@ class PivotSelectRedirect(Component):
             return response
         table_properties = urllib.parse.unquote(cube.encode_properties())
         base_table = pivot.table
-        if base_table.parameters and base_table.filter:
+        if base_table.base_table and base_table.base_table.check_access():
+            base_table = base_table.base_table
+        elif base_table.parameters and base_table.filter:
             base_tables = Table.search([
                     ('filter', '=', base_table.filter.id),
                     ('parameters', '=', None),
@@ -2092,18 +2111,21 @@ class ParametrizePivotTable(Component):
         table, = tables
         if not table.check_access():
             return Response('', content_type='text/html')
-        use_query_params = bool(table.query_parameters)
         param_table = table
+        if table.base_table and table.base_table.check_access():
+            param_table = table.base_table
+        use_query_params = bool(param_table.query_parameters)
         if not use_query_params and table.parameters and table.type in ('table', 'view'):
             base_tables = Table.search([
-                    ('name', '=', table.name),
+                    ('query', '=', table.query),
+                    ('type', '=', table.type),
                     ('parameters', '=', None),
                     ('active', '=', True),
                     ], limit=1)
             if base_tables and base_tables[0].query_parameters:
                 param_table = base_tables[0]
                 use_query_params = True
-        if not use_query_params and not (table.filter and table.filter.parameters):
+        if not use_query_params and not (param_table.filter and param_table.filter.parameters):
             return Response('', content_type='text/html')
 
         params = {}
@@ -2111,7 +2133,7 @@ class ParametrizePivotTable(Component):
         if use_query_params:
             parameters = TableParameter.search([('table', '=', param_table.id)])
         else:
-            parameters = FilterParameter.search([('filter', '=', table.filter.id)])
+            parameters = FilterParameter.search([('filter', '=', param_table.filter.id)])
         for param in parameters:
             raw_value = self._param_values.get(f'param_{param.id}')
             if raw_value is None:
@@ -2141,9 +2163,12 @@ class ParametrizePivotTable(Component):
             return Response(str(notice), content_type='text/html')
 
         internal_name = 'parametrized_' + secrets.token_hex(8)
+        base_table_id = (table.base_table.id
+            if table.base_table else table.id)
         new_table, = Table.copy([table], default={
                 'internal_name': internal_name,
                 'parameters': params,
+                'base_table': base_table_id,
                 'crons': [],
                 })
         Table.compute([new_table])
