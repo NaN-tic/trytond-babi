@@ -101,6 +101,16 @@ def build_pivot_title(database_name, table_name, table_properties, title_value):
     return title_wrapper
 
 
+def get_param_type_label(ttype):
+    if ttype in ('date', 'datetime', 'time'):
+        return _('date')
+    if ttype in ('integer', 'numeric', 'float', 'many2one'):
+        return _('integer')
+    if ttype == 'boolean':
+        return _('boolean')
+    return _('text')
+
+
 def build_pivot_actions(database_name, table_name, table_properties, btable,
         has_saved_pivots):
     pool = Pool()
@@ -578,7 +588,9 @@ class Index(Component):
                                         if table.parameters:
                                             value = table.parameters.get(param.name)
                                         with div(cls="flex flex-col gap-1"):
-                                            label(param.name, cls="text-xs text-gray-600")
+                                            type_label = get_param_type_label(param.ttype)
+                                            label(f"{param.name} ({type_label})",
+                                                cls="text-xs text-gray-600")
                                             if param.ttype == 'boolean':
                                                 input_(
                                                     type="checkbox",
@@ -586,8 +598,17 @@ class Index(Component):
                                                     value="1",
                                                     checked=bool(value))
                                             else:
+                                                input_type = "text"
+                                                if param.ttype in ('integer', 'many2one', 'float', 'numeric'):
+                                                    input_type = "number"
+                                                elif param.ttype == 'date':
+                                                    input_type = "date"
+                                                elif param.ttype == 'datetime':
+                                                    input_type = "datetime-local"
+                                                elif param.ttype == 'time':
+                                                    input_type = "time"
                                                 input_(
-                                                    type="number" if param.ttype in ('integer', 'many2one', 'float', 'numeric') else "text",
+                                                    type=input_type,
                                                     name=f'param_{param.id}',
                                                     value='' if value is None else value,
                                                     cls=("w-full rounded-md border border-gray-300 px-2 "
