@@ -407,14 +407,25 @@ class Index(Component):
                     saved_pivots = [p for p in base_table.pivots if p.active]
                     saved_pivots.sort(key=lambda p: (p.name or '').lower())
                     selected_pivot_id = None
-                    if current_props:
+                    cookie_pivot_id = None
+                    voyager_context = Transaction().context.get('voyager_context')
+                    request = getattr(voyager_context, 'request', None)
+                    if request:
+                        cookie_key = f'babi_pivot_selected_{base_table.id}'
+                        cookie_value = request.cookies.get(cookie_key)
+                        if cookie_value and cookie_value.isdigit():
+                            cookie_pivot_id = int(cookie_value)
+                    if cookie_pivot_id:
+                        for pivot in saved_pivots:
+                            if pivot.id == cookie_pivot_id:
+                                selected_pivot_id = pivot.id
+                                break
+                    if not selected_pivot_id and current_props:
                         for pivot in saved_pivots:
                             pivot_cube = pivot.get_cube()
                             if pivot_cube and pivot_cube.encode_properties() == current_props:
                                 selected_pivot_id = pivot.id
                                 break
-                    if not selected_pivot_id and saved_pivots:
-                        selected_pivot_id = saved_pivots[0].id
 
                     if table.filter and table.filter.parameters:
                         Parameter = pool.get('babi.filter.parameter')
@@ -450,6 +461,10 @@ class Index(Component):
                             label(_('Saved pivots'),
                                 cls="block text-xs font-semibold text-gray-700 mb-1")
                             select(
+                                option(
+                                    _('Custom'),
+                                    value='',
+                                    selected=(selected_pivot_id is None)),
                                 *[
                                     option(
                                         pivot.name or pivot.table.name,
@@ -1836,10 +1851,32 @@ class PivotSelectRedirect(Component):
             pivot_id = self.pivot_id
         except AttributeError:
             pivot_id = None
-        if not pivot_id:
-            return Response('', content_type='text/html')
         pool = Pool()
+        Table = pool.get('babi.table')
         Pivot = pool.get('babi.pivot')
+        if not pivot_id:
+            response = Response('', content_type='text/html')
+            base_table = None
+            if self.table_name.startswith('__'):
+                table_name = self.table_name.split('__')[-1]
+            else:
+                table_name = self.table_name
+            tables = Table.search([('internal_name', '=', table_name)], limit=1)
+            if tables:
+                base_table = tables[0]
+                if base_table.parameters and base_table.filter:
+                    base_tables = Table.search([
+                            ('filter', '=', base_table.filter.id),
+                            ('parameters', '=', None),
+                            ], limit=1)
+                    if base_tables and base_tables[0].check_access():
+                        base_table = base_tables[0]
+            if base_table:
+                response.set_cookie(
+                    f'babi_pivot_selected_{base_table.id}',
+                    '',
+                    max_age=0)
+            return response
         pivots = Pivot.search([('id', '=', pivot_id)], limit=1)
         if not pivots:
             return Response('', content_type='text/html')
@@ -1851,6 +1888,17 @@ class PivotSelectRedirect(Component):
         if not cube:
             return response
         table_properties = urllib.parse.unquote(cube.encode_properties())
+        base_table = pivot.table
+        if base_table.parameters and base_table.filter:
+            base_tables = Table.search([
+                    ('filter', '=', base_table.filter.id),
+                    ('parameters', '=', None),
+                    ], limit=1)
+            if base_tables and base_tables[0].check_access():
+                base_table = base_tables[0]
+        response.set_cookie(
+            f'babi_pivot_selected_{base_table.id}',
+            str(pivot.id))
         response.headers['HX-Redirect'] = Index(
             database_name=self.database_name,
             table_name=self.table_name,
