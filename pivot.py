@@ -3,6 +3,7 @@ import datetime as mdatetime
 import urllib.parse
 import secrets
 import tempfile
+import sql
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
     option, main, th, style, details, summary, input_ as input_, label, ul)
@@ -125,10 +126,13 @@ def format_param_value(ttype, value):
 
 
 def fetch_param_options(table, param):
-    if not hasattr(param, 'values_query'):
-        return []
-    query = (param.values_query or '').strip().rstrip(';')
-    if not query:
+    has_values_query = hasattr(param, 'values_query')
+    query = (param.values_query or '').strip().rstrip(';') if has_values_query else ''
+    if not has_values_query or not query:
+        if param.ttype == 'many2one' and getattr(param, 'related_model', None):
+            Model = Pool().get(param.related_model.model)
+            records = Model.search([], limit=200)
+            return [(record.id, record.rec_name) for record in records]
         return []
     try:
         query = table.replace_parameters(query)
@@ -152,6 +156,39 @@ def fetch_param_options(table, param):
         label = row[1] if len(row) > 1 else row[0]
         options.append((value, label))
     return options
+
+
+def fetch_field_options(table, field_name, related_model=None):
+    cursor = Transaction().connection.cursor()
+    table_sql = sql.Table(table.table_name)
+    column = getattr(table_sql, field_name, None)
+    if column is None:
+        return []
+    query = table_sql.select(column, group_by=[column], order_by=[column],
+        limit=200)
+    try:
+        cursor.execute(*query)
+        rows = cursor.fetchall()
+    except Exception:
+        logger.exception('Error fetching slicer values for %s', field_name)
+        return []
+    values = []
+    for row in rows:
+        if not row:
+            continue
+        value = row[0]
+        if value is not None:
+            values.append(value)
+    if related_model and values:
+        try:
+            Model = Pool().get(related_model)
+            records = Model.search([('id', 'in', values)])
+            record_map = {record.id: record.rec_name for record in records}
+            return [(value, record_map.get(value, value)) for value in values]
+        except Exception:
+            logger.exception('Error fetching slicer rec_name for %s',
+                related_model)
+    return [(value, value) for value in values]
 
 
 def build_pivot_actions(database_name, table_name, table_properties, btable,
@@ -650,7 +687,7 @@ class Index(Component):
                             table_properties=self.table_properties,
                             render=False).url('apply')
                         with div(cls="mx-4 mt-3"):
-                            label(_('Slicers'),
+                            label(_('Parameters'),
                                 cls="block text-xs font-semibold text-gray-700 mb-2")
                             with form(
                                     action=compute_action,
@@ -722,6 +759,117 @@ class Index(Component):
                                         cls=("rounded-md border border-gray-300 bg-white px-3 "
                                              "py-1.5 text-xs font-semibold text-gray-700 "
                                              "hover:bg-gray-50"))
+
+                    field_labels = dict((x.internal_name, x.name) for x in table.fields_)
+                    field_types = dict((x.internal_name, x.type or 'char') for x in table.fields_)
+                    field_related_models = {}
+                    for field in table.fields_:
+                        related_model = None
+                        if field.expression and field.expression.related_model:
+                            related_model = field.expression.related_model.model
+                        field_related_models[field.internal_name] = related_model
+
+                    if self.table_properties == 'null':
+                        slicer_cube = Cube(table=table.name)
+                    else:
+                        slicer_cube = Cube.parse_properties(
+                            self.table_properties, table.name)
+                    if not hasattr(slicer_cube, 'filters'):
+                        slicer_cube.filters = []
+                    slicer_fields = []
+                    for field in (slicer_cube.rows + slicer_cube.columns
+                            + slicer_cube.properties):
+                        if field not in slicer_fields:
+                            slicer_fields.append(field)
+                    if slicer_fields:
+                        try:
+                            PivotSlicerApply = pool.get('www.pivot_slicer_apply')
+                        except Exception:
+                            PivotSlicerApply = None
+                        if PivotSlicerApply:
+                            slicer_action = PivotSlicerApply(
+                                database_name=self.database_name,
+                                table_name=self.table_name,
+                                table_properties=self.table_properties,
+                                render=False).url('apply')
+                        else:
+                            slicer_action = None
+                        filters_by_field = {}
+                        for field, op, value in slicer_cube.filters:
+                            filters_by_field[field] = (op, value)
+                        if slicer_action:
+                            with div(cls="mx-4 mt-3"):
+                                label(_('Slicers'),
+                                    cls="block text-xs font-semibold text-gray-700 mb-2")
+                                with form(
+                                        action=slicer_action,
+                                        method="post",
+                                        hx_post=slicer_action,
+                                        hx_swap="none",
+                                        hx_disabled_elt="button",
+                                        cls="rounded-lg border border-gray-200 bg-white p-3"):
+                                    with div(cls="grid grid-cols-1 gap-3 sm:grid-cols-2"):
+                                        for field in slicer_fields:
+                                            ftype = field_types.get(field, 'char')
+                                            field_label = capitalize(
+                                                field_labels.get(field, field))
+                                            current_filter = filters_by_field.get(field)
+                                            selected_values = []
+                                            range_start = ''
+                                            range_end = ''
+                                            if current_filter:
+                                                op, value = current_filter
+                                                if op == 'in':
+                                                    selected_values = [str(v) for v in (value or [])]
+                                                elif op == 'between' and value:
+                                                    range_start = value[0] or ''
+                                                    range_end = value[1] or ''
+                                            with div(cls=("flex flex-col gap-1 rounded-md "
+                                                         "border border-gray-200 bg-gray-50 px-3 py-2")):
+                                                label(field_label,
+                                                    cls="text-[11px] uppercase tracking-wide text-gray-500")
+                                                if ftype in ('date', 'datetime'):
+                                                    with div(cls="flex items-center gap-2"):
+                                                        input_(
+                                                            type="date",
+                                                            name=f'slicer_{field}_from',
+                                                            value=range_start,
+                                                            cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                                 "py-1 text-xs text-gray-900"))
+                                                        input_(
+                                                            type="date",
+                                                            name=f'slicer_{field}_to',
+                                                            value=range_end,
+                                                            cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                                 "py-1 text-xs text-gray-900"))
+                                                else:
+                                                    options = fetch_field_options(
+                                                        table, field,
+                                                        field_related_models.get(field))
+                                                    select(
+                                                        *[
+                                                            option(
+                                                                str(label),
+                                                                value=str(option_value),
+                                                                selected=str(option_value) in selected_values)
+                                                            for option_value, label in options
+                                                        ],
+                                                        name=f'slicer_{field}',
+                                                        multiple=True,
+                                                        cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                             "py-1 text-xs text-gray-900"))
+                                    with div(cls="mt-3 flex items-center gap-2"):
+                                        button(_('Apply slicers'),
+                                            type="submit",
+                                            cls=("rounded-md bg-blue-600 px-3 py-1.5 text-xs "
+                                                 "font-semibold text-white shadow hover:bg-blue-500"))
+                                        button(_('Clear'),
+                                            type="submit",
+                                            name="slicer_clear",
+                                            value="1",
+                                            cls=("rounded-md border border-gray-300 bg-white px-3 "
+                                                 "py-1.5 text-xs font-semibold text-gray-700 "
+                                                 "hover:bg-gray-50"))
 
                     if saved_pivots:
                         with div(cls="mx-4 mt-3"):
