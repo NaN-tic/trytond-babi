@@ -1,8 +1,12 @@
 import logging
+import datetime as mdatetime
+import urllib.parse
+import secrets
 import tempfile
+import sql
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
-    option, main, th, style, details, summary)
+    option, main, th, style, details, summary, input_ as input_, label, ul)
 from dominate.util import raw
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
@@ -38,6 +42,7 @@ RELOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 2
 EXPAND_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M200-200v-240h80v160h160v80H200Zm480-320v-160H520v-80h240v240h-80Z"/></svg>')
 COLLAPSE_ALL = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-440v240h-80v-160H200v-80h240Zm160-320v160h160v80H520v-240h80Z"/></svg>')
 DOWNLOAD = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>')
+PENCIL = raw('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4"><path d="M16.862 3.487a1.875 1.875 0 0 1 2.651 2.651l-9.75 9.75a4.5 4.5 0 0 1-1.897 1.13l-2.697.9a.75.75 0 0 1-.949-.95l.9-2.696a4.5 4.5 0 0 1 1.13-1.897l9.75-9.75Z"/><path d="M18.75 8.25 15.75 5.25"/></svg>')
 ROWS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" transform="rotate(90)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
 COLUMNS_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>')
 PROPERTY_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M160-760v560h240v-560H160ZM80-120v-720h720v160h-80v-80H480v560h240v-80h80v160H80Zm400-360Zm-80 0h80-80Zm0 0Zm320 120v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/></svg>')
@@ -51,6 +56,285 @@ ORDER_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0
 ORDER_ASC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" /></svg>')
 ORDER_DESC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>')
 LOADING_SPINNER = raw('<svg aria-hidden="true" class="m-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>')
+
+
+def build_pivot_title(database_name, table_name, table_properties, title_value):
+    title_wrapper = div(id="pivot-title", cls="inline-flex items-center gap-2")
+    title_toggle = input_(
+        type="checkbox",
+        id="pivot-title-edit",
+        cls="pivot-title-toggle")
+    title_wrapper.add(title_toggle)
+    title_wrapper.add(span(
+        title_value,
+        cls="pivot-title-display text-base font-semibold leading-6 text-gray-900"))
+    title_form = form(
+        cls="pivot-title-input items-center",
+        action=UpdatePivotTitle(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('update'),
+        hx_post=UpdatePivotTitle(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('update'),
+        hx_trigger="change delay:300ms, blur",
+        hx_target="#pivot-title",
+        hx_swap="outerHTML",
+        method="post")
+    title_form.add(input_(
+        type="text",
+        name="name",
+        value=title_value,
+        cls=("text-base font-semibold leading-6 text-gray-900 "
+             "bg-transparent border-b border-gray-300 "
+             "focus:border-gray-500 focus:outline-none w-72")))
+    title_form.add(button(
+        _('Save title'),
+        type="submit",
+        cls="sr-only"))
+    title_wrapper.add(title_form)
+    title_wrapper.add(label(
+        PENCIL,
+        **{'for': 'pivot-title-edit'},
+        cls="cursor-pointer text-gray-500 hover:text-gray-800"))
+    return title_wrapper
+
+
+def get_param_type_label(ttype):
+    if ttype in ('date', 'datetime', 'time'):
+        return _('date')
+    if ttype in ('integer', 'numeric', 'float', 'many2one'):
+        return _('integer')
+    if ttype == 'boolean':
+        return _('boolean')
+    return _('text')
+
+
+def format_param_value(ttype, value):
+    if value is None:
+        return ''
+    if ttype == 'date' and isinstance(value, mdatetime.date):
+        return value.strftime('%Y-%m-%d')
+    if ttype == 'time' and isinstance(value, mdatetime.time):
+        return value.strftime('%H:%M:%S')
+    if ttype == 'datetime' and isinstance(value, mdatetime.datetime):
+        return value.strftime('%Y-%m-%dT%H:%M:%S')
+    return value
+
+
+def fetch_param_options(table, param):
+    has_values_query = hasattr(param, 'values_query')
+    query = (param.values_query or '').strip().rstrip(';') if has_values_query else ''
+    if not has_values_query or not query:
+        if param.ttype == 'many2one' and getattr(param, 'related_model', None):
+            Model = Pool().get(param.related_model.model)
+            records = Model.search([], limit=200)
+            return [(record.id, record.rec_name) for record in records]
+        return []
+    try:
+        query = table.replace_parameters(query)
+    except Exception:
+        query = (param.values_query or '').strip().rstrip(';')
+    if not query:
+        return []
+    cursor = Transaction().connection.cursor()
+    wrapped_query = f'SELECT * FROM ({query}) AS babi_param_values LIMIT 200'
+    try:
+        cursor.execute(wrapped_query)
+        rows = cursor.fetchall()
+    except Exception:
+        logger.exception('Error fetching parameter values for %s', param.name)
+        return []
+    options = []
+    for row in rows:
+        if not row:
+            continue
+        value = row[0]
+        label = row[1] if len(row) > 1 else row[0]
+        options.append((value, label))
+    return options
+
+
+def fetch_field_options(table, field_name, related_model=None):
+    cursor = Transaction().connection.cursor()
+    table_sql = sql.Table(table.table_name)
+    column = getattr(table_sql, field_name, None)
+    if column is None:
+        return []
+    query = table_sql.select(column, group_by=[column], order_by=[column],
+        limit=200)
+    try:
+        cursor.execute(*query)
+        rows = cursor.fetchall()
+    except Exception:
+        logger.exception('Error fetching slicer values for %s', field_name)
+        return []
+    values = []
+    for row in rows:
+        if not row:
+            continue
+        value = row[0]
+        if value is not None:
+            values.append(value)
+    if related_model and values:
+        try:
+            Model = Pool().get(related_model)
+            records = Model.search([('id', 'in', values)])
+            record_map = {record.id: record.rec_name for record in records}
+            return [(value, record_map.get(value, value)) for value in values]
+        except Exception:
+            logger.exception('Error fetching slicer rec_name for %s',
+                related_model)
+    return [(value, value) for value in values]
+
+
+def build_pivot_actions(database_name, table_name, table_properties, btable,
+        has_saved_pivots):
+    pool = Pool()
+    DownloadReport = pool.get('www.download_report')
+    ParametrizePivotTable = pool.get('www.parametrize_pivot_table')
+    ComputeTable = pool.get('www.compute_table')
+    PivotSaveModal = pool.get('www.pivot_save_modal')
+    SaveSelectedPivot = pool.get('www.save_selected_pivot')
+    Index = pool.get('www.index.pivot')
+
+    download = a(DOWNLOAD,
+        cls="inline-flex h-8 w-8 items-center justify-center",
+        href=DownloadReport(
+            database_name=database_name, table_name=table_name,
+            table_properties=table_properties, render=False).url('download'))
+
+    if table_properties == 'null':
+        cube = Cube(table=table_name)
+    else:
+        cube = Cube.parse_properties(table_properties, table_name)
+
+    cube.table = table_name
+    cube.row_expansions = Cube.EXPAND_ALL
+    cube.column_expansions = Cube.EXPAND_ALL
+    expanded_table_properties = cube.encode_properties()
+
+    cube.table = table_name
+    cube.row_expansions = []
+    cube.column_expansions = []
+    collapsed_table_properties = cube.encode_properties()
+
+    if table_properties == 'null':
+        cube = Cube(table=table_name)
+    else:
+        cube = Cube.parse_properties(table_properties, table_name)
+
+    css = 'text-gray-300'
+    if cube.row_expansions != Cube.EXPAND_ALL or cube.column_expansions != Cube.EXPAND_ALL:
+        css = 'text-black'
+    expand_all = a(cls=("inline-flex h-8 w-8 items-center justify-center "
+            + css), href=Index(
+                database_name=database_name,
+                table_name=table_name,
+                table_properties=expanded_table_properties,
+                render=False).url())
+    expand_all.add(EXPAND_ALL)
+    css = 'text-gray-300'
+    if cube.row_expansions != [] or cube.column_expansions != []:
+        css = 'text-black'
+    collapse_all = a(cls=("inline-flex h-8 w-8 items-center justify-center "
+            + css), href=Index(
+                database_name=database_name,
+                table_name=table_name,
+                table_properties=collapsed_table_properties,
+                render=False).url())
+    collapse_all.add(COLLAPSE_ALL)
+
+    actions_div = div(cls="flex items-center gap-2 text-xs text-black px-6 py-1.5 bg-blue-300 rounded-t-lg")
+    actions_div.add(expand_all)
+    actions_div.add(collapse_all)
+    actions_div.add(download)
+    param_table = btable
+    if btable.base_table and btable.base_table.check_access():
+        param_table = btable.base_table
+    if (param_table.query_parameters
+            or (param_table.filter and param_table.filter.parameters)):
+        compute_action = ParametrizePivotTable(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('apply')
+        compute_form = form(
+            action=compute_action,
+            method='post',
+            hx_post=compute_action,
+            hx_include=("#pivot-params input, #pivot-params select, "
+                        "#pivot-params textarea"),
+            hx_swap="none",
+            hx_disabled_elt="button")
+    else:
+        compute_form = form(
+            action=ComputeTable(
+                database_name=database_name,
+                table_name=table_name,
+                render=False).url('compute'),
+            method='post',
+            hx_post=ComputeTable(
+                database_name=database_name,
+                table_name=table_name,
+                render=False).url('compute'),
+            hx_target="#flash_messages",
+            hx_swap="afterbegin",
+            hx_disabled_elt="button")
+    compute_form.add(
+        button(_('Compute'),
+            cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
+                 "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
+                 "leading-none h-8 box-border relative -top-px "
+                 "disabled:opacity-50 disabled:cursor-not-allowed"),
+            type="submit"))
+    save_selected_form = form(
+        action=SaveSelectedPivot(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('save'),
+        method='post',
+        hx_post=SaveSelectedPivot(
+            database_name=database_name,
+            table_name=table_name,
+            table_properties=table_properties,
+            render=False).url('save'),
+        hx_include="#pivot-saved-select",
+        hx_target="#flash_messages",
+        hx_swap="afterbegin",
+        hx_disabled_elt="button")
+    save_selected_button = button(
+        _('Save'),
+        cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
+             "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
+             "leading-none h-8 box-border relative -top-px "
+             "disabled:opacity-50 disabled:cursor-not-allowed"),
+        type="submit",
+        disabled=not has_saved_pivots,
+        title=_('Select a saved pivot to enable') if not has_saved_pivots else None)
+    save_selected_form.add(save_selected_button)
+    actions_div.add(
+        div(
+            save_selected_form,
+            button(_('Save as'),
+                cls=("inline-flex items-center rounded-md bg-white px-2 py-0 "
+                     "text-xs font-semibold text-gray-900 shadow-sm hover:bg-gray-50 "
+                     "leading-none h-8 box-border relative -top-px"),
+                type="button",
+                hx_get=PivotSaveModal(
+                    database_name=database_name,
+                    table_name=table_name,
+                    table_properties=table_properties,
+                    render=False).url('open'),
+                hx_target="#pivot-save-modal",
+                hx_swap="outerHTML"),
+            compute_form,
+            cls="inline-flex items-center gap-2"))
+    return actions_div
 
 
 class Site(metaclass=PoolMeta):
@@ -109,12 +393,32 @@ class Layout(Component):
                 comment('CSS')
                 style('.loading-indicator{visibility: hidden;}'
                     '.htmx-request .loading-indicator{visibility: visible; transition: opacity 200ms ease-in;}'
-                    '.htmx-request.loading-indicator{visibility: visible; transition: opacity 200ms ease-in;}')
+                    '.htmx-request.loading-indicator{visibility: visible; transition: opacity 200ms ease-in;}'
+                    '.pivot-table{border-collapse: separate; border-spacing: 0;}'
+                    '.pivot-header-cell{white-space: nowrap;}'
+                    '.pivot-header-empty{padding-left:0.15rem !important; padding-right:0.15rem !important;'
+                    'width:0.5rem; min-width:0.5rem; max-width:0.5rem;}'
+                    '.pivot-row-level-1{padding-left:0.25rem !important;}'
+                    '.pivot-title-toggle{display:none;}'
+                    '.pivot-title-input{display:none;}'
+                    '.pivot-title-toggle:checked ~ .pivot-title-input{display:inline-flex;}'
+                    '.pivot-title-toggle:checked ~ .pivot-title-display{display:none;}'
+                    '.pivot-sidebar-toggle{display:none;}'
+                    '.pivot-sidebar-toggle:checked ~ #main #pivot-shell #pivot-sidebar{display:none;}'
+                    '.pivot-sidebar-toggle:checked ~ #main #pivot-shell .pivot-sidebar-toggle-hide{display:none;}'
+                    '.pivot-sidebar-toggle:checked ~ #main #pivot-shell .pivot-sidebar-toggle-show{display:inline;}'
+                    '.pivot-sidebar-toggle-show{display:none;}'
+                    '@keyframes pivotFlashFade{to{opacity:0;}}'
+                    '.pivot-flash{animation:pivotFlashFade 0.4s ease-in 9.6s forwards;}')
                 script(src='https://unpkg.com/htmx.org@2.0.0')
                 script(src="https://cdn.tailwindcss.com")
+            input_(
+                type="checkbox",
+                id="pivot-sidebar-toggle",
+                cls="pivot-sidebar-toggle")
             main_body = div(id='main', cls='bg-white')
             flash_div = div(id='flash_messages',
-                cls="flex w-full flex-col items-center space-y-4 sm:items-end")
+                cls="flex w-full flex-col items-center space-y-4")
             flash_div['hx-swap-oob'] = "afterbegin"
             main_body += flash_div
             main_body += self.main
@@ -129,13 +433,15 @@ class Index(Component):
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
+    name = fields.Char('Name')
+    overwrite = fields.Char('Overwrite')
 
     @classmethod
     def get_url_map(cls):
         #TODO: we need to hande multiple URLs with the same endpoint
         return [
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>', endpoint='render_null'),
-            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>'),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>', endpoint='render_null', methods=['GET']),
+            Rule('/<string:database_name>/babi/pivot/<string:table_name>/<string:table_properties>', methods=['GET']),
         ]
 
     # Temporal solution to have differents urls with the same endpoint
@@ -202,88 +508,453 @@ class Index(Component):
         cube.table = table.name
         cube.rows, cube.columns = cube.columns, cube.rows
         inverted_table_properties = cube.encode_properties()
+        current_props = None
+        if self.table_properties != 'null':
+            current_cube = Cube.parse_properties(
+                self.table_properties, table.name)
+            # Ignore expansions when matching against saved pivots.
+            current_cube.row_expansions = []
+            current_cube.column_expansions = []
+            current_props = current_cube.encode_properties()
 
-        with main() as index_section:
-            with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
-                with div(cls="col-span-2"):
-                    span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
-                    # TODO: Those timestamps are not exactly right because a
-                    # table may depend on other tables so even if this table
-                    # has been recently computed it may depend on old data.
-                    # Even if that seems correct (the table does not currently
-                    # depend on other tables) it may happen that the table did
-                    # depend on other tables when it was computed for the last
-                    # time and at that moment those other tables where not up
-                    # to date.
-                    # All of this is solvable but requires more infrastructure,
-                    # that should probably be implemented in the babi.table
-                    # model.
-                    if table.type in ('model', 'table'):
-                        if table.calculation_date:
+        if not current_props:
+            default_pivot = None
+            for pivot in sorted([p for p in table.pivots if p.active],
+                    key=lambda p: (p.name or '').lower()):
+                if pivot.url:
+                    default_pivot = pivot
+                    break
+            if default_pivot:
+                return redirect(default_pivot.url)
 
-                            timestamp = _('data from %s') % datetime_to_company_tz(table.calculation_date)
-                        else:
-                            timestamp = _('not calculated yet')
+        with main(id="pivot-shell", cls="min-h-screen pivot-shell") as index_section:
+            with div(cls="flex gap-4 items-stretch"):
+                with div(id="pivot-sidebar", cls="relative shrink-0 h-screen min-w-[220px] max-w-[60vw]", style="resize: horizontal; overflow: hidden;"):
+                    div(cls="absolute right-0 top-0 h-full w-2 cursor-col-resize")
+                    div(cls="absolute right-0 top-0 h-full w-px bg-gray-300 pointer-events-none")
+                    with div(cls="border border-gray-200 rounded-lg bg-white p-3 h-full flex flex-col"):
+                        with div(cls="flex-1 overflow-y-auto pr-1"):
+                            with ul(cls="space-y-1 text-sm"):
+                                rendered_any = False
+                                tables = BabiTable.search([('parameters', '=', None)],
+                                    order=[('name', 'ASC')])
+                                for table_ in tables:
+                                    if not table_.check_access():
+                                        continue
+                                    url = table_.pivot_table
+                                    if table_.filter and table_.filter.parameters:
+                                        last_tables = BabiTable.search([
+                                                ('filter', '=', table_.filter.id),
+                                                ('parameters', '!=', None),
+                                                ('calculation_date', '!=', None),
+                                                ], order=[('calculation_date', 'DESC')], limit=1)
+                                        if not last_tables:
+                                            last_tables = BabiTable.search([
+                                                    ('filter', '=', table_.filter.id),
+                                                    ('parameters', '!=', None),
+                                                    ], order=[('create_date', 'DESC')], limit=1)
+                                        if last_tables and last_tables[0].check_access():
+                                            pivots = [p for p in table_.pivots if p.active]
+                                            if pivots:
+                                                pivot_cube = pivots[0].get_cube()
+                                                if pivot_cube:
+                                                    properties = pivot_cube.encode_properties()
+                                                    url = last_tables[0].pivot_table.replace('/null', f'/{properties}')
+                                    if not url:
+                                        continue
+                                    rendered_any = True
+                                    table_label = table_.name or table_.internal_name
+                                    item_cls = ("block rounded px-2 py-1 text-gray-700 "
+                                        "hover:bg-gray-100 hover:border-blue-300 "
+                                        "border-l-4 border-transparent")
+                                    a(p(table_label, cls="truncate"),
+                                        href=url,
+                                        cls=item_cls)
+                                if not rendered_any:
+                                    p(_('No tables'),
+                                        cls="text-xs text-gray-500")
+                with div(cls="flex-1 min-w-0"):
+                    with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 flex items-center justify-between gap-4"):
+                        with div(cls="flex items-center gap-2"):
+                            title_value = table.name
+                            if self.table_properties != 'null':
+                                cube.table = table.name
+                                target_props = cube.encode_properties()
+                                for existing in table.pivots:
+                                    existing_cube = existing.get_cube()
+                                    if not existing_cube:
+                                        continue
+                                    if existing_cube.encode_properties() == target_props:
+                                        title_value = existing.name or table.name
+                                        break
+                            div(cls="inline-flex items-center").add(
+                                build_pivot_title(
+                                    self.database_name,
+                                    self.table_name,
+                                    self.table_properties,
+                                    title_value))
+                            # TODO: Those timestamps are not exactly right because a
+                            # table may depend on other tables so even if this table
+                            # has been recently computed it may depend on old data.
+                            # Even if that seems correct (the table does not currently
+                            # depend on other tables) it may happen that the table did
+                            # depend on other tables when it was computed for the last
+                            # time and at that moment those other tables where not up
+                            # to date.
+                            # All of this is solvable but requires more infrastructure,
+                            # that should probably be implemented in the babi.table
+                            # model.
+                            if table.type in ('model', 'table'):
+                                if table.calculation_date:
+
+                                    timestamp = _('data from %s') % datetime_to_company_tz(table.calculation_date)
+                                else:
+                                    timestamp = _('not calculated yet')
+                            else:
+                                timestamp = _('current data')
+                            timestamp = f'({timestamp})'
+                            # Use a smaller text
+                            header_actions = div(cls="inline-flex items-center")
+                            header_actions.add(span(timestamp, cls="text-sm text-gray-500"))
+                            div(cls="inline-flex items-center").add(header_actions)
+                        with div(cls="flex items-center gap-2"):
+                            label(
+                                span(_('Hide sidebar'), cls="pivot-sidebar-toggle-hide"),
+                                span(_('Show sidebar'), cls="pivot-sidebar-toggle-show"),
+                                **{'for': 'pivot-sidebar-toggle'},
+                                cls=("rounded border border-gray-300 px-2 py-1 "
+                                     "text-xs text-gray-700 hover:bg-gray-50 cursor-pointer"))
+                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
+                                cls="p-1").add(SWAP_AXIS)
+                            a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
+                                cls="p-1").add(RELOAD)
+
+                    div(id="pivot-save-modal")
+
+                    base_table = table
+                    if table.base_table and table.base_table.check_access():
+                        base_table = table.base_table
+                    elif table.parameters and table.filter:
+                        base_tables = BabiTable.search([
+                                ('filter', '=', table.filter.id),
+                                ('parameters', '=', None),
+                                ], limit=1)
+                        if base_tables and base_tables[0].check_access():
+                            base_table = base_tables[0]
+
+                    saved_pivots = [p for p in base_table.pivots if p.active]
+                    saved_pivots.sort(key=lambda p: (p.name or '').lower())
+                    has_saved_pivots = bool(saved_pivots)
+                    selected_pivot_id = None
+                    cookie_pivot_id = None
+                    voyager_context = Transaction().context.get('voyager_context')
+                    request = getattr(voyager_context, 'request', None)
+                    if request:
+                        cookie_key = f'babi_pivot_selected_{base_table.id}'
+                        cookie_value = request.cookies.get(cookie_key)
+                        if cookie_value and cookie_value.isdigit():
+                            cookie_pivot_id = int(cookie_value)
+                    if cookie_pivot_id:
+                        for pivot in saved_pivots:
+                            if pivot.id == cookie_pivot_id:
+                                selected_pivot_id = pivot.id
+                                break
+
+                    params = []
+                    param_table = table
+                    if table.base_table and table.base_table.check_access():
+                        param_table = table.base_table
+                    if param_table.query_parameters:
+                        TableParameter = pool.get('babi.table.parameter')
+                        params = TableParameter.search([('table', '=', param_table.id)])
+                    elif table.parameters and table.type in ('table', 'view'):
+                        TableParameter = pool.get('babi.table.parameter')
+                        base_tables = BabiTable.search([
+                                ('query', '=', table.query),
+                                ('type', '=', table.type),
+                                ('parameters', '=', None),
+                                ('active', '=', True),
+                                ], limit=1)
+                        if base_tables and base_tables[0].query_parameters:
+                            params = TableParameter.search([('table', '=', base_tables[0].id)])
+                    elif param_table.filter and param_table.filter.parameters:
+                        Parameter = pool.get('babi.filter.parameter')
+                        params = Parameter.search([('filter', '=', param_table.filter.id)])
+                    if params:
+                        compute_action = ParametrizePivotTable(
+                            database_name=self.database_name,
+                            table_name=self.table_name,
+                            table_properties=self.table_properties,
+                            render=False).url('apply')
+                        with div(cls="mx-4 mt-3"):
+                            label(_('Parameters'),
+                                cls="block text-xs font-semibold text-gray-700 mb-2")
+                            with form(
+                                    action=compute_action,
+                                    method="post",
+                                    hx_post=compute_action,
+                                    hx_swap="none",
+                                    hx_disabled_elt="button",
+                                    cls="rounded-lg border border-gray-200 bg-gray-50 p-3"):
+                                with div(id="pivot-params",
+                                        cls="grid grid-cols-1 gap-3 sm:grid-cols-2"):
+                                    for param in params:
+                                        value = None
+                                        if table.parameters:
+                                            value = table.parameters.get(param.name)
+                                        value = format_param_value(param.ttype, value)
+                                        type_label = get_param_type_label(param.ttype)
+                                        with div(cls=("flex flex-col gap-1 rounded-md "
+                                                     "border border-gray-200 bg-white px-3 py-2 "
+                                                     "shadow-sm")):
+                                            label(f"{param.name} ({type_label})",
+                                                cls="text-[11px] uppercase tracking-wide text-gray-500")
+                                            if param.ttype == 'boolean':
+                                                input_(
+                                                    type="checkbox",
+                                                    name=f'param_{param.id}',
+                                                    value="1",
+                                                    checked=bool(value),
+                                                    required=True,
+                                                    cls="h-4 w-4")
+                                            else:
+                                                options = fetch_param_options(table, param)
+                                                input_type = "text"
+                                                if param.ttype in ('integer', 'many2one', 'float', 'numeric'):
+                                                    input_type = "number"
+                                                elif param.ttype == 'date':
+                                                    input_type = "date"
+                                                elif param.ttype == 'datetime':
+                                                    input_type = "datetime-local"
+                                                elif param.ttype == 'time':
+                                                    input_type = "time"
+                                                if options:
+                                                    select(
+                                                        *[
+                                                            option(
+                                                                str(label),
+                                                                value=str(option_value),
+                                                                selected=(value is not None and str(option_value) == str(value)))
+                                                            for option_value, label in options
+                                                        ],
+                                                        name=f'param_{param.id}',
+                                                        required=True,
+                                                        cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                             "py-1 text-xs text-gray-900"))
+                                                else:
+                                                    input_(
+                                                        type=input_type,
+                                                        name=f'param_{param.id}',
+                                                        value='' if value is None else value,
+                                                        required=True,
+                                                        cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                             "py-1 text-xs text-gray-900"))
+                                with div(cls="mt-3 flex items-center gap-2"):
+                                    button(_('Apply'),
+                                        type="submit",
+                                        cls=("rounded-md bg-blue-600 px-3 py-1.5 text-xs "
+                                             "font-semibold text-white shadow hover:bg-blue-500"))
+                                    button(_('Reset'),
+                                        type="reset",
+                                        cls=("rounded-md border border-gray-300 bg-white px-3 "
+                                             "py-1.5 text-xs font-semibold text-gray-700 "
+                                             "hover:bg-gray-50"))
+
+                    field_labels = dict((x.internal_name, x.name) for x in table.fields_)
+                    field_types = dict((x.internal_name, x.type or 'char') for x in table.fields_)
+                    field_related_models = {}
+                    for field in table.fields_:
+                        related_model = None
+                        if field.expression and field.expression.related_model:
+                            related_model = field.expression.related_model.model
+                        field_related_models[field.internal_name] = related_model
+
+                    if self.table_properties == 'null':
+                        slicer_cube = Cube(table=table.name)
                     else:
-                        timestamp = _('current data')
-                    timestamp = f'({timestamp})'
-                    # Use a smaller text
-                    span(timestamp, cls="text-sm text-gray-500 ml-2")
-                # Each button is a 36px width
-                # Invert axis button
-                with div(cls="col-span-1"):
-                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties=inverted_table_properties, render=False).url(),
-                        cls="absolute right-12").add(SWAP_AXIS)
-                # Empty cube properties
-                with div(cls="col-span-1"):
-                    a(href=Index(database_name=self.database_name, table_name=self.table_name, table_properties='null', render=False).url(),
-                        cls="absolute right-3").add(RELOAD)
-
-            # Details always opened by default
-            with details(cls="m-2", open=True):
-                summary(cls="text-sm font-semibold text-gray-900").add(_('Configuration'))
-                with div(cls="grid grid-cols-12 px-2"):
-                    PivotHeaderAxis(database_name=self.database_name,
-                        table_name=self.table_name, axis='x',
-                        table_properties=self.table_properties)
-                    PivotHeaderAxis(database_name=self.database_name,
-                        table_name=self.table_name, axis='y',
-                        table_properties=self.table_properties)
-                    PivotHeaderMeasure(database_name=self.database_name,
-                        table_name=self.table_name,
-                        table_properties=self.table_properties)
-                    PivotHeaderAxis(database_name=self.database_name,
-                        table_name=self.table_name, axis='property',
-                        table_properties=self.table_properties)
-                    PivotHeaderOrder(database_name=self.database_name,
-                        table_name=self.table_name,
-                        table_properties=self.table_properties)
-
-            with div(cls="mt-8 flow-root"):
-                with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                    if show_error == True:
-                        div(cls="text-center").add(p(_('You need to select at least one measure and one row or one column to show the table.'), cls="mt-1 text-sm text-gray-500"))
-                    else:
+                        slicer_cube = Cube.parse_properties(
+                            self.table_properties, table.name)
+                    if not hasattr(slicer_cube, 'filters'):
+                        slicer_cube.filters = []
+                    slicer_fields = []
+                    for field in (slicer_cube.rows + slicer_cube.columns
+                            + slicer_cube.properties):
+                        if field not in slicer_fields:
+                            slicer_fields.append(field)
+                    if slicer_fields:
                         try:
-                            PivotTable(database_name=self.database_name, table_name=self.table_name,
+                            PivotSlicerApply = pool.get('www.pivot_slicer_apply')
+                        except Exception:
+                            PivotSlicerApply = None
+                        if PivotSlicerApply:
+                            slicer_action = PivotSlicerApply(
+                                database_name=self.database_name,
+                                table_name=self.table_name,
+                                table_properties=self.table_properties,
+                                render=False).url('apply')
+                        else:
+                            slicer_action = None
+                        filters_by_field = {}
+                        for field, op, value in slicer_cube.filters:
+                            filters_by_field[field] = (op, value)
+                        if slicer_action:
+                            with div(cls="mx-4 mt-3"):
+                                label(_('Slicers'),
+                                    cls="block text-xs font-semibold text-gray-700 mb-2")
+                                with form(
+                                        action=slicer_action,
+                                        method="post",
+                                        hx_post=slicer_action,
+                                        hx_swap="none",
+                                        hx_disabled_elt="button",
+                                        cls="rounded-lg border border-gray-200 bg-white p-3"):
+                                    with div(cls="grid grid-cols-1 gap-3 sm:grid-cols-2"):
+                                        for field in slicer_fields:
+                                            ftype = field_types.get(field, 'char')
+                                            field_label = capitalize(
+                                                field_labels.get(field, field))
+                                            current_filter = filters_by_field.get(field)
+                                            selected_values = []
+                                            range_start = ''
+                                            range_end = ''
+                                            if current_filter:
+                                                op, value = current_filter
+                                                if op == 'in':
+                                                    selected_values = [str(v) for v in (value or [])]
+                                                elif op == 'between' and value:
+                                                    range_start = value[0] or ''
+                                                    range_end = value[1] or ''
+                                            with div(cls=("flex flex-col gap-1 rounded-md "
+                                                         "border border-gray-200 bg-gray-50 px-3 py-2")):
+                                                label(field_label,
+                                                    cls="text-[11px] uppercase tracking-wide text-gray-500")
+                                                if ftype in ('date', 'datetime'):
+                                                    with div(cls="flex items-center gap-2"):
+                                                        input_(
+                                                            type="date",
+                                                            name=f'slicer_{field}_from',
+                                                            value=range_start,
+                                                            cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                                 "py-1 text-xs text-gray-900"))
+                                                        input_(
+                                                            type="date",
+                                                            name=f'slicer_{field}_to',
+                                                            value=range_end,
+                                                            cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                                 "py-1 text-xs text-gray-900"))
+                                                else:
+                                                    options = fetch_field_options(
+                                                        table, field,
+                                                        field_related_models.get(field))
+                                                    select(
+                                                        *[
+                                                            option(
+                                                                str(label),
+                                                                value=str(option_value),
+                                                                selected=str(option_value) in selected_values)
+                                                            for option_value, label in options
+                                                        ],
+                                                        name=f'slicer_{field}',
+                                                        multiple=True,
+                                                        cls=("w-full rounded-md border border-gray-300 px-2 "
+                                                             "py-1 text-xs text-gray-900"))
+                                    with div(cls="mt-3 flex items-center gap-2"):
+                                        button(_('Apply slicers'),
+                                            type="submit",
+                                            cls=("rounded-md bg-blue-600 px-3 py-1.5 text-xs "
+                                                 "font-semibold text-white shadow hover:bg-blue-500"))
+                                        button(_('Clear'),
+                                            type="submit",
+                                            name="slicer_clear",
+                                            value="1",
+                                            cls=("rounded-md border border-gray-300 bg-white px-3 "
+                                                 "py-1.5 text-xs font-semibold text-gray-700 "
+                                                 "hover:bg-gray-50"))
+
+                    if saved_pivots:
+                        with div(cls="mx-4 mt-3"):
+                            label(_('Saved pivots'),
+                                cls="block text-xs font-semibold text-gray-700 mb-1")
+                            select(
+                                option(
+                                    _('Custom'),
+                                    value='',
+                                    selected=(selected_pivot_id is None)),
+                                *[
+                                    option(
+                                        pivot.name or pivot.table.name,
+                                        value=str(pivot.id),
+                                        selected=(pivot.id == selected_pivot_id))
+                                    for pivot in saved_pivots
+                                ],
+                                id="pivot-saved-select",
+                                name="pivot_id",
+                                cls=("w-full rounded-md border border-gray-300 px-2 py-1 "
+                                     "text-xs text-gray-900"),
+                                hx_post=PivotSelectRedirect(
+                                    database_name=self.database_name,
+                                    table_name=self.table_name,
+                                    render=False).url('go'),
+                                hx_trigger="change",
+                                hx_target="this",
+                                hx_swap="none")
+
+                    # Details always opened by default
+                    with details(cls="m-2", open=True):
+                        summary(cls="text-sm font-semibold text-gray-900").add(_('Configuration'))
+                        with div(cls="grid grid-cols-12 px-2"):
+                            PivotHeaderAxis(database_name=self.database_name,
+                                table_name=self.table_name, axis='x',
                                 table_properties=self.table_properties)
-                        except UndefinedTable:
-                            div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
-                        except Exception as e:
-                            div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
-                            print_trace = True
-                            if 'function avg(' in str(e):
-                                div(cls="text-center").add(_("HINT: You are trying to make average of a text type field, please try with a numeric type field or change the operation."))
-                                print_trace = False
-                            if 'function sum(' in str(e):
-                                div(cls="text-center").add(_("HINT: You are trying to sum a text type field, please try with a numeric type field or change the operation."))
-                                print_trace = False
-                            with details() as traceback_details:
-                                summary(_('Show more details'))
-                                p(pre(str(e)))
-                            div(cls="text-center").add(traceback_details)
-                            if print_trace:
-                                logger.exception(e)
+                            PivotHeaderAxis(database_name=self.database_name,
+                                table_name=self.table_name, axis='y',
+                                table_properties=self.table_properties)
+                            PivotHeaderMeasure(database_name=self.database_name,
+                                table_name=self.table_name,
+                                table_properties=self.table_properties)
+                            PivotHeaderAxis(database_name=self.database_name,
+                                table_name=self.table_name, axis='property',
+                                table_properties=self.table_properties)
+                            PivotHeaderOrder(database_name=self.database_name,
+                                table_name=self.table_name,
+                                table_properties=self.table_properties)
+
+                    with div(cls="mt-8 flow-root"):
+                        with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                            if show_error == True:
+                                actions_div = build_pivot_actions(
+                                    self.database_name,
+                                    self.table_name,
+                                    self.table_properties,
+                                    table,
+                                    has_saved_pivots)
+                                actions_div.add(
+                                    div(
+                                        p(_('You need to select at least one measure and one row or one column to show the table.'),
+                                            cls="mt-2 text-sm text-gray-500 text-center"),
+                                        cls="px-6 pb-3"))
+                                div(actions_div)
+                            else:
+                                try:
+                                    PivotTable(database_name=self.database_name, table_name=self.table_name,
+                                        table_properties=self.table_properties)
+                                except UndefinedTable:
+                                    div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
+                                except Exception as e:
+                                    div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
+                                    print_trace = True
+                                    if 'function avg(' in str(e):
+                                        div(cls="text-center").add(_("HINT: You are trying to make average of a text type field, please try with a numeric type field or change the operation."))
+                                        print_trace = False
+                                    if 'function sum(' in str(e):
+                                        div(cls="text-center").add(_("HINT: You are trying to sum a text type field, please try with a numeric type field or change the operation."))
+                                        print_trace = False
+                                    with details() as traceback_details:
+                                        summary(_('Show more details'))
+                                        p(pre(str(e)))
+                                    div(cls="text-center").add(traceback_details)
+                                    if print_trace:
+                                        logger.exception(e)
 
         layout = Layout(title=f'{table.name} | Tryton')
         layout.main.add(index_section)
@@ -817,7 +1488,6 @@ class PivotTable(Component):
     def render(self):
         pool = Pool()
         # Component
-        DownloadReport = pool.get('www.download_report')
         Language = pool.get('ir.lang')
         Table = pool.get('babi.table')
 
@@ -827,53 +1497,34 @@ class PivotTable(Component):
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
 
-        download = a(DOWNLOAD, cls="inline-block p-2", href=DownloadReport(
-                database_name=self.database_name, table_name=self.table_name,
-                table_properties=self.table_properties, render=False).url('download'))
+        base_table = btable
+        if btable.base_table and btable.base_table.check_access():
+            base_table = btable.base_table
+        elif btable.parameters and btable.filter:
+            base_tables = Table.search([
+                    ('filter', '=', btable.filter.id),
+                    ('parameters', '=', None),
+                    ], limit=1)
+            if base_tables and base_tables[0].check_access():
+                base_table = base_tables[0]
+        saved_pivots = [p for p in base_table.pivots if p.active]
+        has_saved_pivots = bool(saved_pivots)
+        actions_div = build_pivot_actions(
+            self.database_name,
+            self.table_name,
+            self.table_properties,
+            btable,
+            has_saved_pivots)
 
-        cube = Cube.parse_properties(self.table_properties, self.table_name)
+        if self.table_properties == 'null':
+            cube = Cube(table=self.table_name)
+        else:
+            cube = Cube.parse_properties(self.table_properties, self.table_name)
 
-        # Prepare the cube properties for the expand all cube function
-        cube.table = self.table_name
-        cube.row_expansions = Cube.EXPAND_ALL
-        cube.column_expansions = Cube.EXPAND_ALL
-        expanded_table_properties = cube.encode_properties()
-
-        # Prepare the cube properties for the collapse all cube function
-        cube.table = self.table_name
-        cube.row_expansions = []
-        cube.column_expansions = []
-        collapsed_table_properties = cube.encode_properties()
-
-        cube = Cube.parse_properties(self.table_properties, self.table_name)
-
-        css = 'text-gray-300'
-        if cube.row_expansions != Cube.EXPAND_ALL or cube.column_expansions != Cube.EXPAND_ALL:
-            css = 'text-black'
-        expand_all = a(cls="inline-block p-2 " + css, href=Index(database_name=self.database_name, table_name=self.table_name,
-                table_properties=expanded_table_properties, render=False).url())
-        expand_all.add(EXPAND_ALL)
-        css = 'text-gray-300'
-        if cube.row_expansions != [] or cube.column_expansions != []:
-            css = 'text-black'
-        collapse_all = a(cls="inline-block p-2 " + css, href=Index(database_name=self.database_name, table_name=self.table_name,
-                table_properties=collapsed_table_properties, render=False).url())
-        collapse_all.add(COLLAPSE_ALL)
-
-        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
+        pivot_table = table(cls="pivot-table table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
         for row in cube.build():
             pivot_row = tr(cls="hover:bg-gray-50 transition-colors")
             for cell in row:
-                if download:
-                    # Paint the download button in the first cell
-                    first_cell = td(cls="flex items-center gap-2 text-xs text-black px-6 py-1.5 bg-blue-300")
-                    first_cell.add(expand_all)
-                    first_cell.add(collapse_all)
-                    first_cell.add(download)
-                    pivot_row.add(first_cell)
-                    download = None
-                    continue
-
                 # Handle the headers links
                 if (cell.type == CellType.ROW_HEADER or
                         cell.type == CellType.COLUMN_HEADER):
@@ -935,7 +1586,14 @@ class PivotTable(Component):
                             hx_trigger="click", hx_swap="outerHTML",
                             hx_indicator="#loading-state")
 
-                    pivot_row.add(td(cell_value, cls="text-xs bg-blue-300 text-black px-2 py-1 border-b-0.5 border-black", style="white-space: nowrap"))
+                    header_cls = "pivot-header-cell text-xs bg-blue-300 text-black px-2 py-1 border-b-0.5 border-black"
+                    if (cell.type == CellType.ROW_HEADER and cell.value
+                            and isinstance(cell.row_expansion, tuple)
+                            and len(cell.row_expansion) == 1):
+                        header_cls += " pivot-row-level-1"
+                    if cell.value in (None, ''):
+                        header_cls += " pivot-header-empty"
+                    pivot_row.add(td(cell_value, cls=header_cls, style="white-space: nowrap"))
 
                 else:
                     pivot_row.add(td(cell.formatted(language), cls="border-b text-black bg-blue-50 border-gray-200 px-2 py-1 text-right", style="white-space: nowrap"))
@@ -949,6 +1607,7 @@ class PivotTable(Component):
 
         pivot_div = div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 relative max-w-sm")
         pivot_div.add(loading_div)
+        pivot_div.add(actions_div)
         pivot_div.add(pivot_table)
         return pivot_div
 
@@ -988,3 +1647,862 @@ class DownloadReport(Component):
         response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         return response
+
+
+class SavePivot(Component):
+    'Save Pivot Configuration'
+    __name__ = 'www.save_pivot'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    name = fields.Char('Name')
+    overwrite = fields.Boolean('Overwrite')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/save/<string:table_name>/<string:table_properties>', endpoint="save"),
+        ]
+
+    def save(self):
+        if self.table_properties == 'null':
+            return redirect(Index(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=self.table_properties,
+                    render=False).url())
+
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+        RowDimension = pool.get('babi.pivot.row_dimension')
+        ColumnDimension = pool.get('babi.pivot.column_dimension')
+        Measure = pool.get('babi.pivot.measure')
+        Property = pool.get('babi.pivot.property')
+        Order = pool.get('babi.pivot.order')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([('internal_name', '=', table_name)], limit=1)
+        if not tables:
+            return redirect(Index(database_name=self.database_name,
+                    table_name=self.table_name,
+                    table_properties=self.table_properties,
+                    render=False).url())
+        table, = tables
+
+        if not self.name or not self.name.strip():
+            notice = div(
+                _('Please provide a title before saving.'),
+                span(
+                    '',
+                    hx_get=FlashClear(render=False).url('clear'),
+                    hx_trigger='load delay:10s',
+                    hx_target='closest .pivot-flash',
+                    hx_swap='outerHTML'),
+                cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                    "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+            return Response(str(notice), content_type='text/html')
+
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+
+        def create_pivot_for(target_table):
+            field_by_name = {field.internal_name: field
+                for field in target_table.fields_}
+            pivot_vals = {'table': target_table.id,
+                'name': self.name.strip()}
+            pivot, = Pivot.create([pivot_vals])
+
+            row_values = []
+            for sequence, field in enumerate(cube.rows, start=1):
+                field_rec = field_by_name.get(field)
+                if field_rec:
+                    row_values.append({
+                        'pivot': pivot.id,
+                        'field': field_rec.id,
+                        'sequence': sequence,
+                        })
+            row_dimensions = RowDimension.create(row_values) if row_values else []
+
+            col_values = []
+            for sequence, field in enumerate(cube.columns, start=1):
+                field_rec = field_by_name.get(field)
+                if field_rec:
+                    col_values.append({
+                        'pivot': pivot.id,
+                        'field': field_rec.id,
+                        'sequence': sequence,
+                        })
+            column_dimensions = ColumnDimension.create(col_values) if col_values else []
+
+            measure_values = []
+            for sequence, (field, aggregate) in enumerate(cube.measures, start=1):
+                field_rec = field_by_name.get(field)
+                if field_rec:
+                    measure_values.append({
+                        'pivot': pivot.id,
+                        'field': field_rec.id,
+                        'aggregate': aggregate,
+                        'sequence': sequence,
+                        })
+            measures = Measure.create(measure_values) if measure_values else []
+
+            property_values = []
+            for sequence, field in enumerate(cube.properties, start=1):
+                field_rec = field_by_name.get(field)
+                if field_rec:
+                    property_values.append({
+                        'pivot': pivot.id,
+                        'field': field_rec.id,
+                        'sequence': sequence,
+                        })
+            properties = Property.create(property_values) if property_values else []
+
+            row_map = {item.field.internal_name: item for item in row_dimensions}
+            col_map = {item.field.internal_name: item for item in column_dimensions}
+            measure_map = {(item.field.internal_name, item.aggregate): item
+                for item in measures}
+            property_map = {item.field.internal_name: item for item in properties}
+
+            order_values = []
+            for sequence, item in enumerate(cube.order, start=1):
+                element = None
+                field = item[0]
+                if isinstance(field, tuple):
+                    element = measure_map.get((field[0], field[1]))
+                else:
+                    element = (row_map.get(field) or col_map.get(field)
+                        or property_map.get(field))
+                if element:
+                    order_values.append({
+                        'pivot': pivot.id,
+                        'element': element,
+                        'order': item[1],
+                        'sequence': sequence,
+                        })
+            if order_values:
+                Order.create(order_values)
+            return pivot
+
+        pivot_table = table
+        if table.base_table and table.base_table.check_access():
+            pivot_table = table.base_table
+        elif table.parameters and table.filter:
+            base_tables = Table.search([
+                    ('filter', '=', table.filter.id),
+                    ('parameters', '=', None),
+                    ], limit=1)
+            if base_tables and base_tables[0].check_access():
+                pivot_table = base_tables[0]
+
+        base_pivot = create_pivot_for(pivot_table)
+        pivot = base_pivot
+        if pivot_table.filter and pivot_table.filter.parameters:
+            last_tables = Table.search([
+                    ('filter', '=', pivot_table.filter.id),
+                    ('parameters', '!=', None),
+                    ('calculation_date', '!=', None),
+                    ], order=[('calculation_date', 'DESC')], limit=1)
+            if not last_tables:
+                last_tables = Table.search([
+                        ('filter', '=', pivot_table.filter.id),
+                        ('parameters', '!=', None),
+                        ], order=[('create_date', 'DESC')], limit=1)
+            if last_tables and last_tables[0].check_access():
+                pivot = create_pivot_for(last_tables[0])
+
+        notice_text = _('Configuration saved.')
+        notice = div(
+            notice_text,
+            span(
+                '',
+                hx_get=FlashClear(render=False).url('clear'),
+                hx_trigger='load delay:10s',
+                hx_target='closest .pivot-flash',
+                hx_swap='outerHTML'),
+            cls="pivot-flash mx-4 mt-2 rounded-md border border-green-200 "
+                "bg-green-50 px-4 py-2 text-sm text-center text-green-800")
+        if pivot.url:
+            redirect_trigger = div(
+                '',
+                hx_get=PivotRedirect(
+                    database_name=self.database_name,
+                    pivot_id=pivot.id,
+                    render=False).url('go'),
+                hx_trigger="load delay:800ms",
+                hx_swap="none")
+        else:
+            redirect_trigger = ''
+        close_modal = div(id="pivot-save-modal", **{'hx-swap-oob': 'outerHTML'})
+        return Response(str(notice) + str(close_modal) + str(redirect_trigger),
+            content_type='text/html')
+
+    def render(self):
+        pass
+
+
+class SaveSelectedPivot(Component):
+    'Save Selected Pivot Configuration'
+    __name__ = 'www.save_selected_pivot'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    pivot_id = fields.Integer('Pivot')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/save_selected/<string:table_name>/<string:table_properties>', endpoint="save"),
+        ]
+
+    def save(self):
+        if self.table_properties == 'null':
+            notice = div(
+                _('Select a configuration before saving.'),
+                span(
+                    '',
+                    hx_get=FlashClear(render=False).url('clear'),
+                    hx_trigger='load delay:10s',
+                    hx_target='closest .pivot-flash',
+                    hx_swap='outerHTML'),
+                cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                    "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+            return Response(str(notice), content_type='text/html')
+
+        if not self.pivot_id:
+            notice = div(
+                _('Select a saved pivot before saving.'),
+                span(
+                    '',
+                    hx_get=FlashClear(render=False).url('clear'),
+                    hx_trigger='load delay:10s',
+                    hx_target='closest .pivot-flash',
+                    hx_swap='outerHTML'),
+                cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                    "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+            return Response(str(notice), content_type='text/html')
+
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+        RowDimension = pool.get('babi.pivot.row_dimension')
+        ColumnDimension = pool.get('babi.pivot.column_dimension')
+        Measure = pool.get('babi.pivot.measure')
+        Property = pool.get('babi.pivot.property')
+        Order = pool.get('babi.pivot.order')
+
+        pivots = Pivot.search([('id', '=', self.pivot_id)], limit=1)
+        if not pivots:
+            notice = div(
+                _('Saved pivot not found.'),
+                span(
+                    '',
+                    hx_get=FlashClear(render=False).url('clear'),
+                    hx_trigger='load delay:10s',
+                    hx_target='closest .pivot-flash',
+                    hx_swap='outerHTML'),
+                cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                    "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+            return Response(str(notice), content_type='text/html')
+        pivot, = pivots
+
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+
+        def apply_cube_to_pivot(target_pivot, cube):
+            target_table = target_pivot.table
+            field_by_name = {field.internal_name: field
+                for field in target_table.fields_}
+
+            if target_pivot.order:
+                Order.delete(target_pivot.order)
+            if target_pivot.row_dimensions:
+                RowDimension.delete(target_pivot.row_dimensions)
+            if target_pivot.column_dimensions:
+                ColumnDimension.delete(target_pivot.column_dimensions)
+            if target_pivot.measures:
+                Measure.delete(target_pivot.measures)
+            if target_pivot.properties:
+                Property.delete(target_pivot.properties)
+
+            row_values = []
+            for sequence, field in enumerate(cube.rows, start=1):
+                field_rec = field_by_name.get(field)
+                if field_rec:
+                    row_values.append({
+                        'pivot': target_pivot.id,
+                        'field': field_rec.id,
+                        'sequence': sequence,
+                        })
+            row_dimensions = RowDimension.create(row_values) if row_values else []
+
+            col_values = []
+            for sequence, field in enumerate(cube.columns, start=1):
+                field_rec = field_by_name.get(field)
+                if field_rec:
+                    col_values.append({
+                        'pivot': target_pivot.id,
+                        'field': field_rec.id,
+                        'sequence': sequence,
+                        })
+            column_dimensions = ColumnDimension.create(col_values) if col_values else []
+
+            measure_values = []
+            for sequence, (field, aggregate) in enumerate(cube.measures, start=1):
+                field_rec = field_by_name.get(field)
+                if field_rec:
+                    measure_values.append({
+                        'pivot': target_pivot.id,
+                        'field': field_rec.id,
+                        'aggregate': aggregate,
+                        'sequence': sequence,
+                        })
+            measures = Measure.create(measure_values) if measure_values else []
+
+            property_values = []
+            for sequence, field in enumerate(cube.properties, start=1):
+                field_rec = field_by_name.get(field)
+                if field_rec:
+                    property_values.append({
+                        'pivot': target_pivot.id,
+                        'field': field_rec.id,
+                        'sequence': sequence,
+                        })
+            properties = Property.create(property_values) if property_values else []
+
+            row_map = {item.field.internal_name: item for item in row_dimensions}
+            col_map = {item.field.internal_name: item for item in column_dimensions}
+            measure_map = {(item.field.internal_name, item.aggregate): item
+                for item in measures}
+            property_map = {item.field.internal_name: item for item in properties}
+
+            order_values = []
+            for sequence, item in enumerate(cube.order, start=1):
+                element = None
+                field = item[0]
+                if isinstance(field, tuple):
+                    element = measure_map.get((field[0], field[1]))
+                else:
+                    element = (row_map.get(field) or col_map.get(field)
+                        or property_map.get(field))
+                if element:
+                    order_values.append({
+                        'pivot': target_pivot.id,
+                        'element': element,
+                        'order': item[1],
+                        'sequence': sequence,
+                        })
+            if order_values:
+                Order.create(order_values)
+
+        apply_cube_to_pivot(pivot, cube)
+
+        if pivot.name and pivot.table.filter and pivot.table.filter.parameters:
+            last_tables = Table.search([
+                    ('filter', '=', pivot.table.filter.id),
+                    ('parameters', '!=', None),
+                    ('calculation_date', '!=', None),
+                    ], order=[('calculation_date', 'DESC')], limit=1)
+            if not last_tables:
+                last_tables = Table.search([
+                        ('filter', '=', pivot.table.filter.id),
+                        ('parameters', '!=', None),
+                        ], order=[('create_date', 'DESC')], limit=1)
+            if last_tables and last_tables[0].check_access():
+                target_table = last_tables[0]
+                target_pivots = Pivot.search([
+                        ('table', '=', target_table.id),
+                        ('name', '=', pivot.name),
+                        ], limit=1)
+                if target_pivots:
+                    target_pivot, = target_pivots
+                else:
+                    target_pivot, = Pivot.create([{
+                            'table': target_table.id,
+                            'name': pivot.name,
+                            }])
+                apply_cube_to_pivot(target_pivot, cube)
+
+        notice = div(
+            _('Configuration saved.'),
+            span(
+                '',
+                hx_get=FlashClear(render=False).url('clear'),
+                hx_trigger='load delay:10s',
+                hx_target='closest .pivot-flash',
+                hx_swap='outerHTML'),
+            cls="pivot-flash mx-4 mt-2 rounded-md border border-green-200 "
+                "bg-green-50 px-4 py-2 text-sm text-center text-green-800")
+        return Response(str(notice), content_type='text/html')
+
+    def render(self):
+        pass
+
+
+class PivotSaveModal(Component):
+    'Pivot Save Modal'
+    __name__ = 'www.pivot_save_modal'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/save_modal/<string:table_name>/<string:table_properties>', endpoint='open'),
+            Rule('/<string:database_name>/babi/pivot/save_modal/<string:table_name>/<string:table_properties>/close', endpoint='close'),
+        ]
+
+    def open(self):
+        modal = div(id="pivot-save-modal", cls="fixed inset-0 z-50")
+        modal.add(div(cls="fixed inset-0 bg-gray-500 bg-opacity-50"))
+        with div(cls="fixed inset-0 flex items-center justify-center p-4") as wrapper:
+            with div(cls="w-full max-w-sm rounded-lg bg-white p-4 shadow-lg") as card:
+                card.add(div(_('Save pivot'), cls="text-sm font-semibold text-gray-900 mb-2"))
+                save_modal_form = form(
+                    action=SavePivot(
+                        database_name=self.database_name,
+                        table_name=self.table_name,
+                        table_properties=self.table_properties,
+                        render=False).url('save'),
+                    method='post',
+                    hx_post=SavePivot(
+                        database_name=self.database_name,
+                        table_name=self.table_name,
+                        table_properties=self.table_properties,
+                        render=False).url('save'),
+                    hx_target="#flash_messages",
+                    hx_swap="afterbegin")
+                save_modal_form.add(input_(
+                    name="name",
+                    type="text",
+                    cls=("w-full rounded border border-gray-300 "
+                         "px-2 py-1 text-sm"),
+                    placeholder=_('Name')))
+                with div(cls="mt-3 flex justify-end gap-2"):
+                    save_modal_form.add(button(
+                        _('Cancel'),
+                        type="button",
+                        hx_get=PivotSaveModal(
+                            database_name=self.database_name,
+                            table_name=self.table_name,
+                            table_properties=self.table_properties,
+                            render=False).url('close'),
+                        hx_target="#pivot-save-modal",
+                        hx_swap="outerHTML",
+                        cls=("inline-flex items-center rounded-md "
+                             "bg-white px-2 py-1 text-xs font-semibold "
+                             "text-gray-700 shadow-sm hover:bg-gray-50")))
+                    save_modal_form.add(button(
+                        _('Save'),
+                        type="submit",
+                        cls=("inline-flex items-center rounded-md "
+                             "bg-white px-2 py-1 text-xs font-semibold "
+                             "text-gray-900 shadow-sm hover:bg-gray-50")))
+                card.add(save_modal_form)
+            wrapper.add(card)
+        modal.add(wrapper)
+        return modal
+
+    def close(self):
+        return div(id="pivot-save-modal")
+
+    def render(self):
+        pass
+
+
+class PivotRedirect(Component):
+    'Pivot Redirect'
+    __name__ = 'www.pivot_redirect'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    pivot_id = fields.Integer('Pivot')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/redirect/<int:pivot_id>', endpoint='go'),
+        ]
+
+    def go(self):
+        pool = Pool()
+        Pivot = pool.get('babi.pivot')
+        pivots = Pivot.search([('id', '=', self.pivot_id)], limit=1)
+        if not pivots:
+            return Response('', content_type='text/html')
+        pivot, = pivots
+        if not pivot.table or not pivot.table.check_access():
+            return Response('', content_type='text/html')
+        response = Response('', content_type='text/html')
+        if pivot.url:
+            response.headers['HX-Redirect'] = pivot.url
+        return response
+
+    def render(self):
+        pass
+
+
+class PivotSelectRedirect(Component):
+    'Pivot Select Redirect'
+    __name__ = 'www.pivot_select_redirect'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    pivot_id = fields.Integer('Pivot')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/select/pivot/<string:table_name>', endpoint='go',
+                methods=['GET', 'POST']),
+        ]
+
+    def go(self):
+        try:
+            pivot_id = self.pivot_id
+        except AttributeError:
+            pivot_id = None
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+        if not pivot_id:
+            response = Response('', content_type='text/html')
+            base_table = None
+            if self.table_name.startswith('__'):
+                table_name = self.table_name.split('__')[-1]
+            else:
+                table_name = self.table_name
+            tables = Table.search([('internal_name', '=', table_name)], limit=1)
+            if tables:
+                base_table = tables[0]
+                if base_table.base_table and base_table.base_table.check_access():
+                    base_table = base_table.base_table
+                elif base_table.parameters and base_table.filter:
+                    base_tables = Table.search([
+                            ('filter', '=', base_table.filter.id),
+                            ('parameters', '=', None),
+                            ], limit=1)
+                    if base_tables and base_tables[0].check_access():
+                        base_table = base_tables[0]
+            if base_table:
+                response.set_cookie(
+                    f'babi_pivot_selected_{base_table.id}',
+                    '',
+                    max_age=0)
+            return response
+        pivots = Pivot.search([('id', '=', pivot_id)], limit=1)
+        if not pivots:
+            return Response('', content_type='text/html')
+        pivot, = pivots
+        if not pivot.table or not pivot.table.check_access():
+            return Response('', content_type='text/html')
+        response = Response('', content_type='text/html')
+        cube = pivot.get_cube()
+        if not cube:
+            return response
+        table_properties = urllib.parse.unquote(cube.encode_properties())
+        base_table = pivot.table
+        if base_table.base_table and base_table.base_table.check_access():
+            base_table = base_table.base_table
+        elif base_table.parameters and base_table.filter:
+            base_tables = Table.search([
+                    ('filter', '=', base_table.filter.id),
+                    ('parameters', '=', None),
+                    ], limit=1)
+            if base_tables and base_tables[0].check_access():
+                base_table = base_tables[0]
+        response.set_cookie(
+            f'babi_pivot_selected_{base_table.id}',
+            str(pivot.id))
+        response.headers['HX-Redirect'] = Index(
+            database_name=self.database_name,
+            table_name=self.table_name,
+            table_properties=table_properties,
+            render=False).url()
+        return response
+
+    def render(self):
+        pass
+
+
+class ParametrizePivotTable(Component):
+    'Parametrize Pivot Table'
+    __name__ = 'www.parametrize_pivot_table'
+    _path = None
+    __slots__ = ('_param_values',)
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+
+    def __init__(self, *args, **kwargs):
+        param_values = {}
+        for key in list(kwargs.keys()):
+            if key.startswith('param_'):
+                param_values[key] = kwargs.pop(key)
+        super().__init__(*args, **kwargs)
+        object.__setattr__(self, '_param_values', param_values)
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/params/<string:table_name>/<string:table_properties>', endpoint='apply'),
+        ]
+
+    def _coerce_value(self, param, value):
+        if value is None or value == '':
+            return None
+        if param.ttype in ('integer', 'many2one'):
+            return int(value)
+        if param.ttype in ('float', 'numeric'):
+            return float(value)
+        if param.ttype == 'boolean':
+            return str(value).lower() in ('1', 'true', 'yes', 'on')
+        return value
+
+    def apply(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        FilterParameter = pool.get('babi.filter.parameter')
+        TableParameter = pool.get('babi.table.parameter')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([('internal_name', '=', table_name)], limit=1)
+        if not tables:
+            return Response('', content_type='text/html')
+        table, = tables
+        if not table.check_access():
+            return Response('', content_type='text/html')
+        param_table = table
+        if table.base_table and table.base_table.check_access():
+            param_table = table.base_table
+        use_query_params = bool(param_table.query_parameters)
+        if not use_query_params and table.parameters and table.type in ('table', 'view'):
+            base_tables = Table.search([
+                    ('query', '=', table.query),
+                    ('type', '=', table.type),
+                    ('parameters', '=', None),
+                    ('active', '=', True),
+                    ], limit=1)
+            if base_tables and base_tables[0].query_parameters:
+                param_table = base_tables[0]
+                use_query_params = True
+        if not use_query_params and not (param_table.filter and param_table.filter.parameters):
+            return Response('', content_type='text/html')
+
+        params = {}
+        missing = []
+        if use_query_params:
+            parameters = TableParameter.search([('table', '=', param_table.id)])
+        else:
+            parameters = FilterParameter.search([('filter', '=', param_table.filter.id)])
+        for param in parameters:
+            raw_value = self._param_values.get(f'param_{param.id}')
+            if raw_value is None:
+                if param.ttype == 'boolean':
+                    value = False
+                else:
+                    missing.append(param.name)
+                    continue
+            else:
+                value = self._coerce_value(param, raw_value)
+            if value is None:
+                missing.append(param.name)
+                continue
+            params[param.name] = value
+
+        if missing:
+            notice = div(
+                _('Please provide all parameters.'),
+                span(
+                    '',
+                    hx_get=FlashClear(render=False).url('clear'),
+                    hx_trigger='load delay:10s',
+                    hx_target='closest .pivot-flash',
+                    hx_swap='outerHTML'),
+                cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                    "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+            return Response(str(notice), content_type='text/html')
+
+        internal_name = 'parametrized_' + secrets.token_hex(8)
+        base_table_id = (table.base_table.id
+            if table.base_table else table.id)
+        new_table, = Table.copy([table], default={
+                'internal_name': internal_name,
+                'parameters': params,
+                'base_table': base_table_id,
+                'crons': [],
+                })
+        Table.compute([new_table])
+        redirect_url = Index(database_name=self.database_name,
+            table_name=new_table.table_name,
+            table_properties=self.table_properties,
+            render=False).url()
+        response = Response('', content_type='text/html')
+        response.headers['HX-Redirect'] = redirect_url
+        return response
+
+    def render(self):
+        pass
+
+
+class ComputeTable(Component):
+    'Compute Pivot Table'
+    __name__ = 'www.compute_table'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/compute/<string:table_name>', endpoint='compute'),
+        ]
+
+    def compute(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([('internal_name', '=', table_name)], limit=1)
+        if not tables:
+            return Response('', content_type='text/html')
+        table, = tables
+        if not table.check_access():
+            return Response('', content_type='text/html')
+
+        Table.compute([table])
+        notice = div(
+            _('Compute started.'),
+            span(
+                '',
+                hx_get=FlashClear(render=False).url('clear'),
+                hx_trigger='load delay:10s',
+                hx_target='closest .pivot-flash',
+                hx_swap='outerHTML'),
+            cls="pivot-flash mx-4 mt-2 rounded-md border border-green-200 "
+                "bg-green-50 px-4 py-2 text-sm text-center text-green-800")
+        return Response(str(notice), content_type='text/html')
+
+    def render(self):
+        pass
+
+
+class UpdatePivotTitle(Component):
+    'Update Pivot Title'
+    __name__ = 'www.update_pivot_title'
+    _path = None
+
+    database_name = fields.Char('Database Name')
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    name = fields.Char('Name')
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/<string:database_name>/babi/pivot/title/<string:table_name>/<string:table_properties>', endpoint="update"),
+        ]
+
+    def update(self):
+        if not self.name or not self.name.strip():
+            return Response('', content_type='text/html')
+
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([('internal_name', '=', table_name)], limit=1)
+        if not tables or self.table_properties == 'null':
+            return Response('', content_type='text/html')
+        table, = tables
+
+        cube = Cube.parse_properties(self.table_properties, self.table_name)
+        target_props = cube.encode_properties()
+
+        for existing in table.pivots:
+            existing_cube = existing.get_cube()
+            if not existing_cube:
+                continue
+            if existing_cube.encode_properties() == target_props:
+                existing.name = self.name.strip()
+                Pivot.save([existing])
+                updated_title = build_pivot_title(
+                    self.database_name,
+                    self.table_name,
+                    self.table_properties,
+                    existing.name or '')
+                notice = div(
+                    _('Title updated.'),
+                    span(
+                        '',
+                        hx_get=FlashClear(render=False).url('clear'),
+                        hx_trigger='load delay:10s',
+                        hx_target='closest .pivot-flash',
+                        hx_swap='outerHTML'),
+                    id='flash_messages',
+                    **{'hx-swap-oob': 'afterbegin'},
+                    cls="pivot-flash mx-4 mt-2 rounded-md border border-green-200 "
+                        "bg-green-50 px-4 py-2 text-sm text-center text-green-800")
+                return Response(str(updated_title) + str(notice),
+                    content_type='text/html')
+
+        notice = div(
+            _('Save this configuration before renaming.'),
+            span(
+                '',
+                hx_get=FlashClear(render=False).url('clear'),
+                hx_trigger='load delay:10s',
+                hx_target='closest .pivot-flash',
+                hx_swap='outerHTML'),
+            id='flash_messages',
+            **{'hx-swap-oob': 'afterbegin'},
+            cls="pivot-flash mx-4 mt-2 rounded-md border border-red-200 "
+                "bg-red-50 px-4 py-2 text-sm text-center text-red-800")
+        updated_title = build_pivot_title(
+            self.database_name,
+            self.table_name,
+            self.table_properties,
+            self.name.strip())
+        return Response(str(updated_title) + str(notice),
+            content_type='text/html')
+
+    def render(self):
+        pass
+
+
+class FlashClear(Component):
+    'Clear Flash Message'
+    __name__ = 'www.flash_clear'
+    _path = None
+
+    @classmethod
+    def get_url_map(cls):
+        return [
+            Rule('/babi/pivot/flash/clear', endpoint='clear'),
+        ]
+
+    def clear(self):
+        return Response('', content_type='text/html')
+
+    def render(self):
+        pass

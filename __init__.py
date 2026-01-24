@@ -51,6 +51,7 @@ def register():
         table.TableUser,
         table.TableGroup,
         table.TableParameters,
+        table.TableParameter,
         table.Cluster,
         table.Table,
         table.Field,
@@ -73,6 +74,15 @@ def register():
         pivot.PivotHeaderSelection,
         pivot.PivotTable,
         pivot.DownloadReport,
+        pivot.SavePivot,
+        pivot.SaveSelectedPivot,
+        pivot.PivotSaveModal,
+        pivot.PivotRedirect,
+        pivot.PivotSelectRedirect,
+        pivot.ParametrizePivotTable,
+        pivot.ComputeTable,
+        pivot.FlashClear,
+        pivot.UpdatePivotTitle,
         module='babi', type_='model')
     Pool.register(
         babi.OpenChart,
