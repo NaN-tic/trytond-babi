@@ -80,3 +80,11 @@ class TestPivot(WebTestCase):
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
             expect(page.get_by_role("main")).to_contain_text("User")
+            header_x = page.locator("#header_x")
+            header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
+            modal_heading = page.get_by_role("heading",
+                name="Select a field to add:")
+            expect(modal_heading).to_have_count(1)
+            page.locator("#field_selection_x").get_by_role("link",
+                name="Cancel").click()
+            expect(modal_heading).to_have_count(0)

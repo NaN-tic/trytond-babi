@@ -527,6 +527,7 @@ class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
     __name__ = 'www.pivot_header.selection'
     _url = '/<string:table_name>/open_field_selection/<string:header>/<string:table_properties>'
     _type = 'babi_pivot'
+    _method = 'POST'
 
 
     def render(self):
@@ -621,6 +622,9 @@ class PivotHeaderSelectionCloseField(PivotHeaderSelectionMixin, Endpoint):
     __name__ = 'www.pivot_header.selection.close_field'
     _url = '/<string:table_name>/close_field_selection/<string:header>/<string:table_properties>'
     _type = 'babi_pivot'
+    _method = ('GET', 'POST')
+
+    field = fields.Char('Field')
 
     def render(self):
         name = None
@@ -645,6 +649,7 @@ class PivotHeaderSelectionAddField(PivotHeaderSelectionMixin, Endpoint):
     __name__ = 'www.pivot_header.selection.add_field'
     _url = '/<string:table_name>/add_field_selection/<string:header>/<string:table_properties>'
     _type = 'babi_pivot'
+    _method = 'POST'
 
     field = fields.Char('Field')
 
@@ -802,6 +807,7 @@ class PivotTable(Endpoint):
     __name__ = 'www.pivot_table'
     _url = '/table/<string:table_name>/<string:table_properties>'
     _type = 'babi_pivot'
+    _method = 'POST'
 
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
