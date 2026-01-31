@@ -2265,6 +2265,10 @@ msgid "Configuration"
 msgstr "Configuració"
 
 msgctxt "voyager:v:"
+msgid "Save Configuration"
+msgstr "Desa la configuració"
+
+msgctxt "voyager:v:"
 msgid "Count"
 msgstr "Comptador"
 

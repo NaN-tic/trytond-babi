@@ -2266,6 +2266,10 @@ msgid "Configuration"
 msgstr "Configuración"
 
 msgctxt "voyager:v:"
+msgid "Save Configuration"
+msgstr "Guardar configuración"
+
+msgctxt "voyager:v:"
 msgid "Count"
 msgstr "Contar"
 

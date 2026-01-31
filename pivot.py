@@ -2,7 +2,7 @@ import logging
 import tempfile
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
-    option, main, th, style, details, summary)
+    option, main, th, style, details, summary, input_)
 from dominate.util import raw
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
@@ -144,6 +144,7 @@ class Index(IndexMixin, Endpoint):
         PivotTable = pool.get('www.pivot_table')
         PivotCompute = pool.get('www.pivot_compute')
         PivotApply = pool.get('www.pivot_apply')
+        PivotSave = pool.get('www.pivot_save')
 
         '''
         We need to:
@@ -245,22 +246,55 @@ class Index(IndexMixin, Endpoint):
                             selected_pivot_id = pivot.id
                             break
                 if pivots:
-                    with form(action=PivotApply.url(
-                            table_name=self.table_name,
-                            table_properties=self.table_properties),
-                            method="POST",
-                            cls="px-2 pt-2"):
-                        with div(cls="flex items-center gap-2"):
-                            span(_('Pivot Table'), cls="text-xs text-gray-700")
-                            with select(name="pivot", cls="text-xs rounded-md border border-gray-300 px-2 py-1",
-                                    onchange="this.form.submit()"):
-                                if selected_pivot_id is None:
-                                    option('-', value="")
-                                for pivot in pivots:
-                                    if selected_pivot_id == pivot.id:
-                                        option(pivot.rec_name, value=str(pivot.id), selected=True)
-                                    else:
-                                        option(pivot.rec_name, value=str(pivot.id))
+                    with div(cls="px-2 pt-2"):
+                        with div(cls="flex items-center gap-2 align-middle"):
+                            with form(action=PivotApply.url(
+                                    table_name=self.table_name,
+                                    table_properties=self.table_properties),
+                                    method="POST",
+                                    cls="flex items-center gap-2 h-7"):
+                                span(_('Pivot Table'), cls="text-xs text-gray-700 align-middle")
+                                with select(name="pivot", cls="text-xs rounded-md border border-gray-300 px-2 py-0 h-7 align-middle",
+                                        onchange="this.form.submit()"):
+                                    if selected_pivot_id is None:
+                                        option('-', value="")
+                                    for pivot in pivots:
+                                        if selected_pivot_id == pivot.id:
+                                            option(pivot.rec_name, value=str(pivot.id), selected=True)
+                                        else:
+                                            option(pivot.rec_name, value=str(pivot.id))
+                            if selected_pivot_id is None:
+                                button(_('Save Configuration'),
+                                    type="button",
+                                    cls="inline-flex items-center rounded-md bg-gray-900 px-3 h-7 text-xs font-semibold text-white hover:bg-gray-800 align-middle",
+                                    onclick="document.getElementById('save_pivot_modal').style.display='block'")
+                    if selected_pivot_id is None:
+                        with div(id="save_pivot_modal", cls="relative z-10", style="display: none;", aria_labelledby="modal-title", role="dialog", aria_modal="true"):
+                            div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
+                            with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
+                                with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
+                                    with form(action=PivotSave.url(
+                                            table_name=self.table_name,
+                                            table_properties=self.table_properties),
+                                            method="POST",
+                                            cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
+                                        with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
+                                            button(type="button",
+                                                cls="rounded-md bg-white text-gray-400 hover:text-gray-500",
+                                                onclick="document.getElementById('save_pivot_modal').style.display='none'").add(CLOSE_ICON)
+                                        h3(_('Save Configuration'), cls="text-sm font-semibold text-gray-900")
+                                        p(_('Name'), cls="mt-3 text-xs text-gray-700")
+                                        input_(type="text", name="name", required=True,
+                                            value=f'{table.name} pivot',
+                                            cls="mt-1 w-full text-xs rounded-md border border-gray-300 px-2 py-1")
+                                        with div(cls="mt-4 flex justify-end gap-2"):
+                                            button(_('Cancel'),
+                                                type="button",
+                                                cls="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50",
+                                                onclick="document.getElementById('save_pivot_modal').style.display='none'")
+                                            button(_('Save Configuration'),
+                                                type="submit",
+                                                cls="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800")
                 with div(cls="grid grid-cols-12 px-2"):
                     PivotHeaderAxis(table_name=self.table_name, axis='x',
                         table_properties=self.table_properties)
@@ -385,6 +419,128 @@ class PivotApply(Endpoint):
                 properties = cube.encode_properties()
                 return redirect(Index.url(table_name=self.table_name,
                     table_properties=properties))
+
+        return redirect(Index.url(table_name=self.table_name,
+            table_properties=self.table_properties))
+
+
+class PivotSave(Endpoint):
+    'Pivot Save'
+    __name__ = 'www.pivot_save'
+    _url = '/save/<string:table_name>/<string:table_properties>'
+    _type = 'babi_pivot'
+    _method = 'POST'
+
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    name = fields.Char('Name')
+
+    def render(self):
+        pool = Pool()
+        Index = pool.get('www.index.pivot')
+        Table = pool.get('babi.table')
+        RowDimension = pool.get('babi.pivot.row_dimension')
+        ColumnDimension = pool.get('babi.pivot.column_dimension')
+        Measure = pool.get('babi.pivot.measure')
+        Property = pool.get('babi.pivot.property')
+        Order = pool.get('babi.pivot.order')
+        Pivot = pool.get('babi.pivot')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([
+                ('internal_name', '=', table_name),
+                ], limit=1)
+        access = False
+        if tables:
+            table, = tables
+            access = table.check_access()
+
+        if (not access or not self.table_properties
+                or self.table_properties == 'null'):
+            return redirect(Index.url(table_name=self.table_name,
+                table_properties=self.table_properties))
+
+        if not self.name:
+            return redirect(Index.url(table_name=self.table_name,
+                table_properties=self.table_properties))
+        pivot, = Pivot.create([{
+                    'table': table.id,
+                    'name': self.name,
+                    }])
+
+        cube = Cube.parse_properties(self.table_properties, table.name)
+        fields_by_internal = {f.internal_name: f for f in table.fields_}
+
+        to_create_rows = []
+        to_create_cols = []
+        to_create_measures = []
+        to_create_properties = []
+
+        for field_name in cube.rows:
+            field = fields_by_internal.get(field_name)
+            if field:
+                to_create_rows.append(RowDimension(pivot=pivot, field=field))
+
+        for field_name in cube.columns:
+            field = fields_by_internal.get(field_name)
+            if field:
+                to_create_cols.append(ColumnDimension(pivot=pivot, field=field))
+
+        for field_name, aggregate in cube.measures:
+            field = fields_by_internal.get(field_name)
+            if field and aggregate:
+                to_create_measures.append(Measure(pivot=pivot,
+                    field=field, aggregate=aggregate))
+
+        for field_name in cube.properties:
+            field = fields_by_internal.get(field_name)
+            if field:
+                to_create_properties.append(Property(pivot=pivot, field=field))
+
+        # Replace all pivot elements
+        RowDimension.delete(list(pivot.row_dimensions))
+        ColumnDimension.delete(list(pivot.column_dimensions))
+        Measure.delete(list(pivot.measures))
+        Property.delete(list(pivot.properties))
+        Order.delete(list(pivot.order))
+
+        RowDimension.save(to_create_rows)
+        ColumnDimension.save(to_create_cols)
+        Measure.save(to_create_measures)
+        Property.save(to_create_properties)
+
+        # Recreate order entries and apply cube order
+        pivot = Pivot(pivot.id)
+        Pivot.update_order([pivot])
+        pivot = Pivot(pivot.id)
+
+        element_map = {}
+        for item in pivot.row_dimensions:
+            element_map[item.field.internal_name] = item
+        for item in pivot.column_dimensions:
+            element_map[item.field.internal_name] = item
+        for item in pivot.properties:
+            element_map[item.field.internal_name] = item
+        for item in pivot.measures:
+            element_map[(item.field.internal_name, item.aggregate)] = item
+
+        sequence = 0
+        to_save_orders = []
+        for element_key, order in cube.order:
+            element = element_map.get(element_key)
+            if not element:
+                continue
+            sequence += 1
+            for order_line in pivot.order:
+                if order_line.element == element:
+                    order_line.sequence = sequence
+                    order_line.order = order
+                    to_save_orders.append(order_line)
+                    break
+        Order.save(to_save_orders)
 
         return redirect(Index.url(table_name=self.table_name,
             table_properties=self.table_properties))
@@ -555,7 +711,6 @@ class PivotHeaderOrder(Endpoint):
         PivotHeaderLevelField = pool.get('www.pivot_header.level_field')
         btable, = Table.search([('internal_name', '=', self.table_name[2:])], limit=1)
         field_names = dict((x.internal_name, x.name) for x in btable.fields_)
-
         items = []
         if self.table_properties != 'null':
             cube = Cube.parse_properties(self.table_properties,
@@ -788,7 +943,8 @@ class PivotHeaderSelectionAddField(PivotHeaderSelectionMixin, Endpoint):
                 if self.field not in cube.properties:
                     cube.properties.append(self.field)
 
-        return redirect(Index.url(table_name=self.table_name, table_properties=cube.encode_properties()))
+        return redirect(Index.url(table_name=self.table_name,
+            table_properties=cube.encode_properties()))
 
 
 # In this function we have some default options available in all the PivotHeader components (handle levels, remove items from header)
@@ -849,7 +1005,8 @@ class PivotHeaderRemoveField(PivotHeaderMixin, Endpoint):
         # multiple URLs with the same endpoint
         if not cube.rows and not cube.columns and not cube.measures and not cube.order:
             table_properties = 'null'
-        return redirect(Index.url(table_name=self.table_name, table_properties=table_properties))
+        return redirect(Index.url(table_name=self.table_name,
+            table_properties=table_properties))
 
 
 class PivotHeaderLevelField(PivotHeaderMixin, Endpoint):
@@ -901,7 +1058,8 @@ class PivotHeaderLevelField(PivotHeaderMixin, Endpoint):
                 cube_attribute.insert(auxiliar_position+1, auxiliar_value)
 
         table_properties = cube.encode_properties()
-        return redirect(Index.url(table_name=self.table_name, table_properties=table_properties))
+        return redirect(Index.url(table_name=self.table_name,
+            table_properties=table_properties))
 
 
 #This function handles the render of the cube into a table and the download button
