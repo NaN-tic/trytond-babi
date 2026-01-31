@@ -857,17 +857,18 @@ class PivotTable(Endpoint):
                 table_properties=collapsed_table_properties))
         collapse_all.add(COLLAPSE_ALL)
 
+        controls = div(cls="flex items-center gap-2 pb-2")
+        controls.add(expand_all)
+        controls.add(collapse_all)
+        controls.add(download)
+
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
         for row in cube.build():
             pivot_row = tr(cls="hover:bg-gray-50 transition-colors")
             for cell in row:
                 if download:
-                    # Paint the download button in the first cell
-                    first_cell = td(cls="flex items-center gap-2 text-xs text-black px-6 py-1.5 bg-blue-300")
-                    first_cell.add(expand_all)
-                    first_cell.add(collapse_all)
-                    first_cell.add(download)
-                    pivot_row.add(first_cell)
+                    # Keep the top-left header cell empty now that controls are outside the table.
+                    pivot_row.add(td('', cls="text-xs bg-blue-300 text-black px-6 py-1.5 border-b-0.5 border-black"))
                     download = None
                     continue
 
@@ -944,6 +945,7 @@ class PivotTable(Endpoint):
 
         pivot_div = div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 relative max-w-sm")
         pivot_div.add(loading_div)
+        pivot_div.add(controls)
         pivot_div.add(pivot_table)
         return pivot_div
 
