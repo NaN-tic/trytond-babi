@@ -58,6 +58,7 @@ def register():
         pivot.PivotHeaderSelectionAddField,
         pivot.PivotHeaderRemoveField,
         pivot.PivotHeaderLevelField,
+        pivot.PivotCompute,
         pivot.PivotTable,
         pivot.DownloadReport,
         module='babi', type_='model')

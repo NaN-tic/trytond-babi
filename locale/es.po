@@ -2258,6 +2258,10 @@ msgid "Columns"
 msgstr "Columnas"
 
 msgctxt "voyager:v:"
+msgid "Compute"
+msgstr "Calcular"
+
+msgctxt "voyager:v:"
 msgid "Configuration"
 msgstr "Configuración"
 

@@ -142,6 +142,7 @@ class Index(IndexMixin, Endpoint):
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
         PivotHeaderOrder = pool.get('www.pivot_header.order')
         PivotTable = pool.get('www.pivot_table')
+        PivotCompute = pool.get('www.pivot_compute')
 
         '''
         We need to:
@@ -220,15 +221,14 @@ class Index(IndexMixin, Endpoint):
                     timestamp = f'({timestamp})'
                     # Use a smaller text
                     span(timestamp, cls="text-sm text-gray-500 ml-2")
-                # Each button is a 36px width
-                # Invert axis button
-                with div(cls="col-span-1"):
+                with div(cls="col-span-2 flex items-center justify-end gap-2"):
+                    a(href=PivotCompute.url(table_name=self.table_name,
+                        table_properties=self.table_properties),
+                        cls="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500").add(_('Compute'))
                     a(href=Index.url(table_name=self.table_name, table_properties=inverted_table_properties),
-                        cls="absolute right-12").add(SWAP_AXIS)
-                # Empty cube properties
-                with div(cls="col-span-1"):
+                        cls="inline-flex items-center p-2").add(SWAP_AXIS)
                     a(href=Index.url(table_name=self.table_name, table_properties='null'),
-                        cls="absolute right-3").add(RELOAD)
+                        cls="inline-flex items-center p-2").add(RELOAD)
 
             # Details always opened by default
             with details(cls="m-2", open=True):
@@ -285,6 +285,42 @@ class IndexNull(IndexMixin, Endpoint):
         pool = Pool()
         Index = pool.get('www.index.pivot')
         return Index(self.table_name)
+
+
+class PivotCompute(Endpoint):
+    'Pivot Compute'
+    __name__ = 'www.pivot_compute'
+    _url = '/compute/<string:table_name>/<string:table_properties>'
+    _type = 'babi_pivot'
+
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+
+    def render(self):
+        pool = Pool()
+        Index = pool.get('www.index.pivot')
+        Table = pool.get('babi.table')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([
+                ('internal_name', '=', table_name),
+                ], limit=1)
+        access = False
+        if tables:
+            table, = tables
+            access = table.check_access()
+
+        if access:
+            try:
+                Table.compute([table])
+            except Exception:
+                logger.exception('Error computing pivot table')
+
+        return redirect(Index.url(table_name=self.table_name,
+            table_properties=self.table_properties))
 
 
 # This class handle the row/columns table headers
