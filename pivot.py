@@ -143,6 +143,7 @@ class Index(IndexMixin, Endpoint):
         PivotHeaderOrder = pool.get('www.pivot_header.order')
         PivotTable = pool.get('www.pivot_table')
         PivotCompute = pool.get('www.pivot_compute')
+        PivotApply = pool.get('www.pivot_apply')
 
         '''
         We need to:
@@ -233,6 +234,33 @@ class Index(IndexMixin, Endpoint):
             # Details always opened by default
             with details(cls="m-2", open=True):
                 summary(cls="text-sm font-semibold text-gray-900").add(_('Configuration'))
+                pivots = [p for p in table.pivots if p.active]
+                selected_pivot_id = None
+                if pivots and self.table_properties and self.table_properties != 'null':
+                    for pivot in pivots:
+                        cube = pivot.get_cube()
+                        if not cube:
+                            continue
+                        if cube.encode_properties() == self.table_properties:
+                            selected_pivot_id = pivot.id
+                            break
+                if pivots:
+                    with form(action=PivotApply.url(
+                            table_name=self.table_name,
+                            table_properties=self.table_properties),
+                            method="POST",
+                            cls="px-2 pt-2"):
+                        with div(cls="flex items-center gap-2"):
+                            span(_('Pivot Table'), cls="text-xs text-gray-700")
+                            with select(name="pivot", cls="text-xs rounded-md border border-gray-300 px-2 py-1",
+                                    onchange="this.form.submit()"):
+                                if selected_pivot_id is None:
+                                    option('-', value="")
+                                for pivot in pivots:
+                                    if selected_pivot_id == pivot.id:
+                                        option(pivot.rec_name, value=str(pivot.id), selected=True)
+                                    else:
+                                        option(pivot.rec_name, value=str(pivot.id))
                 with div(cls="grid grid-cols-12 px-2"):
                     PivotHeaderAxis(table_name=self.table_name, axis='x',
                         table_properties=self.table_properties)
@@ -318,6 +346,45 @@ class PivotCompute(Endpoint):
                 Table.compute([table])
             except Exception:
                 logger.exception('Error computing pivot table')
+
+        return redirect(Index.url(table_name=self.table_name,
+            table_properties=self.table_properties))
+
+
+class PivotApply(Endpoint):
+    'Pivot Apply'
+    __name__ = 'www.pivot_apply'
+    _url = '/apply/<string:table_name>/<string:table_properties>'
+    _type = 'babi_pivot'
+    _method = 'POST'
+
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+    pivot = fields.Many2One('babi.pivot', 'Pivot')
+
+    def render(self):
+        pool = Pool()
+        Index = pool.get('www.index.pivot')
+        Table = pool.get('babi.table')
+
+        table_name = self.table_name
+        if table_name.startswith('__'):
+            table_name = table_name.split('__')[-1]
+
+        tables = Table.search([
+                ('internal_name', '=', table_name),
+                ], limit=1)
+        access = False
+        if tables:
+            table, = tables
+            access = table.check_access()
+
+        if access and self.pivot and self.pivot.table == table:
+            cube = self.pivot.get_cube()
+            if cube:
+                properties = cube.encode_properties()
+                return redirect(Index.url(table_name=self.table_name,
+                    table_properties=properties))
 
         return redirect(Index.url(table_name=self.table_name,
             table_properties=self.table_properties))
