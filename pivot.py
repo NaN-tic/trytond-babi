@@ -70,6 +70,32 @@ def _get_filter_parameters(table):
     return valid_parameters
 
 
+def _get_query_parameters(table):
+    if not table:
+        return []
+    parameters = list(getattr(table, 'query_parameters', []) or [])
+    valid_parameters = []
+    for parameter in parameters:
+        try:
+            if parameter.check_parameter_in_query():
+                valid_parameters.append(parameter)
+        except Exception:
+            logger.exception('Error checking query parameter %s', parameter.id)
+    return valid_parameters
+
+
+def _get_table_parameters(table):
+    if table and table.type in ('table', 'view'):
+        return _get_query_parameters(table)
+    return _get_filter_parameters(table)
+
+
+def _get_parameter_options(parameter):
+    if parameter.ttype in ('selection', 'multiselection'):
+        return parameter.get_values()
+    return []
+
+
 def _format_parameter_value(parameter, value):
     if value is None:
         return ''
@@ -83,7 +109,7 @@ def _format_parameter_value(parameter, value):
             return value.strftime('%Y-%m-%dT%H:%M')
         if isinstance(value, date):
             return value.strftime('%Y-%m-%dT00:00')
-    if ttype == 'many2many':
+    if ttype in ('many2many', 'multiselection'):
         if isinstance(value, (list, tuple)):
             return ', '.join(str(x) for x in value)
     return str(value)
@@ -91,6 +117,10 @@ def _format_parameter_value(parameter, value):
 
 def _parse_parameter_value(parameter, raw_value):
     if raw_value is not None and not isinstance(raw_value, str):
+        if parameter.ttype == 'many2many' and isinstance(raw_value, (list, tuple)):
+            return [int(x) for x in raw_value if x not in (None, '')]
+        if parameter.ttype == 'multiselection' and isinstance(raw_value, (list, tuple)):
+            return [x for x in raw_value if x not in (None, '')]
         return raw_value
     ttype = parameter.ttype
     if ttype == 'boolean':
@@ -108,6 +138,8 @@ def _parse_parameter_value(parameter, raw_value):
     if ttype == 'many2many':
         values = [x.strip() for x in raw_value.split(',') if x.strip()]
         return [int(x) for x in values]
+    if ttype == 'multiselection':
+        return [x.strip() for x in raw_value.split(',') if x.strip()]
     return raw_value
 
 
@@ -272,18 +304,31 @@ class Index(IndexMixin, Endpoint):
                     div(cls="pointer-events-none absolute right-0 top-0 h-full w-1 bg-gradient-to-r from-transparent to-gray-200")
                     div(_('Tables'), cls="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide")
                     tables_sidebar = []
+                    user_id = Transaction().user
                     for t in BabiTable.search([('internal_name', 'not like', 'parametrized_%')]):
                         if not t.check_access():
                             continue
+                        sidebar_table = t
+                        if t.type in ('table', 'view') and t.query_parameters:
+                            last_param = BabiTable.search([
+                                    ('base_table', '=', t.id),
+                                    ('parametrized_user', '=', user_id),
+                                    ('calculation_date', '!=', None),
+                                    ], order=[
+                                    ('calculation_date', 'DESC'),
+                                    ('id', 'DESC'),
+                                    ], limit=1)
+                            if last_param:
+                                sidebar_table = last_param[0]
                         pivot_props = 'null'
-                        pivots = [p for p in t.pivots if p.active]
+                        pivots = [p for p in sidebar_table.pivots if p.active]
                         if pivots:
                             cube_pivot = pivots[0].get_cube()
                             if cube_pivot:
                                 pivot_props = cube_pivot.encode_properties()
-                        tables_sidebar.append((t, pivot_props))
-                    for t, props in tables_sidebar:
-                        is_active = (t.id == table.id)
+                        tables_sidebar.append((t, sidebar_table, pivot_props))
+                    for t, sidebar_table, props in tables_sidebar:
+                        is_active = (t.id == table.id) or (getattr(table, 'base_table', None) == t)
                         row_cls = ("block w-full px-3 py-2 text-sm truncate "
                             "hover:bg-indigo-50 hover:text-indigo-700 "
                             "active:bg-indigo-100 active:text-indigo-800 "
@@ -292,7 +337,7 @@ class Index(IndexMixin, Endpoint):
                             row_cls += " bg-indigo-50 text-indigo-700 font-semibold"
                         a(t.name,
                             cls=row_cls,
-                            href=Index.url(table_name=t.table_name,
+                            href=Index.url(table_name=sidebar_table.table_name,
                                 table_properties=props))
 
                 with div(cls="flex-1 overflow-auto"):
@@ -337,7 +382,7 @@ class Index(IndexMixin, Endpoint):
                             a(href=Index.url(table_name=self.table_name, table_properties='null'),
                                 cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition").add(RELOAD)
 
-                    parameters = _get_filter_parameters(table)
+                    parameters = _get_table_parameters(table)
                     with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
                         summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Parameters'))
                         if not parameters:
@@ -347,9 +392,8 @@ class Index(IndexMixin, Endpoint):
                             with div(cls="grid grid-cols-1 gap-3 px-3 pb-2 pt-2 sm:grid-cols-2"):
                                 for parameter in parameters:
                                     field_name = f'{parameter.name}_{parameter.id}'
-                                    value = _format_parameter_value(
-                                        parameter,
-                                        current_parameters.get(parameter.name))
+                                    raw_value = current_parameters.get(parameter.name)
+                                    value = _format_parameter_value(parameter, raw_value)
                                     ttype = parameter.ttype
                                     with div(cls="flex flex-col gap-1"):
                                         if ttype == 'boolean':
@@ -364,35 +408,66 @@ class Index(IndexMixin, Endpoint):
                                         else:
                                             span(parameter.name,
                                                 cls="text-xs font-medium text-gray-700")
-                                            input_type = 'text'
-                                            input_step = None
-                                            if ttype in ('integer', 'many2one'):
-                                                input_type = 'number'
-                                                input_step = '1'
-                                            elif ttype in ('float', 'numeric'):
-                                                input_type = 'number'
-                                                input_step = 'any'
-                                            elif ttype == 'date':
-                                                input_type = 'date'
-                                            elif ttype == 'datetime':
-                                                input_type = 'datetime-local'
-                                            input_kwargs = {
-                                                'type': input_type,
-                                                'name': field_name,
-                                                'form': 'compute_form',
-                                                'value': value,
-                                                'required': True,
-                                                'cls': ("w-full rounded-md border border-gray-300 px-2 py-1 "
-                                                    "text-xs text-gray-900 focus:border-blue-500 "
-                                                    "focus:ring-blue-500"),
-                                                }
-                                            if input_step:
-                                                input_kwargs['step'] = input_step
-                                            if ttype == 'many2many':
-                                                input_kwargs['placeholder'] = _('Comma-separated IDs')
-                                            if ttype == 'many2one':
-                                                input_kwargs['placeholder'] = _('Record ID')
-                                            input_(**input_kwargs)
+                                            options = _get_parameter_options(parameter)
+                                            if options:
+                                                if ttype == 'multiselection':
+                                                    selected_values = set()
+                                                    if isinstance(raw_value, (list, tuple)):
+                                                        selected_values = {str(x) for x in raw_value}
+                                                    with select(name=field_name,
+                                                            form='compute_form',
+                                                            multiple=True,
+                                                            cls=("w-full rounded-md border border-gray-300 px-2 py-1 "
+                                                                "text-xs text-gray-900 focus:border-blue-500 "
+                                                                "focus:ring-blue-500")):
+                                                        for option_value, option_label in options:
+                                                            option_value = '' if option_value is None else str(option_value)
+                                                            attrs = {'value': option_value}
+                                                            if option_value in selected_values:
+                                                                attrs['selected'] = True
+                                                            option(option_label, **attrs)
+                                                else:
+                                                    selected_value = '' if value is None else str(value)
+                                                    with select(name=field_name,
+                                                            form='compute_form',
+                                                            cls=("w-full rounded-md border border-gray-300 px-2 py-1 "
+                                                                "text-xs text-gray-900 focus:border-blue-500 "
+                                                                "focus:ring-blue-500")):
+                                                        option('', value='', selected=selected_value == '')
+                                                        for option_value, option_label in options:
+                                                            option_value = '' if option_value is None else str(option_value)
+                                                            option(option_label, value=option_value,
+                                                                selected=option_value == selected_value)
+                                            else:
+                                                input_type = 'text'
+                                                input_step = None
+                                                if ttype in ('integer', 'many2one'):
+                                                    input_type = 'number'
+                                                    input_step = '1'
+                                                elif ttype in ('float', 'numeric'):
+                                                    input_type = 'number'
+                                                    input_step = 'any'
+                                                elif ttype == 'date':
+                                                    input_type = 'date'
+                                                elif ttype == 'datetime':
+                                                    input_type = 'datetime-local'
+                                                input_kwargs = {
+                                                    'type': input_type,
+                                                    'name': field_name,
+                                                    'form': 'compute_form',
+                                                    'value': value,
+                                                    'required': True,
+                                                    'cls': ("w-full rounded-md border border-gray-300 px-2 py-1 "
+                                                        "text-xs text-gray-900 focus:border-blue-500 "
+                                                        "focus:ring-blue-500"),
+                                                    }
+                                                if input_step:
+                                                    input_kwargs['step'] = input_step
+                                                if ttype == 'many2many':
+                                                    input_kwargs['placeholder'] = _('Comma-separated IDs')
+                                                if ttype == 'many2one':
+                                                    input_kwargs['placeholder'] = _('Record ID')
+                                                input_(**input_kwargs)
 
                     # Details always opened by default
                     with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
@@ -541,57 +616,66 @@ class PivotCompute(Endpoint):
         cube = None
         redirect_properties = self.table_properties
         if access:
-            request = Transaction().context.get('voyager_context').request
-            if self.table_properties == 'null':
-                cube = Cube(table=table.name)
-            else:
-                cube = Cube.parse_properties(self.table_properties, table.name)
-            existing_parameters = (
-                cube.parameters if getattr(cube, 'parameters', None) else {})
-            parameters = _get_filter_parameters(table)
-            params_by_name = {}
-            for parameter in parameters:
-                field_name = f'{parameter.name}_{parameter.id}'
-                raw_value = request.form.get(field_name) if request else None
-                if raw_value in (None, '') and parameter.name in existing_parameters:
-                    raw_value = existing_parameters.get(parameter.name)
-                if parameter.ttype == 'boolean' and raw_value is None:
-                    parsed_value = False
+            try:
+                request = Transaction().context.get('voyager_context').request
+                if self.table_properties == 'null':
+                    cube = Cube(table=table.name)
                 else:
-                    parsed_value = _parse_parameter_value(
-                        parameter, raw_value)
-                params_by_name[parameter.name] = parsed_value
+                    cube = Cube.parse_properties(self.table_properties, table.name)
+                existing_parameters = (
+                    cube.parameters if getattr(cube, 'parameters', None) else {})
+                parameters = _get_table_parameters(table)
+                params_by_name = {}
+                for parameter in parameters:
+                    field_name = f'{parameter.name}_{parameter.id}'
+                    if request and parameter.ttype == 'multiselection':
+                        raw_value = request.form.getlist(field_name)
+                    else:
+                        raw_value = request.form.get(field_name) if request else None
+                    if raw_value in (None, '', []) and parameter.name in existing_parameters:
+                        raw_value = existing_parameters.get(parameter.name)
+                    if parameter.ttype == 'boolean' and raw_value is None:
+                        parsed_value = False
+                    else:
+                        parsed_value = _parse_parameter_value(
+                            parameter, raw_value)
+                    params_by_name[parameter.name] = parsed_value
 
-            if cube:
-                cube.parameters = params_by_name
-            if parameters:
-                internal_name = 'parametrized_' + secrets.token_hex(8)
-                new_tables = Table.copy([table], default={
-                    'internal_name': internal_name,
-                    'parameters': params_by_name,
-                    'crons': [],
-                })
-                if not new_tables:
-                    logger.error('Parametrized table copy returned empty list')
-                else:
-                    table = new_tables[0]
-                    table._compute()
-                    target_table_name = table.table_name
-                    if self.table_properties == 'null':
-                        pivots = [p for p in table.pivots if p.active]
-                        if pivots:
-                            pivot_cube = pivots[0].get_cube()
-                            if pivot_cube:
-                                pivot_cube.parameters = params_by_name
-                                redirect_properties = pivot_cube.encode_properties()
+                if cube:
+                    cube.parameters = params_by_name
+                if parameters:
+                    internal_name = 'parametrized_' + secrets.token_hex(8)
+                    new_tables = Table.copy([table], default={
+                        'internal_name': internal_name,
+                        'parameters': params_by_name,
+                        'crons': [],
+                        'base_table': table.id,
+                        'parametrized_user': Transaction().user,
+                    })
+                    if not new_tables:
+                        logger.error('Parametrized table copy returned empty list')
+                    else:
+                        table = new_tables[0]
+                        table._compute()
+                        target_table_name = table.table_name
+                        if self.table_properties == 'null':
+                            pivots = [p for p in table.pivots if p.active]
+                            if pivots:
+                                pivot_cube = pivots[0].get_cube()
+                                if pivot_cube:
+                                    pivot_cube.parameters = params_by_name
+                                    redirect_properties = pivot_cube.encode_properties()
+                            elif cube:
+                                redirect_properties = cube.encode_properties()
                         elif cube:
                             redirect_properties = cube.encode_properties()
-                    elif cube:
+                else:
+                    Table.compute([table])
+                    if cube:
                         redirect_properties = cube.encode_properties()
-            else:
-                Table.compute([table])
-                if cube:
-                    redirect_properties = cube.encode_properties()
+            except Exception:
+                logger.exception('Error computing pivot for table %s', table_name)
+                raise
 
         if redirect_properties == 'null':
             redirect_url = Index.url(table_name=target_table_name,
