@@ -327,12 +327,14 @@ class Index(IndexMixin, Endpoint):
                             if cube_pivot:
                                 pivot_props = cube_pivot.encode_properties()
                         tables_sidebar.append((t, sidebar_table, pivot_props))
-                    for t, sidebar_table, props in tables_sidebar:
+                    for idx, (t, sidebar_table, props) in enumerate(tables_sidebar):
                         is_active = (t.id == table.id) or (getattr(table, 'base_table', None) == t)
-                        row_cls = ("block w-full px-3 py-2 text-sm truncate "
+                        row_cls = ("block w-full px-3 py-0.5 text-sm truncate "
                             "hover:bg-indigo-50 hover:text-indigo-700 "
                             "active:bg-indigo-100 active:text-indigo-800 "
                             "transition")
+                        if idx % 2 == 0:
+                            row_cls += " bg-blue-50"
                         if is_active:
                             row_cls += " bg-indigo-50 text-indigo-700 font-semibold"
                         a(t.name,
