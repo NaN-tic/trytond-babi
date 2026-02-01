@@ -299,8 +299,15 @@ class Index(IndexMixin, Endpoint):
         inverted_table_properties = cube.encode_properties()
 
         with main() as index_section:
-            with div(cls="flex h-screen bg-white"):
-                with div(cls="relative h-screen w-64 min-w-[12rem] max-w-[28rem] resize-x overflow-auto border-r border-gray-200 bg-white shadow-sm"):
+            with div(cls="flex h-screen gap-2 bg-white"):
+                with div(cls="relative h-screen w-64 min-w-[12rem] max-w-[28rem] resize-x overflow-auto border-r border-gray-200 bg-white shadow-sm",
+                        id="sidebar"):
+                    with button(type="button",
+                            cls=("absolute right-2 top-2 z-10 inline-flex items-center justify-center "
+                                "h-7 w-7 rounded-md bg-blue-600 text-white "
+                                "hover:bg-blue-500 active:bg-blue-700 transition"),
+                            onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.add('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.remove('hidden');})();"):
+                        span('⟨')
                     div(cls="pointer-events-none absolute right-0 top-0 h-full w-1 bg-gradient-to-r from-transparent to-gray-200")
                     div(_('Tables'), cls="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide")
                     tables_sidebar = []
@@ -342,9 +349,15 @@ class Index(IndexMixin, Endpoint):
                             href=Index.url(table_name=sidebar_table.table_name,
                                 table_properties=props))
 
-                with div(cls="flex-1 overflow-auto"):
+                with div(cls="flex-1 overflow-auto m-2 rounded-lg border border-gray-200 bg-white"):
                     with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
-                        with div(cls="col-span-2"):
+                        with div(cls="col-span-2 flex items-center gap-2"):
+                            with button(type="button",
+                                    id="toggle_sidebar",
+                                    cls=("hidden inline-flex items-center justify-center h-7 w-7 rounded-md "
+                                        "bg-blue-600 text-white hover:bg-blue-500 active:bg-blue-700 transition"),
+                                    onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.remove('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.add('hidden');})();"):
+                                span('⟩')
                             span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
                             # TODO: Those timestamps are not exactly right because a
                             # table may depend on other tables so even if this table
@@ -1451,7 +1464,7 @@ class PivotTable(Endpoint):
         controls.add(collapse_all)
         controls.add(download)
 
-        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
+        pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto")
         data_row_index = 0
         header_row_index = 0
         for row in cube.build():
@@ -1542,10 +1555,13 @@ class PivotTable(Endpoint):
         loading_spinner_.add(p(_('Loading ...'), cls="text-white"))
         loading_div.add(loading_spinner_)
 
-        pivot_div = div(id='pivot_table', cls="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8 relative max-w-sm")
+        pivot_div = div(id='pivot_table', cls=("inline-block min-w-full py-2 align-middle "
+            "sm:px-6 lg:px-8 relative max-w-sm m-2 border border-gray-200 rounded-lg bg-white"))
         pivot_div.add(loading_div)
         pivot_div.add(controls)
-        pivot_div.add(pivot_table)
+        table_container = div(cls="shadow-md rounded-lg overflow-hidden border border-gray-200")
+        table_container.add(pivot_table)
+        pivot_div.add(table_container)
         return pivot_div
 
 
