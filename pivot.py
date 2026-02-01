@@ -1452,12 +1452,22 @@ class PivotTable(Endpoint):
         controls.add(download)
 
         pivot_table = table(cls="table-auto text-sm text-left rtl:text-right text-black overflow-x-auto shadow-md rounded-lg")
+        data_row_index = 0
+        header_row_index = 0
         for row in cube.build():
-            pivot_row = tr(cls="hover:bg-gray-50 transition-colors")
+            has_data = any(cell.type == CellType.VALUE for cell in row)
+            row_bg = ""
+            if has_data:
+                row_bg = " bg-blue-50" if data_row_index % 2 == 0 else " bg-white"
+                data_row_index += 1
+            else:
+                row_bg = " bg-blue-200" if header_row_index % 2 == 0 else " bg-blue-300"
+                header_row_index += 1
+            pivot_row = tr(cls="hover:bg-gray-50 transition-colors" + row_bg)
             for cell in row:
                 if download:
                     # Keep the top-left header cell empty now that controls are outside the table.
-                    pivot_row.add(td('', cls="text-xs bg-blue-300 text-black px-6 py-1.5 border-b-0.5 border-black"))
+                    pivot_row.add(td('', cls="text-xs font-semibold text-slate-900 px-6 py-1.5 border-b-0.5 border-black"))
                     download = None
                     continue
 
@@ -1520,10 +1530,10 @@ class PivotTable(Endpoint):
                             hx_trigger="click", hx_swap="outerHTML",
                             hx_indicator="#loading-state")
 
-                    pivot_row.add(td(cell_value, cls="text-xs bg-blue-300 text-black px-2 py-1 border-b-0.5 border-black", style="white-space: nowrap"))
+                    pivot_row.add(td(cell_value, cls="text-xs font-semibold text-slate-900 px-2 py-1 border-b-0.5 border-black", style="white-space: nowrap"))
 
                 else:
-                    pivot_row.add(td(cell.formatted(language), cls="border-b text-black bg-blue-50 border-gray-200 px-2 py-1 text-right", style="white-space: nowrap"))
+                    pivot_row.add(td(cell.formatted(language), cls="border-b text-black border-gray-200 px-2 py-1 text-right", style="white-space: nowrap"))
             pivot_table.add(pivot_row)
 
         loading_div = div(id="loading-state", cls="loading-indicator absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2 w-full bg-gray-800 bg-opacity-50 h-full")
