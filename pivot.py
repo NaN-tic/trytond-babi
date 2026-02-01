@@ -234,6 +234,7 @@ class Index(IndexMixin, Endpoint):
     def render(self):
         pool = Pool()
         BabiTable = pool.get('babi.table')
+        TableTag = pool.get('babi.table.tag')
         Layout = pool.get('www.layout.pivot')
         PivotHeaderAxis = pool.get('www.pivot_header.axis')
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
@@ -278,6 +279,11 @@ class Index(IndexMixin, Endpoint):
         if not hasattr(self, 'table_properties'):
             self.table_properties = 'null'
 
+        request = Transaction().context.get('voyager_context').request
+        current_tag = None
+        if request:
+            current_tag = request.args.get('tag')
+
         # Check if we have the cube properties to see the table, if not, show a messagge
         show_error = True
         if self.table_properties == 'null':
@@ -309,45 +315,46 @@ class Index(IndexMixin, Endpoint):
                             onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.add('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.remove('hidden');})();"):
                         span('⟨')
                     div(cls="pointer-events-none absolute right-0 top-0 h-full w-1 bg-gradient-to-r from-transparent to-gray-200")
+                    div(_('Tags'), cls="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide")
+                    with div(cls="px-2 pb-2 flex flex-wrap gap-1"):
+                        all_cls = ("px-2 py-0.5 text-xs rounded-full border "
+                            "border-gray-200 text-gray-700 hover:bg-indigo-50 "
+                            "hover:text-indigo-700 transition")
+                        if not current_tag:
+                            all_cls += " bg-indigo-50 text-indigo-700 font-semibold"
+                        all_url = Index.url(table_name=self.table_name,
+                            table_properties=self.table_properties)
+                        a(_('All'), cls=all_cls, href=all_url)
+                        for tag in TableTag.search([], order=[('name', 'ASC')]):
+                            tag_cls = ("px-2 py-0.5 text-xs rounded-full border "
+                                "border-gray-200 text-gray-700 hover:bg-indigo-50 "
+                                "hover:text-indigo-700 transition")
+                            if current_tag and str(tag.id) == str(current_tag):
+                                tag_cls += " bg-indigo-50 text-indigo-700 font-semibold"
+                            tag_url = (Index.url(table_name=self.table_name,
+                                table_properties=self.table_properties)
+                                + f'?tag={tag.id}')
+                            a(tag.name, cls=tag_cls, href=tag_url)
+
+                    with div(cls="px-2 pb-2"):
+                        with form():
+                            if current_tag:
+                                input_(type="hidden", name="tag", value=str(current_tag))
+                            input_(type="text", name="q",
+                                placeholder=_('Search tables'),
+                                hx_get=PivotSidebarTables.url(
+                                    table_name=self.table_name,
+                                    table_properties=self.table_properties),
+                                hx_trigger="keyup changed delay:300ms",
+                                hx_target="#sidebar_tables",
+                                hx_include="closest form",
+                                cls=("w-full rounded-md border border-gray-300 px-2 py-1 "
+                                    "text-xs text-gray-900 focus:border-blue-500 "
+                                    "focus:ring-blue-500"))
+
                     div(_('Tables'), cls="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide")
-                    tables_sidebar = []
-                    user_id = Transaction().user
-                    for t in BabiTable.search([('internal_name', 'not like', 'parametrized_%')]):
-                        if not t.check_access():
-                            continue
-                        sidebar_table = t
-                        if t.type in ('table', 'view') and t.query_parameters:
-                            last_param = BabiTable.search([
-                                    ('base_table', '=', t.id),
-                                    ('parametrized_user', '=', user_id),
-                                    ('calculation_date', '!=', None),
-                                    ], order=[
-                                    ('calculation_date', 'DESC'),
-                                    ('id', 'DESC'),
-                                    ], limit=1)
-                            if last_param:
-                                sidebar_table = last_param[0]
-                        pivot_props = 'null'
-                        pivots = [p for p in sidebar_table.pivots if p.active]
-                        if pivots:
-                            cube_pivot = pivots[0].get_cube()
-                            if cube_pivot:
-                                pivot_props = cube_pivot.encode_properties()
-                        tables_sidebar.append((t, sidebar_table, pivot_props))
-                    for idx, (t, sidebar_table, props) in enumerate(tables_sidebar):
-                        is_active = (t.id == table.id) or (getattr(table, 'base_table', None) == t)
-                        row_cls = ("block w-full px-3 py-0.5 text-sm truncate "
-                            "hover:bg-indigo-50 hover:text-indigo-700 "
-                            "active:bg-indigo-100 active:text-indigo-800 "
-                            "transition")
-                        if idx % 2 == 0:
-                            row_cls += " bg-blue-50"
-                        if is_active:
-                            row_cls += " bg-indigo-50 text-indigo-700 font-semibold"
-                        a(t.name,
-                            cls=row_cls,
-                            href=Index.url(table_name=sidebar_table.table_name,
-                                table_properties=props))
+                    PivotSidebarTables(table_name=self.table_name,
+                        table_properties=self.table_properties)
 
                 with div(cls="flex-1 overflow-auto m-2 rounded-lg border border-gray-200 bg-white"):
                     with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
@@ -588,6 +595,86 @@ class Index(IndexMixin, Endpoint):
         layout = Layout(title=f'{table.name} | Tryton')
         layout.main.add(index_section)
         return layout.tag()
+
+
+class PivotSidebarTables(Endpoint):
+    'Pivot Sidebar Tables'
+    __name__ = 'www.pivot_sidebar_tables'
+    _url = '/sidebar_tables/<string:table_name>/<string:table_properties>'
+    _type = 'babi_pivot'
+
+    table_name = fields.Char('Table Name')
+    table_properties = fields.Char('Table Properties')
+
+    def render(self):
+        pool = Pool()
+        BabiTable = pool.get('babi.table')
+
+        request = Transaction().context.get('voyager_context').request
+        current_tag = request.args.get('tag') if request else None
+        query = request.args.get('q') if request else None
+        query = (query or '').strip().lower()
+
+        internal_name = _normalize_table_name(self.table_name)
+        tables = BabiTable.search([('internal_name', '=', internal_name)], limit=1)
+        current_table = tables[0] if tables else None
+
+        container = div(id="sidebar_tables")
+        tables_sidebar = []
+        user_id = Transaction().user
+        table_domain = [('internal_name', 'not like', 'parametrized_%')]
+        if current_tag:
+            try:
+                tag_id = int(current_tag)
+            except (TypeError, ValueError):
+                tag_id = None
+            if tag_id:
+                table_domain.append(('tags', '=', tag_id))
+        if query:
+            table_domain.append(('name', 'ilike', f'%{query}%'))
+
+        for t in BabiTable.search(table_domain):
+            if not t.check_access():
+                continue
+            sidebar_table = t
+            if t.type in ('table', 'view') and t.query_parameters:
+                last_param = BabiTable.search([
+                        ('base_table', '=', t.id),
+                        ('parametrized_user', '=', user_id),
+                        ('calculation_date', '!=', None),
+                        ], order=[
+                        ('calculation_date', 'DESC'),
+                        ('id', 'DESC'),
+                        ], limit=1)
+                if last_param:
+                    sidebar_table = last_param[0]
+            pivot_props = 'null'
+            pivots = [p for p in sidebar_table.pivots if p.active]
+            if pivots:
+                cube_pivot = pivots[0].get_cube()
+                if cube_pivot:
+                    pivot_props = cube_pivot.encode_properties()
+            tables_sidebar.append((t, sidebar_table, pivot_props))
+
+        for idx, (t, sidebar_table, props) in enumerate(tables_sidebar):
+            is_active = False
+            if current_table:
+                is_active = (t.id == current_table.id) or (
+                    getattr(current_table, 'base_table', None) == t)
+            row_cls = ("block w-full px-3 py-0.5 text-sm truncate "
+                "hover:bg-indigo-50 hover:text-indigo-700 "
+                "active:bg-indigo-100 active:text-indigo-800 "
+                "transition")
+            if idx % 2 == 0:
+                row_cls += " bg-blue-50"
+            if is_active:
+                row_cls += " bg-indigo-50 text-indigo-700 font-semibold"
+            table_url = Index.url(table_name=sidebar_table.table_name,
+                table_properties=props)
+            if current_tag:
+                table_url += f'?tag={current_tag}'
+            container.add(a(t.name, cls=row_cls, href=table_url))
+        return container
 
 
 class IndexNull(IndexMixin, Endpoint):
