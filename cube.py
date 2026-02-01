@@ -1,6 +1,8 @@
 import ast
 import binascii
 import hashlib
+import json
+import base64
 import openpyxl
 import sql
 from collections import defaultdict
@@ -37,6 +39,7 @@ class Cube:
 
     def __init__(self, table=None, rows=None, columns=None, measures=None,
             properties=None, order=None, row_expansions=None,
+            parameters=None,
             column_expansions=None):
         '''
         order must have the following format:
@@ -56,6 +59,8 @@ class Cube:
             row_expansions = []
         if column_expansions is None:
             column_expansions = []
+        if parameters is None:
+            parameters = {}
 
         assert all(len(x) == 2 for x in order), ('Each order item must '
             'have 2 elements')
@@ -67,6 +72,7 @@ class Cube:
         self.order = order
         self.row_expansions = row_expansions
         self.column_expansions = column_expansions
+        self.parameters = parameters
 
     def clear_cache(self):
         cursor = Transaction().connection.cursor()
@@ -581,10 +587,18 @@ class Cube:
         Given a cube instance, return a string with the properties of the cube.
         Make the trasformation using the urllib.parse.urlencode function
         '''
-        cube_properties = self.__dict__
+        cube_properties = self.__dict__.copy()
         # We need to delete the table property because it is already in the url
         del cube_properties['table']
-        return urlencode(self.__dict__, doseq=True)
+        if cube_properties.get('parameters') is not None:
+            payload = json.dumps(
+                cube_properties['parameters'],
+                default=str,
+                sort_keys=True,
+            ).encode('utf-8')
+            encoded = base64.urlsafe_b64encode(payload).decode('ascii').rstrip('=')
+            cube_properties['parameters'] = encoded
+        return urlencode(cube_properties, doseq=True)
 
     @classmethod
     def parse_properties(cls, url, table_name=None):
@@ -612,6 +626,12 @@ class Cube:
         if cube_properties.get('column_expansions'):
             cube_properties['column_expansions'] = [
                 ast.literal_eval(m) for m in cube_properties['column_expansions']]
+
+        if cube_properties.get('parameters'):
+            encoded = cube_properties['parameters'][0]
+            padding = '=' * (-len(encoded) % 4)
+            payload = base64.urlsafe_b64decode((encoded + padding).encode('ascii'))
+            cube_properties['parameters'] = json.loads(payload.decode('utf-8'))
 
         if table_name:
             cube_properties['table'] = table_name
