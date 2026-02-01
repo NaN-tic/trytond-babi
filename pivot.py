@@ -267,204 +267,233 @@ class Index(IndexMixin, Endpoint):
         inverted_table_properties = cube.encode_properties()
 
         with main() as index_section:
-            with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
-                with div(cls="col-span-2"):
-                    span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
-                    # TODO: Those timestamps are not exactly right because a
-                    # table may depend on other tables so even if this table
-                    # has been recently computed it may depend on old data.
-                    # Even if that seems correct (the table does not currently
-                    # depend on other tables) it may happen that the table did
-                    # depend on other tables when it was computed for the last
-                    # time and at that moment those other tables where not up
-                    # to date.
-                    # All of this is solvable but requires more infrastructure,
-                    # that should probably be implemented in the babi.table
-                    # model.
-                    if table.type in ('model', 'table'):
-                        if table.calculation_date:
-                            timestamp = _('data from %s') % datetime_to_company_tz(table.calculation_date)
-                        else:
-                            timestamp = _('not calculated yet')
-                    else:
-                        timestamp = _('current data')
-                    timestamp = f'({timestamp})'
-                    # Use a smaller text
-                    span(timestamp, cls="text-sm text-gray-500 ml-2")
-                with div(cls="col-span-2 flex items-center justify-end gap-2 pr-1"):
-                    with form(id="compute_form",
-                            action=PivotCompute.url(table_name=self.table_name,
-                                table_properties=self.table_properties),
-                            method="POST",
-                            hx_post=PivotCompute.url(table_name=self.table_name,
-                                table_properties=self.table_properties),
-                            cls="inline-flex items-center"):
-                        with button(type="submit",
-                                cls="inline-flex items-center rounded-md bg-blue-600 px-2.5 h-7 text-xs font-semibold text-white hover:bg-blue-500 active:bg-blue-700 active:scale-95 transition"):
-                            span(_('Compute'))
-                            span(cls="loading-indicator").add(LOADING_SPINNER)
-                    a(href=Index.url(table_name=self.table_name, table_properties=inverted_table_properties),
-                        cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition").add(SWAP_AXIS)
-                    a(href=Index.url(table_name=self.table_name, table_properties='null'),
-                        cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition").add(RELOAD)
-
-            parameters = _get_filter_parameters(table)
-            with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
-                summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Parameters'))
-                if not parameters:
-                    div(_('No parameters defined for this table.'),
-                        cls="px-2 pt-2 text-xs text-gray-500")
-                else:
-                    with div(cls="grid grid-cols-1 gap-3 px-3 pb-2 pt-2 sm:grid-cols-2"):
-                        for parameter in parameters:
-                            field_name = f'{parameter.name}_{parameter.id}'
-                            value = _format_parameter_value(
-                                parameter,
-                                current_parameters.get(parameter.name))
-                            ttype = parameter.ttype
-                            with div(cls="flex flex-col gap-1"):
-                                if ttype == 'boolean':
-                                    with div(cls="flex items-center gap-2"):
-                                        input_(type="checkbox",
-                                            name=field_name,
-                                            form="compute_form",
-                                            checked=bool(value),
-                                            cls="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500")
-                                        span(parameter.name,
-                                            cls="text-xs font-medium text-gray-700")
-                                else:
-                                    span(parameter.name,
-                                        cls="text-xs font-medium text-gray-700")
-                                    input_type = 'text'
-                                    input_step = None
-                                    if ttype in ('integer', 'many2one'):
-                                        input_type = 'number'
-                                        input_step = '1'
-                                    elif ttype in ('float', 'numeric'):
-                                        input_type = 'number'
-                                        input_step = 'any'
-                                    elif ttype == 'date':
-                                        input_type = 'date'
-                                    elif ttype == 'datetime':
-                                        input_type = 'datetime-local'
-                                    input_kwargs = {
-                                        'type': input_type,
-                                        'name': field_name,
-                                        'form': 'compute_form',
-                                        'value': value,
-                                        'required': True,
-                                        'cls': ("w-full rounded-md border border-gray-300 px-2 py-1 "
-                                            "text-xs text-gray-900 focus:border-blue-500 "
-                                            "focus:ring-blue-500"),
-                                        }
-                                    if input_step:
-                                        input_kwargs['step'] = input_step
-                                    if ttype == 'many2many':
-                                        input_kwargs['placeholder'] = _('Comma-separated IDs')
-                                    if ttype == 'many2one':
-                                        input_kwargs['placeholder'] = _('Record ID')
-                                    input_(**input_kwargs)
-
-            # Details always opened by default
-            with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
-                summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Configuration'))
-                pivots = [p for p in table.pivots if p.active]
-                selected_pivot_id = None
-                if pivots and self.table_properties and self.table_properties != 'null':
-                    for pivot in pivots:
-                        cube = pivot.get_cube()
-                        if not cube:
+            with div(cls="flex h-screen bg-white"):
+                with div(cls="relative h-screen w-64 min-w-[12rem] max-w-[28rem] resize-x overflow-auto border-r border-gray-200 bg-white shadow-sm"):
+                    div(cls="pointer-events-none absolute right-0 top-0 h-full w-1 bg-gradient-to-r from-transparent to-gray-200")
+                    div(_('Tables'), cls="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide")
+                    tables_sidebar = []
+                    for t in BabiTable.search([('internal_name', 'not like', 'parametrized_%')]):
+                        if not t.check_access():
                             continue
-                        if cube.encode_properties() == self.table_properties:
-                            selected_pivot_id = pivot.id
-                            break
-                if pivots:
-                    with div(cls="px-2 pt-2"):
-                        with div(cls="flex items-center gap-2 align-middle"):
-                            with form(action=PivotApply.url(
-                                    table_name=self.table_name,
-                                    table_properties=self.table_properties),
+                        pivot_props = 'null'
+                        pivots = [p for p in t.pivots if p.active]
+                        if pivots:
+                            cube_pivot = pivots[0].get_cube()
+                            if cube_pivot:
+                                pivot_props = cube_pivot.encode_properties()
+                        tables_sidebar.append((t, pivot_props))
+                    for t, props in tables_sidebar:
+                        is_active = (t.id == table.id)
+                        row_cls = ("block w-full px-3 py-2 text-sm truncate "
+                            "hover:bg-indigo-50 hover:text-indigo-700 "
+                            "active:bg-indigo-100 active:text-indigo-800 "
+                            "transition")
+                        if is_active:
+                            row_cls += " bg-indigo-50 text-indigo-700 font-semibold"
+                        a(t.name,
+                            cls=row_cls,
+                            href=Index.url(table_name=t.table_name,
+                                table_properties=props))
+
+                with div(cls="flex-1 overflow-auto"):
+                    with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
+                        with div(cls="col-span-2"):
+                            span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
+                            # TODO: Those timestamps are not exactly right because a
+                            # table may depend on other tables so even if this table
+                            # has been recently computed it may depend on old data.
+                            # Even if that seems correct (the table does not currently
+                            # depend on other tables) it may happen that the table did
+                            # depend on other tables when it was computed for the last
+                            # time and at that moment those other tables where not up
+                            # to date.
+                            # All of this is solvable but requires more infrastructure,
+                            # that should probably be implemented in the babi.table
+                            # model.
+                            if table.type in ('model', 'table'):
+                                if table.calculation_date:
+                                    timestamp = _('data from %s') % datetime_to_company_tz(table.calculation_date)
+                                else:
+                                    timestamp = _('not calculated yet')
+                            else:
+                                timestamp = _('current data')
+                            timestamp = f'({timestamp})'
+                            # Use a smaller text
+                            span(timestamp, cls="text-sm text-gray-500 ml-2")
+                        with div(cls="col-span-2 flex items-center justify-end gap-2 pr-1"):
+                            with form(id="compute_form",
+                                    action=PivotCompute.url(table_name=self.table_name,
+                                        table_properties=self.table_properties),
                                     method="POST",
-                                    cls="flex items-center gap-2 h-7"):
-                                span(_('Pivot Table'), cls="text-xs text-gray-700 align-middle")
-                                with select(name="pivot", cls="text-xs rounded-md border border-gray-300 px-2 py-0 h-7 align-middle",
-                                        onchange="this.form.submit()"):
-                                    if selected_pivot_id is None:
-                                        option('-', value="")
-                                    for pivot in pivots:
-                                        if selected_pivot_id == pivot.id:
-                                            option(pivot.rec_name, value=str(pivot.id), selected=True)
+                                    hx_post=PivotCompute.url(table_name=self.table_name,
+                                        table_properties=self.table_properties),
+                                    cls="inline-flex items-center"):
+                                with button(type="submit",
+                                        cls="inline-flex items-center rounded-md bg-blue-600 px-2.5 h-7 text-xs font-semibold text-white hover:bg-blue-500 active:bg-blue-700 active:scale-95 transition"):
+                                    span(_('Compute'))
+                                    span(cls="loading-indicator").add(LOADING_SPINNER)
+                            a(href=Index.url(table_name=self.table_name, table_properties=inverted_table_properties),
+                                cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition").add(SWAP_AXIS)
+                            a(href=Index.url(table_name=self.table_name, table_properties='null'),
+                                cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition").add(RELOAD)
+
+                    parameters = _get_filter_parameters(table)
+                    with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
+                        summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Parameters'))
+                        if not parameters:
+                            div(_('No parameters defined for this table.'),
+                                cls="px-2 pt-2 text-xs text-gray-500")
+                        else:
+                            with div(cls="grid grid-cols-1 gap-3 px-3 pb-2 pt-2 sm:grid-cols-2"):
+                                for parameter in parameters:
+                                    field_name = f'{parameter.name}_{parameter.id}'
+                                    value = _format_parameter_value(
+                                        parameter,
+                                        current_parameters.get(parameter.name))
+                                    ttype = parameter.ttype
+                                    with div(cls="flex flex-col gap-1"):
+                                        if ttype == 'boolean':
+                                            with div(cls="flex items-center gap-2"):
+                                                input_(type="checkbox",
+                                                    name=field_name,
+                                                    form="compute_form",
+                                                    checked=bool(value),
+                                                    cls="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500")
+                                                span(parameter.name,
+                                                    cls="text-xs font-medium text-gray-700")
                                         else:
-                                            option(pivot.rec_name, value=str(pivot.id))
-                            if selected_pivot_id is None:
-                                button(_('Save Configuration'),
-                                    type="button",
-                                    cls="inline-flex items-center rounded-md bg-gray-900 px-3 h-7 text-xs font-semibold text-white hover:bg-gray-800 active:bg-gray-950 active:scale-95 transition align-middle",
-                                    onclick="document.getElementById('save_pivot_modal').style.display='block'")
-                    if selected_pivot_id is None:
-                        with div(id="save_pivot_modal", cls="relative z-10", style="display: none;", aria_labelledby="modal-title", role="dialog", aria_modal="true"):
-                            div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
-                            with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
-                                with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
-                                    with form(action=PivotSave.url(
+                                            span(parameter.name,
+                                                cls="text-xs font-medium text-gray-700")
+                                            input_type = 'text'
+                                            input_step = None
+                                            if ttype in ('integer', 'many2one'):
+                                                input_type = 'number'
+                                                input_step = '1'
+                                            elif ttype in ('float', 'numeric'):
+                                                input_type = 'number'
+                                                input_step = 'any'
+                                            elif ttype == 'date':
+                                                input_type = 'date'
+                                            elif ttype == 'datetime':
+                                                input_type = 'datetime-local'
+                                            input_kwargs = {
+                                                'type': input_type,
+                                                'name': field_name,
+                                                'form': 'compute_form',
+                                                'value': value,
+                                                'required': True,
+                                                'cls': ("w-full rounded-md border border-gray-300 px-2 py-1 "
+                                                    "text-xs text-gray-900 focus:border-blue-500 "
+                                                    "focus:ring-blue-500"),
+                                                }
+                                            if input_step:
+                                                input_kwargs['step'] = input_step
+                                            if ttype == 'many2many':
+                                                input_kwargs['placeholder'] = _('Comma-separated IDs')
+                                            if ttype == 'many2one':
+                                                input_kwargs['placeholder'] = _('Record ID')
+                                            input_(**input_kwargs)
+
+                    # Details always opened by default
+                    with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
+                        summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Configuration'))
+                        pivots = [p for p in table.pivots if p.active]
+                        selected_pivot_id = None
+                        if pivots and self.table_properties and self.table_properties != 'null':
+                            for pivot in pivots:
+                                cube = pivot.get_cube()
+                                if not cube:
+                                    continue
+                                if cube.encode_properties() == self.table_properties:
+                                    selected_pivot_id = pivot.id
+                                    break
+                        if pivots:
+                            with div(cls="px-2 pt-2"):
+                                with div(cls="flex items-center gap-2 align-middle"):
+                                    with form(action=PivotApply.url(
                                             table_name=self.table_name,
                                             table_properties=self.table_properties),
                                             method="POST",
-                                            cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
-                                        with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
-                                            button(type="button",
-                                                cls="rounded-md bg-white text-gray-400 hover:text-gray-500",
-                                                onclick="document.getElementById('save_pivot_modal').style.display='none'").add(CLOSE_ICON)
-                                        h3(_('Save Configuration'), cls="text-sm font-semibold text-gray-900")
-                                        p(_('Name'), cls="mt-3 text-xs text-gray-700")
-                                        input_(type="text", name="name", required=True,
-                                            value=f'{table.name} pivot',
-                                            cls="mt-1 w-full text-xs rounded-md border border-gray-300 px-2 py-1")
-                                        with div(cls="mt-4 flex justify-end gap-2"):
-                                            button(_('Cancel'),
-                                                type="button",
-                                                cls="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 active:bg-gray-100 active:scale-95 transition",
-                                                onclick="document.getElementById('save_pivot_modal').style.display='none'")
-                                            button(_('Save Configuration'),
-                                                type="submit",
-                                                cls="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 active:bg-gray-950 active:scale-95 transition")
-                with div(cls="grid grid-cols-12 px-3 pb-2"):
-                    PivotHeaderAxis(table_name=self.table_name, axis='x',
-                        table_properties=self.table_properties)
-                    PivotHeaderAxis(table_name=self.table_name, axis='y',
-                        table_properties=self.table_properties)
-                    PivotHeaderMeasure(table_name=self.table_name,
-                        table_properties=self.table_properties)
-                    PivotHeaderAxis(table_name=self.table_name, axis='property',
-                        table_properties=self.table_properties)
-                    PivotHeaderOrder(table_name=self.table_name,
-                        table_properties=self.table_properties)
-            with div(cls="mt-8 flow-root"):
-                with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
-                    if show_error == True:
-                        div(cls="text-center").add(p(_('You need to select at least one measure and one row or one column to show the table.'), cls="mt-1 text-sm text-gray-500"))
-                    else:
-                        try:
-                            PivotTable(table_name=self.table_name,
+                                            cls="flex items-center gap-2 h-7"):
+                                        span(_('Pivot Table'), cls="text-xs text-gray-700 align-middle")
+                                        with select(name="pivot", cls="text-xs rounded-md border border-gray-300 px-2 py-0 h-7 align-middle",
+                                                onchange="this.form.submit()"):
+                                            if selected_pivot_id is None:
+                                                option('-', value="")
+                                            for pivot in pivots:
+                                                if selected_pivot_id == pivot.id:
+                                                    option(pivot.rec_name, value=str(pivot.id), selected=True)
+                                                else:
+                                                    option(pivot.rec_name, value=str(pivot.id))
+                                    if selected_pivot_id is None:
+                                        button(_('Save Configuration'),
+                                            type="button",
+                                            cls="inline-flex items-center rounded-md bg-gray-900 px-3 h-7 text-xs font-semibold text-white hover:bg-gray-800 active:bg-gray-950 active:scale-95 transition align-middle",
+                                            onclick="document.getElementById('save_pivot_modal').style.display='block'")
+                            if selected_pivot_id is None:
+                                with div(id="save_pivot_modal", cls="relative z-10", style="display: none;", aria_labelledby="modal-title", role="dialog", aria_modal="true"):
+                                    div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
+                                    with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
+                                        with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
+                                            with form(action=PivotSave.url(
+                                                    table_name=self.table_name,
+                                                    table_properties=self.table_properties),
+                                                    method="POST",
+                                                    cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
+                                                with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
+                                                    button(type="button",
+                                                        cls="rounded-md bg-white text-gray-400 hover:text-gray-500",
+                                                        onclick="document.getElementById('save_pivot_modal').style.display='none'").add(CLOSE_ICON)
+                                                h3(_('Save Configuration'), cls="text-sm font-semibold text-gray-900")
+                                                p(_('Name'), cls="mt-3 text-xs text-gray-700")
+                                                input_(type="text", name="name", required=True,
+                                                    value=f'{table.name} pivot',
+                                                    cls="mt-1 w-full text-xs rounded-md border border-gray-300 px-2 py-1")
+                                                with div(cls="mt-4 flex justify-end gap-2"):
+                                                    button(_('Cancel'),
+                                                        type="button",
+                                                        cls="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 active:bg-gray-100 active:scale-95 transition",
+                                                        onclick="document.getElementById('save_pivot_modal').style.display='none'")
+                                                    button(_('Save Configuration'),
+                                                        type="submit",
+                                                        cls="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 active:bg-gray-950 active:scale-95 transition")
+                        with div(cls="grid grid-cols-12 px-3 pb-2"):
+                            PivotHeaderAxis(table_name=self.table_name, axis='x',
                                 table_properties=self.table_properties)
-                        except UndefinedTable:
-                            div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
-                        except Exception as e:
-                            div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
-                            print_trace = True
-                            if 'function avg(' in str(e):
-                                div(cls="text-center").add(_("HINT: You are trying to make average of a text type field, please try with a numeric type field or change the operation."))
-                                print_trace = False
-                            if 'function sum(' in str(e):
-                                div(cls="text-center").add(_("HINT: You are trying to sum a text type field, please try with a numeric type field or change the operation."))
-                                print_trace = False
-                            with details() as traceback_details:
-                                summary(_('Show more details'),
-                                    cls="text-sm font-semibold text-gray-900 hover:text-indigo-700 transition")
-                                p(pre(str(e)))
-                            div(cls="text-center").add(traceback_details)
-                            if print_trace:
-                                logger.exception(e)
+                            PivotHeaderAxis(table_name=self.table_name, axis='y',
+                                table_properties=self.table_properties)
+                            PivotHeaderMeasure(table_name=self.table_name,
+                                table_properties=self.table_properties)
+                            PivotHeaderAxis(table_name=self.table_name, axis='property',
+                                table_properties=self.table_properties)
+                            PivotHeaderOrder(table_name=self.table_name,
+                                table_properties=self.table_properties)
+                    with div(cls="mt-8 flow-root"):
+                        with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
+                            if show_error == True:
+                                div(cls="text-center").add(p(_('You need to select at least one measure and one row or one column to show the table.'), cls="mt-1 text-sm text-gray-500"))
+                            else:
+                                try:
+                                    PivotTable(table_name=self.table_name,
+                                        table_properties=self.table_properties)
+                                except UndefinedTable:
+                                    div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
+                                except Exception as e:
+                                    div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
+                                    print_trace = True
+                                    if 'function avg(' in str(e):
+                                        div(cls="text-center").add(_("HINT: You are trying to make average of a text type field, please try with a numeric type field or change the operation."))
+                                        print_trace = False
+                                    if 'function sum(' in str(e):
+                                        div(cls="text-center").add(_("HINT: You are trying to sum a text type field, please try with a numeric type field or change the operation."))
+                                        print_trace = False
+                                    with details() as traceback_details:
+                                        summary(_('Show more details'),
+                                            cls="text-sm font-semibold text-gray-900 hover:text-indigo-700 transition")
+                                        p(pre(str(e)))
+                                    div(cls="text-center").add(traceback_details)
+                                    if print_trace:
+                                        logger.exception(e)
 
         layout = Layout(title=f'{table.name} | Tryton')
         layout.main.add(index_section)
