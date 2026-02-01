@@ -111,5 +111,8 @@
             <newline/>
             <field name="pivots" colspan="4" height="450"/>
         </page>
+        <page name="tags">
+            <field name="tags" colspan="4" height="550"/>
+        </page>
     </notebook>
 </form>

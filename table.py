@@ -419,6 +419,23 @@ class TableQueryParameter(ModelSQL, ModelView):
         return True
 
 
+class TableTag(ModelSQL, ModelView):
+    "Table Tag"
+    __name__ = 'babi.table.tag'
+    _history = True
+
+    name = fields.Char('Name', required=True)
+
+
+class TableTagRelation(ModelSQL):
+    "Table Tag Relation"
+    __name__ = 'babi.table-babi.table.tag'
+    table = fields.Many2One('babi.table', 'Table', required=True,
+        ondelete='CASCADE')
+    tag = fields.Many2One('babi.table.tag', 'Tag', required=True,
+        ondelete='CASCADE')
+
+
 class Table(DeactivableMixin, ModelSQL, ModelView):
     'BABI Table'
     __name__ = 'babi.table'
@@ -552,6 +569,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         'Access Users')
     access_groups = fields.Many2Many('babi.table-res.group', 'babi_table', 'user',
         'Access Groups')
+    tags = fields.Many2Many('babi.table-babi.table.tag', 'table', 'tag', 'Tags')
     pivots = fields.One2Many('babi.pivot', 'table', 'Pivot Tables')
     comment = fields.Text('Comment')
     parameters = fields.Dict('babi.table.parameters', 'Parameters', readonly=True,
