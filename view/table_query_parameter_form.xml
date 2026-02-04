@@ -14,6 +14,6 @@ contains the full copyright notices and license terms. -->
     <label name="digits"/>
     <field name="digits"/>
     <newline/>
-    <label name="values_query" states="{'invisible': Eval('ttype').not in ('selection', 'multiselection')}" pyson="1"/>
-    <field name="values_query" states="{'invisible': Eval('ttype').not in ('selection', 'multiselection'), 'required': Eval('ttype').in_(['selection', 'multiselection'])}" pyson="1"/>
+    <label name="values_query"/>
+    <field name="values_query"/>
 </form>
