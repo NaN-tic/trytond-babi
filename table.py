@@ -397,21 +397,6 @@ class TableQueryParameter(ModelSQL, ModelView):
             'required': Eval('ttype').in_(['selection', 'multiselection']),
             })
 
-    @classmethod
-    def view_attributes(cls):
-        return super().view_attributes() + [
-            ('/form//label[@name="values_query"]', 'states', {
-                    'invisible': Not(Eval('ttype').in_(
-                            ['selection', 'multiselection'])),
-                    }),
-            ('/form//field[@name="values_query"]', 'states', {
-                    'invisible': Not(Eval('ttype').in_(
-                            ['selection', 'multiselection'])),
-                    'required': Eval('ttype').in_(
-                        ['selection', 'multiselection']),
-                    }),
-            ]
-
     def get_values(self):
         if not self.values_query:
             return []
@@ -2632,7 +2617,8 @@ class OpenExecutionFiltered(StateView):
         FilterParameter = pool.get('babi.filter.parameter')
 
         context = Transaction().context
-        record = Table(context.get('active_id'))
+        active_id = context.get('active_id')
+        record = Table(active_id) if active_id else None
 
         result = {}
         result['type'] = 'form'
@@ -2643,7 +2629,7 @@ class OpenExecutionFiltered(StateView):
         parameter2report = {}
 
         parameters = []
-        if record and record.type in ('table', 'view'):
+        if record and getattr(record, 'type', None) in ('table', 'view'):
             parameters = list(record.query_parameters or [])
         elif record and hasattr(record, 'filter'):
             parameters = FilterParameter.search([('filter', '=', record.filter)])

@@ -213,9 +213,6 @@ contains the full copyright notices and license terms. -->
             <field name="view" ref="babi_table_tag_form_view"/>
             <field name="act_window" ref="act_babi_table_tag"/>
         </record>
-        <menuitem id="menu_babi_table_tag" parent="menu_configuration"
-            action="act_babi_table_tag" sequence="40"/>
-
         <!-- ir.model -->
         <record model="ir.ui.view" id="model_form_view">
             <field name="model">ir.model</field>
@@ -228,5 +225,7 @@ contains the full copyright notices and license terms. -->
         <menuitem id="menu_configuration" name="Configuration" parent="menu_babi" sequence="10" icon="tryton-settings"/>
         <menuitem action="act_babi_expression" id="menu_babi_expression" parent="menu_configuration" sequence="10" name="Expressions"/>
         <menuitem action="act_babi_filter" id="menu_babi_filter" parent="menu_configuration" sequence="20" name="Filters"/>
+        <menuitem id="menu_babi_table_tag" parent="menu_configuration"
+            action="act_babi_table_tag" sequence="40"/>
     </data>
 </tryton>
