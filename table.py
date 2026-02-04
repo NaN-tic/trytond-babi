@@ -397,6 +397,21 @@ class TableQueryParameter(ModelSQL, ModelView):
             'required': Eval('ttype').in_(['selection', 'multiselection']),
             })
 
+    @classmethod
+    def view_attributes(cls):
+        return super().view_attributes() + [
+            ('/form//label[@name="values_query"]', 'states', {
+                    'invisible': Not(Eval('ttype').in_(
+                            ['selection', 'multiselection'])),
+                    }),
+            ('/form//field[@name="values_query"]', 'states', {
+                    'invisible': Not(Eval('ttype').in_(
+                            ['selection', 'multiselection'])),
+                    'required': Eval('ttype').in_(
+                        ['selection', 'multiselection']),
+                    }),
+            ]
+
     def get_values(self):
         if not self.values_query:
             return []
