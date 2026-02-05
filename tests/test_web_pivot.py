@@ -1,6 +1,7 @@
 import os
 import logging
 from playwright.sync_api import expect, sync_playwright
+from trytond import backend
 from trytond.config import config
 from trytond.modules.voyager.tests.tools import WebTestCase
 from proteus import Model
@@ -88,3 +89,49 @@ class TestPivot(WebTestCase):
             page.locator("#field_selection_x").get_by_role("link",
                 name="Cancel").click()
             expect(modal_heading).to_have_count(0)
+
+    def test_02_download_document(self):
+        if backend.name == 'sqlite':
+            self.skipTest('Download report not supported on sqlite')
+
+        Table = Model.get('babi.table')
+        Pivot = Model.get('babi.pivot')
+        RowDimension = Model.get('babi.pivot.row_dimension')
+        Measure = Model.get('babi.pivot.measure')
+
+        table = Table.find([('name', '=', 'User')])[0]
+        fields = {f.internal_name: f for f in table.fields_}
+        row_field = fields.get('name') or next(iter(fields.values()))
+        measure_field = fields.get('id') or row_field
+
+        pivot = Pivot(table=table, name='Test Download')
+        pivot.save()
+        row = RowDimension(pivot=pivot, field=row_field)
+        row.save()
+        measure = Measure(pivot=pivot, field=measure_field, aggregate='count')
+        measure.save()
+
+        pivot = Pivot(pivot.id)
+        pivot_url = pivot.url
+        assert pivot_url and not pivot_url.endswith('/null')
+
+        with sync_playwright() as playwright:
+            headless = (config.getboolean('nantic_connection',
+                'test_headless', default=False) or
+                    'DISPLAY' not in os.environ)
+
+            browser = playwright.firefox.launch(headless=headless)
+            context = browser.new_context(
+                locale='en-US',
+                http_credentials={
+                    "username": self.user,
+                    "password": self.password,
+                }
+            )
+            page = context.new_page()
+            page.goto(pivot_url)
+            page.wait_for_load_state('load')
+
+            download = page.locator("a[href*='/babi/pivot/download/']").first
+            expect(download).to_have_attribute('href',
+                lambda v: v is not None and v.endswith('/xlsx'))

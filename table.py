@@ -483,6 +483,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         states={
             'invisible': ~Bool(Eval('parameters')),
             })
+    output_format = fields.Selection([
+            ('pdf', 'PDF'),
+            ('xlsx', 'Excel'),
+            ], 'Output Format')
 
     @staticmethod
     def default_timeout():
@@ -493,6 +497,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
     @staticmethod
     def default_preview_limit():
         return 10
+
+    @staticmethod
+    def default_output_format():
+        return 'xlsx'
 
     @classmethod
     def __setup__(cls):
