@@ -6,7 +6,6 @@ from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
 from dominate.util import raw
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
-from weasyprint import HTML
 from psycopg2.errors import UndefinedTable
 from werkzeug.routing import Rule
 from werkzeug.utils import redirect
@@ -19,6 +18,7 @@ from trytond.modules.voyager.i18n import _
 from .cube import Cube, CellType, capitalize
 from .table import datetime_to_company_tz
 from .tools import adjust_column_widths
+
 
 logger = logging.getLogger(__name__)
 
@@ -266,8 +266,7 @@ class Index(Component):
                     else:
                         try:
                             PivotTable(database_name=self.database_name, table_name=self.table_name,
-                                table_properties=self.table_properties,
-                                output_format=table.output_format)
+                                table_properties=self.table_properties)
                         except UndefinedTable:
                             div(cls="text-center").add(_("Table has not been computed. Click on the 'Compute' button or wait until the process has finished. Also ensure there is no 'Errors' tab in the table."))
                         except Exception as e:
@@ -808,7 +807,6 @@ class PivotTable(Component):
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
-    output_format = fields.Char('Output Format')
 
     @classmethod
     def get_url_map(cls):
@@ -831,8 +829,7 @@ class PivotTable(Component):
 
         download = a(DOWNLOAD, cls="inline-block p-2", href=DownloadReport(
                 database_name=self.database_name, table_name=self.table_name,
-                table_properties=self.table_properties, output_format=self.output_format,
-                render=False).url('download'))
+                table_properties=self.table_properties, render=False).url('download'))
 
         cube = Cube.parse_properties(self.table_properties, self.table_name)
 
@@ -964,159 +961,30 @@ class DownloadReport(Component):
     database_name = fields.Char('Database Name')
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
-    output_format = fields.Char('Output Format')
 
     @classmethod
     def get_url_map(cls):
         return [
-            Rule('/<string:database_name>/babi/pivot/download/<string:table_name>/<string:table_properties>/<string:output_format>', endpoint="download")
+            Rule('/<string:database_name>/babi/pivot/download/<string:table_name>/<string:table_properties>/', endpoint="download")
         ]
 
     def render(self):
         pass
 
-    def render_xlsx(self, table, cube, language):
-        wb = Workbook()
-        ws = wb.active
-        # header
-        ws.append([table.rec_name, _('data from %s') % datetime_to_company_tz(table.calculation_date)])
-        for row in cube.build():
-            ws.append([x.formatted(language, worksheet=ws) for x in row])
-        adjust_column_widths(ws, max_width=30)
-        return save_virtual_workbook(wb), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-
-    def render_pdf(self, table, cube, language):
-        rows_html = ''
-        for row in cube.build():
-            cols = ''
-            active = False
-            for x in row:
-                value = x.formatted(language)
-                if not active and value:
-                    active = True
-                css = 'border-cell-active' if active else 'border-cell'
-                cols += f'<td class="{css}">{value or ''}</td>'
-            rows_html += f"<tr>{cols}</tr>"
-        timestamp = _('data from %s') % datetime_to_company_tz(table.calculation_date)
-        html_content = f"""
-            <html>
-            <head>
-                <meta charset="utf-8">
-                <style>
-                    @page {{
-                    size: A4 landscape;
-                    @top-left {{
-                        content: "{table.rec_name}";
-                        font-size: 9px;
-                    }}
-                    @top-right {{
-                        content: "{timestamp}";
-                        font-size: 9px;
-                    }}
-                    @bottom-right {{
-                        content: counter(page) " / " counter(pages);
-                        text-align: right;
-                        font-family: 'Arial';
-                        font-size: 9px;
-                    }}
-                    }}
-                    body {{
-                        font-family: 'Arial';
-                        font-size: 10px;
-                    }}
-                    tbody tr {{
-                        page-break-inside: avoid;
-                    }}
-                    table.border td {{
-                        border: 1px solid grey;
-                    }}
-                    table {{
-                        width: 100%;
-                        padding: 0;
-                        margin:0;
-                        margin-bottom: 1rem;
-                        color: #212529;
-                        border-collapse:collapse;
-                    }}
-
-                    table.tr {{
-                        margin-left: 0;
-                        margin-right: 0;
-                        padding: 0.75rem;
-                    }}
-
-                    table td {{
-                        padding: 0.25rem;
-                        margin-left: 0;
-                        margin-right: 0;
-                        vertical-align: top;
-                    }}
-
-                    table thead th {{
-                        padding: 0.25rem;
-                        vertical-align: bottom;
-                        margin-left: 0;
-                        margin-right: 0;
-                        border-bottom: solid 1px #000 !important;
-                    }}
-
-                    table tbody.border  {{
-                        border-top: 2px solid #dee2e6;
-                        margin-left: 0;
-                        margin-right: 0;
-                        padding: 1px;
-                    }}
-                    tr.bottom {{
-                        border-bottom: 1pt solid black;
-                    }}
-                    .border-cell-active {{
-                        border-bottom: solid 1px #999 !important;
-                    }}
-                    .border-cell {{
-                        border-top: 0px !important;
-                    }}
-                </style>
-            </head>
-            <body>
-                <table>
-                    {rows_html}
-                </table>
-            </body>
-            </html>
-            """
-        return HTML(string=html_content).write_pdf(), 'application/pdf'
-
     def download(self):
         pool = Pool()
         Language = pool.get('ir.lang')
-        BabiTable = pool.get('babi.table')
 
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
 
-        # TODO same code as Index.render()
-        table_name = self.table_name
-        if table_name.startswith('__'):
-            table_name = table_name.split('__')[-1]
-
-        tables = BabiTable.search([
-                ('internal_name', '=', table_name),
-                ], limit=1)
-
-        # Check if the user can see the table, if not, return an error page
-        access = False
-        if tables:
-            table, = tables
-            access = table.check_access()
-
-        if not access or not tables:
-            return
-
-        output_format = self.output_format or table.output_format or 'xlsx'
-
         cube = Cube.parse_properties(self.table_properties, self.table_name)
-        content, content_type = getattr(self, 'render_%s' % output_format)(table, cube, language)
-        response = Response(content)
-        response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.{output_format}'
-        response.headers['Content-Type'] = content_type
+        wb = Workbook()
+        ws = wb.active
+        for row in cube.build():
+            ws.append([x.formatted(language, worksheet=ws) for x in row])
+        adjust_column_widths(ws, max_width=30)
+        response = Response(save_virtual_workbook(wb))
+        response.headers['Content-Disposition'] = f'attachment; filename={self.table_name}.xlsx'
+        response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         return response
