@@ -97,6 +97,9 @@ def datetime_to_company_tz(value):
     Company = pool.get('company.company')
     Lang = pool.get('ir.lang')
 
+    if value is None:
+        return
+
     company_id = Transaction().context.get('company')
     if company_id:
         company = Company(company_id)
