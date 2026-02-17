@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--The COPYRIGHT file at the top level of this repository
+contains the full copyright notices and license terms. -->
+<form>
+    <label name="name"/>
+    <field name="name"/>
+    <label name="table"/>
+    <field name="table"/>
+    <label name="ttype"/>
+    <field name="ttype"/>
+    <label name="related_model"/>
+    <field name="related_model"/>
+    <newline/>
+    <label name="digits"/>
+    <field name="digits"/>
+    <newline/>
+    <label name="values_query"/>
+    <field name="values_query"/>
+</form>

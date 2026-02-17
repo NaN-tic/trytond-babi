@@ -22,6 +22,9 @@
         <page name="query">
             <field name="query" colspan="4" height="550" widget="code" language="sql"/>
         </page>
+        <page name="query_parameters">
+            <field name="query_parameters" colspan="4" height="550"/>
+        </page>
         <page name="fields_">
             <field name="fields_" colspan="4" height="550"/>
         </page>
