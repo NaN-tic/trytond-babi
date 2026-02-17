@@ -122,6 +122,36 @@ contains the full copyright notices and license terms. -->
             <field name="name">filter_parameter_tree</field>
         </record>
 
+        <!-- babi.table.query_parameter -->
+        <record model="ir.ui.view" id="babi_table_query_parameter_form_view">
+            <field name="model">babi.table.query_parameter</field>
+            <field name="type">form</field>
+            <field name="name">table_query_parameter_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="babi_table_query_parameter_tree_view">
+            <field name="model">babi.table.query_parameter</field>
+            <field name="type">tree</field>
+            <field name="name">table_query_parameter_tree</field>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_table_query_parameter">
+            <field name="model">babi.table.query_parameter</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
+        <record model="ir.model.access" id="access_babi_table_query_parameter_admin">
+            <field name="model">babi.table.query_parameter</field>
+            <field name="group" ref="group_babi_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
         <record model="ir.model.access" id="access_babi_filter_parameter">
             <field name="model">babi.filter.parameter</field>
             <field name="perm_read" eval="True"/>
