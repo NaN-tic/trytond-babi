@@ -1551,7 +1551,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
                     to_insert.append(values)
 
-                cursor.execute(*table.insert(columns=columns, values=to_insert))
+                if to_insert:
+                    cursor.execute(*table.insert(columns=columns, values=to_insert))
 
                 index += 1
                 count += len(records)
