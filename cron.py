@@ -14,8 +14,8 @@ class Cron(metaclass=PoolMeta):
             'required': Eval('method') == 'babi.table|_compute',
             }, ondelete='CASCADE')
     babi_cluster = fields.Many2One('babi.table.cluster', 'Cluster', states={
-            'invisible': Eval('method') != 'babi.table.cluster|_compute',
-            'required': Eval('method') == 'babi.table.cluster|_compute',
+            'invisible': Eval('method') != 'babi.table.cluster|compute',
+            'required': Eval('method') == 'babi.table.cluster|compute',
             })
     babi_compute_warnings = fields.Boolean('Compute Warnings', states={
             'invisible': ~Eval('method').in_(['babi.table|_compute',
