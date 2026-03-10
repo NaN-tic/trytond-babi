@@ -2658,7 +2658,7 @@ class OpenExecutionFiltered(StateView):
                 'required': True,
             }
             if parameter.ttype in ['many2one', 'many2many']:
-                field_definition['relation'] = parameter.related_model.model
+                field_definition['relation'] = parameter.related_model.name
             if parameter.ttype == 'datetime':
                 field_definition['format'] = '%H:%M:%S'
             if parameter.ttype in ['selection', 'multiselection']:
