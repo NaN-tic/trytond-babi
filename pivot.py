@@ -353,7 +353,7 @@ class Index(IndexMixin, Endpoint):
             "active:text-indigo-800 active:scale-95 transition")
         sidebar_hidden = bool(self.table_name)
         sidebar_classes = (
-            "relative h-screen w-64 min-w-[12rem] max-w-[28rem] resize-x "
+            "relative h-screen w-96 min-w-[12rem] max-w-[28rem] resize-x "
             "overflow-auto border-r border-gray-200 bg-white shadow-sm")
         if sidebar_hidden:
             sidebar_classes += " hidden"
