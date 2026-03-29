@@ -1139,6 +1139,8 @@ class PivotHeaderMeasure(Endpoint):
                                 th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(MEASURE_ICON)
                                 th(_('Measure fields'), scope="col", cls="py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0")
                                 th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Measure type'), cls="sr-only"))
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
+                                th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
                                 with th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0"):
                                     a(href="#", cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition",
                                         hx_target="#field_selection_measure",
@@ -1151,6 +1153,14 @@ class PivotHeaderMeasure(Endpoint):
                                     td(capitalize(field_names[field[0]]), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         p(_measure_label(field, field_names))
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        if field != fields[0]:
+                                            a(href=PivotHeaderLevelField.url(table_name=self.table_name, header=self.header, field=repr(field), table_properties=self.table_properties, level_action='up'),
+                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(UP_ARROW)
+                                    with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
+                                        if field != fields[-1]:
+                                            a(href=PivotHeaderLevelField.url(table_name=self.table_name, header=self.header, field=repr(field), table_properties=self.table_properties, level_action='down'),
+                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(DOWN_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeaderRemoveField.url(table_name=self.table_name, header=self.header, field=repr(field), table_properties=self.table_properties),
                                             cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(REMOVE_ICON)
@@ -1555,6 +1565,9 @@ class PivotHeaderLevelField(PivotHeaderMixin, Endpoint):
                         field = ca
                         break
                     index +1
+                auxiliar_position = cube_attribute.index(field)
+            elif self.header == 'measures':
+                field = _parse_field_reference(self.field)
                 auxiliar_position = cube_attribute.index(field)
             else:
                 auxiliar_position = cube_attribute.index(self.field)
