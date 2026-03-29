@@ -286,6 +286,14 @@ msgctxt "field:babi.pivot.measure,field:"
 msgid "Field"
 msgstr "Camp"
 
+msgctxt "field:babi.pivot.measure,over_field:"
+msgid "Over Field"
+msgstr "Sobre el camp"
+
+msgctxt "field:babi.pivot.measure,percentile:"
+msgid "Percentile"
+msgstr "Percentil"
+
 msgctxt "field:babi.pivot.measure,pivot:"
 msgid "Pivot"
 msgstr "Taula dinàmica"
@@ -966,6 +974,14 @@ msgctxt "field:www.pivot_header.selection,measure:"
 msgid "Measure"
 msgstr "Mesura"
 
+msgctxt "field:www.pivot_header.selection,over_field:"
+msgid "Over Field"
+msgstr "Sobre el camp"
+
+msgctxt "field:www.pivot_header.selection,percentile:"
+msgid "Percentile"
+msgstr "Percentil"
+
 msgctxt "field:www.pivot_header.selection,table_name:"
 msgid "Table Name"
 msgstr "Nom de la taula"
@@ -986,6 +1002,14 @@ msgctxt "field:www.pivot_header.selection.add_field,measure:"
 msgid "Measure"
 msgstr "Mesura"
 
+msgctxt "field:www.pivot_header.selection.add_field,over_field:"
+msgid "Over Field"
+msgstr "Sobre el camp"
+
+msgctxt "field:www.pivot_header.selection.add_field,percentile:"
+msgid "Percentile"
+msgstr "Percentil"
+
 msgctxt "field:www.pivot_header.selection.add_field,table_name:"
 msgid "Table Name"
 msgstr "Nom de la taula"
@@ -1005,6 +1029,14 @@ msgstr "Capçalera"
 msgctxt "field:www.pivot_header.selection.close_field,measure:"
 msgid "Measure"
 msgstr "Mesura"
+
+msgctxt "field:www.pivot_header.selection.close_field,over_field:"
+msgid "Over Field"
+msgstr "Sobre el camp"
+
+msgctxt "field:www.pivot_header.selection.close_field,percentile:"
+msgid "Percentile"
+msgstr "Percentil"
 
 msgctxt "field:www.pivot_header.selection.close_field,table_name:"
 msgid "Table Name"
@@ -1281,6 +1313,10 @@ msgid "Order fields"
 msgstr "Camps de comanda"
 
 msgctxt "html_report:h:"
+msgid "Over Field"
+msgstr "Sobre el camp"
+
+msgctxt "html_report:h:"
 msgid "Page not found or you don't have access to it"
 msgstr "No s'ha trobat la pàgina o no hi teniu accés"
 
@@ -1291,6 +1327,10 @@ msgstr "Pàgina no trobada | Tryton"
 msgctxt "html_report:h:"
 msgid "Parameters"
 msgstr "Paràmetres"
+
+msgctxt "html_report:h:"
+msgid "Percentile"
+msgstr "Percentil"
 
 msgctxt "html_report:h:"
 msgid "Pivot Table"
@@ -2269,6 +2309,10 @@ msgid "Min"
 msgstr "Mínim"
 
 msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Percentile"
+msgstr "Percentil"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
 msgid "Sum"
 msgstr "Suma"
 
@@ -2749,6 +2793,10 @@ msgid "Order fields"
 msgstr "Camps ordenació"
 
 msgctxt "voyager:v:"
+msgid "Over Field"
+msgstr "Sobre el camp"
+
+msgctxt "voyager:v:"
 msgid "Page not found or you don't have access to it"
 msgstr "No s'ha trobat la pàgina o no hi tens accés"
 
@@ -2759,6 +2807,10 @@ msgstr "No s'ha trobat la pàgina | Tryton"
 msgctxt "voyager:v:"
 msgid "Parameters"
 msgstr "Paràmetres"
+
+msgctxt "voyager:v:"
+msgid "Percentile"
+msgstr "Percentil"
 
 msgctxt "voyager:v:"
 msgid "Pivot Table"

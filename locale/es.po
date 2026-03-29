@@ -286,6 +286,14 @@ msgctxt "field:babi.pivot.measure,field:"
 msgid "Field"
 msgstr "Campo"
 
+msgctxt "field:babi.pivot.measure,over_field:"
+msgid "Over Field"
+msgstr "Sobre el campo"
+
+msgctxt "field:babi.pivot.measure,percentile:"
+msgid "Percentile"
+msgstr "Percentil"
+
 msgctxt "field:babi.pivot.measure,pivot:"
 msgid "Pivot"
 msgstr "Tabla dinámica"
@@ -966,6 +974,14 @@ msgctxt "field:www.pivot_header.selection,measure:"
 msgid "Measure"
 msgstr "Medida"
 
+msgctxt "field:www.pivot_header.selection,over_field:"
+msgid "Over Field"
+msgstr "Sobre el campo"
+
+msgctxt "field:www.pivot_header.selection,percentile:"
+msgid "Percentile"
+msgstr "Percentil"
+
 msgctxt "field:www.pivot_header.selection,table_name:"
 msgid "Table Name"
 msgstr "Nombre de la tabla"
@@ -986,6 +1002,14 @@ msgctxt "field:www.pivot_header.selection.add_field,measure:"
 msgid "Measure"
 msgstr "Medida"
 
+msgctxt "field:www.pivot_header.selection.add_field,over_field:"
+msgid "Over Field"
+msgstr "Sobre el campo"
+
+msgctxt "field:www.pivot_header.selection.add_field,percentile:"
+msgid "Percentile"
+msgstr "Percentil"
+
 msgctxt "field:www.pivot_header.selection.add_field,table_name:"
 msgid "Table Name"
 msgstr "Nombre de la tabla"
@@ -1005,6 +1029,14 @@ msgstr "Encabezamiento"
 msgctxt "field:www.pivot_header.selection.close_field,measure:"
 msgid "Measure"
 msgstr "Medida"
+
+msgctxt "field:www.pivot_header.selection.close_field,over_field:"
+msgid "Over Field"
+msgstr "Sobre el campo"
+
+msgctxt "field:www.pivot_header.selection.close_field,percentile:"
+msgid "Percentile"
+msgstr "Percentil"
 
 msgctxt "field:www.pivot_header.selection.close_field,table_name:"
 msgid "Table Name"
@@ -1281,6 +1313,10 @@ msgid "Order fields"
 msgstr "Campos de pedido"
 
 msgctxt "html_report:h:"
+msgid "Over Field"
+msgstr "Sobre el campo"
+
+msgctxt "html_report:h:"
 msgid "Page not found or you don't have access to it"
 msgstr "Página no encontrada o no tienes acceso a ella."
 
@@ -1291,6 +1327,10 @@ msgstr "Página no encontrada | Tryton"
 msgctxt "html_report:h:"
 msgid "Parameters"
 msgstr "Parámetros"
+
+msgctxt "html_report:h:"
+msgid "Percentile"
+msgstr "Percentil"
 
 msgctxt "html_report:h:"
 msgid "Pivot Table"
@@ -2270,6 +2310,10 @@ msgid "Min"
 msgstr "Mínimo"
 
 msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Percentile"
+msgstr "Percentil"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
 msgid "Sum"
 msgstr "Suma"
 
@@ -2750,6 +2794,10 @@ msgid "Order fields"
 msgstr "Campos de orden"
 
 msgctxt "voyager:v:"
+msgid "Over Field"
+msgstr "Sobre el campo"
+
+msgctxt "voyager:v:"
 msgid "Page not found or you don't have access to it"
 msgstr "Página no encontrada o no tienes acceso a ella"
 
@@ -2760,6 +2808,10 @@ msgstr "Página no encontrada | Tryton"
 msgctxt "voyager:v:"
 msgid "Parameters"
 msgstr "Parámetros"
+
+msgctxt "voyager:v:"
+msgid "Percentile"
+msgstr "Percentil"
 
 msgctxt "voyager:v:"
 msgid "Pivot Table"
