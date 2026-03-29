@@ -297,4 +297,56 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         self.assertEqual(Cube.measure_name(('value', 'percentile', 12.5)),
             'percentile_12_5_value__')
 
+    @with_transaction()
+    def test_pivot_window_aggregate(self):
+        measure = Cube.measure_method(sql.Table('test'),
+            ('value', 'sum', 'category'))
+        self.assertEqual(str(measure.expression),
+            'SUM("value") OVER (PARTITION BY "category")')
+        self.assertEqual(Cube.measure_name(('value', 'sum', 'category')),
+            'sum_value_over_category__')
+
+        percentile = Cube.measure_method(sql.Table('test'),
+            ('value', 'percentile', 90, 'category'))
+        self.assertIn('PARTITION BY "category"', str(percentile.expression))
+        self.assertEqual(percentile.expression.params, (0.9,))
+        self.assertEqual(
+            Cube.measure_name(('value', 'percentile', 12.5, 'category')),
+            'percentile_12_5_value_over_category__')
+
+    @with_transaction()
+    def test_pivot_window_build(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+
+        table = Table()
+        table.type = 'table'
+        table.name = 'Window Build Table'
+        table.on_change_name()
+        if backend.name == 'sqlite':
+            table.query = '''
+                SELECT 1 AS id, 10 AS company, 'Alice' AS name
+                UNION ALL
+                SELECT 2 AS id, 10 AS company, 'Bob' AS name
+                UNION ALL
+                SELECT 3 AS id, 20 AS company, 'Carol' AS name
+                '''
+        else:
+            table.query = '''
+                SELECT * FROM (
+                    VALUES
+                        (1, 10, 'Alice'),
+                        (2, 10, 'Bob'),
+                        (3, 20, 'Carol')
+                ) AS data(id, company, name)
+                '''
+        table.save()
+        table._compute()
+
+        cube = Cube(table=table.table_name,
+            rows=['name'],
+            measures=[('id', 'count', 'company')])
+        result = list(cube.build())
+        self.assertTrue(result)
+
 del ModuleTestCase

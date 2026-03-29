@@ -1424,11 +1424,13 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         else:
             return ''
 
-    def _drop(self):
+    def _drop(self, connection=None):
         # Given that the type may be changed from view to table and viceversa
         # we cannot rely on self.type to know if we have to execute DROP TABLE
         # or DROP VIEW.
-        cursor = Transaction().connection.cursor()
+        if connection is None:
+            connection = Transaction().connection
+        cursor = connection.cursor()
         if backend.name != 'postgresql':
             cursor.execute('DROP TABLE IF EXISTS %s' % self.table_name)
             cursor.execute('DROP VIEW IF EXISTS %s' % self.table_name)
@@ -1450,16 +1452,20 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         else:
             cursor.execute(f'DROP TABLE IF EXISTS "{self.table_name}" CASCADE')
 
-    def _set_statement_timeout(self, timeout=None):
+    def _set_statement_timeout(self, timeout=None, connection=None):
         if backend.name != 'postgresql':
             return
-        cursor = Transaction().connection.cursor()
+        if connection is None:
+            connection = Transaction().connection
+        cursor = connection.cursor()
         cursor.execute(f'SET statement_timeout TO {self.timeout * 1000};')
 
-    def _reset_statement_timeout(self):
+    def _reset_statement_timeout(self, connection=None):
         if backend.name != 'postgresql':
             return
-        cursor = Transaction().connection.cursor()
+        if connection is None:
+            connection = Transaction().connection
+        cursor = connection.cursor()
         cursor.execute('SET statement_timeout TO 0;')
 
     def _compute_view(self):
@@ -1467,10 +1473,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             cursor = transaction.connection.cursor()
             # We must use a subquery because the _stripped_query may contain a
             # LIMIT clause
-            self._set_statement_timeout()
+            self._set_statement_timeout(connection=transaction.connection)
             cursor.execute('SELECT * FROM (%s) AS subquery LIMIT 1' %
                 self._stripped_query)
-            self._reset_statement_timeout()
+            self._reset_statement_timeout(connection=transaction.connection)
 
         field_names = [x[0] for x in cursor.description]
         self.update_fields(field_names)
@@ -1481,12 +1487,12 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
     def _compute_table(self):
         with Transaction().new_transaction() as transaction:
-            self._drop()
+            self._drop(transaction.connection)
             cursor = transaction.connection.cursor()
-            self._set_statement_timeout()
+            self._set_statement_timeout(connection=transaction.connection)
             cursor.execute('CREATE TABLE "%s" AS %s' % (self.table_name,
                     self._stripped_query))
-            self._reset_statement_timeout()
+            self._reset_statement_timeout(connection=transaction.connection)
             cursor.execute('SELECT * FROM "%s" LIMIT 1' % self.table_name)
 
         field_names = [x[0] for x in cursor.description]
@@ -1497,7 +1503,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-            self._drop()
+            self._drop(transaction.connection)
             fields = []
             for field in self.fields_:
                 fields.append('"%s" %s' % (field.internal_name, field.sql_type()))
@@ -2283,6 +2289,8 @@ class Pivot(ModelSQL, ModelView):
                 record.field = rel[measure.field.internal_name]
                 record.aggregate = measure.aggregate
                 record.percentile = measure.percentile
+                record.over_field = (measure.over_field
+                    and rel[measure.over_field.internal_name])
                 m_to_save.append(record)
             for property_ in old.properties:
                 record = Property()
@@ -2337,19 +2345,14 @@ class Pivot(ModelSQL, ModelView):
             if not item.element:
                 continue
             if item.element.__name__ == 'babi.pivot.measure':
-                measure = (item.element.field.internal_name,
-                    item.element.aggregate)
-                if item.element.aggregate == 'percentile':
-                    measure += (item.element.percentile,)
-                order.append((measure, item.order))
+                order.append((Measure.get_measure_tuple(item.element),
+                    item.order))
             else:
                 order.append((item.element.field.internal_name, item.order))
         return Cube(table=self.table.table_name,
             rows=[x.field.internal_name for x in self.row_dimensions if x.field],
             columns=[x.field.internal_name for x in self.column_dimensions if x.field],
-            measures=[((x.field.internal_name, x.aggregate, x.percentile)
-                    if x.aggregate == 'percentile'
-                    else (x.field.internal_name, x.aggregate))
+            measures=[Measure.get_measure_tuple(x)
                 for x in self.measures if x.field and x.aggregate],
             properties=[x.field.internal_name for x in self.properties if x.field],
             order=order,
@@ -2476,6 +2479,10 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
         ondelete='CASCADE', domain=[
                 ('table', '=', Eval('table', -1)),
                 ])
+    over_field = fields.Many2One('babi.field', 'Over Field',
+        ondelete='CASCADE', domain=[
+                ('table', '=', Eval('table', -1)),
+                ])
     table = fields.Function(fields.Many2One('babi.table', 'Table'),
         'on_change_with_table')
     aggregate = fields.Selection([
@@ -2500,6 +2507,15 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
     @staticmethod
     def default_percentile():
         return 50.0
+
+    @classmethod
+    def get_measure_tuple(cls, measure):
+        values = [measure.field.internal_name, measure.aggregate]
+        if measure.aggregate == 'percentile':
+            values.append(measure.percentile)
+        if measure.over_field:
+            values.append(measure.over_field.internal_name)
+        return tuple(values)
 
     def get_rec_name(self, name):
         return self.field.rec_name

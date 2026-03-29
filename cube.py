@@ -38,17 +38,18 @@ class Median(sql.aggregate.Aggregate):
     __slots__ = ()
     _sql = 'PERCENTILE_CONT'
 
-    def __init__(self, expression):
-        super().__init__(sql.Literal(0.5), within=[expression])
+    def __init__(self, expression, window=None):
+        super().__init__(sql.Literal(0.5), within=[expression],
+            window=window)
 
 
 class Percentile(sql.aggregate.Aggregate):
     __slots__ = ()
     _sql = 'PERCENTILE_CONT'
 
-    def __init__(self, percentile, expression):
+    def __init__(self, percentile, expression, window=None):
         super().__init__(sql.Literal(float(percentile) / 100),
-            within=[expression])
+            within=[expression], window=window)
 
 
 class Cube:
@@ -138,12 +139,15 @@ class Cube:
 
     def get_data(self, query, orderby):
         cursor = Transaction().connection.cursor()
+        query_string, params = tuple(query)
 
         cursor.execute('SAVEPOINT babi_cube')
         try:
-            mogrified = cursor.mogrify(*query)
-            cache = self.cache_prefix() + hashlib.md5(mogrified).hexdigest()[:20]
-            mogrified = mogrified.decode('utf-8')
+            # SQLite cursors do not support mogrify(), so hash the query text
+            # together with its parameters and execute the CREATE TABLE with
+            # parameters directly on all backends.
+            cache_data = repr((query_string, params)).encode('utf-8')
+            cache = self.cache_prefix() + hashlib.md5(cache_data).hexdigest()[:20]
             unlogged = ''
             if backend.name == 'postgresql':
                 unlogged = 'UNLOGGED'
@@ -160,7 +164,9 @@ class Cube:
             # that get_values() should sort groupby fields alphabetically and then
             # be able to pick the right values from the result tuple
             # (probably using DictCursor)
-            cursor.execute(f"CREATE {unlogged} TABLE IF NOT EXISTS {cache} AS {mogrified}")
+            cursor.execute(
+                f"CREATE {unlogged} TABLE IF NOT EXISTS {cache} AS "
+                f"{query_string}", params)
 
             table = sql.Table(cache)
             query_order = []
@@ -313,7 +319,8 @@ class Cube:
             column_header.append(row_extra_space + column)
 
         # Add the measure information row
-        measure_names = [Cell(m[0], type=CellType.COLUMN_HEADER) for m in self.measures]
+        measure_names = [Cell(self.measure_label(m), type=CellType.COLUMN_HEADER)
+            for m in self.measures]
         column_length = column_header and len(column_header[0])-(len(self.rows)+1)
         if not measure_names or not isinstance(column_length, int) or column_length < 0:
             return column_header
@@ -325,27 +332,68 @@ class Cube:
 
     @classmethod
     def measure_method(cls, table, measure):
-        field = measure[0]
-        aggregate = measure[1]
+        field, aggregate, percentile, over_field = cls.measure_parts(measure)
+        window = None
+        if over_field:
+            window = sql.Window([getattr(table, over_field)])
         if aggregate == 'average':
             aggregate = 'avg'
         if aggregate == 'median':
-            return Median(getattr(table, field)).as_(cls.measure_name(measure))
+            return Median(getattr(table, field), window=window).as_(
+                cls.measure_name(measure))
         if aggregate == 'percentile':
-            percentile = measure[2]
-            return Percentile(percentile, getattr(table, field)).as_(
+            return Percentile(percentile, getattr(table, field),
+                window=window).as_(
                 cls.measure_name(measure))
         Operator = getattr(sql.aggregate, aggregate.capitalize())
-        return Operator(getattr(table, field)).as_(cls.measure_name(measure))
+        return Operator(getattr(table, field), window=window).as_(
+            cls.measure_name(measure))
+
+    @classmethod
+    def measure_parts(cls, measure):
+        field = measure[0]
+        aggregate = measure[1]
+        percentile = None
+        over_field = None
+        if aggregate == 'percentile':
+            if len(measure) > 2:
+                percentile = measure[2]
+            if len(measure) > 3:
+                over_field = measure[3]
+        elif len(measure) > 2:
+            over_field = measure[2]
+        return field, aggregate, percentile, over_field
+
+    @classmethod
+    def measure_label(cls, measure):
+        field, aggregate, percentile, over_field = cls.measure_parts(measure)
+        aggregate_labels = {
+            'avg': 'Average',
+            'average': 'Average',
+            'min': 'Minimum',
+            'max': 'Maximum',
+        }
+        aggregate_label = aggregate_labels.get(aggregate,
+            capitalize(aggregate))
+        label = f'{capitalize(field)} ({aggregate_label}'
+        if percentile is not None:
+            label += f' {percentile}'
+        label += ')'
+        if over_field:
+            label += f' / {capitalize(over_field)}'
+        return label
 
     @classmethod
     def measure_name(cls, measure):
-        field = measure[0]
-        aggregate = measure[1]
+        field, aggregate, percentile, over_field = cls.measure_parts(measure)
         if aggregate == 'percentile':
-            percentile = str(measure[2]).replace('.', '_')
-            return f'{aggregate}_{percentile}_{field}__'
-        return f'{aggregate}_{field}__'
+            percentile = str(percentile).replace('.', '_')
+            name = f'{aggregate}_{percentile}_{field}'
+        else:
+            name = f'{aggregate}_{field}'
+        if over_field:
+            name += f'_over_{over_field}'
+        return f'{name}__'
 
     @classmethod
     def property_name(cls, property):
@@ -380,13 +428,8 @@ class Cube:
 
         table = sql.Table(self.table)
         # Format the measures and properties to use them in the query
-        measures = [self.measure_method(table, x) for x in self.measures]
-        # We could use DISTINCT ON but unfortunately it is not standard and
-        # not supported by SQLite
-        # See: https://www.postgresql.org/docs/17/sql-select.html#SQL-DISTINCT
-        properties = [sql.aggregate.Min(
-                getattr(table, x)).as_(self.property_name(x))
-            for x in self.properties]
+        has_window_measures = any(self.measure_parts(x)[3] for x in self.measures)
+        property_count = len(self.properties)
         values = OrderedDict()
         property_values = OrderedDict()
         for rowxcolumn in rxc:
@@ -402,9 +445,19 @@ class Cube:
                     if item[0] in groupby:
                         orderby.append(item)
 
-            groupby = [getattr(table, x) for x in groupby]
-            fields = groupby + measures + properties
-            query = table.select(*fields, group_by=groupby)
+            if has_window_measures:
+                query = self.get_values_window_query(table, groupby)
+            else:
+                measures = [self.measure_method(table, x) for x in self.measures]
+                # We could use DISTINCT ON but unfortunately it is not standard and
+                # not supported by SQLite
+                # See: https://www.postgresql.org/docs/17/sql-select.html#SQL-DISTINCT
+                properties = [sql.aggregate.Min(
+                        getattr(table, x)).as_(self.property_name(x))
+                    for x in self.properties]
+                groupby_fields = [getattr(table, x) for x in groupby]
+                fields = groupby_fields + measures + properties
+                query = table.select(*fields, group_by=groupby_fields)
             results = self.get_data(query, orderby)
 
             # If we dont have any expansion -> we are in the level 0
@@ -413,14 +466,16 @@ class Cube:
             default_row_coordinates = tuple([None] * len(self.rows))
             default_column_coordinates = tuple([None] * len(self.columns))
             for raw_result in results:
-                if properties:
-                    result = [Cell(x) for x in raw_result[:-len(properties)]]
+                if property_count:
+                    result = [Cell(x) for x in raw_result[:-property_count]]
                 else:
                     result = [Cell(x) for x in raw_result]
                 coordinates = self.get_value_coordinate(result, rowxcolumn)
 
-                if properties and coordinates[0] and coordinates[0][-1] is not None:
-                    coordinates[0][-1].properties = raw_result[-len(properties):]
+                if (property_count and coordinates[0]
+                        and coordinates[0][-1] is not None):
+                    coordinates[0][-1].properties = (
+                        raw_result[-property_count:])
 
                 # Get the row values from the coordinates
                 row_coordinate_values = tuple(
@@ -497,6 +552,39 @@ class Cube:
                         # will equal the number of measures we have
                         values[coordinates] = result
         return values, property_values
+
+    def get_values_window_query(self, table, groupby):
+        field_aliases = list(groupby)
+        for property_ in self.properties:
+            if property_ not in field_aliases:
+                field_aliases.append(property_)
+        for measure in self.measures:
+            field, _, _, _ = self.measure_parts(measure)
+            if field not in field_aliases:
+                field_aliases.append(field)
+
+        inner_fields = [getattr(table, name).as_(name) for name in field_aliases]
+        for measure in self.measures:
+            _, _, _, over_field = self.measure_parts(measure)
+            if over_field:
+                inner_fields.append(self.measure_method(table, measure))
+
+        inner_query = table.select(*inner_fields)
+        measures = []
+        for measure in self.measures:
+            field, _, _, over_field = self.measure_parts(measure)
+            alias = self.measure_name(measure)
+            if over_field:
+                measures.append(sql.aggregate.Min(
+                        getattr(inner_query, alias)).as_(alias))
+            else:
+                measures.append(self.measure_method(inner_query, measure))
+        properties = [sql.aggregate.Min(
+                getattr(inner_query, x)).as_(self.property_name(x))
+            for x in self.properties]
+        groupby_fields = [getattr(inner_query, x) for x in groupby]
+        fields = groupby_fields + measures + properties
+        return inner_query.select(*fields, group_by=groupby_fields)
 
     def build(self):
         '''

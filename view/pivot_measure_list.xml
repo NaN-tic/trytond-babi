@@ -3,4 +3,5 @@
     <field name="field"/>
     <field name="aggregate"/>
     <field name="percentile"/>
+    <field name="over_field"/>
 </tree>
