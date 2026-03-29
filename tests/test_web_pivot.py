@@ -91,9 +91,47 @@ class TestPivot(WebTestCase):
             modal_heading = page.get_by_role("heading",
                 name="Select a field to add:")
             expect(modal_heading).to_have_count(1)
+            self.assertEqual(
+                page.locator("#field_selection_x a[title='Close']")
+                .get_attribute("title"),
+                "Close")
             page.locator("#field_selection_x").get_by_role("link",
                 name="Cancel").click()
             expect(modal_heading).to_have_count(0)
+            self.assertEqual(
+                page.locator("button[title='Compute']").get_attribute(
+                    "title"),
+                "Compute")
+            self.assertEqual(
+                page.locator("a[title='Swap rows and columns']").get_attribute(
+                    "title"),
+                "Swap rows and columns")
+            self.assertEqual(
+                page.locator("a[title='Clear configuration']").get_attribute(
+                    "title"),
+                "Clear configuration")
+            compute_box = page.locator("button[title='Compute']").bounding_box()
+            swap_box = page.locator(
+                "a[title='Swap rows and columns']").bounding_box()
+            clear_box = page.locator(
+                "a[title='Clear configuration']").bounding_box()
+            self.assertIsNotNone(compute_box)
+            self.assertIsNotNone(swap_box)
+            self.assertIsNotNone(clear_box)
+            self.assertAlmostEqual(compute_box['y'], swap_box['y'], delta=1)
+            self.assertAlmostEqual(compute_box['y'], clear_box['y'], delta=1)
+            self.assertAlmostEqual(
+                compute_box['height'], swap_box['height'], delta=1)
+            self.assertAlmostEqual(
+                compute_box['height'], clear_box['height'], delta=1)
+            header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
+            page.locator("#field_selection_x #field").select_option('name')
+            page.locator("#field_selection_x button[type='submit']").click()
+            page.wait_for_load_state('load')
+            self.assertEqual(
+                page.locator("a[title='Clear configuration']")
+                .get_attribute("title"),
+                "Clear configuration")
 
     def test_02_add_measure(self):
         with sync_playwright() as playwright:
@@ -367,3 +405,114 @@ class TestPivot(WebTestCase):
             download = page.locator("a[href*='/babi/pivot/download/']").first
             expect(download).to_have_attribute('href',
                 lambda v: v is not None and v.endswith('/xlsx'))
+
+    def test_08_button_tooltips(self):
+        with sync_playwright() as playwright:
+            headless = (config.getboolean('nantic_connection',
+                'test_headless', default=False) or
+                    'DISPLAY' not in os.environ)
+
+            browser = playwright.firefox.launch(headless=headless)
+            context = browser.new_context(
+                locale='en-US',
+                http_credentials={
+                    "username": self.user,
+                    "password": self.password,
+                }
+            )
+            page = context.new_page()
+            page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
+            page.wait_for_load_state('load')
+
+            self.assertEqual(
+                page.locator("#toggle_sidebar").get_attribute("title"),
+                "Show sidebar")
+            page.locator("#toggle_sidebar").click()
+            self.assertEqual(
+                page.locator("#sidebar button[title='Hide sidebar']")
+                .get_attribute("title"),
+                "Hide sidebar")
+            self.assertEqual(
+                page.locator("button[title='Compute']").get_attribute(
+                    "title"),
+                "Compute")
+            self.assertEqual(
+                page.locator("a[title='Swap rows and columns']")
+                .get_attribute("title"),
+                "Swap rows and columns")
+            self.assertEqual(
+                page.locator("a[title='Clear configuration']")
+                .get_attribute("title"),
+                "Clear configuration")
+            self.assertEqual(
+                page.locator("#header_x a[title='Add row']")
+                .get_attribute("title"),
+                "Add row")
+            self.assertEqual(
+                page.locator("#header_y a[title='Add column']")
+                .get_attribute("title"),
+                "Add column")
+            self.assertEqual(
+                page.locator("#header_measure a[title='Add measure']")
+                .get_attribute("title"),
+                "Add measure")
+            self.assertEqual(
+                page.locator("#header_property a[title='Add property']")
+                .get_attribute("title"),
+                "Add property")
+
+            header_x = page.locator("#header_x")
+            header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
+            page.locator("#field_selection_x #field").select_option('name')
+            page.locator("#field_selection_x button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
+            page.locator("#field_selection_x #field").select_option('company')
+            page.locator("#field_selection_x button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_measure = page.locator("#header_measure")
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option('id')
+            page.locator("#field_selection_measure button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option('id')
+            page.locator("#field_selection_measure #measure").select_option(
+                'count')
+            page.locator("#field_selection_measure button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            expect(page.locator("#header_x a[title='Remove row']")).to_have_count(2)
+            expect(page.locator("#header_x a[title='Move row up']")).to_have_count(1)
+            expect(page.locator("#header_x a[title='Move row down']")).to_have_count(1)
+            expect(page.locator("#header_measure a[title='Remove measure']")).to_have_count(2)
+            expect(page.locator("#header_measure a[title='Move measure up']")).to_have_count(1)
+            expect(page.locator("#header_measure a[title='Move measure down']")).to_have_count(1)
+            self.assertGreater(
+                page.locator("#header_order a[title='Change order direction']")
+                .count(), 0)
+            self.assertGreater(
+                page.locator("#header_order a[title='Move order up']").count(),
+                0)
+            self.assertGreater(
+                page.locator("#header_order a[title='Move order down']").count(),
+                0)
+            self.assertEqual(
+                page.locator("#pivot_table a[title='Expand all']")
+                .get_attribute("title"),
+                "Expand all")
+            self.assertEqual(
+                page.locator("#pivot_table a[title='Collapse all']")
+                .get_attribute("title"),
+                "Collapse all")
+            self.assertEqual(
+                page.locator("#pivot_table a[title='Download']")
+                .get_attribute("title"),
+                "Download")
+            expect(page.locator("body")).not_to_contain_text(
+                "Internal Server Error")

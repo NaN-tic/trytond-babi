@@ -2829,12 +2829,116 @@ msgid "Rows"
 msgstr "Files"
 
 msgctxt "voyager:v:"
+msgid "Clear configuration"
+msgstr "Neteja la configuració"
+
+msgctxt "voyager:v:"
+msgid "Hide sidebar"
+msgstr "Amaga la barra lateral"
+
+msgctxt "voyager:v:"
+msgid "Show sidebar"
+msgstr "Mostra la barra lateral"
+
+msgctxt "voyager:v:"
+msgid "Add row"
+msgstr "Afegeix una fila"
+
+msgctxt "voyager:v:"
+msgid "Add column"
+msgstr "Afegeix una columna"
+
+msgctxt "voyager:v:"
+msgid "Add property"
+msgstr "Afegeix una propietat"
+
+msgctxt "voyager:v:"
+msgid "Add measure"
+msgstr "Afegeix una mesura"
+
+msgctxt "voyager:v:"
+msgid "Move row up"
+msgstr "Mou la fila amunt"
+
+msgctxt "voyager:v:"
+msgid "Move row down"
+msgstr "Mou la fila avall"
+
+msgctxt "voyager:v:"
+msgid "Remove row"
+msgstr "Elimina la fila"
+
+msgctxt "voyager:v:"
+msgid "Move column up"
+msgstr "Mou la columna amunt"
+
+msgctxt "voyager:v:"
+msgid "Move column down"
+msgstr "Mou la columna avall"
+
+msgctxt "voyager:v:"
+msgid "Remove column"
+msgstr "Elimina la columna"
+
+msgctxt "voyager:v:"
+msgid "Move property up"
+msgstr "Mou la propietat amunt"
+
+msgctxt "voyager:v:"
+msgid "Move property down"
+msgstr "Mou la propietat avall"
+
+msgctxt "voyager:v:"
+msgid "Remove property"
+msgstr "Elimina la propietat"
+
+msgctxt "voyager:v:"
+msgid "Move measure up"
+msgstr "Mou la mesura amunt"
+
+msgctxt "voyager:v:"
+msgid "Move measure down"
+msgstr "Mou la mesura avall"
+
+msgctxt "voyager:v:"
+msgid "Remove measure"
+msgstr "Elimina la mesura"
+
+msgctxt "voyager:v:"
+msgid "Change order direction"
+msgstr "Canvia la direcció de l'ordenació"
+
+msgctxt "voyager:v:"
+msgid "Move order up"
+msgstr "Mou l'ordre amunt"
+
+msgctxt "voyager:v:"
+msgid "Move order down"
+msgstr "Mou l'ordre avall"
+
+msgctxt "voyager:v:"
+msgid "Expand all"
+msgstr "Expandeix-ho tot"
+
+msgctxt "voyager:v:"
+msgid "Collapse all"
+msgstr "Col·lapsa-ho tot"
+
+msgctxt "voyager:v:"
+msgid "Download"
+msgstr "Descarrega"
+
+msgctxt "voyager:v:"
 msgid "Save Configuration"
 msgstr "Desa la configuració"
 
 msgctxt "voyager:v:"
 msgid "Search tables"
 msgstr "Cerca taules"
+
+msgctxt "voyager:v:"
+msgid "Swap rows and columns"
+msgstr "Intercanvia files i columnes"
 
 msgctxt "voyager:v:"
 msgid "Select a field to add:"
