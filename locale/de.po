@@ -2545,6 +2545,15 @@ msgid ""
 msgstr "TIPP: Sie versuchen, den Durchschnitt eines Textfelds zu ermitteln. Versuchen Sie es bitte mit einem numerischen Feld oder ändern Sie die Operation."
 
 msgctxt "voyager:v:"
+msgid ""
+"HINT: You are trying to calculate percentile or median of a text type "
+"field, please try with a numeric type field or change the operation."
+msgstr ""
+"TIPP: Sie versuchen, das Perzentil oder den Median eines Textfelds zu "
+"berechnen. Versuchen Sie es bitte mit einem numerischen Feld oder ändern "
+"Sie die Operation."
+
+msgctxt "voyager:v:"
 msgid "Loading ..."
 msgstr "Wird geladen ..."
 

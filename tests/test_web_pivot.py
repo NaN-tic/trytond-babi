@@ -1,5 +1,6 @@
 import os
 import logging
+from unittest.mock import patch
 from playwright.sync_api import expect, sync_playwright
 from trytond import backend
 from trytond.config import config
@@ -516,3 +517,55 @@ class TestPivot(WebTestCase):
                 "Download")
             expect(page.locator("body")).not_to_contain_text(
                 "Internal Server Error")
+
+    def test_09_percentile_text_field_renders_hint(self):
+        with sync_playwright() as playwright:
+            headless = (config.getboolean('nantic_connection',
+                'test_headless', default=False) or
+                    'DISPLAY' not in os.environ)
+
+            browser = playwright.firefox.launch(headless=headless)
+            context = browser.new_context(
+                locale='en-US',
+                http_credentials={
+                    "username": self.user,
+                    "password": self.password,
+                }
+            )
+            page = context.new_page()
+            page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
+            page.wait_for_load_state('load')
+
+            header_x = page.locator("#header_x")
+            header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
+            page.locator("#field_selection_x #field").select_option('id')
+            page.locator("#field_selection_x button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_measure = page.locator("#header_measure")
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option(
+                'name')
+            page.locator("#field_selection_measure #measure").select_option(
+                'percentile')
+            expect(page.locator("#field_selection_measure #percentile")
+                ).to_be_visible()
+            page.locator("#field_selection_measure #percentile").fill('90')
+
+            with patch('trytond.modules.babi.cube.Cube.build',
+                    side_effect=Exception(
+                        'function percentile_cont(numeric, character '
+                        'varying) does not exist')):
+                page.locator(
+                    "#field_selection_measure button[type='submit']").click()
+                page.wait_for_load_state('load')
+
+            expect(page.locator("body")).not_to_contain_text(
+                "Internal Server Error")
+            expect(page.locator("body")).to_contain_text(
+                "Error building the cube:")
+            expect(page.locator("body")).to_contain_text(
+                "HINT: You are trying to calculate percentile or median of a "
+                "text type field, please try with a numeric type field or "
+                "change the operation.")
