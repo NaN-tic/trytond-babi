@@ -1838,7 +1838,7 @@ class PivotTable(Endpoint):
         loading_div.add(loading_spinner_)
 
         pivot_div = div(id='pivot_table', cls=("inline-block min-w-full py-2 align-middle "
-            "sm:px-6 lg:px-8 relative max-w-sm m-2 border border-gray-200 rounded-lg bg-white"))
+            "sm:px-6 lg:px-8 relative my-2 border border-gray-200 rounded-lg bg-white"))
         pivot_div.add(loading_div)
         pivot_div.add(controls)
         table_container = div(cls="shadow-md rounded-lg overflow-hidden border border-gray-200")
