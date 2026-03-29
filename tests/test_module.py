@@ -7,6 +7,7 @@ import random
 import sql
 from decimal import Decimal
 from trytond import backend
+from trytond.model.exceptions import ValidationError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
@@ -348,5 +349,83 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             measures=[('id', 'count', 'company')])
         result = list(cube.build())
         self.assertTrue(result)
+
+    @with_transaction()
+    def test_pivot_measure_allows_reused_fields(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+        RowDimension = pool.get('babi.pivot.row_dimension')
+        Measure = pool.get('babi.pivot.measure')
+        Property = pool.get('babi.pivot.property')
+
+        table = Table()
+        table.type = 'table'
+        table.name = 'Measure Reuse Table'
+        table.on_change_name()
+        if backend.name == 'sqlite':
+            table.query = '''
+                SELECT 1 AS id, 10 AS company, 'Alice' AS name
+                UNION ALL
+                SELECT 2 AS id, 20 AS company, 'Bob' AS name
+                '''
+        else:
+            table.query = '''
+                SELECT * FROM (
+                    VALUES
+                        (1, 10, 'Alice'),
+                        (2, 20, 'Bob')
+                ) AS data(id, company, name)
+                '''
+        table.save()
+        table._compute()
+
+        fields = {field.internal_name: field for field in table.fields_}
+        pivot = Pivot(table=table, name='Measure Reuse')
+        pivot.save()
+        RowDimension(pivot=pivot, field=fields['company']).save()
+        Property(pivot=pivot, field=fields['name']).save()
+        Measure.save([
+                Measure(pivot=pivot, field=fields['company'],
+                    aggregate='sum'),
+                Measure(pivot=pivot, field=fields['company'],
+                    aggregate='count'),
+                Measure(pivot=pivot, field=fields['name'],
+                    aggregate='count'),
+                ])
+
+        pivot = Pivot(pivot.id)
+        self.assertCountEqual(pivot.get_cube().measures, [
+                ('company', 'sum'),
+                ('company', 'count'),
+                ('name', 'count'),
+                ])
+
+    @with_transaction()
+    def test_pivot_measure_requires_unique_configuration(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+        Measure = pool.get('babi.pivot.measure')
+
+        table = Table()
+        table.type = 'table'
+        table.name = 'Duplicate Measure Table'
+        table.on_change_name()
+        if backend.name == 'sqlite':
+            table.query = 'SELECT 1 AS id, 10 AS company'
+        else:
+            table.query = 'SELECT 1::INTEGER AS id, 10::INTEGER AS company'
+        table.save()
+        table._compute()
+
+        fields = {field.internal_name: field for field in table.fields_}
+        pivot = Pivot(table=table, name='Duplicate Measure')
+        pivot.save()
+        Measure(pivot=pivot, field=fields['company'], aggregate='sum').save()
+
+        with self.assertRaises(ValidationError):
+            Measure(pivot=pivot, field=fields['company'],
+                aggregate='sum').save()
 
 del ModuleTestCase

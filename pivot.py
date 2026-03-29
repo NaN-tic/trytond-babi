@@ -1311,7 +1311,10 @@ class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
                                 h3(_('Select a field to add:'), cls="text-base font-semibold leading-6 text-gray-900", id="modal-title")
                                 with div(cls="mt-2 space-y-4"):
                                     with select(id="field", name="field", cls="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"):
-                                        if self.header != 'order':
+                                        if self.header == 'measure':
+                                            for field in sorted(fields):
+                                                option(capitalize(field_names[field]), value=field)
+                                        elif self.header != 'order':
                                             for field in sorted(fields):
                                                 if field not in fields_used:
                                                     option(capitalize(field_names[field]), value=field)
