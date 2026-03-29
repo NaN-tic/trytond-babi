@@ -384,9 +384,11 @@ class Cube:
         # We could use DISTINCT ON but unfortunately it is not standard and
         # not supported by SQLite
         # See: https://www.postgresql.org/docs/17/sql-select.html#SQL-DISTINCT
-        properties = [sql.aggregate.Min(
-                getattr(table, x)).as_(self.property_name(x))
-            for x in self.properties]
+        properties = []
+        if self.properties:
+            properties = [sql.aggregate.Min(
+                    getattr(table, x)).as_(self.property_name(x))
+                for x in self.properties]
         values = OrderedDict()
         property_values = OrderedDict()
         for rowxcolumn in rxc:
