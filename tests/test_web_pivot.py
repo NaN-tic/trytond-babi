@@ -217,7 +217,62 @@ class TestPivot(WebTestCase):
             expect(page.locator("#header_measure")).to_contain_text("Sum")
             expect(page.locator("#header_measure")).to_contain_text("Count")
 
-    def test_05_download_document(self):
+    def test_05_axis_fields_allow_measures_but_remain_unique(self):
+        with sync_playwright() as playwright:
+            headless = (config.getboolean('nantic_connection',
+                'test_headless', default=False) or
+                    'DISPLAY' not in os.environ)
+
+            browser = playwright.firefox.launch(headless=headless)
+            context = browser.new_context(
+                locale='en-US',
+                http_credentials={
+                    "username": self.user,
+                    "password": self.password,
+                }
+            )
+            page = context.new_page()
+            page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
+            page.wait_for_load_state('load')
+
+            header_measure = page.locator("#header_measure")
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option(
+                'company')
+            page.locator("#field_selection_measure button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_x = page.locator("#header_x")
+            header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
+            expect(page.locator(
+                "#field_selection_x #field option[value='company']"
+                )).to_have_count(1)
+            page.locator("#field_selection_x #field").select_option('company')
+            page.locator("#field_selection_x button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_property = page.locator("#header_property")
+            header_property.locator(
+                "a[hx-post*='/open_field_selection/property/']").click()
+            expect(page.locator(
+                "#field_selection_property #field option[value='company']"
+                )).to_have_count(0)
+            page.locator("#field_selection_property").get_by_role("link",
+                name="Cancel").click()
+            expect(page.locator("#field_selection_property")).to_be_empty()
+
+            header_y = page.locator("#header_y")
+            header_y.locator("a[hx-post*='/open_field_selection/y/']").click()
+            expect(page.locator(
+                "#field_selection_y #field option[value='company']"
+                )).to_have_count(0)
+
+            expect(page.locator("body")).not_to_contain_text(
+                "Internal Server Error")
+            expect(page.locator("#header_x")).to_contain_text("Company")
+
+    def test_06_download_document(self):
         if backend.name == 'sqlite':
             self.skipTest('Download report not supported on sqlite')
 

@@ -428,4 +428,43 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             Measure(pivot=pivot, field=fields['company'],
                 aggregate='sum').save()
 
+    @with_transaction()
+    def test_pivot_axis_fields_ignore_measures_but_remain_unique(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Pivot = pool.get('babi.pivot')
+        RowDimension = pool.get('babi.pivot.row_dimension')
+        ColumnDimension = pool.get('babi.pivot.column_dimension')
+        Measure = pool.get('babi.pivot.measure')
+
+        table = Table()
+        table.type = 'table'
+        table.name = 'Axis Field Reuse Table'
+        table.on_change_name()
+        if backend.name == 'sqlite':
+            table.query = '''
+                SELECT 1 AS id, 10 AS company, 'Alice' AS name
+                UNION ALL
+                SELECT 2 AS id, 20 AS company, 'Bob' AS name
+                '''
+        else:
+            table.query = '''
+                SELECT * FROM (
+                    VALUES
+                        (1, 10, 'Alice'),
+                        (2, 20, 'Bob')
+                ) AS data(id, company, name)
+                '''
+        table.save()
+        table._compute()
+
+        fields = {field.internal_name: field for field in table.fields_}
+        pivot = Pivot(table=table, name='Axis Field Reuse')
+        pivot.save()
+        Measure(pivot=pivot, field=fields['company'], aggregate='sum').save()
+        RowDimension(pivot=pivot, field=fields['company']).save()
+
+        with self.assertRaises(ValidationError):
+            ColumnDimension(pivot=pivot, field=fields['company']).save()
+
 del ModuleTestCase

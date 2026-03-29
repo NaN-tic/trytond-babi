@@ -1287,7 +1287,7 @@ class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
             if self.header == 'measure':
                 fields_used = []
             elif self.header != 'order':
-                fields_used = cube.rows + cube.columns + [m[0] for m in cube.measures]
+                fields_used = cube.rows + cube.columns + cube.properties
             else:
                 order_fields = [o[0] for o in cube.order]
                 fields_used = cube.rows + cube.columns + cube.measures
@@ -1440,13 +1440,14 @@ class PivotHeaderSelectionAddField(PivotHeaderSelectionMixin, Endpoint):
         # we can send multiple times a request to the server, tryton to add
         # multiple times a field. For each header, we add the field in his
         # header and in the order header
+        axis_fields = cube.rows + cube.columns + cube.properties
         match self.header:
             case 'x':
-                if self.field not in cube.rows:
+                if self.field not in axis_fields:
                     cube.rows.append(self.field)
                     cube.order.append((self.field, 'asc'))
             case 'y':
-                if self.field not in cube.columns:
+                if self.field not in axis_fields:
                     cube.columns.append(self.field)
                     cube.order.append((self.field, 'asc'))
             case 'measure':
@@ -1456,7 +1457,7 @@ class PivotHeaderSelectionAddField(PivotHeaderSelectionMixin, Endpoint):
                     cube.measures.append(measure)
                     cube.order.append((measure, 'asc'))
             case 'property':
-                if self.field not in cube.properties:
+                if self.field not in axis_fields:
                     cube.properties.append(self.field)
             case 'order':
                 field = _parse_field_reference(self.field)

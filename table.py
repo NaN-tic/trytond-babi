@@ -2239,6 +2239,26 @@ class Pivot(ModelSQL, ModelView):
             pivot.active_stored = value
         cls.save(pivots)
 
+    @classmethod
+    def validate(cls, pivots):
+        super().validate(pivots)
+        cls.check_unique_axis_fields(pivots)
+
+    @classmethod
+    def check_unique_axis_fields(cls, pivots):
+        for pivot in pivots:
+            seen = set()
+            for records in (pivot.row_dimensions, pivot.column_dimensions,
+                    pivot.properties):
+                for record in records:
+                    if not record.field:
+                        continue
+                    field_name = record.field.internal_name
+                    if field_name in seen:
+                        raise ValidationError('Fields can only appear once '
+                            'across rows, columns, and properties.')
+                    seen.add(field_name)
+
     @fields.depends('table', '_parent_table.pivot_table', methods=['get_cube'])
     def on_change_with_url(self, name=None):
         cube = self.get_cube()
@@ -2436,6 +2456,27 @@ class RowDimension(sequence_ordered(), ModelSQL, ModelView):
         super().__setup__()
         cls.__access__.add('pivot')
 
+    @classmethod
+    def validate(cls, records):
+        super().validate(records)
+        cls.check_unique_axis_fields(records)
+
+    @classmethod
+    def check_unique_axis_fields(cls, records):
+        pool = Pool()
+        Pivot = pool.get('babi.pivot')
+
+        pivots = {}
+        for record in records:
+            if not record.pivot:
+                continue
+            pivot_id = getattr(record.pivot, 'id', None)
+            if pivot_id and pivot_id > 0:
+                pivots[pivot_id] = Pivot(pivot_id)
+            else:
+                pivots[id(record.pivot)] = record.pivot
+        Pivot.check_unique_axis_fields(pivots.values())
+
     def get_rec_name(self, name):
         return self.field.rec_name
 
@@ -2461,6 +2502,27 @@ class ColumnDimension(sequence_ordered(), ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls.__access__.add('pivot')
+
+    @classmethod
+    def validate(cls, records):
+        super().validate(records)
+        cls.check_unique_axis_fields(records)
+
+    @classmethod
+    def check_unique_axis_fields(cls, records):
+        pool = Pool()
+        Pivot = pool.get('babi.pivot')
+
+        pivots = {}
+        for record in records:
+            if not record.pivot:
+                continue
+            pivot_id = getattr(record.pivot, 'id', None)
+            if pivot_id and pivot_id > 0:
+                pivots[pivot_id] = Pivot(pivot_id)
+            else:
+                pivots[id(record.pivot)] = record.pivot
+        Pivot.check_unique_axis_fields(pivots.values())
 
     def get_rec_name(self, name):
         return self.field.rec_name
@@ -2600,6 +2662,27 @@ class Property(sequence_ordered(), ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls.__access__.add('pivot')
+
+    @classmethod
+    def validate(cls, records):
+        super().validate(records)
+        cls.check_unique_axis_fields(records)
+
+    @classmethod
+    def check_unique_axis_fields(cls, records):
+        pool = Pool()
+        Pivot = pool.get('babi.pivot')
+
+        pivots = {}
+        for record in records:
+            if not record.pivot:
+                continue
+            pivot_id = getattr(record.pivot, 'id', None)
+            if pivot_id and pivot_id > 0:
+                pivots[pivot_id] = Pivot(pivot_id)
+            else:
+                pivots[id(record.pivot)] = record.pivot
+        Pivot.check_unique_axis_fields(pivots.values())
 
     def get_rec_name(self, name):
         return self.field.rec_name
