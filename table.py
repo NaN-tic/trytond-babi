@@ -2312,7 +2312,8 @@ class Pivot(ModelSQL, ModelView):
                 assert old_dimension.field.internal_name == new_dimension.field.internal_name
                 rel[new_dimension] = old_dimension
             for old_measure, new_measure in zip(old.measures, new.measures):
-                assert old_measure.field.internal_name == new_measure.field.internal_name
+                assert (Measure.get_measure_tuple(old_measure)
+                    == Measure.get_measure_tuple(new_measure))
                 rel[new_measure] = old_measure
             for old_property, new_property in zip(old.properties, new.properties):
                 assert old_property.field.internal_name == new_property.field.internal_name
@@ -2526,11 +2527,43 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
         cls.__access__.add('pivot')
 
     @classmethod
+    def validate(cls, records):
+        super().validate(records)
+        cls.check_unique_configuration(records)
+
+    @classmethod
     def validate_fields(cls, records, field_names):
         super().validate_fields(records, field_names)
         if field_names & {'aggregate', 'percentile'}:
             for record in records:
                 record.check_percentile()
+
+    @classmethod
+    def check_unique_configuration(cls, records):
+        pool = Pool()
+        Pivot = pool.get('babi.pivot')
+
+        pivots = {}
+        for record in records:
+            if not record.pivot:
+                continue
+            pivot_id = getattr(record.pivot, 'id', None)
+            if pivot_id and pivot_id > 0:
+                pivots[pivot_id] = Pivot(pivot_id)
+            else:
+                pivots[id(record.pivot)] = record.pivot
+
+        for pivot in pivots.values():
+            seen = set()
+            for measure in pivot.measures:
+                if not measure.field or not measure.aggregate:
+                    continue
+                key = cls.get_measure_tuple(measure)
+                if key in seen:
+                    raise ValidationError('Measures must use a unique '
+                        'combination of field, aggregate, percentile, and '
+                        'over field.')
+                seen.add(key)
 
     def check_percentile(self):
         if self.aggregate != 'percentile':

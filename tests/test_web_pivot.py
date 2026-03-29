@@ -166,7 +166,53 @@ class TestPivot(WebTestCase):
             expect(page.locator("#header_measure")).to_contain_text(
                 "Count / Company")
 
-    def test_04_download_document(self):
+    def test_04_reuse_measure_field(self):
+        with sync_playwright() as playwright:
+            headless = (config.getboolean('nantic_connection',
+                'test_headless', default=False) or
+                    'DISPLAY' not in os.environ)
+
+            browser = playwright.firefox.launch(headless=headless)
+            context = browser.new_context(
+                locale='en-US',
+                http_credentials={
+                    "username": self.user,
+                    "password": self.password,
+                }
+            )
+            page = context.new_page()
+            page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
+            page.wait_for_load_state('load')
+
+            header_x = page.locator("#header_x")
+            header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
+            page.locator("#field_selection_x #field").select_option('company')
+            page.locator("#field_selection_x button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_measure = page.locator("#header_measure")
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option(
+                'company')
+            page.locator("#field_selection_measure button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option(
+                'company')
+            page.locator("#field_selection_measure #measure").select_option(
+                'count')
+            page.locator("#field_selection_measure button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            expect(page.locator("body")).not_to_contain_text(
+                "Internal Server Error")
+            expect(page.locator("#header_measure")).to_contain_text("Sum")
+            expect(page.locator("#header_measure")).to_contain_text("Count")
+
+    def test_05_download_document(self):
         if backend.name == 'sqlite':
             self.skipTest('Download report not supported on sqlite')
 
