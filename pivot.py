@@ -49,6 +49,8 @@ REMOVE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="
 UP_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>')
 DOWN_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>')
 CLOSE_ICON = raw('<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
+SIDEBAR_CLOSE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M660-320v-320L500-480l160 160ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm120-80v-560H200v560h120Zm80 0h360v-560H400v560Zm-80 0H200h120Z"/></svg>')
+SIDEBAR_OPEN_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M500-640v320l160-160-160-160ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm120-80v-560H200v560h120Zm80 0h360v-560H400v560Zm-80 0H200h120Z"/></svg>')
 ORDER_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg>')
 ORDER_ASC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" /></svg>')
 ORDER_DESC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>')
@@ -344,17 +346,29 @@ class Index(IndexMixin, Endpoint):
         cube.table = table.name
         cube.rows, cube.columns = cube.columns, cube.rows
         inverted_table_properties = cube.encode_properties()
+        sidebar_button_classes = (
+            "inline-flex items-center justify-center h-7 w-7 rounded-md "
+            "bg-white text-gray-700 ring-1 ring-inset ring-gray-300 "
+            "hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 "
+            "active:text-indigo-800 active:scale-95 transition")
+        sidebar_hidden = bool(self.table_name)
+        sidebar_classes = (
+            "relative h-screen w-64 min-w-[12rem] max-w-[28rem] resize-x "
+            "overflow-auto border-r border-gray-200 bg-white shadow-sm")
+        if sidebar_hidden:
+            sidebar_classes += " hidden"
+        toggle_sidebar_classes = sidebar_button_classes
+        if not sidebar_hidden:
+            toggle_sidebar_classes = "hidden " + toggle_sidebar_classes
 
         with main() as index_section:
             with div(cls="flex h-screen gap-2 bg-white"):
-                with div(cls="relative h-screen w-64 min-w-[12rem] max-w-[28rem] resize-x overflow-auto border-r border-gray-200 bg-white shadow-sm",
+                with div(cls=sidebar_classes,
                         id="sidebar"):
                     with button(type="button",
-                            cls=("absolute right-2 top-2 z-10 inline-flex items-center justify-center "
-                                "h-7 w-7 rounded-md bg-blue-600 text-white "
-                                "hover:bg-blue-500 active:bg-blue-700 transition"),
-                            onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.add('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.remove('hidden');})();"):
-                        span('⟨')
+                            cls="absolute right-2 top-2 z-10 " + sidebar_button_classes,
+                            onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.add('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.remove('hidden');})();").add(SIDEBAR_CLOSE_ICON):
+                        pass
                     div(cls="pointer-events-none absolute right-0 top-0 h-full w-1 bg-gradient-to-r from-transparent to-gray-200")
                     div(_('Tags'), cls="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide")
                     with div(cls="px-2 pb-2 flex flex-wrap gap-1"):
@@ -402,10 +416,9 @@ class Index(IndexMixin, Endpoint):
                         with div(cls="col-span-2 flex items-center gap-2"):
                             with button(type="button",
                                     id="toggle_sidebar",
-                                    cls=("hidden inline-flex items-center justify-center h-7 w-7 rounded-md "
-                                        "bg-blue-600 text-white hover:bg-blue-500 active:bg-blue-700 transition"),
-                                    onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.remove('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.add('hidden');})();"):
-                                span('⟩')
+                                    cls=toggle_sidebar_classes,
+                                    onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.remove('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.add('hidden');})();").add(SIDEBAR_OPEN_ICON):
+                                pass
                             span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
                             # TODO: Those timestamps are not exactly right because a
                             # table may depend on other tables so even if this table
