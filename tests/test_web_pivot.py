@@ -272,7 +272,57 @@ class TestPivot(WebTestCase):
                 "Internal Server Error")
             expect(page.locator("#header_x")).to_contain_text("Company")
 
-    def test_06_download_document(self):
+    def test_06_reorder_measures(self):
+        with sync_playwright() as playwright:
+            headless = (config.getboolean('nantic_connection',
+                'test_headless', default=False) or
+                    'DISPLAY' not in os.environ)
+
+            browser = playwright.firefox.launch(headless=headless)
+            context = browser.new_context(
+                locale='en-US',
+                http_credentials={
+                    "username": self.user,
+                    "password": self.password,
+                }
+            )
+            page = context.new_page()
+            page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
+            page.wait_for_load_state('load')
+
+            header_measure = page.locator("#header_measure")
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option(
+                'company')
+            page.locator("#field_selection_measure button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option(
+                'company')
+            page.locator("#field_selection_measure #measure").select_option(
+                'count')
+            page.locator("#field_selection_measure button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            measure_rows = page.locator("#header_measure tbody tr")
+            expect(measure_rows).to_have_count(2)
+            expect(measure_rows.nth(0)).to_contain_text("Sum")
+            expect(measure_rows.nth(1)).to_contain_text("Count")
+
+            measure_rows.nth(1).locator(
+                "a[href*='/level/up/measures/']").click()
+            page.wait_for_load_state('load')
+
+            measure_rows = page.locator("#header_measure tbody tr")
+            expect(page.locator("body")).not_to_contain_text(
+                "Internal Server Error")
+            expect(measure_rows.nth(0)).to_contain_text("Count")
+            expect(measure_rows.nth(1)).to_contain_text("Sum")
+
+    def test_07_download_document(self):
         if backend.name == 'sqlite':
             self.skipTest('Download report not supported on sqlite')
 
