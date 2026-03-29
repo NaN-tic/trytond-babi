@@ -2750,6 +2750,15 @@ msgstr ""
 "camp numérico o cambia el tipo de operación."
 
 msgctxt "voyager:v:"
+msgid ""
+"HINT: You are trying to calculate percentile or median of a text type "
+"field, please try with a numeric type field or change the operation."
+msgstr ""
+"PISTA: Estás intentando calcular el percentil o la mediana de un campo de "
+"texto, por favor, prueba con un campo numérico o cambia el tipo de "
+"operación."
+
+msgctxt "voyager:v:"
 msgid "Loading ..."
 msgstr "Cargando ..."
 

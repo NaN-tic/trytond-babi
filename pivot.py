@@ -197,6 +197,27 @@ def _tooltip_attrs(label, cls=None):
     return attrs
 
 
+def _cube_error_hint(error):
+    message = str(error).lower()
+    hints = (
+        ('function avg(',
+            _('HINT: You are trying to make average of a text type field, '
+                'please try with a numeric type field or change the '
+                'operation.')),
+        ('function sum(',
+            _('HINT: You are trying to sum a text type field, please try '
+                'with a numeric type field or change the operation.')),
+        ('percentile_cont',
+            _('HINT: You are trying to calculate percentile or median of a '
+                'text type field, please try with a numeric type field or '
+                'change the operation.')),
+    )
+    for pattern, hint in hints:
+        if pattern in message:
+            return hint
+    return None
+
+
 def _parse_field_reference(field):
     if field and field.startswith('('):
         return ast.literal_eval(field)
@@ -661,11 +682,9 @@ class Index(IndexMixin, Endpoint):
                                 except Exception as e:
                                     div(cls="text-center").add(p(_('Error building the cube:'), cls="mt-1 text-sm text-gray-500"))
                                     print_trace = True
-                                    if 'function avg(' in str(e):
-                                        div(cls="text-center").add(_("HINT: You are trying to make average of a text type field, please try with a numeric type field or change the operation."))
-                                        print_trace = False
-                                    if 'function sum(' in str(e):
-                                        div(cls="text-center").add(_("HINT: You are trying to sum a text type field, please try with a numeric type field or change the operation."))
+                                    hint = _cube_error_hint(e)
+                                    if hint:
+                                        div(cls="text-center").add(hint)
                                         print_trace = False
                                     with details() as traceback_details:
                                         summary(_('Show more details'),

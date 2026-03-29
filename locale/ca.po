@@ -2749,6 +2749,14 @@ msgstr ""
 "numèric o canvia el tipus d'operació."
 
 msgctxt "voyager:v:"
+msgid ""
+"HINT: You are trying to calculate percentile or median of a text type "
+"field, please try with a numeric type field or change the operation."
+msgstr ""
+"PISTA: Estàs intentant calcular el percentil o la mediana d'un camp de "
+"text, si us plau, prova amb un camp numèric o canvia el tipus d'operació."
+
+msgctxt "voyager:v:"
 msgid "Loading ..."
 msgstr "Carregant ..."
 
