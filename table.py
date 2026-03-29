@@ -2475,6 +2475,7 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
     aggregate = fields.Selection([
             ('sum', 'Sum'),
             ('avg', 'Average'),
+            ('median', 'Median'),
             ('count', 'Count'),
             ('max', 'Max'),
             ('min', 'Min'),

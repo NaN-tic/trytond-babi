@@ -34,6 +34,14 @@ def capitalize(string):
     return ' '.join([word.capitalize() for word in string.split('_')])
 
 
+class Median(sql.aggregate.Aggregate):
+    __slots__ = ()
+    _sql = 'PERCENTILE_CONT'
+
+    def __init__(self, expression):
+        super().__init__(sql.Literal(0.5), within=[expression])
+
+
 class Cube:
     EXPAND_ALL = [('all',)]
 
@@ -312,6 +320,8 @@ class Cube:
         aggregate = measure[1]
         if aggregate == 'average':
             aggregate = 'avg'
+        if aggregate == 'median':
+            return Median(getattr(table, field)).as_(cls.measure_name(measure))
         Operator = getattr(sql.aggregate, aggregate.capitalize())
         return Operator(getattr(table, field)).as_(cls.measure_name(measure))
 

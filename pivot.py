@@ -1095,6 +1095,8 @@ class PivotHeaderMeasure(Endpoint):
                                                 p(_('Sum'))
                                             case 'avg':
                                                 p(_('Average'))
+                                            case 'median':
+                                                p(_('Median'))
                                             case 'count':
                                                 p(_('Count'))
                                             case 'min':
@@ -1285,6 +1287,7 @@ class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
                                             option(_('Average'), value='average')
                                             option(_('Count'), value='count')
                                             option(_('Max'), value='max')
+                                            option(_('Median'), value='median')
                                             option(_('Min'), value='min')
                                             option(_('Sum'), value='sum', selected=True)
                         with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
