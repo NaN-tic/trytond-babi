@@ -569,3 +569,46 @@ class TestPivot(WebTestCase):
                 "HINT: You are trying to calculate percentile or median of a "
                 "text type field, please try with a numeric type field or "
                 "change the operation.")
+
+    def test_10_small_pivot_has_no_horizontal_scroll(self):
+        with sync_playwright() as playwright:
+            headless = (config.getboolean('nantic_connection',
+                'test_headless', default=False) or
+                    'DISPLAY' not in os.environ)
+
+            browser = playwright.firefox.launch(headless=headless)
+            context = browser.new_context(
+                locale='en-US',
+                http_credentials={
+                    "username": self.user,
+                    "password": self.password,
+                }
+            )
+            page = context.new_page()
+            page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
+            page.wait_for_load_state('load')
+
+            header_x = page.locator("#header_x")
+            header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
+            page.locator("#field_selection_x #field").select_option('name')
+            page.locator("#field_selection_x button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            header_measure = page.locator("#header_measure")
+            header_measure.locator(
+                "a[hx-post*='/open_field_selection/measure/']").click()
+            page.locator("#field_selection_measure #field").select_option('id')
+            page.locator("#field_selection_measure #measure").select_option(
+                'count')
+            page.locator("#field_selection_measure button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            overflow = page.locator("#pivot_table").evaluate("""
+                (el) => {
+                    const container = el.parentElement;
+                    return container.scrollWidth - container.clientWidth;
+                }
+            """)
+            self.assertLessEqual(overflow, 1)
+            expect(page.locator("body")).not_to_contain_text(
+                "Internal Server Error")
