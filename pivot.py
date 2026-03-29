@@ -217,11 +217,21 @@ class Site(metaclass=PoolMeta):
             return
         return super().get_cache(session, request)
 
-    @classmethod
-    def dispatch(cls, site_type, site_id, request, user, web_prefix=None):
-        with Transaction().set_context(language=Transaction().language):
-            return super().dispatch(site_type, site_id, request, user,
-                web_prefix)
+    def _get_context(self, session, component_model, args):
+        pool = Pool()
+        User = pool.get('res.user')
+
+        context = super()._get_context(session, component_model, args)
+
+        language = User(Transaction().user).language
+        if language:
+            language = language.code
+        else:
+            language = 'en'
+
+        context['language'] = language
+        return context
+
 
 ###############################################################################
 #################################### SITE #####################################
