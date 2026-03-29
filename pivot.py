@@ -459,12 +459,9 @@ class Index(IndexMixin, Endpoint):
                                 cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition").add(RELOAD)
 
                     parameters = _get_table_parameters(table)
-                    with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
-                        summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Parameters'))
-                        if not parameters:
-                            div(_('No parameters defined for this table.'),
-                                cls="px-2 pt-2 text-xs text-gray-500")
-                        else:
+                    if parameters:
+                        with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
+                            summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Parameters'))
                             with div(cls="grid grid-cols-1 gap-3 px-3 pb-2 pt-2 sm:grid-cols-2"):
                                 for parameter in parameters:
                                     field_name = f'{parameter.name}_{parameter.id}'
