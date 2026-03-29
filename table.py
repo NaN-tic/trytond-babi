@@ -2530,6 +2530,9 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
     def validate(cls, records):
         super().validate(records)
         cls.check_unique_configuration(records)
+        for record in records:
+            record.check_percentile()
+            record.check_aggregate()
 
     @classmethod
     def validate_fields(cls, records, field_names):
@@ -2570,6 +2573,49 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
             return
         if self.percentile is None or not (0 <= self.percentile <= 100):
             raise ValidationError('Percentile must be between 0 and 100.')
+
+    def _field_is_numeric_in_database(self):
+        if backend.name != 'postgresql':
+            return False
+        if not self.field or not self.field.table:
+            return False
+        cursor = Transaction().connection.cursor()
+        cursor.execute(
+            'SELECT data_type '
+            'FROM information_schema.columns '
+            'WHERE table_schema = %s '
+            'AND table_name = %s '
+            'AND column_name = %s',
+            ('public', self.field.table.table_name, self.field.internal_name))
+        record = cursor.fetchone()
+        if not record:
+            return False
+        return record[0] in {
+            'smallint',
+            'integer',
+            'bigint',
+            'numeric',
+            'decimal',
+            'real',
+            'double precision',
+        }
+
+    def check_aggregate(self):
+        if not self.aggregate or not self.field:
+            return
+        if self.aggregate not in ('sum', 'avg', 'median', 'percentile'):
+            return
+        if self.field.type in ('integer', 'float', 'numeric'):
+            return
+        if self.field.type is None:
+            if backend.name != 'postgresql':
+                return
+            if self._field_is_numeric_in_database():
+                return
+        aggregate_label = dict(self.__class__.aggregate.selection).get(
+            self.aggregate, self.aggregate)
+        raise ValidationError(gettext('babi.msg_invalid_measure_aggregate',
+            aggregate=aggregate_label, field=self.field.rec_name))
 
     @fields.depends('aggregate')
     def on_change_aggregate(self):
