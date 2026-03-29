@@ -4,12 +4,14 @@
 
 import datetime
 import random
+import sql
 from decimal import Decimal
 from trytond import backend
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
 from trytond.modules.babi.babi_eval import babi_eval
+from trytond.modules.babi.cube import Cube
 from trytond.pyson import PYSONEncoder
 from trytond.modules.company.tests import CompanyTestMixin
 
@@ -248,5 +250,27 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
         oext, _, _, _ = TableExcel.execute([table.id], {})
         self.assertEqual(oext, 'xlsx')
+
+    @with_transaction()
+    def test_pivot_median_aggregate(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Measure = pool.get('babi.pivot.measure')
+
+        table = Table()
+        table.type = 'table'
+        table.name = 'Median Table'
+        table.on_change_name()
+        table.query = 'SELECT 1::INTEGER AS value'
+        if backend.name == 'sqlite':
+            table.query = 'SELECT 1 AS value'
+        table.save()
+        table._compute()
+
+        self.assertIn(('median', 'Median'), Measure.aggregate.selection)
+
+        measure = Cube.measure_method(sql.Table(table.table_name),
+            ('value', 'median'))
+        self.assertEqual(measure.expression.__class__.__name__, 'Median')
 
 del ModuleTestCase
