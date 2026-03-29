@@ -85,6 +85,7 @@ class TestPivot(WebTestCase):
                 page.locator("#sidebar").get_attribute("class"))
             self.assertNotIn('hidden',
                 page.locator("#toggle_sidebar").get_attribute("class"))
+            expect(page.get_by_text("Parameters", exact=True)).to_have_count(0)
             header_x = page.locator("#header_x")
             header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
             modal_heading = page.get_by_role("heading",
