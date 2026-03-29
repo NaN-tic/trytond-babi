@@ -7,4 +7,6 @@
     <field name="aggregate"/>
     <label name="percentile"/>
     <field name="percentile"/>
+    <label name="over_field"/>
+    <field name="over_field"/>
 </form>
