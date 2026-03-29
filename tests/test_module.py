@@ -273,4 +273,28 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             ('value', 'median'))
         self.assertEqual(measure.expression.__class__.__name__, 'Median')
 
+    @with_transaction()
+    def test_pivot_percentile_aggregate(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Measure = pool.get('babi.pivot.measure')
+
+        table = Table()
+        table.type = 'table'
+        table.name = 'Percentile Table'
+        table.on_change_name()
+        table.query = 'SELECT 1::INTEGER AS value'
+        if backend.name == 'sqlite':
+            table.query = 'SELECT 1 AS value'
+        table.save()
+        table._compute()
+
+        self.assertIn(('percentile', 'Percentile'), Measure.aggregate.selection)
+
+        measure = Cube.measure_method(sql.Table(table.table_name),
+            ('value', 'percentile', 90))
+        self.assertEqual(measure.expression.__class__.__name__, 'Percentile')
+        self.assertEqual(Cube.measure_name(('value', 'percentile', 12.5)),
+            'percentile_12_5_value__')
+
 del ModuleTestCase

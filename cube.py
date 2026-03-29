@@ -42,6 +42,15 @@ class Median(sql.aggregate.Aggregate):
         super().__init__(sql.Literal(0.5), within=[expression])
 
 
+class Percentile(sql.aggregate.Aggregate):
+    __slots__ = ()
+    _sql = 'PERCENTILE_CONT'
+
+    def __init__(self, percentile, expression):
+        super().__init__(sql.Literal(float(percentile) / 100),
+            within=[expression])
+
+
 class Cube:
     EXPAND_ALL = [('all',)]
 
@@ -322,6 +331,10 @@ class Cube:
             aggregate = 'avg'
         if aggregate == 'median':
             return Median(getattr(table, field)).as_(cls.measure_name(measure))
+        if aggregate == 'percentile':
+            percentile = measure[2]
+            return Percentile(percentile, getattr(table, field)).as_(
+                cls.measure_name(measure))
         Operator = getattr(sql.aggregate, aggregate.capitalize())
         return Operator(getattr(table, field)).as_(cls.measure_name(measure))
 
@@ -329,6 +342,9 @@ class Cube:
     def measure_name(cls, measure):
         field = measure[0]
         aggregate = measure[1]
+        if aggregate == 'percentile':
+            percentile = str(measure[2]).replace('.', '_')
+            return f'{aggregate}_{percentile}_{field}__'
         return f'{aggregate}_{field}__'
 
     @classmethod

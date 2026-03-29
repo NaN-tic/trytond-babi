@@ -2282,6 +2282,7 @@ class Pivot(ModelSQL, ModelView):
                 record.pivot = new
                 record.field = rel[measure.field.internal_name]
                 record.aggregate = measure.aggregate
+                record.percentile = measure.percentile
                 m_to_save.append(record)
             for property_ in old.properties:
                 record = Property()
@@ -2336,14 +2337,19 @@ class Pivot(ModelSQL, ModelView):
             if not item.element:
                 continue
             if item.element.__name__ == 'babi.pivot.measure':
-                order.append(((item.element.field.internal_name,
-                            item.element.aggregate), item.order))
+                measure = (item.element.field.internal_name,
+                    item.element.aggregate)
+                if item.element.aggregate == 'percentile':
+                    measure += (item.element.percentile,)
+                order.append((measure, item.order))
             else:
                 order.append((item.element.field.internal_name, item.order))
         return Cube(table=self.table.table_name,
             rows=[x.field.internal_name for x in self.row_dimensions if x.field],
             columns=[x.field.internal_name for x in self.column_dimensions if x.field],
-            measures=[(x.field.internal_name, x.aggregate)
+            measures=[((x.field.internal_name, x.aggregate, x.percentile)
+                    if x.aggregate == 'percentile'
+                    else (x.field.internal_name, x.aggregate))
                 for x in self.measures if x.field and x.aggregate],
             properties=[x.field.internal_name for x in self.properties if x.field],
             order=order,
@@ -2476,14 +2482,24 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
             ('sum', 'Sum'),
             ('avg', 'Average'),
             ('median', 'Median'),
+            ('percentile', 'Percentile'),
             ('count', 'Count'),
             ('max', 'Max'),
             ('min', 'Min'),
             ], 'Aggregate')
+    percentile = fields.Float('Percentile',
+        digits=(16, 2), states={
+            'invisible': Eval('aggregate') != 'percentile',
+            'required': Eval('aggregate') == 'percentile',
+            }, depends=['aggregate'])
 
     @staticmethod
     def default_aggregate():
         return 'sum'
+
+    @staticmethod
+    def default_percentile():
+        return 50.0
 
     def get_rec_name(self, name):
         return self.field.rec_name
@@ -2492,6 +2508,26 @@ class Measure(sequence_ordered(), ModelSQL, ModelView):
     def __setup__(cls):
         super().__setup__()
         cls.__access__.add('pivot')
+
+    @classmethod
+    def validate_fields(cls, records, field_names):
+        super().validate_fields(records, field_names)
+        if field_names & {'aggregate', 'percentile'}:
+            for record in records:
+                record.check_percentile()
+
+    def check_percentile(self):
+        if self.aggregate != 'percentile':
+            return
+        if self.percentile is None or not (0 <= self.percentile <= 100):
+            raise ValidationError('Percentile must be between 0 and 100.')
+
+    @fields.depends('aggregate')
+    def on_change_aggregate(self):
+        if self.aggregate == 'percentile' and self.percentile is None:
+            self.percentile = self.default_percentile()
+        elif self.aggregate != 'percentile':
+            self.percentile = None
 
     @fields.depends('pivot', '_parent_pivot.table')
     def on_change_with_table(self, name=None):

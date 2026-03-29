@@ -2,4 +2,5 @@
     <field name="pivot"/>
     <field name="field"/>
     <field name="aggregate"/>
+    <field name="percentile"/>
 </tree>
