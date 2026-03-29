@@ -81,6 +81,10 @@ class TestPivot(WebTestCase):
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
             expect(page.get_by_role("main")).to_contain_text("User")
+            self.assertIn('hidden',
+                page.locator("#sidebar").get_attribute("class"))
+            self.assertNotIn('hidden',
+                page.locator("#toggle_sidebar").get_attribute("class"))
             header_x = page.locator("#header_x")
             header_x.locator("a[hx-post*='/open_field_selection/x/']").click()
             modal_heading = page.get_by_role("heading",
