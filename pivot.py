@@ -46,6 +46,7 @@ PROPERTY_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewB
 MEASURE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>')
 ADD_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>')
 REMOVE_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>')
+REMOVE_SELECTION_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor" class="size-5 shrink-0"><path d="m500-120-56-56 142-142-142-142 56-56 142 142 142-142 56 56-142 142 142 142-56 56-142-142-142 142Zm-220 0v-80h80v80h-80Zm-80-640h-80q0-33 23.5-56.5T200-840v80Zm80 0v-80h80v80h-80Zm160 0v-80h80v80h-80Zm160 0v-80h80v80h-80Zm160 0v-80q33 0 56.5 23.5T840-760h-80ZM200-200v80q-33 0-56.5-23.5T120-200h80Zm-80-80v-80h80v80h-80Zm0-160v-80h80v80h-80Zm0-160v-80h80v80h-80Zm640 0v-80h80v80h-80Z"/></svg>')
 UP_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>')
 DOWN_ARROW = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" /></svg>')
 CLOSE_ICON = raw('<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
@@ -184,6 +185,16 @@ def _measure_label(measure, field_names=None):
             over_field = field_names.get(over_field, over_field)
         label = f"{label} / {capitalize(over_field)}"
     return label
+
+
+def _tooltip_attrs(label, cls=None):
+    attrs = {
+        'title': label,
+        'aria_label': label,
+    }
+    if cls is not None:
+        attrs['cls'] = cls
+    return attrs
 
 
 def _parse_field_reference(field):
@@ -366,7 +377,9 @@ class Index(IndexMixin, Endpoint):
                 with div(cls=sidebar_classes,
                         id="sidebar"):
                     with button(type="button",
-                            cls="absolute right-2 top-2 z-10 " + sidebar_button_classes,
+                            **_tooltip_attrs(_('Hide sidebar'),
+                                "absolute right-2 top-2 z-10 "
+                                + sidebar_button_classes),
                             onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.add('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.remove('hidden');})();").add(SIDEBAR_CLOSE_ICON):
                         pass
                     div(cls="pointer-events-none absolute right-0 top-0 h-full w-1 bg-gradient-to-r from-transparent to-gray-200")
@@ -416,7 +429,8 @@ class Index(IndexMixin, Endpoint):
                         with div(cls="col-span-2 flex items-center gap-2"):
                             with button(type="button",
                                     id="toggle_sidebar",
-                                    cls=toggle_sidebar_classes,
+                                    **_tooltip_attrs(_('Show sidebar'),
+                                        toggle_sidebar_classes),
                                     onclick="(function(){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.remove('hidden');var tsb=document.getElementById('toggle_sidebar');if(tsb)tsb.classList.add('hidden');})();").add(SIDEBAR_OPEN_ICON):
                                 pass
                             span(f'{table.name}', cls="text-base font-semibold leading-6 text-gray-900")
@@ -441,22 +455,28 @@ class Index(IndexMixin, Endpoint):
                             timestamp = f'({timestamp})'
                             # Use a smaller text
                             span(timestamp, cls="text-sm text-gray-500 ml-2")
-                        with div(cls="col-span-2 flex items-center justify-end gap-2 pr-1"):
-                            with form(id="compute_form",
-                                    action=PivotCompute.url(table_name=self.table_name,
-                                        table_properties=self.table_properties),
-                                    method="POST",
-                                    hx_post=PivotCompute.url(table_name=self.table_name,
-                                        table_properties=self.table_properties),
-                                    cls="inline-flex items-center"):
-                                with button(type="submit",
-                                        cls="inline-flex items-center rounded-md bg-blue-600 px-2.5 h-7 text-xs font-semibold text-white hover:bg-blue-500 active:bg-blue-700 active:scale-95 transition"):
-                                    span(_('Compute'))
-                                    span(cls="loading-indicator").add(LOADING_SPINNER)
-                            a(href=Index.url(table_name=self.table_name, table_properties=inverted_table_properties),
-                                cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition").add(SWAP_AXIS)
-                            a(href=Index.url(table_name=self.table_name, table_properties='null'),
-                                cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition").add(RELOAD)
+                        with div(cls="col-span-2 flex items-center justify-end pr-1"):
+                            with div(cls="inline-flex h-7 items-stretch gap-2"):
+                                with form(id="compute_form",
+                                        action=PivotCompute.url(table_name=self.table_name,
+                                            table_properties=self.table_properties),
+                                        method="POST",
+                                        hx_post=PivotCompute.url(table_name=self.table_name,
+                                            table_properties=self.table_properties),
+                                        cls="m-0 flex h-full items-stretch"):
+                                    with button(type="submit",
+                                            **_tooltip_attrs(_('Compute'),
+                                                "relative inline-flex h-full min-w-[7.25rem] items-center rounded-md bg-blue-600 text-xs font-semibold leading-none text-white hover:bg-blue-500 active:bg-blue-700 active:scale-95 transition appearance-none border-0")):
+                                        span(cls="absolute left-2 top-1/2 inline-flex -translate-y-1/2 items-center").add(RELOAD)
+                                        span(_('Compute'),
+                                            cls="absolute inset-y-0 left-7 right-0 inline-flex items-center justify-center text-center")
+                                        span(cls="loading-indicator absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center").add(LOADING_SPINNER)
+                                a(href=Index.url(table_name=self.table_name, table_properties=inverted_table_properties),
+                                    **_tooltip_attrs(_('Swap rows and columns'),
+                                        "inline-flex h-full w-7 items-center justify-center rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition")).add(SWAP_AXIS)
+                                a(href=Index.url(table_name=self.table_name, table_properties='null'),
+                                    **_tooltip_attrs(_('Clear configuration'),
+                                        "inline-flex h-full w-7 items-center justify-center rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition")).add(REMOVE_SELECTION_ICON)
 
                     parameters = _get_table_parameters(table)
                     if parameters:
@@ -590,7 +610,8 @@ class Index(IndexMixin, Endpoint):
                                                     cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
                                                 with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
                                                     button(type="button",
-                                                        cls="rounded-md bg-white text-gray-400 hover:text-gray-500",
+                                                        **_tooltip_attrs(_('Close'),
+                                                            "rounded-md bg-white text-gray-400 hover:text-gray-500"),
                                                         onclick="document.getElementById('save_pivot_modal').style.display='none'").add(CLOSE_ICON)
                                                 h3(_('Save Configuration'), cls="text-sm font-semibold text-gray-900")
                                                 p(_('Name'), cls="mt-3 text-xs text-gray-700")
@@ -1044,16 +1065,28 @@ class PivotHeaderAxis(Endpoint):
         if self.axis == 'x':
             icon = ROWS_ICON
             name = _('Rows')
+            add_label = _('Add row')
+            move_up_label = _('Move row up')
+            move_down_label = _('Move row down')
+            remove_label = _('Remove row')
             if cube:
                 fields = cube.rows
         elif self.axis == 'y':
             icon = COLUMNS_ICON
             name = _('Columns')
+            add_label = _('Add column')
+            move_up_label = _('Move column up')
+            move_down_label = _('Move column down')
+            remove_label = _('Remove column')
             if cube:
                 fields = cube.columns
         else:
             icon = PROPERTY_ICON
             name = _('Properties')
+            add_label = _('Add property')
+            move_up_label = _('Move property up')
+            move_down_label = _('Move property down')
+            remove_label = _('Remove property')
             if cube:
                 fields = cube.properties
 
@@ -1063,7 +1096,6 @@ class PivotHeaderAxis(Endpoint):
             return div()
         btable = tables[0]
         field_names = dict((x.internal_name, x.name) for x in btable.fields_)
-
         self.header = self.axis
         with div(cls="px-1 mt-2 flow-root col-span-2", id=f'header_{self.axis}') as header_axis:
             div(id=f'field_selection_{self.axis}')
@@ -1077,7 +1109,9 @@ class PivotHeaderAxis(Endpoint):
                                 th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
                                 th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
                                 with th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0"):
-                                    a(href="#", cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition",
+                                    a(href="#",
+                                        **_tooltip_attrs(add_label,
+                                            "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition"),
                                         hx_target=f"#field_selection_{self.axis}",
                                         hx_post=PivotHeaderSelection.url(header=self.axis, table_name=self.table_name, table_properties=self.table_properties),
                                         hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
@@ -1089,14 +1123,17 @@ class PivotHeaderAxis(Endpoint):
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
                                             a(href=PivotHeaderLevelField.url(table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='up'),
-                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(UP_ARROW)
+                                                **_tooltip_attrs(move_up_label,
+                                                    "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(UP_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[-1]:
                                             a(href=PivotHeaderLevelField.url(table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties, level_action='down'),
-                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(DOWN_ARROW)
+                                                **_tooltip_attrs(move_down_label,
+                                                    "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(DOWN_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeaderRemoveField.url(table_name=self.table_name, header=self.axis, field=field, table_properties=self.table_properties),
-                                            cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(REMOVE_ICON)
+                                            **_tooltip_attrs(remove_label,
+                                                "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(REMOVE_ICON)
         return header_axis
 
 
@@ -1122,13 +1159,16 @@ class PivotHeaderMeasure(Endpoint):
             return div()
         btable = tables[0]
         field_names = dict((x.internal_name, x.name) for x in btable.fields_)
-
         fields = []
         if self.table_properties != 'null':
             cube = Cube.parse_properties(self.table_properties,
                 self.table_name)
             fields = cube.measures
         self.header = 'measures'
+        add_label = _('Add measure')
+        move_up_label = _('Move measure up')
+        move_down_label = _('Move measure down')
+        remove_label = _('Remove measure')
         with div(cls="px-1 mt-2 flow-root col-span-3", id='header_measure') as header_measure:
             div(id='field_selection_measure')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
@@ -1142,7 +1182,9 @@ class PivotHeaderMeasure(Endpoint):
                                 th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Up'), cls="sr-only"))
                                 th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0").add(span(_('Down'), cls="sr-only"))
                                 with th(scope="col", cls="relative py-2 pl-3 pr-4 sm:pr-0"):
-                                    a(href="#", cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition",
+                                    a(href="#",
+                                        **_tooltip_attrs(add_label,
+                                            "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition"),
                                         hx_target="#field_selection_measure",
                                         hx_post=PivotHeaderSelection.url(header='measure', table_name=self.table_name, table_properties=self.table_properties, render=False),
                                         hx_trigger="click", hx_swap="outerHTML").add(ADD_ICON)
@@ -1156,14 +1198,17 @@ class PivotHeaderMeasure(Endpoint):
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[0]:
                                             a(href=PivotHeaderLevelField.url(table_name=self.table_name, header=self.header, field=repr(field), table_properties=self.table_properties, level_action='up'),
-                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(UP_ARROW)
+                                                **_tooltip_attrs(move_up_label,
+                                                    "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(UP_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if field != fields[-1]:
                                             a(href=PivotHeaderLevelField.url(table_name=self.table_name, header=self.header, field=repr(field), table_properties=self.table_properties, level_action='down'),
-                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(DOWN_ARROW)
+                                                **_tooltip_attrs(move_down_label,
+                                                    "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(DOWN_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         a(href=PivotHeaderRemoveField.url(table_name=self.table_name, header=self.header, field=repr(field), table_properties=self.table_properties),
-                                            cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(REMOVE_ICON)
+                                            **_tooltip_attrs(remove_label,
+                                                "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(REMOVE_ICON)
         return header_measure
 
 
@@ -1196,6 +1241,9 @@ class PivotHeaderOrder(Endpoint):
                 self.table_name)
             items = cube.order
         self.header = 'order'
+        toggle_order_label = _('Change order direction')
+        move_up_label = _('Move order up')
+        move_down_label = _('Move order down')
         with div(cls="px-1 mt-2 flow-root col-span-3", id='header_order') as header_order:
             div(id='field_selection_order')
             with div(cls="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"):
@@ -1235,18 +1283,22 @@ class PivotHeaderOrder(Endpoint):
 
                                         if item[1] == 'desc':
                                             a(href=Index.url(table_name=self.table_name, table_properties=invert_table_properties),
-                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(ORDER_DESC_ICON)
+                                                **_tooltip_attrs(toggle_order_label,
+                                                    "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(ORDER_DESC_ICON)
                                         else:
                                             a(href=Index.url(table_name=self.table_name, table_properties=invert_table_properties),
-                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(ORDER_ASC_ICON)
+                                                **_tooltip_attrs(toggle_order_label,
+                                                    "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(ORDER_ASC_ICON)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if item != items[0]:
                                             a(href=PivotHeaderLevelField.url(table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='up'),
-                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(UP_ARROW)
+                                                **_tooltip_attrs(move_up_label,
+                                                    "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(UP_ARROW)
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
                                         if item != items[-1]:
                                             a(href=PivotHeaderLevelField.url(table_name=self.table_name, header=self.header, field=field, table_properties=self.table_properties, level_action='down'),
-                                                cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(DOWN_ARROW)
+                                                **_tooltip_attrs(move_down_label,
+                                                    "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(DOWN_ARROW)
         return header_order
 
 
@@ -1319,11 +1371,13 @@ class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
                             method="POST", cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
                         with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
                             with a(href="#",
+                                    title=_('Close'),
+                                    aria_label=_('Close'),
                                     hx_target=f"#{name}",
                                     hx_post=PivotHeaderSelectionCloseField.url(header=self.header,
                                         table_name=self.table_name, table_properties=self.table_properties),
                                     hx_trigger="click", hx_swap="outerHTML",
-                                    cls="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2").add(CLOSE_ICON):
+                                    cls="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"):
                                 span(_('Close'), cls="sr-only")
                                 CLOSE_ICON
                         with div(cls="sm:flex sm:items-start"):
@@ -1615,9 +1669,12 @@ class PivotTable(Endpoint):
         language = Transaction().context.get('language', 'en')
         language, = Language.search([('code', '=', language)], limit=1)
 
-        download = a(DOWNLOAD, cls="inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition", href=DownloadReport.url(
+        download = a(DOWNLOAD,
+            href=DownloadReport.url(
                 table_name=self.table_name, table_properties=self.table_properties,
-                output_format=self.output_format or 'xlsx'))
+                output_format=self.output_format or 'xlsx'),
+            **_tooltip_attrs(_('Download'),
+                "inline-flex items-center justify-center h-7 w-7 rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition"))
 
         cube = Cube.parse_properties(self.table_properties, self.table_name)
 
@@ -1638,16 +1695,20 @@ class PivotTable(Endpoint):
         css = 'text-gray-300'
         if cube.row_expansions != Cube.EXPAND_ALL or cube.column_expansions != Cube.EXPAND_ALL:
             css = 'text-black'
-        expand_all = a(cls="inline-flex items-center justify-center h-7 w-7 rounded-md ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition " + css,
+        expand_all = a(
             href=Index.url(table_name=self.table_name,
-                table_properties=expanded_table_properties))
+                table_properties=expanded_table_properties),
+            **_tooltip_attrs(_('Expand all'),
+                "inline-flex items-center justify-center h-7 w-7 rounded-md ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition " + css))
         expand_all.add(EXPAND_ALL)
         css = 'text-gray-300'
         if cube.row_expansions != [] or cube.column_expansions != []:
             css = 'text-black'
-        collapse_all = a(cls="inline-flex items-center justify-center h-7 w-7 rounded-md ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition " + css,
+        collapse_all = a(
             href=Index.url(table_name=self.table_name,
-                table_properties=collapsed_table_properties))
+                table_properties=collapsed_table_properties),
+            **_tooltip_attrs(_('Collapse all'),
+                "inline-flex items-center justify-center h-7 w-7 rounded-md ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition " + css))
         collapse_all.add(COLLAPSE_ALL)
 
         controls = div(cls="flex items-center gap-2 pb-2")

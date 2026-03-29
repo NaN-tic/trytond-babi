@@ -2617,12 +2617,116 @@ msgid "Rows"
 msgstr "Zeilen"
 
 msgctxt "voyager:v:"
+msgid "Clear configuration"
+msgstr "Konfiguration leeren"
+
+msgctxt "voyager:v:"
+msgid "Hide sidebar"
+msgstr "Seitenleiste ausblenden"
+
+msgctxt "voyager:v:"
+msgid "Show sidebar"
+msgstr "Seitenleiste anzeigen"
+
+msgctxt "voyager:v:"
+msgid "Add row"
+msgstr "Zeile hinzufügen"
+
+msgctxt "voyager:v:"
+msgid "Add column"
+msgstr "Spalte hinzufügen"
+
+msgctxt "voyager:v:"
+msgid "Add property"
+msgstr "Eigenschaft hinzufügen"
+
+msgctxt "voyager:v:"
+msgid "Add measure"
+msgstr "Messwert hinzufügen"
+
+msgctxt "voyager:v:"
+msgid "Move row up"
+msgstr "Zeile nach oben verschieben"
+
+msgctxt "voyager:v:"
+msgid "Move row down"
+msgstr "Zeile nach unten verschieben"
+
+msgctxt "voyager:v:"
+msgid "Remove row"
+msgstr "Zeile entfernen"
+
+msgctxt "voyager:v:"
+msgid "Move column up"
+msgstr "Spalte nach oben verschieben"
+
+msgctxt "voyager:v:"
+msgid "Move column down"
+msgstr "Spalte nach unten verschieben"
+
+msgctxt "voyager:v:"
+msgid "Remove column"
+msgstr "Spalte entfernen"
+
+msgctxt "voyager:v:"
+msgid "Move property up"
+msgstr "Eigenschaft nach oben verschieben"
+
+msgctxt "voyager:v:"
+msgid "Move property down"
+msgstr "Eigenschaft nach unten verschieben"
+
+msgctxt "voyager:v:"
+msgid "Remove property"
+msgstr "Eigenschaft entfernen"
+
+msgctxt "voyager:v:"
+msgid "Move measure up"
+msgstr "Messwert nach oben verschieben"
+
+msgctxt "voyager:v:"
+msgid "Move measure down"
+msgstr "Messwert nach unten verschieben"
+
+msgctxt "voyager:v:"
+msgid "Remove measure"
+msgstr "Messwert entfernen"
+
+msgctxt "voyager:v:"
+msgid "Change order direction"
+msgstr "Sortierrichtung ändern"
+
+msgctxt "voyager:v:"
+msgid "Move order up"
+msgstr "Sortierung nach oben verschieben"
+
+msgctxt "voyager:v:"
+msgid "Move order down"
+msgstr "Sortierung nach unten verschieben"
+
+msgctxt "voyager:v:"
+msgid "Expand all"
+msgstr "Alles ausklappen"
+
+msgctxt "voyager:v:"
+msgid "Collapse all"
+msgstr "Alles einklappen"
+
+msgctxt "voyager:v:"
+msgid "Download"
+msgstr "Herunterladen"
+
+msgctxt "voyager:v:"
 msgid "Save Configuration"
 msgstr "Konfiguration speichern"
 
 msgctxt "voyager:v:"
 msgid "Search tables"
 msgstr "Tabellen suchen"
+
+msgctxt "voyager:v:"
+msgid "Swap rows and columns"
+msgstr "Zeilen und Spalten vertauschen"
 
 msgctxt "voyager:v:"
 msgid "Select a field to add:"
