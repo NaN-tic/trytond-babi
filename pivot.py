@@ -1,10 +1,11 @@
+import ast
 import logging
 import secrets
 import tempfile
 from datetime import date, datetime
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
-    option, main, th, style, details, summary, input_)
+    option, main, th, style, details, summary, input_, label)
 from dominate.util import raw
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
@@ -147,6 +148,36 @@ def _normalize_table_name(name):
     if name.startswith('__'):
         return name.split('__')[-1]
     return name
+
+
+def _measure_key(field_name, aggregate, percentile=None):
+    key = (field_name, aggregate)
+    if aggregate == 'percentile':
+        key += (percentile,)
+    return key
+
+
+def _measure_label(measure):
+    aggregate = measure[1]
+    labels = {
+        'sum': _('Sum'),
+        'avg': _('Average'),
+        'average': _('Average'),
+        'median': _('Median'),
+        'percentile': _('Percentile'),
+        'count': _('Count'),
+        'min': _('Minimum'),
+        'max': _('Maximum'),
+    }
+    if aggregate == 'percentile':
+        return f"{labels[aggregate]} ({measure[2]})"
+    return labels.get(aggregate, capitalize(aggregate))
+
+
+def _parse_field_reference(field):
+    if field and field.startswith('('):
+        return ast.literal_eval(field)
+    return field
 
 
 class Site(metaclass=PoolMeta):
@@ -896,11 +927,16 @@ class PivotSave(Endpoint):
             if field:
                 to_create_cols.append(ColumnDimension(pivot=pivot, field=field))
 
-        for field_name, aggregate in cube.measures:
+        for measure in cube.measures:
+            field_name = measure[0]
+            aggregate = measure[1]
             field = fields_by_internal.get(field_name)
             if field and aggregate:
                 to_create_measures.append(Measure(pivot=pivot,
-                    field=field, aggregate=aggregate))
+                    field=field, aggregate=aggregate,
+                    percentile=(measure[2]
+                        if aggregate == 'percentile' and len(measure) > 2
+                        else None)))
 
         for field_name in cube.properties:
             field = fields_by_internal.get(field_name)
@@ -932,7 +968,8 @@ class PivotSave(Endpoint):
         for item in pivot.properties:
             element_map[item.field.internal_name] = item
         for item in pivot.measures:
-            element_map[(item.field.internal_name, item.aggregate)] = item
+            element_map[_measure_key(item.field.internal_name,
+                item.aggregate, item.percentile)] = item
 
         sequence = 0
         to_save_orders = []
@@ -1090,21 +1127,9 @@ class PivotHeaderMeasure(Endpoint):
                                 with tr():
                                     td(capitalize(field_names[field[0]]), colspan="2", cls="whitespace-nowrap px-3 py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0")
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        match field[1]:
-                                            case 'sum':
-                                                p(_('Sum'))
-                                            case 'avg':
-                                                p(_('Average'))
-                                            case 'median':
-                                                p(_('Median'))
-                                            case 'count':
-                                                p(_('Count'))
-                                            case 'min':
-                                                p(_('Minimum'))
-                                            case 'max':
-                                                p(_('Maximum'))
+                                        p(_measure_label(field))
                                     with td(cls="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"):
-                                        a(href=PivotHeaderRemoveField.url(table_name=self.table_name, header=self.header, field=field[0], table_properties=self.table_properties),
+                                        a(href=PivotHeaderRemoveField.url(table_name=self.table_name, header=self.header, field=repr(field), table_properties=self.table_properties),
                                             cls="text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition").add(REMOVE_ICON)
         return header_measure
 
@@ -1153,8 +1178,8 @@ class PivotHeaderOrder(Endpoint):
                             for item in items:
                                 with tr():
                                     if isinstance(item[0], tuple):
-                                        value = f'{field_names.get(item[0][1], item[0][1])}({field_names.get(item[0][0], item[0][0])})'
-                                        field = '__'.join(item[0])
+                                        value = f'{_measure_label(item[0])} ({field_names.get(item[0][0], item[0][0])})'
+                                        field = repr(item[0])
                                     else:
                                         value = capitalize(field_names[item[0]])
                                         field = item[0]
@@ -1199,6 +1224,7 @@ class PivotHeaderSelectionMixin(object):
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
     measure = fields.Char('Measure')
+    percentile = fields.Float('Percentile')
 
 
 class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
@@ -1275,9 +1301,9 @@ class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
                                             for field in fields_used:
                                                 if field not in order_fields:
                                                     if isinstance(field, tuple):
-                                                        field_1 = field_names[field[0]]
-                                                        field_0 = field_names[field[1]]
-                                                        name_ = f'{field_1}({field_0})'
+                                                        name_ = (
+                                                            f'{_measure_label(field)} '
+                                                            f'({field_names[field[0]]})')
                                                     else:
                                                         name_ = field_names[field]
                                                     option(name_, value=field)
@@ -1288,8 +1314,33 @@ class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
                                             option(_('Count'), value='count')
                                             option(_('Max'), value='max')
                                             option(_('Median'), value='median')
+                                            option(_('Percentile'), value='percentile')
                                             option(_('Min'), value='min')
                                             option(_('Sum'), value='sum', selected=True)
+                                            script(raw("""
+                                                (function() {
+                                                  var update = function() {
+                                                    var measure = document.getElementById('measure');
+                                                    var percentile = document.getElementById('percentile_container');
+                                                    if (!measure || !percentile) return;
+                                                    var show = measure.value === 'percentile';
+                                                    percentile.classList.toggle('hidden', !show);
+                                                    var input = document.getElementById('percentile');
+                                                    if (input) input.required = show;
+                                                  };
+                                                  setTimeout(function() {
+                                                    var measure = document.getElementById('measure');
+                                                    if (measure) {
+                                                      measure.addEventListener('change', update);
+                                                      update();
+                                                    }
+                                                  }, 0);
+                                                })();
+                                            """))
+                                        with div(id="percentile_container", cls="hidden"):
+                                            label(_('Percentile'), fr="percentile", cls="block text-sm font-medium leading-6 text-gray-900")
+                                            input_(id="percentile", name="percentile", type="number", value="50", min="0", max="100", step="0.01",
+                                                cls="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6")
                         with div(cls="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse"):
                             button(_('Add'), type="submit", cls="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto")
                             a(_('Cancel'), href="#",
@@ -1362,12 +1413,17 @@ class PivotHeaderSelectionAddField(PivotHeaderSelectionMixin, Endpoint):
                     cube.columns.append(self.field)
                     cube.order.append((self.field, 'asc'))
             case 'measure':
-                if (self.field, self.measure) not in cube.measures:
-                    cube.measures.append((self.field, self.measure))
-                    cube.order.append(((self.field, self.measure), 'asc'))
+                measure = _measure_key(self.field, self.measure, self.percentile)
+                if measure not in cube.measures:
+                    cube.measures.append(measure)
+                    cube.order.append((measure, 'asc'))
             case 'property':
                 if self.field not in cube.properties:
                     cube.properties.append(self.field)
+            case 'order':
+                field = _parse_field_reference(self.field)
+                if field not in [item[0] for item in cube.order]:
+                    cube.order.append((field, 'asc'))
 
         return redirect(Index.url(table_name=self.table_name,
             table_properties=cube.encode_properties()))
@@ -1404,15 +1460,8 @@ class PivotHeaderRemoveField(PivotHeaderMixin, Endpoint):
             case 'property':
                 cube.properties.remove(self.field)
             case 'measures':
-                #TODO: we need to handle the case when we have multiple
-                # measures for the same field.
-                # For example, we can have: SUM('x') and MAX('x')
-                index = 0
-                for measure in cube.measures:
-                    if measure[0] == self.field:
-                        cube.measures.pop(index)
-                        break
-                    index += 1
+                measure = _parse_field_reference(self.field)
+                cube.measures.remove(measure)
 
         # Remove the field from the order property
         index = 0
@@ -1421,7 +1470,8 @@ class PivotHeaderRemoveField(PivotHeaderMixin, Endpoint):
                 cube.order.pop(index)
                 break
             if self.header == 'measures':
-                if isinstance(order[0], tuple) and order[0][0] == self.field:
+                measure = _parse_field_reference(self.field)
+                if order[0] == measure:
                     cube.order.pop(index)
                     break
             index +=1
@@ -1458,11 +1508,7 @@ class PivotHeaderLevelField(PivotHeaderMixin, Endpoint):
         if self.header in headers:
             cube_attribute = getattr(cube, headers[self.header])
             if self.header == 'order':
-                field = self.field.split('__')
-                if len(field) > 1:
-                    field = tuple(field)
-                else:
-                    field = self.field
+                field = _parse_field_reference(self.field)
 
                 index = 0
                 for ca in cube_attribute:
