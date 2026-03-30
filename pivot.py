@@ -416,8 +416,8 @@ class Index(IndexMixin, Endpoint):
                     div(cls="pointer-events-none absolute right-0 top-0 h-full w-1 bg-gradient-to-r from-transparent to-gray-200")
                     div(_('Tags'), cls="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide")
                     with div(cls="px-2 pb-2 flex flex-wrap gap-1"):
-                        all_cls = ("px-2 py-0.5 text-xs rounded-full border "
-                            "border-gray-200 text-gray-700 hover:bg-indigo-50 "
+                        all_cls = ("px-2 py-0.5 text-xs rounded-full "
+                            "text-gray-700 hover:bg-indigo-50 "
                             "hover:text-indigo-700 transition")
                         if not current_tag:
                             all_cls += " bg-indigo-50 text-indigo-700 font-semibold"
@@ -425,8 +425,8 @@ class Index(IndexMixin, Endpoint):
                             table_properties=self.table_properties)
                         a(_('All'), cls=all_cls, href=all_url)
                         for tag in TableTag.search([], order=[('name', 'ASC')]):
-                            tag_cls = ("px-2 py-0.5 text-xs rounded-full border "
-                                "border-gray-200 text-gray-700 hover:bg-indigo-50 "
+                            tag_cls = ("px-2 py-0.5 text-xs rounded-full "
+                                "text-gray-700 hover:bg-indigo-50 "
                                 "hover:text-indigo-700 transition")
                             if current_tag and str(tag.id) == str(current_tag):
                                 tag_cls += " bg-indigo-50 text-indigo-700 font-semibold"
@@ -447,7 +447,7 @@ class Index(IndexMixin, Endpoint):
                                 hx_trigger="keyup changed delay:300ms",
                                 hx_target="#sidebar_tables",
                                 hx_include="closest form",
-                                cls=("w-full rounded-md border border-gray-300 px-2 py-1 "
+                                cls=("w-full rounded-md px-2 py-1 "
                                     "text-xs text-gray-900 focus:border-blue-500 "
                                     "focus:ring-blue-500"))
 
@@ -455,8 +455,8 @@ class Index(IndexMixin, Endpoint):
                     PivotSidebarTables(table_name=self.table_name,
                         table_properties=self.table_properties)
 
-                with div(cls="flex-1 overflow-auto m-2 rounded-lg border border-gray-200 bg-white"):
-                    with div(cls="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
+                with div(cls="flex-1 overflow-auto m-2 rounded-lg bg-white"):
+                    with div(cls="bg-white px-4 py-3 sm:px-6 grid grid-cols-4"):
                         with div(cls="col-span-2 flex items-center gap-2"):
                             with button(type="button",
                                     id="toggle_sidebar",
@@ -511,7 +511,7 @@ class Index(IndexMixin, Endpoint):
 
                     parameters = _get_table_parameters(table)
                     if parameters:
-                        with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
+                        with details(cls="m-2", open=True):
                             summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Parameters'))
                             with div(cls="grid grid-cols-1 gap-3 px-3 pb-2 pt-2 sm:grid-cols-2"):
                                 for parameter in parameters:
@@ -594,7 +594,7 @@ class Index(IndexMixin, Endpoint):
                                                 input_(**input_kwargs)
 
                     # Details always opened by default
-                    with details(cls="m-2 border border-gray-200 rounded-lg", open=True):
+                    with details(cls="m-2", open=True):
                         summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Configuration'))
                         pivots = [p for p in table.pivots if p.active]
                         selected_pivot_id = None
@@ -1838,7 +1838,7 @@ class PivotTable(Endpoint):
         loading_div.add(loading_spinner_)
 
         pivot_div = div(id='pivot_table', cls=("inline-block min-w-full py-2 align-middle "
-            "sm:px-6 lg:px-8 relative my-2 border border-gray-200 rounded-lg bg-white"))
+            "sm:px-6 lg:px-8 relative my-2"))
         pivot_div.add(loading_div)
         pivot_div.add(controls)
         table_container = div(cls="shadow-md rounded-lg overflow-hidden border border-gray-200")
