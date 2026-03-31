@@ -907,16 +907,16 @@ class WidgetParameter(sequence_ordered(), ModelSQL, ModelView):
 
     @fields.depends('type', 'widget', '_parent_widget.type')
     def on_change_with_aggregate_required(self, name=None):
-        if not self.widget:
+        if not self.widget or not self.type:
             return
-        settings = self.widget.parameter_settings()
+        settings = self.widget.parameter_settings() or {}
         return settings.get(self.type, {}).get('aggregate') == 'required'
 
     @fields.depends('type', 'widget', '_parent_widget.type')
     def on_change_with_aggregate_invisible(self, name=None):
         if not self.widget or not self.type:
             return
-        settings = self.widget.parameter_settings()
+        settings = self.widget.parameter_settings() or {}
         return settings.get(self.type, {}).get('aggregate') == 'forbidden'
 
     @classmethod
