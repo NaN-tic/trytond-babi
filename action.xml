@@ -32,5 +32,61 @@
             action="act_action_dashboard_form"
             sequence="60"
             id="menu_action_dashboard"/>
+
+        <!-- babi.voyager.open_session -->
+        <record model="ir.model.access" id="access_babi_voyager_open_session">
+            <field name="model">babi.voyager.open_session</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_babi_voyager_open_session_babi">
+            <field name="model">babi.voyager.open_session</field>
+            <field name="group" ref="group_babi"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_babi_voyager_open_session_table">
+            <field name="model">babi.voyager.open_session</field>
+            <field name="group" ref="group_babi_table"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_babi_voyager_open_session_admin">
+            <field name="model">babi.voyager.open_session</field>
+            <field name="group" ref="group_babi_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.action.url" id="act_babi_voyager_url">
+            <field name="name">Businiess Intelligence</field>
+            <field name="url">/</field>
+        </record>
+        <record model="ir.action.wizard" id="act_babi_open_voyager">
+            <field name="name">Businiess Intelligence</field>
+            <field name="wiz_name">babi.open_voyager</field>
+        </record>
+        <menuitem id="menu_babi_open_voyager" parent="menu_babi"
+            action="act_babi_open_voyager" sequence="20" icon="tryton-graph"/>
+        <record model="ir.ui.menu-res.group" id="menu_babi_open_voyager_group_babi">
+            <field name="menu" ref="menu_babi_open_voyager"/>
+            <field name="group" ref="group_babi"/>
+        </record>
+        <record model="ir.ui.menu-res.group" id="menu_babi_open_voyager_group_babi_table">
+            <field name="menu" ref="menu_babi_open_voyager"/>
+            <field name="group" ref="group_babi_table"/>
+        </record>
+        <record model="ir.ui.menu-res.group" id="menu_babi_open_voyager_group_babi_admin">
+            <field name="menu" ref="menu_babi_open_voyager"/>
+            <field name="group" ref="group_babi_admin"/>
+        </record>
     </data>
 </tryton>
