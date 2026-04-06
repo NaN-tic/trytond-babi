@@ -29,6 +29,7 @@ def register():
         action.View,
         action.Action,
         action.ActionDashboard,
+        action.VoyagerOpenSession,
         action.Menu,
         test_model.TestBabiModel,
         table.TableUser,
@@ -70,6 +71,7 @@ def register():
         module='babi', type_='model')
     Pool.register(
         table.ParametrizeTable,
+        action.OpenVoyager,
         module='babi', type_='wizard')
     Pool.register(
         table.TableExcel,

@@ -1,7 +1,12 @@
+from datetime import datetime, timedelta
+import secrets
+
 from lxml import etree
 from trytond.pool import PoolMeta, Pool
 from trytond.model import fields, ModelSQL, ModelView
 from trytond.ir.action import ActionMixin
+from trytond.transaction import Transaction
+from trytond.wizard import StateAction, Wizard
 
 
 class View(metaclass=PoolMeta):
@@ -47,6 +52,41 @@ class ActionDashboard(ActionMixin, ModelSQL, ModelView):
     @staticmethod
     def default_type():
         return 'babi.action.dashboard'
+
+
+class VoyagerOpenSession(ModelSQL, ModelView):
+    'Babi Voyager Open Session'
+    __name__ = 'babi.voyager.open_session'
+
+    token = fields.Char('Token', required=True)
+    user = fields.Many2One('res.user', 'User', required=True,
+        ondelete='CASCADE')
+    expiration_date = fields.DateTime('Expiration Date', required=True)
+
+
+class OpenVoyager(Wizard):
+    'Open Babi Voyager'
+    __name__ = 'babi.open_voyager'
+    start_state = 'open_voyager'
+
+    open_voyager = StateAction('babi.act_babi_voyager_url')
+
+    def do_open_voyager(self, action):
+        pool = Pool()
+        OpenSession = pool.get('babi.voyager.open_session')
+
+        database = Transaction().database.name
+        session, = OpenSession.create([{
+                    'token': secrets.token_urlsafe(32),
+                    'user': Transaction().user,
+                    'expiration_date': datetime.now() + timedelta(minutes=5),
+                    }])
+        action['url'] = f'/{database}/babi/voyager-login/{session.token}'
+        return action, {}
+
+    @classmethod
+    def transition_open_voyager(cls):
+        return 'end'
 
 
 class Menu(metaclass=PoolMeta):
