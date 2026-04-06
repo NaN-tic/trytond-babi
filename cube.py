@@ -34,6 +34,74 @@ def capitalize(string):
     return ' '.join([word.capitalize() for word in string.split('_')])
 
 
+def _serialize_expansion_value(value):
+    if isinstance(value, tuple):
+        return {
+            '__class__': 'tuple',
+            'items': [_serialize_expansion_value(v) for v in value],
+        }
+    if isinstance(value, list):
+        return [_serialize_expansion_value(v) for v in value]
+    if isinstance(value, Decimal):
+        return {
+            '__class__': 'Decimal',
+            'value': str(value),
+        }
+    if isinstance(value, datetime):
+        return {
+            '__class__': 'datetime',
+            'value': value.isoformat(),
+        }
+    if isinstance(value, date):
+        return {
+            '__class__': 'date',
+            'value': value.isoformat(),
+        }
+    return value
+
+
+def _deserialize_expansion_value(value):
+    if isinstance(value, list):
+        return [_deserialize_expansion_value(v) for v in value]
+    if isinstance(value, dict):
+        value_class = value.get('__class__')
+        if value_class == 'tuple':
+            return tuple(_deserialize_expansion_value(v)
+                for v in value.get('items', []))
+        if value_class == 'Decimal':
+            return Decimal(value['value'])
+        if value_class == 'datetime':
+            return datetime.fromisoformat(value['value'])
+        if value_class == 'date':
+            return date.fromisoformat(value['value'])
+    return value
+
+
+def _encode_expansions(expansions):
+    payload = json.dumps(
+        [_serialize_expansion_value(v) for v in expansions],
+        separators=(',', ':'),
+        sort_keys=True,
+    ).encode('utf-8')
+    return base64.urlsafe_b64encode(payload).decode('ascii').rstrip('=')
+
+
+def _decode_expansions(values):
+    if not values:
+        return []
+    if len(values) == 1:
+        encoded = values[0]
+        try:
+            padding = '=' * (-len(encoded) % 4)
+            payload = base64.urlsafe_b64decode(
+                (encoded + padding).encode('ascii'))
+            decoded = json.loads(payload.decode('utf-8'))
+            return [_deserialize_expansion_value(v) for v in decoded]
+        except (binascii.Error, json.JSONDecodeError, UnicodeDecodeError):
+            pass
+    return [ast.literal_eval(v) for v in values]
+
+
 class Median(sql.aggregate.Aggregate):
     __slots__ = ()
     _sql = 'PERCENTILE_CONT'
@@ -704,6 +772,12 @@ class Cube:
         cube_properties = self.__dict__.copy()
         # We need to delete the table property because it is already in the url
         del cube_properties['table']
+        if cube_properties.get('row_expansions') is not None:
+            cube_properties['row_expansions'] = _encode_expansions(
+                cube_properties['row_expansions'])
+        if cube_properties.get('column_expansions') is not None:
+            cube_properties['column_expansions'] = _encode_expansions(
+                cube_properties['column_expansions'])
         if cube_properties.get('parameters') is not None:
             payload = json.dumps(
                 cube_properties['parameters'],
@@ -734,12 +808,12 @@ class Cube:
                 ast.literal_eval(m) for m in cube_properties['order']]
 
         if cube_properties.get('row_expansions'):
-            cube_properties['row_expansions'] = [
-                ast.literal_eval(m) for m in cube_properties['row_expansions']]
+            cube_properties['row_expansions'] = _decode_expansions(
+                cube_properties['row_expansions'])
 
         if cube_properties.get('column_expansions'):
-            cube_properties['column_expansions'] = [
-                ast.literal_eval(m) for m in cube_properties['column_expansions']]
+            cube_properties['column_expansions'] = _decode_expansions(
+                cube_properties['column_expansions'])
 
         if cube_properties.get('parameters'):
             encoded = cube_properties['parameters'][0]

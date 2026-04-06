@@ -50,8 +50,9 @@ def voyager(request, pool, path):
         abort(HTTPStatus.UNAUTHORIZED)
     user_id = request.user_id or (
         session.system_user.id if session.system_user else None)
-    return Site.dispatch(site.type, site.id, request, user_id,
-        f'/{Transaction().database.name}/babi/voyager')
+    with Transaction().set_user(user_id):
+        return Site.dispatch(site.type, site.id, request, user_id,
+            f'/{Transaction().database.name}/babi/voyager')
 
 
 @app.route('/<database_name>/babi/voyager-login/<string:token>')
