@@ -48,7 +48,9 @@ def voyager(request, pool, path):
         session = Session.get(request)
     if not request.user_id and not session.system_user:
         abort(HTTPStatus.UNAUTHORIZED)
-    return Site.dispatch(site.type, site.id, request, request.user_id,
+    user_id = request.user_id or (
+        session.system_user.id if session.system_user else None)
+    return Site.dispatch(site.type, site.id, request, user_id,
         f'/{Transaction().database.name}/babi/voyager')
 
 
@@ -89,5 +91,7 @@ def voyager_login(request, pool, token):
     response = redirect(
         f'/{Transaction().database.name}/babi/voyager/{table.table_name}/null',
         HTTPStatus.FOUND)
-    response.set_cookie('session_id', session.session_id)
+    response.set_cookie(
+        'session_id', session.session_id,
+        path=f'/{Transaction().database.name}/babi')
     return response
