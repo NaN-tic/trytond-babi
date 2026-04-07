@@ -2,7 +2,7 @@
 # copyright notices and license terms.
 from trytond.model import fields, dualmethod
 from trytond.pool import Pool, PoolMeta
-from trytond.transaction import Transaction
+from trytond.transaction import Transaction, without_check_access
 from trytond.pyson import Eval
 from .babi import QUEUE_NAME
 
@@ -19,7 +19,7 @@ class Cron(metaclass=PoolMeta):
             })
     babi_compute_warnings = fields.Boolean('Compute Warnings', states={
             'invisible': ~Eval('method').in_(['babi.table|_compute',
-                    'babi.table.cluster|_compute']),
+                    'babi.table.cluster|compute']),
             })
 
     @classmethod
@@ -76,11 +76,21 @@ class Cron(metaclass=PoolMeta):
         pool = Pool()
         Table = pool.get('babi.table')
         Cluster = pool.get('babi.table.cluster')
+        Company = pool.get('company.company')
+
+        def iter_companies(cron):
+            if cron.companies:
+                return cron.companies
+            company_id = Transaction().context.get('company')
+            if company_id:
+                return [Company(company_id)]
+            with without_check_access():
+                return Company.search([])
 
         table_crons = [cron for cron in crons if cron.babi_table]
         for cron in table_crons:
             # babi execution require company. Run compute when has a company
-            for company in cron.companies:
+            for company in iter_companies(cron):
                 with Transaction().set_context(company=company.id,
                         queue_name=QUEUE_NAME):
                     Table.__queue__._compute(cron.babi_table,
@@ -88,7 +98,7 @@ class Cron(metaclass=PoolMeta):
         cluster_crons = [cron for cron in crons if cron.babi_cluster]
         for cron in cluster_crons:
             # babi execution require company. Run compute when has a company
-            for company in cron.companies:
+            for company in iter_companies(cron):
                 with Transaction().set_context(company=company.id,
                         queue_name=QUEUE_NAME):
                     Cluster.__queue__.compute([cron.babi_cluster],
@@ -99,6 +109,6 @@ class Cron(metaclass=PoolMeta):
     @fields.depends('method')
     def on_change_with_babi_compute_warnings(self, name=None):
         if self.method not in ('babi.table|_compute',
-                'babi.table.cluster|_compute'):
+                'babi.table.cluster|compute'):
             return False
         return self.babi_compute_warnings
