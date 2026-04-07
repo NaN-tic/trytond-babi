@@ -2,7 +2,7 @@
 # copyright notices and license terms.
 from trytond.model import fields, dualmethod
 from trytond.pool import Pool, PoolMeta
-from trytond.transaction import Transaction
+from trytond.transaction import Transaction, without_check_access
 from trytond.pyson import Eval
 from .babi import QUEUE_NAME
 
@@ -84,7 +84,8 @@ class Cron(metaclass=PoolMeta):
             company_id = Transaction().context.get('company')
             if company_id:
                 return [Company(company_id)]
-            return Company.search([])
+            with without_check_access():
+                return Company.search([])
 
         table_crons = [cron for cron in crons if cron.babi_table]
         for cron in table_crons:
