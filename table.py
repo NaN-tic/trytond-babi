@@ -2100,12 +2100,13 @@ class WarningExcel(Report):
             return
 
         action, model = cls.get_action(data)
-        cls.check_access(action, model, ids)
+        cls.check_access(action, None, None)
 
         wb = Workbook()
         wb.remove(wb.active)
 
-        warnings = Warning.browse(ids)
+        with Transaction().set_context(_check_access=False):
+            warnings = Warning.browse(ids)
         for warning in warnings:
             ws = wb.create_sheet(_convert_to_title(warning.table.name))
             for record in warning.table.get_records(where=warning.query_where()):
@@ -2135,15 +2136,17 @@ class WarningPivotExcel(Report):
     def execute(cls, ids, data):
         pool = Pool()
         ActionReport = pool.get('ir.action.report')
+        Warning = pool.get('babi.warning')
         PivotExcel = pool.get('babi.pivot.excel', type='report')
 
         if not ids:
             return
 
         action, model = cls.get_action(data)
-        cls.check_access(action, model, ids)
+        cls.check_access(action, None, None)
 
-        warnings = Warning.browse(ids)
+        with Transaction().set_context(_check_access=False):
+            warnings = Warning.browse(ids)
         pivots = []
         for warning in warnings:
             pivots += list(warning.table.pivots)
