@@ -893,7 +893,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
              </head>
              <body>%s</body></html>
         ''' % content
-        return html
+        # Remove leading whitespace from each line to
+        # ensure HTML is properly rendered in Markdown
+        return '\n'.join([x.strip() for x in html.splitlines()])
 
     def get_preview(self, name):
         return self.get_html(limit=self.preview_limit, wait=False).encode()
