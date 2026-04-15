@@ -67,11 +67,11 @@
         </record>
 
         <record model="ir.action.url" id="act_babi_voyager_url">
-            <field name="name">Businiess Intelligence</field>
+            <field name="name">Pivot Tables</field>
             <field name="url">/</field>
         </record>
         <record model="ir.action.wizard" id="act_babi_open_voyager">
-            <field name="name">Businiess Intelligence</field>
+            <field name="name">Pivot Tables</field>
             <field name="wiz_name">babi.open_voyager</field>
         </record>
         <menuitem id="menu_babi_open_voyager" parent="menu_babi"
