@@ -241,16 +241,17 @@ class Site(metaclass=PoolMeta):
     def _get_context(self, session, component_model, args):
         pool = Pool()
         User = pool.get('res.user')
+        Component = pool.get(component_model)
 
         context = super()._get_context(session, component_model, args)
+        if Component._type == 'babi_pivot':
+            language = User(Transaction().user).language
+            if language:
+                language = language.code
+            else:
+                language = 'en'
 
-        language = User(Transaction().user).language
-        if language:
-            language = language.code
-        else:
-            language = 'en'
-
-        context['language'] = language
+            context['language'] = language
         return context
 
 
