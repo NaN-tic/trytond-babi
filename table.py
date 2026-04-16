@@ -1312,6 +1312,9 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             self.__class__.__queue__.compute_warnings(self)
 
     def compute_warnings(self):
+        pool = Pool()
+        Warning = pool.get('babi.warning')
+
         self.compute_warning_error = None
         self.save()
         query = self.get_query()
@@ -1386,7 +1389,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 warnings = Warning.create(to_create)
                 for warning in warnings:
                     warning.send()
-            except Exception as e:
+            except (UserError, ValidationError, psycopg2.Error) as e:
                 Transaction().connection.rollback()
                 self.compute_warning_error = f'{e}\n{traceback.format_exc()}'
                 self.save()
