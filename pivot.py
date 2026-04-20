@@ -319,9 +319,11 @@ class Index(IndexMixin, Endpoint):
 
     def render(self):
         pool = Pool()
+        Index = self.__class__
         BabiTable = pool.get('babi.table')
         TableTag = pool.get('babi.table.tag')
         Layout = pool.get('www.layout.pivot')
+        PivotSidebarTables = pool.get('www.pivot_sidebar_tables')
         PivotHeaderAxis = pool.get('www.pivot_header.axis')
         PivotHeaderMeasure = pool.get('www.pivot_header.measure')
         PivotHeaderOrder = pool.get('www.pivot_header.order')
@@ -711,6 +713,7 @@ class PivotSidebarTables(Endpoint):
 
     def render(self):
         pool = Pool()
+        Index = pool.get('www.index.pivot')
         BabiTable = pool.get('babi.table')
 
         request = Transaction().context.get('voyager_context').request
@@ -1181,6 +1184,7 @@ class PivotHeaderMeasure(Endpoint):
     def render(self):
         pool = Pool()
         PivotHeaderSelection = pool.get('www.pivot_header.selection')
+        PivotHeaderLevelField = pool.get('www.pivot_header.level_field')
         Table = pool.get('babi.table')
         PivotHeaderRemoveField = pool.get('www.pivot_header.remove_field')
         internal_name = _normalize_table_name(self.table_name)
@@ -1685,6 +1689,8 @@ class PivotTable(Endpoint):
     def render(self):
         pool = Pool()
         # Component
+        Index = pool.get('www.index.pivot')
+        PivotTable = self.__class__
         DownloadReport = pool.get('www.download_report')
         Language = pool.get('ir.lang')
         Table = pool.get('babi.table')
