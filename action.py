@@ -9,21 +9,38 @@ from trytond.transaction import Transaction
 from trytond.wizard import StateAction, Wizard
 
 
+class _ChartValidator:
+    def __init__(self, validator):
+        self._validator = validator
+
+    def _prepare_tree(self, tree):
+        tree = etree.fromstring(etree.tostring(tree))
+        for field in tree.xpath('.//field[@widget="chart"]'):
+            field.set('widget', 'text')
+        return tree
+
+    def validate(self, tree):
+        return self._validator.validate(self._prepare_tree(tree))
+
+    def assertValid(self, tree):
+        return self._validator.assertValid(self._prepare_tree(tree))
+
+    @property
+    def error_log(self):
+        return self._validator.error_log
+
+
 class View(metaclass=PoolMeta):
     __name__ = 'ir.ui.view'
 
     @classmethod
-    def get_rng(cls, type_):
-        rng = super().get_rng(type_)
-        if type_ in ('form', 'list-form'):
-            widgets = rng.xpath(
-                '//ns:define/ns:optional/ns:attribute'
-                '/ns:name[.="widget"]/following-sibling::ns:choice',
-                namespaces={'ns': 'http://relaxng.org/ns/structure/1.0'})[0]
-            subelem = etree.SubElement(widgets,
-                '{http://relaxng.org/ns/structure/1.0}value')
-            subelem.text = 'chart'
-        return rng
+    def _validator(cls, type_):
+        validator = super()._validator(type_)
+        if type_ in {'form', 'list-form'}:
+            validator = _ChartValidator(validator)
+            key = (cls.__name__, type_)
+            validator = cls._get_validator_cache.set(key, validator)
+        return validator
 
 
 class Action(metaclass=PoolMeta):
