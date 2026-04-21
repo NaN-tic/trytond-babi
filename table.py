@@ -11,7 +11,7 @@ import tempfile
 import html
 import urllib.parse
 import secrets
-import psycopg2
+import psycopg
 from sql import Literal
 from sql.operators import Equal
 from decimal import Decimal
@@ -1221,7 +1221,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 try:
                     cursor.execute(f'LOCK TABLE {self.table_name} IN ACCESS '
                         'SHARE MODE NOWAIT')
-                except psycopg2.errors.LockNotAvailable:
+                except psycopg.errors.LockNotAvailable:
                     transaction.connection.rollback()
                     raise NoWaitError
 
@@ -1389,7 +1389,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 warnings = Warning.create(to_create)
                 for warning in warnings:
                     warning.send()
-            except (UserError, ValidationError, psycopg2.Error) as e:
+            except (UserError, ValidationError, psycopg.Error) as e:
                 Transaction().connection.rollback()
                 self.compute_warning_error = f'{e}\n{traceback.format_exc()}'
                 self.save()
@@ -2777,7 +2777,7 @@ class PivotExcel(Report):
             try:
                 for row in cube.build():
                     ws.append([x.formatted(language, worksheet=ws) for x in row])
-            except psycopg2.errors.UndefinedTable:
+            except psycopg.errors.UndefinedTable:
                 continue
             try:
                 adjust_column_widths(ws, max_width=30)
