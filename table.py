@@ -1366,6 +1366,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
         to_create = []
         self.last_warning_execution = datetime.now()
+        self.save()
         cursor = Transaction().connection.cursor()
         cursor.execute(query_full)
         query_last = cursor.fetchall()
