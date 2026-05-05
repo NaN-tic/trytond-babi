@@ -19,6 +19,7 @@ from types import SimpleNamespace
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
 from openpyxl.cell import Cell
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from simpleeval import EvalWithCompoundTypes
 from trytond import backend
 from trytond.bus import notify
@@ -2027,8 +2028,9 @@ def _convert_to_cell(value, ws):
         cell = Cell(ws, value=value)
         cell.number_format = fmt
         return cell
-    if isinstance(value, (str, int, float, date, datetime,
-            dt_time, bool)):
+    if isinstance(value, str):
+        return ILLEGAL_CHARACTERS_RE.sub('', value)
+    if isinstance(value, (int, float, date, datetime, dt_time, bool)):
         return value
     return str(value) if value is not None else None
 
