@@ -3,9 +3,11 @@
 # this repository contains the full copyright notices and license terms.
 
 import datetime
+import io
 import random
 import sql
 from decimal import Decimal
+from openpyxl import load_workbook
 from trytond import backend
 from trytond.model.exceptions import ValidationError
 from trytond.pool import Pool
@@ -225,6 +227,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             table.query = """
                 SELECT
                     'Hello World' AS text_value,
+                    '3103250004395' || CHAR(29) || '152603' AS barcode_value,
                     42 AS int_value,
                     3.14 AS float_value,
                     DATE('now') AS date_value,
@@ -237,6 +240,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             table.query = """
                 SELECT
                     'Hello World' AS text_value,           -- str (text)
+                    E'3103250004395\\x1d152603' AS barcode_value,
                     42 AS int_value,                       -- int
                     3.14 AS float_value,                   -- float
                     CURRENT_DATE AS date_value,            -- date
@@ -249,8 +253,11 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         table._compute()
         self.assertIn('Hello World', str(table.preview))
 
-        oext, _, _, _ = TableExcel.execute([table.id], {})
+        oext, content, _, _ = TableExcel.execute([table.id], {})
         self.assertEqual(oext, 'xlsx')
+        wb = load_workbook(io.BytesIO(content), read_only=True)
+        ws = wb.active
+        self.assertEqual(ws['B2'].value, '3103250004395152603')
 
     @with_transaction()
     def test_pivot_median_aggregate(self):
