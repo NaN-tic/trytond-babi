@@ -51,8 +51,10 @@ class DashboardItem(sequence_ordered(), ModelSQL, ModelView):
     __name__ = 'babi.dashboard.item'
     dashboard = fields.Many2One('babi.dashboard', 'Dashboard', required=True)
     widget = fields.Many2One('babi.widget', 'Widget', required=True)
-    colspan = fields.Integer('Columns')
-    height = fields.Integer('Height', help='The default is 450px')
+    colspan = fields.Integer('Columns',
+        help='Number of columns to occupy in the dashboard. The default is 1, '
+        'the maximum 4.')
+    height = fields.Integer('Height', help='In pixels. The default is 450px')
     parent = fields.Many2One('babi.dashboard.item', 'Parent', domain=[
             ('dashboard', '=', Eval('dashboard', -1)),
             ], depends=['dashboard'])
