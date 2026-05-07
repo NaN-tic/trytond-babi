@@ -49,7 +49,8 @@ class Dashboard(ModelSQL, ModelView):
 class DashboardItem(sequence_ordered(), ModelSQL, ModelView):
     'Dashboard Item'
     __name__ = 'babi.dashboard.item'
-    dashboard = fields.Many2One('babi.dashboard', 'Dashboard', required=True)
+    dashboard = fields.Many2One('babi.dashboard', 'Dashboard', required=True,
+        ondelete='CASCADE')
     widget = fields.Many2One('babi.widget', 'Widget', required=True)
     colspan = fields.Integer('Columns',
         help='Number of columns to occupy in the dashboard. The default is 1, '
