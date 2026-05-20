@@ -1671,7 +1671,7 @@ msgstr "Campos"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_filter"
 msgid "Filters"
-msgstr "Filtro"
+msgstr "Filtros"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_pivot"
 msgid "Pivot Tables"

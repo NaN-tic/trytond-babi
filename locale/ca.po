@@ -1670,7 +1670,7 @@ msgstr "Camps"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_filter"
 msgid "Filters"
-msgstr "Filtre"
+msgstr "Filtres"
 
 msgctxt "model:ir.ui.menu,name:menu_babi_pivot"
 msgid "Pivot Tables"
