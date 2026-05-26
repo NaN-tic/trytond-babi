@@ -7,6 +7,7 @@ import io
 import random
 import sql
 from decimal import Decimal
+from types import SimpleNamespace
 from openpyxl import load_workbook
 from trytond import backend
 from trytond.model.exceptions import ValidationError
@@ -118,6 +119,8 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         Model = pool.get('ir.model')
         date = datetime.date(2014, 10, 10)
         other_date = datetime.date(2014, 1, 1)
+        nested_record = SimpleNamespace(
+            party=SimpleNamespace(rec_name='Test Party'))
         tests = [
             ('o', None, '(empty)'),
             ('y(o)', date, str(date.year)),
@@ -142,6 +145,16 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             ('str(o)', 3.14, '3.14'),
             ('Decimal(o)', 3.14, Decimal(3.14)),
             ('Decimal(0)', None, Decimal(0)),
+            ('getattr(o, "year")', date, 2014),
+            ('hasattr(o, "year")', date, True),
+            ('isinstance(o, Decimal)', Decimal('1.2'), True),
+            ('o and "yes" or "no"', 1, 'yes'),
+            ('o and "yes" or "no"', 0, 'no'),
+            ('"big" if o > 10 else "small"', 11, 'big'),
+            ('"big" if o > 10 else "small"', 9, 'small'),
+            ('[str(x) for x in o]', [1, 2, 3], ['1', '2', '3']),
+            ('o.party.rec_name', nested_record, 'Test Party'),
+            ('pool("ir.model")', None, Model),
         ]
         models = Model.search([('name', '=', 'babi.test')])
         tests.append(
