@@ -29,6 +29,7 @@ class Test(unittest.TestCase):
         record.category = 'odd'
         record.amount = Decimal('10.50')
         record.save()
+        first_record = record
 
         record = TestModel()
         record.date = datetime.date(2026, 1, 16)
@@ -258,6 +259,39 @@ class Test(unittest.TestCase):
         self.assertIn('>2026-01-14</td>', str(table.preview))
         self.assertIn('>2026-01-15</td>', str(table.preview))
         self.assertIn('>ODD</td>', str(table.preview))
+
+        broken_expression = Expression()
+        broken_expression.name = 'Broken Amount'
+        broken_expression.model = model
+        broken_expression.ttype = 'numeric'
+        broken_expression.decimal_digits = 2
+        broken_expression.expression = 'o.amount / 0'
+        broken_expression.save()
+
+        broken_table = Table()
+        broken_table.name = 'Broken Model Table'
+        broken_table.type = 'model'
+        broken_table.model = model
+        broken_table.babi_raise_user_error = True
+
+        for expression, internal_name in [
+                (id_expression, 'id'),
+                (amount_expression, 'amount'),
+                (broken_expression, 'broken_amount'),
+                (category_expression, 'category')]:
+            field = Field()
+            field.expression = expression
+            field.name = expression.name
+            field.internal_name = internal_name
+            broken_table.fields_.append(field)
+
+        broken_table.save()
+        broken_table.click('compute')
+        broken_table.reload()
+        self.assertIsNotNone(broken_table.compute_error)
+        self.assertIn('Broken Amount', broken_table.compute_error)
+        self.assertIn('Broken Model Table', broken_table.compute_error)
+        self.assertIn(str(first_record.id), broken_table.compute_error)
         self.assertIn('>EVEN</td>', str(table.preview))
         self.assertIn('>has_amount</td>', str(table.preview))
         self.assertIn('>decimal</td>', str(table.preview))

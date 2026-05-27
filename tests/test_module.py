@@ -14,7 +14,7 @@ from trytond.model.exceptions import ValidationError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
-from trytond.modules.babi.babi_eval import babi_eval
+from trytond.modules.babi.babi_eval import babi_eval, babi_eval_batch
 from trytond.modules.babi.cube import Cube
 from trytond.pyson import PYSONEncoder
 from trytond.modules.company.tests import CompanyTestMixin
@@ -158,14 +158,28 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         ]
         models = Model.search([('name', '=', 'babi.test')])
         tests.append(
-            ('Pool().get(\'ir.model\').search(['
+            ('pool(\'ir.model\').search(['
                 '(\'name\', \'=\', \'babi.test\')])', None, models),
             )
         for expression, obj, result in tests:
             self.assertEqual(babi_eval(expression, obj), result)
+        self.assertEqual(
+            babi_eval_batch(
+                ['o.year', 'o.month', 'o.day'],
+                date,
+                convert_none=None),
+            (2014, 10, 10))
+        self.assertEqual(
+            babi_eval_batch(
+                ['o', 'o', 'float(o)'],
+                1,
+                convert_none=None,
+                digits=[None, None, 2],
+                ttypes=[None, None, 'numeric']),
+            (1, 1, Decimal('1.00')))
         with Transaction().set_context(date=date):
             self.assertEqual(babi_eval(
-                    'Transaction().context.get(\'date\')', None), date)
+                    'transaction().context.get(\'date\')', None), date)
 
         self.assertEqual(babi_eval('o', None, convert_none='zero'), '0')
         self.assertEqual(babi_eval('o', None, convert_none=''), '')
@@ -204,9 +218,10 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         table.save()
         table._compute()
 
-        cursor = Transaction().connection.cursor()
-        cursor.execute('SELECT count(*) FROM "%s"' % table.table_name)
-        count = cursor.fetchall()[0][0]
+        with Transaction().new_transaction() as transaction:
+            cursor = transaction.connection.cursor()
+            cursor.execute('SELECT count(*) FROM "%s"' % table.table_name)
+            count = cursor.fetchall()[0][0]
         self.assertNotEqual(count, 0)
 
         table = Table()
@@ -264,9 +279,11 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                 """
         table.save()
         table._compute()
-        self.assertIn('Hello World', str(table.preview))
-
-        oext, content, _, _ = TableExcel.execute([table.id], {})
+        Transaction().commit()
+        with Transaction().new_transaction():
+            table = Table(table.id)
+            self.assertIn('Hello World', str(table.preview))
+            oext, content, _, _ = TableExcel.execute([table.id], {})
         self.assertEqual(oext, 'xlsx')
         wb = load_workbook(io.BytesIO(content), read_only=True)
         ws = wb.active

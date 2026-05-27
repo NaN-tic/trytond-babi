@@ -39,7 +39,7 @@ from trytond.report import Report
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.rpc import RPC
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
-from .babi_eval import babi_eval
+from .babi_eval import babi_eval, babi_eval_batch
 from .cube import Cube
 from .tools import adjust_column_widths
 
@@ -1534,8 +1534,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
             table = sql.Table(self.table_name)
             columns = [sql.Column(table, x.internal_name) for x in self.fields_]
-            expressions = [(x.expression.expression, x.expression.ttype, x.expression.decimal_digits)
-                for x in self.fields_]
+            expressions = [(x, x.expression.expression, x.expression.ttype,
+                    x.expression.decimal_digits) for x in self.fields_]
             index = 0
             count = 0
             offset = 10000
@@ -1562,24 +1562,42 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                     if python_filter:
                         if not babi_eval(python_filter, record, convert_none=None):
                             continue
-                    values = []
-                    for expression, ttype, digits in expressions:
-                        try:
-                            values.append(babi_eval(expression, record,
-                                    convert_none=None, digits=digits, ttype=ttype))
-                        except Exception as message:
+                    try:
+                        values = list(babi_eval_batch(
+                                [expression for _, expression, _, _
+                                    in expressions],
+                                record,
+                                convert_none=None,
+                                digits=[digits for _, _, _, digits
+                                    in expressions],
+                                ttypes=[ttype for _, _, ttype, _
+                                    in expressions]))
+                    except Exception as batch_message:
+                        failing_field = None
+                        failing_message = batch_message
+                        for field, expression, ttype, digits in expressions:
+                            try:
+                                babi_eval(expression, record, convert_none=None,
+                                    digits=digits, ttype=ttype)
+                            except Exception as message:
+                                failing_field = field
+                                failing_message = message
+                                break
+                        if failing_field:
                             notify(gettext('babi.msg_compute_table_exception',
-                                    table=self.name, field=field.name,
-                                    record=record.id, error=repr(message)),
+                                    table=self.name,
+                                    field=failing_field.name,
+                                    record=record.id,
+                                    error=repr(failing_message)),
                                 priority=1)
                             if self.babi_raise_user_error:
                                 raise UserError(gettext(
                                     'babi.msg_compute_table_exception',
                                     table=self.name,
-                                    field=field.name,
+                                    field=failing_field.name,
                                     record=record.id,
-                                    error=repr(message)))
-                            raise
+                                    error=repr(failing_message)))
+                        raise failing_message
 
                     to_insert.append(values)
 
