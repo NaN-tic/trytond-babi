@@ -1536,6 +1536,10 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             columns = [sql.Column(table, x.internal_name) for x in self.fields_]
             expressions = [(x, x.expression.expression, x.expression.ttype,
                     x.expression.decimal_digits) for x in self.fields_]
+            batch_expressions = [
+                expression for _, expression, _, _ in expressions]
+            batch_digits = [digits for _, _, _, digits in expressions]
+            batch_ttypes = [ttype for _, _, ttype, _ in expressions]
             index = 0
             count = 0
             offset = 10000
@@ -1564,14 +1568,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                             continue
                     try:
                         values = list(babi_eval_batch(
-                                [expression for _, expression, _, _
-                                    in expressions],
+                                batch_expressions,
                                 record,
                                 convert_none=None,
-                                digits=[digits for _, _, _, digits
-                                    in expressions],
-                                ttypes=[ttype for _, _, ttype, _
-                                    in expressions]))
+                                digits=batch_digits,
+                                ttypes=batch_ttypes))
                     except Exception as batch_message:
                         failing_field = None
                         failing_message = batch_message
