@@ -1,5 +1,8 @@
 import csv
+from collections import defaultdict
+import multiprocessing
 import pytz
+import queue
 import time
 import traceback
 import datetime as mdatetime
@@ -12,7 +15,11 @@ import html
 import urllib.parse
 import secrets
 import psycopg2
-from sql import Literal
+try:
+    from psycopg import ClientCursor
+except ImportError:
+    ClientCursor = None
+from sql import Flavor, Literal
 from sql.operators import Equal
 from decimal import Decimal
 from types import SimpleNamespace
@@ -38,6 +45,7 @@ from trytond.modules.company.model import (
 from trytond.report import Report
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.rpc import RPC
+from trytond.tools.immutabledict import ImmutableDict
 from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
 from .babi_eval import babi_eval, babi_eval_batch
 from .cube import Cube
@@ -64,6 +72,183 @@ HOURGLASS_HTML = '&#x231B;'
 HOURGLASS = html.unescape(HOURGLASS_HTML)
 
 logger = logging.getLogger(__name__)
+
+MODEL_COMPUTE_CHUNK_SIZE = 1000
+MODEL_COMPUTE_PROCESSES = 8
+
+
+class ModelComputeFieldError(Exception):
+
+    def __init__(self, field_name, record_id, error):
+        super().__init__(error)
+        self.field_name = field_name
+        self.record_id = record_id
+        self.error = error
+
+
+def drop_table_or_view(connection, table_name):
+    cursor = connection.cursor()
+    if backend.name != 'postgresql':
+        cursor.execute('DROP TABLE IF EXISTS %s' % table_name)
+        cursor.execute('DROP VIEW IF EXISTS %s' % table_name)
+        return
+
+    tables = sql.Table('tables', 'information_schema')
+    cursor.execute(*tables.select(tables.table_type,
+            where=(tables.table_name == table_name) &
+            (tables.table_schema == 'public')))
+    record = cursor.fetchone()
+    if not record:
+        return
+    if record[0] == 'VIEW':
+        cursor.execute(f'DROP VIEW IF EXISTS "{table_name}" CASCADE')
+    else:
+        cursor.execute(f'DROP TABLE IF EXISTS "{table_name}" CASCADE')
+
+
+def get_model_expression_specs(fields_):
+    return [(field.name, field.internal_name, field.expression.expression,
+            field.expression.ttype, field.expression.decimal_digits)
+        for field in fields_]
+
+
+def get_model_batch_specs(expression_specs):
+    batch_expressions = [expression for _, _, expression, _, _
+        in expression_specs]
+    batch_digits = [digits for _, _, _, _, digits in expression_specs]
+    batch_ttypes = [ttype for _, _, _, ttype, _ in expression_specs]
+    return batch_expressions, batch_digits, batch_ttypes
+
+
+def compute_model_insert_values(records, python_filter, expression_specs,
+        batch_expressions, batch_digits, batch_ttypes):
+    to_insert = []
+    for record in records:
+        if python_filter:
+            if not babi_eval(python_filter, record, convert_none=None):
+                continue
+        try:
+            values = list(babi_eval_batch(
+                    batch_expressions,
+                    record,
+                    convert_none=None,
+                    digits=batch_digits,
+                    ttypes=batch_ttypes))
+        except Exception as batch_message:
+            for field_name, _, expression, ttype, digits in expression_specs:
+                try:
+                    babi_eval(expression, record, convert_none=None,
+                        digits=digits, ttype=ttype)
+                except Exception as message:
+                    raise ModelComputeFieldError(field_name, record.id,
+                        repr(message)) from message
+            raise batch_message
+        to_insert.append(values)
+    return to_insert
+
+
+def ensure_pool(database_name):
+    database_list = Pool.database_list()
+    pool = Pool(database_name)
+    if database_name not in database_list:
+        with Transaction().start(database_name, 0, readonly=True):
+            pool.init()
+    return pool
+
+
+def import_snapshot_transaction(database_name, user, context, snapshot_id,
+        timeout=None):
+    database = backend.Database(database_name).connect()
+    connection = database._connpool.getconn()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(
+            'BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ WRITE')
+        if hasattr(cursor, 'mogrify'):
+            snapshot_literal = cursor.mogrify('%s', (snapshot_id,))
+        elif ClientCursor:
+            snapshot_literal = ClientCursor(connection).mogrify(
+                '%s', (snapshot_id,))
+        else:
+            snapshot_literal = "'%s'" % snapshot_id.replace("'", "''")
+        if isinstance(snapshot_literal, bytes):
+            snapshot_literal = snapshot_literal.decode()
+        cursor.execute(f'SET TRANSACTION SNAPSHOT {snapshot_literal}')
+        if timeout:
+            cursor.execute(f'SET LOCAL statement_timeout TO {timeout * 1000};')
+    finally:
+        cursor.close()
+
+    transaction = Transaction(new=True)
+    Flavor.set(backend.Database.flavor)
+    transaction.started_at = transaction.monotonic_time()
+    transaction.user = user
+    transaction.database = database
+    transaction.readonly = False
+    transaction.close = False
+    transaction.context = ImmutableDict(context or {})
+    transaction.create_records = defaultdict(list)
+    transaction.delete_records = defaultdict(set)
+    transaction.trigger_records = defaultdict(set)
+    transaction.log_records = []
+    transaction.check_warnings = defaultdict(set)
+    transaction.timestamp = {}
+    transaction.counter = 0
+    transaction._datamanagers = []
+    transaction._locked_tables = set()
+    transaction._locked_records = defaultdict(set)
+    transaction.connection = connection
+    return transaction
+
+
+def compute_model_worker(database_name, user, context, snapshot_id,
+        model_name, table_name, internal_names, expression_specs,
+        python_filter, timeout, input_queue, result_queue):
+    transaction = None
+    try:
+        pool = ensure_pool(database_name)
+        Model = pool.get(model_name)
+        table = sql.Table(table_name)
+        columns = [sql.Column(table, name) for name in internal_names]
+        batch_expressions, batch_digits, batch_ttypes = get_model_batch_specs(
+            expression_specs)
+        transaction = import_snapshot_transaction(database_name, user,
+            context, snapshot_id, timeout=timeout)
+        while True:
+            chunk_ids = input_queue.get()
+            if chunk_ids is None:
+                break
+            records = Model.browse(chunk_ids)
+            to_insert = compute_model_insert_values(records, python_filter,
+                expression_specs, batch_expressions, batch_digits,
+                batch_ttypes)
+            if to_insert:
+                cursor = transaction.connection.cursor()
+                try:
+                    cursor.execute(*table.insert(columns=columns,
+                            values=to_insert))
+                finally:
+                    cursor.close()
+        transaction.stop(True)
+        transaction = None
+        result_queue.put({'type': 'done'})
+    except ModelComputeFieldError as error:
+        if transaction:
+            transaction.stop(False)
+        result_queue.put({
+                'type': 'field_error',
+                'field_name': error.field_name,
+                'record_id': error.record_id,
+                'error': error.error,
+                })
+    except Exception as error:
+        if transaction:
+            transaction.stop(False)
+        result_queue.put({
+                'type': 'error',
+                'error': repr(error),
+                'traceback': traceback.format_exc(),
+                })
 
 def save_virtual_workbook(workbook):
     with tempfile.NamedTemporaryFile() as tmp:
@@ -1437,27 +1622,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         # or DROP VIEW.
         if connection is None:
             connection = Transaction().connection
-        cursor = connection.cursor()
-        if backend.name != 'postgresql':
-            cursor.execute('DROP TABLE IF EXISTS %s' % self.table_name)
-            cursor.execute('DROP VIEW IF EXISTS %s' % self.table_name)
-            return
-        # In Postgres, trying to execute DROP VIEW on a TABLE will make
-        # postgres complaint (even with the 'IF EXISTS' clause). And the same
-        # will happen with DROP TABLE on a VIEW. So we must check if it exists
-        # and its type.
-
-        tables = sql.Table('tables', 'information_schema')
-        cursor.execute(*tables.select(tables.table_type,
-                where=(tables.table_name == self.table_name) &
-                (tables.table_schema == 'public')))
-        record = cursor.fetchone()
-        if not record:
-            return
-        if record[0] == 'VIEW':
-            cursor.execute(f'DROP VIEW IF EXISTS "{self.table_name}" CASCADE')
-        else:
-            cursor.execute(f'DROP TABLE IF EXISTS "{self.table_name}" CASCADE')
+        drop_table_or_view(connection, self.table_name)
 
     def _set_statement_timeout(self, timeout=None, connection=None):
         if backend.name != 'postgresql':
@@ -1505,114 +1670,239 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         field_names = [x[0] for x in cursor.description]
         self.update_fields(field_names)
 
-    def _compute_model(self):
-        Model = Pool().get(self.model.name)
+    def _create_model_compute_table(self, table_name, connection):
+        drop_table_or_view(connection, table_name)
+        cursor = connection.cursor()
+        fields = []
+        for field in self.fields_:
+            fields.append('"%s" %s' % (field.internal_name, field.sql_type()))
+        cursor.execute('CREATE TABLE "%s" (%s);' % (
+                table_name, ', '.join(fields)))
 
+    def _handle_model_compute_field_error(self, error):
+        notify(gettext('babi.msg_compute_table_exception',
+                table=self.name,
+                field=error.field_name,
+                record=error.record_id,
+                error=error.error),
+            priority=1)
+        if self.babi_raise_user_error:
+            raise UserError(gettext(
+                'babi.msg_compute_table_exception',
+                table=self.name,
+                field=error.field_name,
+                record=error.record_id,
+                error=error.error))
+        raise Exception(error.error)
+
+    def _handle_model_compute_general_error(self, error):
+        if self.babi_raise_user_error:
+            raise UserError(gettext(
+                'babi.create_data_exception',
+                error=error))
+        raise Exception(error)
+
+    def _check_model_worker_results(self, result_queue, processes):
+        while True:
+            try:
+                result = result_queue.get_nowait()
+            except queue.Empty:
+                break
+            if result['type'] == 'done':
+                continue
+            if result['type'] == 'field_error':
+                error = ModelComputeFieldError(result['field_name'],
+                    result['record_id'], result['error'])
+                self._handle_model_compute_field_error(error)
+            self._handle_model_compute_general_error(result['error'])
+        self._check_model_worker_processes(processes)
+
+    def _check_model_worker_processes(self, processes):
+        for process in processes:
+            if process.exitcode and process.exitcode != 0:
+                self._handle_model_compute_general_error(
+                    f'Worker exited with code {process.exitcode}')
+
+    def _put_model_worker_item(self, input_queue, result_queue, processes,
+            item, checker):
+        while True:
+            checker.check()
+            self._check_model_worker_results(result_queue, processes)
+            try:
+                input_queue.put(item, timeout=1)
+                return
+            except queue.Full:
+                continue
+
+    def _compute_model_sequential(self, Model, domain, context,
+            expression_specs, python_filter):
         with Transaction().new_transaction() as transaction:
             cursor = transaction.connection.cursor()
-            self._drop(transaction.connection)
-            fields = []
-            for field in self.fields_:
-                fields.append('"%s" %s' % (field.internal_name, field.sql_type()))
-            cursor.execute('CREATE TABLE IF NOT EXISTS "%s" (%s);' % (
-                    self.table_name, ', '.join(fields)))
+            self._create_model_compute_table(self.table_name,
+                transaction.connection)
 
             checker = TimeoutChecker(self.timeout, self.timeout_exception)
-            domain = self.get_domain_filter()
-
-            context = self.get_context()
-            if not context:
-                context = {}
-            else:
-                assert isinstance(context, dict)
-            context['_datetime'] = None
-            # This is needed when execute the wizard to calculate the report, to
-            # ensure the company rule is used.
-            context['_check_access'] = True
-
-            python_filter = self.get_python_filter()
-
-            table = sql.Table(self.table_name)
-            columns = [sql.Column(table, x.internal_name) for x in self.fields_]
-            expressions = [(x, x.expression.expression, x.expression.ttype,
-                    x.expression.decimal_digits) for x in self.fields_]
-            batch_expressions = [
-                expression for _, expression, _, _ in expressions]
-            batch_digits = [digits for _, _, _, digits in expressions]
-            batch_ttypes = [ttype for _, _, ttype, _ in expressions]
+            batch_expressions, batch_digits, batch_ttypes = (
+                get_model_batch_specs(expression_specs))
             index = 0
             count = 0
-            offset = 10000
-            context['_record_cache_size'] = 10000
 
             with Transaction().set_context(**context):
                 try:
-                    records = Model.search(domain, offset=index * offset,
-                        limit=offset)
+                    records = Model.search(domain,
+                        offset=index * MODEL_COMPUTE_CHUNK_SIZE,
+                        limit=MODEL_COMPUTE_CHUNK_SIZE,
+                        order=[('id', 'ASC')])
                 except Exception as message:
-                    if self.babi_raise_user_error:
-                        raise UserError(gettext(
-                            'babi.create_data_exception',
-                            error=repr(message)))
-                    raise
+                    self._handle_model_compute_general_error(repr(message))
+
+            table = sql.Table(self.table_name)
+            columns = [sql.Column(table, x.internal_name) for x in self.fields_]
 
             while records:
                 checker.check()
                 logger.info('Calculated %s, %s records in %s seconds'
                     % (self.model.name, count, checker.elapsed))
 
-                to_insert = []
-                for record in records:
-                    if python_filter:
-                        if not babi_eval(python_filter, record, convert_none=None):
-                            continue
-                    try:
-                        values = list(babi_eval_batch(
-                                batch_expressions,
-                                record,
-                                convert_none=None,
-                                digits=batch_digits,
-                                ttypes=batch_ttypes))
-                    except Exception as batch_message:
-                        failing_field = None
-                        failing_message = batch_message
-                        for field, expression, ttype, digits in expressions:
-                            try:
-                                babi_eval(expression, record, convert_none=None,
-                                    digits=digits, ttype=ttype)
-                            except Exception as message:
-                                failing_field = field
-                                failing_message = message
-                                break
-                        if failing_field:
-                            notify(gettext('babi.msg_compute_table_exception',
-                                    table=self.name,
-                                    field=failing_field.name,
-                                    record=record.id,
-                                    error=repr(failing_message)),
-                                priority=1)
-                            if self.babi_raise_user_error:
-                                raise UserError(gettext(
-                                    'babi.msg_compute_table_exception',
-                                    table=self.name,
-                                    field=failing_field.name,
-                                    record=record.id,
-                                    error=repr(failing_message)))
-                        raise failing_message
-
-                    to_insert.append(values)
+                try:
+                    to_insert = compute_model_insert_values(records,
+                        python_filter, expression_specs, batch_expressions,
+                        batch_digits, batch_ttypes)
+                except ModelComputeFieldError as error:
+                    self._handle_model_compute_field_error(error)
 
                 if to_insert:
-                    cursor.execute(*table.insert(columns=columns, values=to_insert))
+                    cursor.execute(*table.insert(columns=columns,
+                            values=to_insert))
 
                 index += 1
                 count += len(records)
                 with Transaction().set_context(**context):
-                    records = Model.search(domain, offset=index * offset,
-                        limit=offset)
+                    records = Model.search(domain,
+                        offset=index * MODEL_COMPUTE_CHUNK_SIZE,
+                        limit=MODEL_COMPUTE_CHUNK_SIZE,
+                        order=[('id', 'ASC')])
 
         logger.info('Calculated %s, %s records in %s seconds'
             % (self.model.name, count, checker.elapsed))
+
+    def _compute_model_parallel(self, Model, domain, context,
+            expression_specs, python_filter):
+        staging_table_name = (
+            f'{self.table_name}_compute_{secrets.token_hex(4)}')
+        with Transaction().new_transaction() as transaction:
+            self._create_model_compute_table(staging_table_name,
+                transaction.connection)
+
+        checker = TimeoutChecker(self.timeout, self.timeout_exception)
+        internal_names = [field.internal_name for field in self.fields_]
+        count = 0
+        mp_context = multiprocessing.get_context('spawn')
+        input_queue = mp_context.Queue(
+            maxsize=MODEL_COMPUTE_PROCESSES * 2)
+        result_queue = mp_context.Queue()
+        processes = []
+        try:
+            with Transaction().new_transaction(readonly=True):
+                cursor = Transaction().connection.cursor()
+                cursor.execute('SELECT pg_export_snapshot()')
+                snapshot_id, = cursor.fetchone()
+                for _ in range(MODEL_COMPUTE_PROCESSES):
+                    process = mp_context.Process(
+                        target=compute_model_worker,
+                        args=(Transaction().database.name, Transaction().user,
+                            dict(context), snapshot_id, self.model.name,
+                            staging_table_name, internal_names,
+                            expression_specs, python_filter, self.timeout,
+                            input_queue, result_queue))
+                    process.start()
+                    processes.append(process)
+
+                index = 0
+                with Transaction().set_context(**context):
+                    try:
+                        records = Model.search(domain,
+                            offset=index * MODEL_COMPUTE_CHUNK_SIZE,
+                            limit=MODEL_COMPUTE_CHUNK_SIZE,
+                            order=[('id', 'ASC')])
+                    except Exception as message:
+                        self._handle_model_compute_general_error(repr(message))
+
+                while records:
+                    logger.info('Calculated %s, %s records in %s seconds'
+                        % (self.model.name, count, checker.elapsed))
+                    self._put_model_worker_item(input_queue, result_queue,
+                        processes, [record.id for record in records], checker)
+                    count += len(records)
+                    index += 1
+                    with Transaction().set_context(**context):
+                        records = Model.search(domain,
+                            offset=index * MODEL_COMPUTE_CHUNK_SIZE,
+                            limit=MODEL_COMPUTE_CHUNK_SIZE,
+                            order=[('id', 'ASC')])
+
+                for _ in processes:
+                    self._put_model_worker_item(input_queue, result_queue,
+                        processes, None, checker)
+
+                done = 0
+                while done < len(processes):
+                    checker.check()
+                    self._check_model_worker_processes(processes)
+                    try:
+                        result = result_queue.get(timeout=1)
+                    except queue.Empty:
+                        continue
+                    if result['type'] == 'done':
+                        done += 1
+                        continue
+                    if result['type'] == 'field_error':
+                        error = ModelComputeFieldError(result['field_name'],
+                            result['record_id'], result['error'])
+                        self._handle_model_compute_field_error(error)
+                    self._handle_model_compute_general_error(result['error'])
+
+            with Transaction().new_transaction() as transaction:
+                self._drop(transaction.connection)
+                cursor = transaction.connection.cursor()
+                cursor.execute('ALTER TABLE "%s" RENAME TO "%s"' % (
+                        staging_table_name, self.table_name))
+        except Exception:
+            with Transaction().new_transaction() as transaction:
+                drop_table_or_view(transaction.connection, staging_table_name)
+            for process in processes:
+                if process.is_alive():
+                    process.terminate()
+            raise
+        finally:
+            for process in processes:
+                process.join()
+
+        logger.info('Calculated %s, %s records in %s seconds'
+            % (self.model.name, count, checker.elapsed))
+
+    def _compute_model(self):
+        Model = Pool().get(self.model.name)
+        domain = self.get_domain_filter()
+
+        context = self.get_context()
+        if not context:
+            context = {}
+        else:
+            assert isinstance(context, dict)
+        context['_datetime'] = None
+        # This is needed when execute the wizard to calculate the report, to
+        # ensure the company rule is used.
+        context['_check_access'] = True
+        context['_record_cache_size'] = MODEL_COMPUTE_CHUNK_SIZE
+
+        expression_specs = get_model_expression_specs(self.fields_)
+        python_filter = self.get_python_filter()
+        if backend.name == 'postgresql':
+            return self._compute_model_parallel(Model, domain, context,
+                expression_specs, python_filter)
+        return self._compute_model_sequential(Model, domain, context,
+            expression_specs, python_filter)
 
     def check_access(self, user=None):
         pool = Pool()

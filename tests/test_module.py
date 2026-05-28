@@ -6,6 +6,7 @@ import datetime
 import io
 import random
 import sql
+from unittest.mock import patch
 from decimal import Decimal
 from types import SimpleNamespace
 from openpyxl import load_workbook
@@ -15,6 +16,8 @@ from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
 from trytond.modules.babi.babi_eval import babi_eval, babi_eval_batch
+from trytond.modules.babi.table import (
+    ModelComputeFieldError, compute_model_insert_values)
 from trytond.modules.babi.cube import Cube
 from trytond.pyson import PYSONEncoder
 from trytond.modules.company.tests import CompanyTestMixin
@@ -186,6 +189,63 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         self.assertEqual(babi_eval('o', None, convert_none=None), None)
 
     @with_transaction()
+    def test_compute_model_insert_values_identifies_field(self):
+        record = SimpleNamespace(id=7, ok=3)
+        expression_specs = [
+            ('Ok', 'ok', 'o.ok', 'integer', None),
+            ('Broken', 'broken', 'o.missing', 'integer', None),
+            ]
+        batch_expressions = ['o.ok', 'o.missing']
+        batch_digits = [None, None]
+        batch_ttypes = ['integer', 'integer']
+
+        with self.assertRaises(ModelComputeFieldError) as cm:
+            compute_model_insert_values([record], None, expression_specs,
+                batch_expressions, batch_digits, batch_ttypes)
+
+        self.assertEqual(cm.exception.field_name, 'Broken')
+        self.assertEqual(cm.exception.record_id, 7)
+        self.assertIn('missing', cm.exception.error)
+
+    @with_transaction()
+    def test_compute_model_dispatch(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Field = pool.get('babi.field')
+        Model = pool.get('ir.model')
+        Expression = pool.get('babi.expression')
+
+        self.create_data()
+
+        table = Table()
+        table.type = 'model'
+        table.name = 'Dispatch Table'
+        table.on_change_name()
+        table.model, = Model.search([('name', '=', 'babi.test')])
+        expression, = Expression.search([('name', '=', 'Id')], limit=1)
+        field = Field()
+        field.expression = expression
+        field.on_change_expression()
+        field.on_change_name()
+        table.fields_ = [field]
+        table.save()
+
+        with patch.object(Table, '_compute_model_parallel') as parallel, \
+                patch.object(Table, '_compute_model_sequential') as sequential, \
+                patch('trytond.modules.babi.table.backend.name',
+                    'postgresql'):
+            table._compute_model()
+            parallel.assert_called_once()
+            sequential.assert_not_called()
+
+        with patch.object(Table, '_compute_model_parallel') as parallel, \
+                patch.object(Table, '_compute_model_sequential') as sequential, \
+                patch('trytond.modules.babi.table.backend.name', 'sqlite'):
+            table._compute_model()
+            sequential.assert_called_once()
+            parallel.assert_not_called()
+
+    @with_transaction()
     def test_table(self):
         pool = Pool()
         Table = pool.get('babi.table')
@@ -239,6 +299,51 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         table._compute()
         fields = sorted([x.internal_name for x in table.fields_])
         self.assertEqual(fields, ['amount', 'date'])
+
+    @with_transaction()
+    def test_table_model_batches_over_1000_records(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Field = pool.get('babi.field')
+        Model = pool.get('ir.model')
+        Expression = pool.get('babi.expression')
+        TestModel = pool.get('babi.test')
+
+        initial_count = len(TestModel.search([]))
+        TestModel.create([{
+                    'date': datetime.date(2024, 1, 1),
+                    'category': 'odd',
+                    'amount': Decimal('1.00'),
+                    } for _ in range(1205)])
+        model, = Model.search([('name', '=', 'babi.test')])
+        Model.write([model], {'babi_enabled': True})
+        expression, = Expression.create([{
+                    'name': 'Record Id',
+                    'model': model.id,
+                    'ttype': 'integer',
+                    'expression': 'o.id',
+                    }])
+        Transaction().commit()
+
+        table = Table()
+        table.type = 'model'
+        table.name = 'Chunked Table'
+        table.on_change_name()
+        table.model = model
+
+        field = Field()
+        field.expression = expression
+        field.on_change_expression()
+        field.on_change_name()
+        table.fields_ = [field]
+        table.save()
+        table._compute()
+
+        with Transaction().new_transaction() as transaction:
+            cursor = transaction.connection.cursor()
+            cursor.execute('SELECT count(*) FROM "%s"' % table.table_name)
+            count = cursor.fetchone()[0]
+        self.assertEqual(count, initial_count + 1205)
 
     @with_transaction()
     def test_table_xls_report(self):
