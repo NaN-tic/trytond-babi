@@ -1874,7 +1874,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
         expression_specs = get_model_expression_specs(self.fields_)
         python_filter = self.get_python_filter()
-        if backend.name == 'postgresql':
+        if backend.name == 'postgresql' and MODEL_COMPUTE_PROCESSES > 1:
             return self._compute_model_parallel(Model, domain, context,
                 expression_specs, python_filter)
         return self._compute_model_sequential(Model, domain, context,
