@@ -3,16 +3,22 @@
 # this repository contains the full copyright notices and license terms.
 
 import datetime
+import io
 import random
 import sql
+from unittest.mock import patch
 from decimal import Decimal
+from types import SimpleNamespace
+from openpyxl import load_workbook
 from lxml import etree
 from trytond import backend
 from trytond.model.exceptions import ValidationError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
-from trytond.modules.babi.babi_eval import babi_eval
+from trytond.modules.babi.babi_eval import babi_eval, babi_eval_batch
+from trytond.modules.babi.table import (
+    ModelComputeFieldError, compute_model_insert_values)
 from trytond.modules.babi.cube import Cube
 from trytond.pyson import PYSONEncoder
 from trytond.modules.company.tests import CompanyTestMixin
@@ -126,6 +132,8 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         Model = pool.get('ir.model')
         date = datetime.date(2014, 10, 10)
         other_date = datetime.date(2014, 1, 1)
+        nested_record = SimpleNamespace(
+            party=SimpleNamespace(rec_name='Test Party'))
         tests = [
             ('o', None, '(empty)'),
             ('y(o)', date, str(date.year)),
@@ -150,21 +158,102 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             ('str(o)', 3.14, '3.14'),
             ('Decimal(o)', 3.14, Decimal(3.14)),
             ('Decimal(0)', None, Decimal(0)),
+            ('getattr(o, "year")', date, 2014),
+            ('hasattr(o, "year")', date, True),
+            ('isinstance(o, Decimal)', Decimal('1.2'), True),
+            ('o and "yes" or "no"', 1, 'yes'),
+            ('o and "yes" or "no"', 0, 'no'),
+            ('"big" if o > 10 else "small"', 11, 'big'),
+            ('"big" if o > 10 else "small"', 9, 'small'),
+            ('[str(x) for x in o]', [1, 2, 3], ['1', '2', '3']),
+            ('o.party.rec_name', nested_record, 'Test Party'),
+            ('pool("ir.model")', None, Model),
         ]
         models = Model.search([('name', '=', 'babi.test')])
         tests.append(
-            ('Pool().get(\'ir.model\').search(['
+            ('pool(\'ir.model\').search(['
                 '(\'name\', \'=\', \'babi.test\')])', None, models),
             )
         for expression, obj, result in tests:
             self.assertEqual(babi_eval(expression, obj), result)
+        self.assertEqual(
+            babi_eval_batch(
+                ['o.year', 'o.month', 'o.day'],
+                date,
+                convert_none=None),
+            (2014, 10, 10))
+        self.assertEqual(
+            babi_eval_batch(
+                ['o', 'o', 'float(o)'],
+                1,
+                convert_none=None,
+                digits=[None, None, 2],
+                ttypes=[None, None, 'numeric']),
+            (1, 1, Decimal('1.00')))
         with Transaction().set_context(date=date):
             self.assertEqual(babi_eval(
-                    'Transaction().context.get(\'date\')', None), date)
+                    'transaction().context.get(\'date\')', None), date)
 
         self.assertEqual(babi_eval('o', None, convert_none='zero'), '0')
         self.assertEqual(babi_eval('o', None, convert_none=''), '')
         self.assertEqual(babi_eval('o', None, convert_none=None), None)
+
+    @with_transaction()
+    def test_compute_model_insert_values_identifies_field(self):
+        record = SimpleNamespace(id=7, ok=3)
+        expression_specs = [
+            ('Ok', 'ok', 'o.ok', 'integer', None),
+            ('Broken', 'broken', 'o.missing', 'integer', None),
+            ]
+        batch_expressions = ['o.ok', 'o.missing']
+        batch_digits = [None, None]
+        batch_ttypes = ['integer', 'integer']
+
+        with self.assertRaises(ModelComputeFieldError) as cm:
+            compute_model_insert_values([record], None, expression_specs,
+                batch_expressions, batch_digits, batch_ttypes)
+
+        self.assertEqual(cm.exception.field_name, 'Broken')
+        self.assertEqual(cm.exception.record_id, 7)
+        self.assertIn('missing', cm.exception.error)
+
+    @with_transaction()
+    def test_compute_model_dispatch(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Field = pool.get('babi.field')
+        Model = pool.get('ir.model')
+        Expression = pool.get('babi.expression')
+
+        self.create_data()
+
+        table = Table()
+        table.type = 'model'
+        table.name = 'Dispatch Table'
+        table.on_change_name()
+        table.model, = Model.search([('name', '=', 'babi.test')])
+        expression, = Expression.search([('name', '=', 'Id')], limit=1)
+        field = Field()
+        field.expression = expression
+        field.on_change_expression()
+        field.on_change_name()
+        table.fields_ = [field]
+        table.save()
+
+        with patch.object(Table, '_compute_model_parallel') as parallel, \
+                patch.object(Table, '_compute_model_sequential') as sequential, \
+                patch('trytond.modules.babi.table.backend.name',
+                    'postgresql'):
+            table._compute_model()
+            parallel.assert_called_once()
+            sequential.assert_not_called()
+
+        with patch.object(Table, '_compute_model_parallel') as parallel, \
+                patch.object(Table, '_compute_model_sequential') as sequential, \
+                patch('trytond.modules.babi.table.backend.name', 'sqlite'):
+            table._compute_model()
+            sequential.assert_called_once()
+            parallel.assert_not_called()
 
     @with_transaction()
     def test_table(self):
@@ -199,9 +288,10 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         table.save()
         table._compute()
 
-        cursor = Transaction().connection.cursor()
-        cursor.execute('SELECT count(*) FROM "%s"' % table.table_name)
-        count = cursor.fetchall()[0][0]
+        with Transaction().new_transaction() as transaction:
+            cursor = transaction.connection.cursor()
+            cursor.execute('SELECT count(*) FROM "%s"' % table.table_name)
+            count = cursor.fetchall()[0][0]
         self.assertNotEqual(count, 0)
 
         table = Table()
@@ -221,6 +311,51 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         self.assertEqual(fields, ['amount', 'date'])
 
     @with_transaction()
+    def test_table_model_batches_over_1000_records(self):
+        pool = Pool()
+        Table = pool.get('babi.table')
+        Field = pool.get('babi.field')
+        Model = pool.get('ir.model')
+        Expression = pool.get('babi.expression')
+        TestModel = pool.get('babi.test')
+
+        initial_count = len(TestModel.search([]))
+        TestModel.create([{
+                    'date': datetime.date(2024, 1, 1),
+                    'category': 'odd',
+                    'amount': Decimal('1.00'),
+                    } for _ in range(1205)])
+        model, = Model.search([('name', '=', 'babi.test')])
+        Model.write([model], {'babi_enabled': True})
+        expression, = Expression.create([{
+                    'name': 'Record Id',
+                    'model': model.id,
+                    'ttype': 'integer',
+                    'expression': 'o.id',
+                    }])
+        Transaction().commit()
+
+        table = Table()
+        table.type = 'model'
+        table.name = 'Chunked Table'
+        table.on_change_name()
+        table.model = model
+
+        field = Field()
+        field.expression = expression
+        field.on_change_expression()
+        field.on_change_name()
+        table.fields_ = [field]
+        table.save()
+        table._compute()
+
+        with Transaction().new_transaction() as transaction:
+            cursor = transaction.connection.cursor()
+            cursor.execute('SELECT count(*) FROM "%s"' % table.table_name)
+            count = cursor.fetchone()[0]
+        self.assertEqual(count, initial_count + 1205)
+
+    @with_transaction()
     def test_table_xls_report(self):
         pool = Pool()
         Table = pool.get('babi.table')
@@ -235,6 +370,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             table.query = """
                 SELECT
                     'Hello World' AS text_value,
+                    '3103250004395' || CHAR(29) || '152603' AS barcode_value,
                     42 AS int_value,
                     3.14 AS float_value,
                     DATE('now') AS date_value,
@@ -247,6 +383,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
             table.query = """
                 SELECT
                     'Hello World' AS text_value,           -- str (text)
+                    E'3103250004395\\x1d152603' AS barcode_value,
                     42 AS int_value,                       -- int
                     3.14 AS float_value,                   -- float
                     CURRENT_DATE AS date_value,            -- date
@@ -257,10 +394,15 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                 """
         table.save()
         table._compute()
-        self.assertIn('Hello World', str(table.preview))
-
-        oext, _, _, _ = TableExcel.execute([table.id], {})
+        Transaction().commit()
+        with Transaction().new_transaction():
+            table = Table(table.id)
+            self.assertIn('Hello World', str(table.preview))
+            oext, content, _, _ = TableExcel.execute([table.id], {})
         self.assertEqual(oext, 'xlsx')
+        wb = load_workbook(io.BytesIO(content), read_only=True)
+        ws = wb.active
+        self.assertEqual(ws['B2'].value, '3103250004395152603')
 
     @with_transaction()
     def test_pivot_median_aggregate(self):

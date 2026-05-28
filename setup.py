@@ -45,6 +45,7 @@ major_version = int(major_version)
 minor_version = int(minor_version)
 
 requires = []
+requires.append('simpleeval')
 for dep in info.get('depends', []):
     if not re.match(r'(ir|res)(\W|$)', dep):
         prefix = MODULE2PREFIX.get(dep, 'trytond')
