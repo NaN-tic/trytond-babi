@@ -74,7 +74,7 @@ HOURGLASS = html.unescape(HOURGLASS_HTML)
 logger = logging.getLogger(__name__)
 
 MODEL_COMPUTE_CHUNK_SIZE = 1000
-MODEL_COMPUTE_PROCESSES = 8
+MODEL_COMPUTE_PROCESSES = 4
 
 
 class ModelComputeFieldError(Exception):
@@ -202,8 +202,9 @@ def import_snapshot_transaction(database_name, user, context, snapshot_id,
 
 
 def compute_model_worker(database_name, user, context, snapshot_id,
-        model_name, table_name, internal_names, expression_specs,
-        python_filter, timeout, input_queue, result_queue):
+        model_name, domain, table_name, internal_names, expression_specs,
+        python_filter, timeout, input_queue,
+        result_queue):
     transaction = None
     try:
         pool = ensure_pool(database_name)
@@ -214,11 +215,14 @@ def compute_model_worker(database_name, user, context, snapshot_id,
             expression_specs)
         transaction = import_snapshot_transaction(database_name, user,
             context, snapshot_id, timeout=timeout)
+        count = 0
         while True:
-            chunk_ids = input_queue.get()
-            if chunk_ids is None:
+            chunk_index = input_queue.get()
+            if chunk_index is None:
                 break
-            records = Model.browse(chunk_ids)
+            offset = chunk_index * MODEL_COMPUTE_CHUNK_SIZE
+            records = Model.search(domain, offset=offset,
+                limit=MODEL_COMPUTE_CHUNK_SIZE, order=[('id', 'ASC')])
             to_insert = compute_model_insert_values(records, python_filter,
                 expression_specs, batch_expressions, batch_digits,
                 batch_ttypes)
@@ -229,9 +233,15 @@ def compute_model_worker(database_name, user, context, snapshot_id,
                             values=to_insert))
                 finally:
                     cursor.close()
+            count += len(records)
+            result_queue.put({
+                    'type': 'progress',
+                    'count': len(records),
+                    'chunk_index': chunk_index,
+                    })
         transaction.stop(True)
         transaction = None
-        result_queue.put({'type': 'done'})
+        result_queue.put({'type': 'done', 'count': count})
     except ModelComputeFieldError as error:
         if transaction:
             transaction.stop(False)
@@ -1702,37 +1712,11 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 error=error))
         raise Exception(error)
 
-    def _check_model_worker_results(self, result_queue, processes):
-        while True:
-            try:
-                result = result_queue.get_nowait()
-            except queue.Empty:
-                break
-            if result['type'] == 'done':
-                continue
-            if result['type'] == 'field_error':
-                error = ModelComputeFieldError(result['field_name'],
-                    result['record_id'], result['error'])
-                self._handle_model_compute_field_error(error)
-            self._handle_model_compute_general_error(result['error'])
-        self._check_model_worker_processes(processes)
-
     def _check_model_worker_processes(self, processes):
         for process in processes:
             if process.exitcode and process.exitcode != 0:
                 self._handle_model_compute_general_error(
                     f'Worker exited with code {process.exitcode}')
-
-    def _put_model_worker_item(self, input_queue, result_queue, processes,
-            item, checker):
-        while True:
-            checker.check()
-            self._check_model_worker_results(result_queue, processes)
-            try:
-                input_queue.put(item, timeout=1)
-                return
-            except queue.Full:
-                continue
 
     def _compute_model_sequential(self, Model, domain, context,
             expression_specs, python_filter):
@@ -1798,8 +1782,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         internal_names = [field.internal_name for field in self.fields_]
         count = 0
         mp_context = multiprocessing.get_context('spawn')
-        input_queue = mp_context.Queue(
-            maxsize=MODEL_COMPUTE_PROCESSES * 2)
+        input_queue = mp_context.Queue()
         result_queue = mp_context.Queue()
         processes = []
         try:
@@ -1807,51 +1790,42 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 cursor = Transaction().connection.cursor()
                 cursor.execute('SELECT pg_export_snapshot()')
                 snapshot_id, = cursor.fetchone()
+                with Transaction().set_context(**context):
+                    try:
+                        total_count = Model.search(domain, count=True)
+                    except Exception as message:
+                        self._handle_model_compute_general_error(repr(message))
+                chunk_count = (
+                    (total_count + MODEL_COMPUTE_CHUNK_SIZE - 1)
+                    // MODEL_COMPUTE_CHUNK_SIZE)
+                for chunk_index in range(chunk_count):
+                    input_queue.put(chunk_index)
+                for _ in range(MODEL_COMPUTE_PROCESSES):
+                    input_queue.put(None)
+
                 for _ in range(MODEL_COMPUTE_PROCESSES):
                     process = mp_context.Process(
                         target=compute_model_worker,
                         args=(Transaction().database.name, Transaction().user,
                             dict(context), snapshot_id, self.model.name,
-                            staging_table_name, internal_names,
+                            domain, staging_table_name, internal_names,
                             expression_specs, python_filter, self.timeout,
                             input_queue, result_queue))
                     process.start()
                     processes.append(process)
 
-                index = 0
-                with Transaction().set_context(**context):
-                    try:
-                        records = Model.search(domain,
-                            offset=index * MODEL_COMPUTE_CHUNK_SIZE,
-                            limit=MODEL_COMPUTE_CHUNK_SIZE,
-                            order=[('id', 'ASC')])
-                    except Exception as message:
-                        self._handle_model_compute_general_error(repr(message))
-
-                while records:
-                    logger.info('Calculated %s, %s records in %s seconds'
-                        % (self.model.name, count, checker.elapsed))
-                    self._put_model_worker_item(input_queue, result_queue,
-                        processes, [record.id for record in records], checker)
-                    count += len(records)
-                    index += 1
-                    with Transaction().set_context(**context):
-                        records = Model.search(domain,
-                            offset=index * MODEL_COMPUTE_CHUNK_SIZE,
-                            limit=MODEL_COMPUTE_CHUNK_SIZE,
-                            order=[('id', 'ASC')])
-
-                for _ in processes:
-                    self._put_model_worker_item(input_queue, result_queue,
-                        processes, None, checker)
-
                 done = 0
                 while done < len(processes):
                     checker.check()
                     self._check_model_worker_processes(processes)
+                    logger.info('Calculated %s, %s records in %s seconds'
+                        % (self.model.name, count, checker.elapsed))
                     try:
                         result = result_queue.get(timeout=1)
                     except queue.Empty:
+                        continue
+                    if result['type'] == 'progress':
+                        count += result.get('count', 0)
                         continue
                     if result['type'] == 'done':
                         done += 1
