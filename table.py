@@ -73,7 +73,7 @@ HOURGLASS = html.unescape(HOURGLASS_HTML)
 
 logger = logging.getLogger(__name__)
 
-MODEL_COMPUTE_CHUNK_SIZE = config.getint('babi', 'compute_chunk_size', default=1000)
+MODEL_COMPUTE_CHUNK_SIZE = config.getint('babi', 'compute_chunk_size', default=100)
 MODEL_COMPUTE_PROCESSES = config.getint('babi', 'compute_processes', default=2)
 
 
