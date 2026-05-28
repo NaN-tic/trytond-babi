@@ -14,7 +14,7 @@ import tempfile
 import html
 import urllib.parse
 import secrets
-import psycopg2
+import psycopg
 try:
     from psycopg import ClientCursor
 except ImportError:
@@ -1418,7 +1418,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 try:
                     cursor.execute(f'LOCK TABLE {self.table_name} IN ACCESS '
                         'SHARE MODE NOWAIT')
-                except psycopg2.errors.LockNotAvailable:
+                except psycopg.errors.LockNotAvailable:
                     transaction.connection.rollback()
                     raise NoWaitError
 
@@ -1587,7 +1587,7 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 warnings = Warning.create(to_create)
                 for warning in warnings:
                     warning.send()
-            except (UserError, ValidationError, psycopg2.Error) as e:
+            except (UserError, ValidationError, psycopg.Error) as e:
                 Transaction().connection.rollback()
                 self.compute_warning_error = f'{e}\n{traceback.format_exc()}'
                 self.save()
@@ -1634,7 +1634,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         if connection is None:
             connection = Transaction().connection
         drop_table_or_view(connection, self.table_name)
-
     def _set_statement_timeout(self, timeout=None, connection=None):
         if backend.name != 'postgresql':
             return
@@ -1755,7 +1754,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                         batch_digits, batch_ttypes)
                 except ModelComputeFieldError as error:
                     self._handle_model_compute_field_error(error)
-
                 if to_insert:
                     cursor.execute(*table.insert(columns=columns,
                             values=to_insert))
@@ -3067,7 +3065,7 @@ class PivotExcel(Report):
             try:
                 for row in cube.build():
                     ws.append([x.formatted(language, worksheet=ws) for x in row])
-            except psycopg2.errors.UndefinedTable:
+            except psycopg.errors.UndefinedTable:
                 continue
             try:
                 adjust_column_widths(ws, max_width=30)

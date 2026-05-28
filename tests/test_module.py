@@ -10,6 +10,7 @@ from unittest.mock import patch
 from decimal import Decimal
 from types import SimpleNamespace
 from openpyxl import load_workbook
+from lxml import etree
 from trytond import backend
 from trytond.model.exceptions import ValidationError
 from trytond.pool import Pool
@@ -35,6 +36,15 @@ class BabiCompanyTestMixin(CompanyTestMixin):
 class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
     'Test Babi module'
     module = 'babi'
+
+    @with_transaction()
+    def test_validator_supports_chart_widget(self):
+        'Test validator supports chart widget'
+        View = Pool().get('ir.ui.view')
+        validator = View._validator('form')
+
+        validator.assertValid(etree.fromstring(
+                '<form><field name="chart" widget="chart"/></form>'))
 
     def create_data(self):
         pool = Pool()

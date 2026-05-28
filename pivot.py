@@ -10,7 +10,7 @@ from dominate.util import raw
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
 from weasyprint import HTML
-from psycopg2.errors import UndefinedTable
+from psycopg.errors import UndefinedTable
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from trytond.model import fields
