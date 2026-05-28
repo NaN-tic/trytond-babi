@@ -237,6 +237,7 @@ def compute_model_worker(database_name, user, context, snapshot_id,
             result_queue.put({
                     'type': 'progress',
                     'count': len(records),
+                    'inserted': len(to_insert),
                     'chunk_index': chunk_index,
                     })
         transaction.stop(True)
@@ -1780,7 +1781,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
         checker = TimeoutChecker(self.timeout, self.timeout_exception)
         internal_names = [field.internal_name for field in self.fields_]
-        count = 0
         mp_context = multiprocessing.get_context('spawn')
         input_queue = mp_context.Queue()
         result_queue = mp_context.Queue()
@@ -1815,17 +1815,21 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                     processes.append(process)
 
                 done = 0
+                count = 0
+                inserted = 0
                 while done < len(processes):
                     checker.check()
                     self._check_model_worker_processes(processes)
-                    logger.info('Calculated %s, %s records in %s seconds'
-                        % (self.model.name, count, checker.elapsed))
+                    logger.info(f'Calculated {self.model.name}: '
+                        f'{inserted}/{count} (inserted/count) records '
+                        f'in {checker.elapsed} seconds.')
                     try:
                         result = result_queue.get(timeout=1)
                     except queue.Empty:
                         continue
                     if result['type'] == 'progress':
                         count += result.get('count', 0)
+                        inserted += result.get('inserted', 0)
                         continue
                     if result['type'] == 'done':
                         done += 1
