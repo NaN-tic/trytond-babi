@@ -10,6 +10,7 @@ import html
 
 from sql import Column
 from datetime import datetime
+from simpleeval import EvalWithCompoundTypes
 
 from trytond.model import DeactivableMixin, ModelSQL, ModelView, fields
 from trytond.model.fields import depends
@@ -232,11 +233,12 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
             try:
                 if '__' in domain:
                     domain = str(PYSONDecoder().decode(domain))
-                domain = eval(domain, {
+                evaluator = EvalWithCompoundTypes(names={
                         'datetime': mdatetime,
                         'false': False,
                         'true': True,
                         })
+                domain = evaluator.eval(domain)
                 records = Model.search(domain, limit=100,
                     order=[('id', 'DESC')])
             except Exception as e:

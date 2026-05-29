@@ -1211,11 +1211,12 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             if '__' in domain:
                 domain = str(PYSONDecoder().decode(domain))
         domain = self.replace_parameters(domain)
-        return eval(domain, {
+        evaluator = EvalWithCompoundTypes(names={
                 'datetime': mdatetime,
                 'false': False,
                 'true': True,
                 })
+        return evaluator.eval(domain)
 
     def get_context(self):
         pool = Pool()
