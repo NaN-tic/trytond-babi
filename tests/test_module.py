@@ -126,6 +126,27 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         Transaction().commit()
 
     @with_transaction()
+    def test_pyson_date_domain_filter(self):
+        'Test PYSON date domains'
+        pool = Pool()
+        Filter = pool.get('babi.filter')
+        Table = pool.get('babi.table')
+
+        self.create_data()
+        filter_, = Filter.search([('name', '=', 'Date')],
+            order=[('id', 'DESC')], limit=1)
+        table = Table()
+        table.filter = filter_
+
+        year = datetime.date.today().year
+        self.assertEqual(table.get_domain_filter(), [
+                ['date', '>=', datetime.date(year, 6, 1)],
+                ])
+
+        filter_.single_check()
+        self.assertIsNone(filter_.domain_error)
+
+    @with_transaction()
     def test_eval(self):
         'Test babi_eval'
         pool = Pool()

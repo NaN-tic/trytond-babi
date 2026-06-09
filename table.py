@@ -37,7 +37,7 @@ from trytond.model import (Exclude, Model, ModelView, ModelSQL, fields,
 from trytond.exceptions import UserError
 from trytond.model.exceptions import ValidationError
 from trytond.i18n import gettext
-from trytond.pyson import Bool, Eval, In, Not, PYSONDecoder, PYSONEncoder
+from trytond.pyson import Bool, Eval, In, Not, PYSONEncoder
 from trytond.url import http_host
 from trytond.config import config
 from trytond.modules.company.model import (
@@ -46,7 +46,8 @@ from trytond.report import Report
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.rpc import RPC
 from trytond.tools.immutabledict import ImmutableDict
-from .babi import TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME
+from .babi import (
+    TimeoutChecker, TimeoutException, FIELD_TYPES, QUEUE_NAME, eval_domain)
 from .babi_eval import babi_eval, babi_eval_batch
 from .cube import Cube
 from .tools import adjust_column_widths
@@ -1208,15 +1209,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         domain = '[]'
         if self.filter and self.filter.domain:
             domain = self.filter.domain
-            if '__' in domain:
-                domain = str(PYSONDecoder().decode(domain))
         domain = self.replace_parameters(domain)
-        evaluator = EvalWithCompoundTypes(names={
-                'datetime': mdatetime,
-                'false': False,
-                'true': True,
-                })
-        return evaluator.eval(domain)
+        return eval_domain(domain)
 
     def get_context(self):
         pool = Pool()
