@@ -34,6 +34,18 @@ FIELD_TYPES = [
     ('datetime', 'Date & Time'),
     ]
 
+
+def eval_domain(domain):
+    if '__' in domain:
+        return PYSONDecoder().decode(domain)
+    evaluator = EvalWithCompoundTypes(names={
+            'datetime': mdatetime,
+            'false': False,
+            'true': True,
+            })
+    return evaluator.eval(domain)
+
+
 AGGREGATE_TYPES = [
     ('avg', 'Average'),
     ('sum', 'Sum'),
@@ -231,14 +243,7 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
         if self.domain:
             domain = self.domain
             try:
-                if '__' in domain:
-                    domain = str(PYSONDecoder().decode(domain))
-                evaluator = EvalWithCompoundTypes(names={
-                        'datetime': mdatetime,
-                        'false': False,
-                        'true': True,
-                        })
-                domain = evaluator.eval(domain)
+                domain = eval_domain(domain)
                 records = Model.search(domain, limit=100,
                     order=[('id', 'DESC')])
             except Exception as e:
