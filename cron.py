@@ -58,8 +58,12 @@ class Cron(metaclass=PoolMeta):
                 ])
 
     @classmethod
-    def default_get(cls, fields, with_rec_name=True):
-        res = super().default_get(fields, with_rec_name)
+    def default_get(
+            cls, fields_names=None, with_rec_name=True, with_default=True):
+        res = super().default_get(
+            fields_names=fields_names,
+            with_rec_name=with_rec_name,
+            with_default=with_default)
         context = Transaction().context
         res['interval_type'] = 'days'
         res['interval_number'] = 1
