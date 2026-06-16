@@ -2627,7 +2627,7 @@ class InternalMeasure(ModelSQL, ModelView):
         sql_table = cls.__table__()
 
         # Migration from 3.0: no more relation with reports.
-        table = backend.TableHandler(cls, module_name)
+        table = cls.__table_handler__(module_name)
         if table.column_exist('report'):
             table.not_null_action('report', action='remove')
 
