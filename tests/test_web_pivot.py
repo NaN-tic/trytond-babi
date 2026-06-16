@@ -587,3 +587,66 @@ class TestPivot(WebTestCase):
             self.assertLessEqual(overflow, 1)
             expect(page.locator("body")).not_to_contain_text(
                 "Internal Server Error")
+
+    def test_11_parameterized_table_can_save_configuration(self):
+        Table = Model.get('babi.table')
+        Pivot = Model.get('babi.pivot')
+        RowDimension = Model.get('babi.pivot.row_dimension')
+        Measure = Model.get('babi.pivot.measure')
+        User = Model.get('res.user')
+
+        base_table = Table.find([('name', '=', 'User')])[0]
+        fields = {field.internal_name: field for field in base_table.fields_}
+        row_field = fields['name']
+        measure_field = fields['id']
+
+        pivot = Pivot(table=base_table, name='Base Pivot')
+        pivot.save()
+        row = RowDimension(pivot=pivot, field=row_field)
+        row.save()
+        measure = Measure(pivot=pivot, field=measure_field, aggregate='count')
+        measure.save()
+
+        base_table = Table(base_table.id)
+        self.assertEqual(len(base_table.pivots), 1)
+
+        user = User.find([('login', '=', self.user)])[0]
+        param_table, = Table.copy([base_table], default={
+                'internal_name': 'parametrized_save_configuration',
+                'parameters': {'company': get_company().id},
+                'crons': [],
+                'base_table': base_table.id,
+                'parametrized_user': user.id,
+                })
+
+        with sync_playwright() as playwright:
+            headless = (config.getboolean('nantic_connection',
+                'test_headless', default=False) or
+                    'DISPLAY' not in os.environ)
+
+            browser = playwright.firefox.launch(headless=headless)
+            context = browser.new_context(
+                locale='en-US',
+                http_credentials={
+                    "username": self.user,
+                    "password": self.password,
+                }
+            )
+            page = context.new_page()
+            page.goto(f'{self.base_url}/{self.database}/babi/pivot/'
+                f'{param_table.table_name}/null')
+            page.wait_for_load_state('load')
+
+            save_button = page.locator(
+                "button[type='button']").filter(has_text='Save Configuration')
+            expect(save_button).to_have_count(1)
+            save_button.click()
+            page.locator("#save_pivot_modal input[name='name']").fill(
+                'Parametrized Pivot')
+            page.locator("#save_pivot_modal button[type='submit']").click()
+            page.wait_for_load_state('load')
+
+            base_table = Table(base_table.id)
+            self.assertEqual(len(base_table.pivots), 2)
+            expect(page.locator("body")).not_to_contain_text(
+                "Internal Server Error")

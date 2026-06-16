@@ -387,6 +387,23 @@ class Index(IndexMixin, Endpoint):
         if cube.measures and (cube.rows or cube.columns):
             show_error = False
 
+        pivots = [p for p in table.pivots if p.active]
+        selected_pivot_id = None
+        if pivots and self.table_properties and self.table_properties != 'null':
+            for pivot in pivots:
+                cube = pivot.get_cube()
+                if not cube:
+                    continue
+                if cube.encode_properties() == self.table_properties:
+                    selected_pivot_id = pivot.id
+                    break
+        parametrized_table = bool(getattr(table, 'base_table', None))
+        if parametrized_table:
+            # Parametrized tables are temporary copies of the base table.
+            # Keep the save action available so the current configuration can
+            # be persisted back on the base table.
+            selected_pivot_id = None
+
         # Prepare the cube properties for the invert cube function
         cube.table = table.name
         cube.rows, cube.columns = cube.columns, cube.rows
@@ -505,6 +522,12 @@ class Index(IndexMixin, Endpoint):
                                         span(_('Compute'),
                                             cls="absolute inset-y-0 left-7 right-0 inline-flex items-center justify-center text-center")
                                         span(cls="loading-indicator absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center").add(LOADING_SPINNER)
+                                if selected_pivot_id is None:
+                                    button(_('Save Configuration'),
+                                        type="button",
+                                        **_tooltip_attrs(_('Save Configuration'),
+                                            "inline-flex h-full items-center rounded-md bg-gray-900 px-3 text-xs font-semibold leading-none text-white hover:bg-gray-800 active:bg-gray-950 active:scale-95 transition"),
+                                        onclick="document.getElementById('save_pivot_modal').style.display='block'")
                                 a(href=Index.url(table_name=self.table_name, table_properties=inverted_table_properties),
                                     **_tooltip_attrs(_('Swap rows and columns'),
                                         "inline-flex h-full w-7 items-center justify-center rounded-md text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 active:text-indigo-800 active:scale-95 transition")).add(SWAP_AXIS)
@@ -599,19 +622,9 @@ class Index(IndexMixin, Endpoint):
                     # Details always opened by default
                     with details(cls="m-2", open=True):
                         summary(cls="px-2 py-1 text-sm font-semibold text-gray-900 hover:text-indigo-700 transition").add(_('Configuration'))
-                        pivots = [p for p in table.pivots if p.active]
-                        selected_pivot_id = None
-                        if pivots and self.table_properties and self.table_properties != 'null':
-                            for pivot in pivots:
-                                cube = pivot.get_cube()
-                                if not cube:
-                                    continue
-                                if cube.encode_properties() == self.table_properties:
-                                    selected_pivot_id = pivot.id
-                                    break
-                        if pivots:
-                            with div(cls="px-2 pt-2"):
-                                with div(cls="flex items-center gap-2 align-middle"):
+                        with div(cls="px-2 pt-2"):
+                            with div(cls="flex items-center gap-2 align-middle"):
+                                if pivots:
                                     with form(action=PivotApply.url(
                                             table_name=self.table_name,
                                             table_properties=self.table_properties),
@@ -627,39 +640,34 @@ class Index(IndexMixin, Endpoint):
                                                     option(pivot.rec_name, value=str(pivot.id), selected=True)
                                                 else:
                                                     option(pivot.rec_name, value=str(pivot.id))
-                                    if selected_pivot_id is None:
-                                        button(_('Save Configuration'),
-                                            type="button",
-                                            cls="inline-flex items-center rounded-md bg-gray-900 px-3 h-7 text-xs font-semibold text-white hover:bg-gray-800 active:bg-gray-950 active:scale-95 transition align-middle",
-                                            onclick="document.getElementById('save_pivot_modal').style.display='block'")
-                            if selected_pivot_id is None:
-                                with div(id="save_pivot_modal", cls="relative z-10", style="display: none;", aria_labelledby="modal-title", role="dialog", aria_modal="true"):
-                                    div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
-                                    with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
-                                        with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
-                                            with form(action=PivotSave.url(
-                                                    table_name=self.table_name,
-                                                    table_properties=self.table_properties),
-                                                    method="POST",
-                                                    cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
-                                                with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
-                                                    button(type="button",
-                                                        **_tooltip_attrs(_('Close'),
-                                                            "rounded-md bg-white text-gray-400 hover:text-gray-500"),
-                                                        onclick="document.getElementById('save_pivot_modal').style.display='none'").add(CLOSE_ICON)
-                                                h3(_('Save Configuration'), cls="text-sm font-semibold text-gray-900")
-                                                p(_('Name'), cls="mt-3 text-xs text-gray-700")
-                                                input_(type="text", name="name", required=True,
-                                                    value=f'{table.name} pivot',
-                                                    cls="mt-1 w-full text-xs rounded-md border border-gray-300 px-2 py-1")
-                                                with div(cls="mt-4 flex justify-end gap-2"):
-                                                    button(_('Cancel'),
-                                                        type="button",
-                                                        cls="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 active:bg-gray-100 active:scale-95 transition",
-                                                        onclick="document.getElementById('save_pivot_modal').style.display='none'")
-                                                    button(_('Save Configuration'),
-                                                        type="submit",
-                                                        cls="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 active:bg-gray-950 active:scale-95 transition")
+                        if selected_pivot_id is None:
+                            with div(id="save_pivot_modal", cls="relative z-10", style="display: none;", aria_labelledby="modal-title", role="dialog", aria_modal="true"):
+                                div(cls="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", aria_hidden="true")
+                                with div(cls="fixed inset-0 z-10 w-screen overflow-y-auto"):
+                                    with div(cls="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"):
+                                        with form(action=PivotSave.url(
+                                                table_name=self.table_name,
+                                                table_properties=self.table_properties),
+                                                method="POST",
+                                                cls="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"):
+                                            with div(cls="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"):
+                                                button(type="button",
+                                                    **_tooltip_attrs(_('Close'),
+                                                        "rounded-md bg-white text-gray-400 hover:text-gray-500"),
+                                                    onclick="document.getElementById('save_pivot_modal').style.display='none'").add(CLOSE_ICON)
+                                            h3(_('Save Configuration'), cls="text-sm font-semibold text-gray-900")
+                                            p(_('Name'), cls="mt-3 text-xs text-gray-700")
+                                            input_(type="text", name="name", required=True,
+                                                value=f'{table.name} pivot',
+                                                cls="mt-1 w-full text-xs rounded-md border border-gray-300 px-2 py-1")
+                                            with div(cls="mt-4 flex justify-end gap-2"):
+                                                button(_('Cancel'),
+                                                    type="button",
+                                                    cls="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 active:bg-gray-100 active:scale-95 transition",
+                                                    onclick="document.getElementById('save_pivot_modal').style.display='none'")
+                                                button(_('Save Configuration'),
+                                                    type="submit",
+                                                    cls="inline-flex items-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 active:bg-gray-950 active:scale-95 transition")
                         with div(cls="grid grid-cols-12 px-3 pb-2"):
                             PivotHeaderAxis(table_name=self.table_name, axis='x',
                                 table_properties=self.table_properties)
@@ -978,13 +986,16 @@ class PivotSave(Endpoint):
         if not self.name:
             return redirect(Index.url(table_name=self.table_name,
                 table_properties=self.table_properties))
+        save_table = table.base_table or table
         pivot, = Pivot.create([{
-                    'table': table.id,
+                    'table': save_table.id,
                     'name': self.name,
                     }])
 
         cube = Cube.parse_properties(self.table_properties, table.name)
-        fields_by_internal = {f.internal_name: f for f in table.fields_}
+        fields_by_internal = {
+            f.internal_name: f for f in save_table.fields_
+            }
 
         to_create_rows = []
         to_create_cols = []
