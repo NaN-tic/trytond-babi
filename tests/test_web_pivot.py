@@ -11,6 +11,21 @@ from trytond.tests.tools import  set_user
 
 logger = logging.getLogger(__name__)
 
+HEADLESS = (config.getboolean('nantic_connection',
+    'test_headless', default=False) or
+        'DISPLAY' not in os.environ)
+
+FIREFOX_ENV = {
+    **os.environ,
+    }
+
+if 'DISPLAY' not in os.environ:
+    # Disable sandbox if no 'DISPLAY'. We're probably in a container
+    # docker which will have security restrictions that will prevent the
+    # sandbox from working.
+    FIREFOX_ENV['MOZ_DISABLE_CONTENT_SANDBOX'] = '1'
+
+
 class TestPivot(WebTestCase):
     modules = ['babi']
 
@@ -66,11 +81,7 @@ class TestPivot(WebTestCase):
     # enter to the babi website.
     def test_01(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -136,11 +147,7 @@ class TestPivot(WebTestCase):
 
     def test_02_add_measure(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -169,11 +176,7 @@ class TestPivot(WebTestCase):
 
     def test_03_add_measure_with_over_field(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -212,11 +215,7 @@ class TestPivot(WebTestCase):
 
     def test_04_reuse_measure_field(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -258,11 +257,7 @@ class TestPivot(WebTestCase):
 
     def test_05_axis_fields_allow_measures_but_remain_unique(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -313,11 +308,7 @@ class TestPivot(WebTestCase):
 
     def test_06_reorder_measures(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -387,11 +378,7 @@ class TestPivot(WebTestCase):
         assert pivot_url and not pivot_url.endswith('/null')
 
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -409,11 +396,7 @@ class TestPivot(WebTestCase):
 
     def test_08_button_tooltips(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -520,11 +503,7 @@ class TestPivot(WebTestCase):
 
     def test_09_percentile_text_field_renders_hint(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
@@ -572,11 +551,7 @@ class TestPivot(WebTestCase):
 
     def test_10_small_pivot_has_no_horizontal_scroll(self):
         with sync_playwright() as playwright:
-            headless = (config.getboolean('nantic_connection',
-                'test_headless', default=False) or
-                    'DISPLAY' not in os.environ)
-
-            browser = playwright.firefox.launch(headless=headless)
+            browser = playwright.firefox.launch(headless=HEADLESS, env=FIREFOX_ENV)
             context = browser.new_context(
                 locale='en-US',
                 http_credentials={
