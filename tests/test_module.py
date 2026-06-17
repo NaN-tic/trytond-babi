@@ -9,6 +9,7 @@ import sql
 from decimal import Decimal
 from openpyxl import load_workbook
 from trytond import backend
+from trytond.exceptions import UserWarning
 from trytond.model.exceptions import ValidationError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
@@ -211,6 +212,80 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         table._compute()
         fields = sorted([x.internal_name for x in table.fields_])
         self.assertEqual(fields, ['amount', 'date'])
+
+    @with_transaction()
+    def test_filter_context_parameters(self):
+        pool = Pool()
+        Model = pool.get('ir.model')
+        Filter = pool.get('babi.filter')
+        FilterParameter = pool.get('babi.filter.parameter')
+        Table = pool.get('babi.table')
+
+        self.create_data()
+
+        model, = Model.search([('name', '=', 'babi.test')])
+        filter_, = Filter.create([{
+                    'name': 'Context Filter',
+                    'model': model.id,
+                    'context': (
+                        "{'category': '{category}', "
+                        "'stock_date_end': date('{stock_date_end}')}"
+                        ),
+                    }])
+        parameters = FilterParameter.create([{
+                    'filter': filter_.id,
+                    'name': 'category',
+                    'ttype': 'char',
+                    }, {
+                    'filter': filter_.id,
+                    'name': 'stock_date_end',
+                    'ttype': 'date',
+                    }])
+
+        table = Table(
+            name='Context Table',
+            type='model',
+            internal_name='context_table',
+            model=model,
+            filter=filter_,
+            timeout=30,
+            preview_limit=10,
+            parameters={
+                'category': 'odd',
+                'stock_date_end': '2024-06-17',
+                })
+
+        context = table.get_context()
+
+        self.assertEqual(context, {
+                'category': 'odd',
+                'stock_date_end': datetime.date(2024, 6, 17),
+                })
+        for parameter in parameters:
+            self.assertTrue(parameter.check_parameter_in_filter())
+
+    @with_transaction()
+    def test_filter_parameter_in_context_warning(self):
+        pool = Pool()
+        Model = pool.get('ir.model')
+        Filter = pool.get('babi.filter')
+        FilterParameter = pool.get('babi.filter.parameter')
+
+        self.create_data()
+
+        model, = Model.search([('name', '=', 'babi.test')])
+        filter_, = Filter.create([{
+                    'name': 'Invalid Context Filter',
+                    'model': model.id,
+                    'context': "{'category': '{category}'}",
+                    }])
+        parameter, = FilterParameter.create([{
+                    'filter': filter_.id,
+                    'name': 'missing_parameter',
+                    'ttype': 'char',
+                    }])
+
+        self.assertRaises(UserWarning, parameter.check_parameter_in_filter)
 
     @with_transaction()
     def test_table_xls_report(self):

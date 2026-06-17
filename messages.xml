@@ -7,7 +7,7 @@ this repository contains the full copyright notices and license terms. -->
             <field name="text">Report "%(report)s" no longer exists or you do not have the rights to access it.</field>
         </record>
         <record model="ir.message" id="parameter_not_found">
-            <field name="text">Parameter "%(parameter)s" not found in Domain nor in Python Expression of filter "%(filter)s".</field>
+            <field name="text">Parameter "%(parameter)s" not found in Domain, Python Expression nor Context of filter "%(filter)s".</field>
         </record>
         <record model="ir.message" id="no_dimensions">
             <field name="text">Report "%(report)s" has no dimensions. At least one is needed.</field>
@@ -60,7 +60,7 @@ Exception: %(error)s</field>
 Exception: %(error)s</field>
         </record>
         <record model="ir.message" id="invalid_parameters">
-            <field name="text">Key "%(key)s" in domain or in python expression is not in the parameters from filter of report.</field>
+            <field name="text">Key "%(key)s" in domain, python expression or context is not in the parameters from filter of report.</field>
         </record>
         <record model="ir.message" id="msg_render_report_columns">
             <field name="text">Print report "%(report)s" has dimensions in columns and is not supported.</field>
