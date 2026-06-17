@@ -959,17 +959,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         return self._replace_parameters(expression, params)
 
     def _replace_parameters(self, expression, parameters):
-        try:
-            if '%(' in expression:
-                expression = expression % parameters
-            else:
-                expression = expression.format(**parameters)
-        except KeyError as message:
-            if self.babi_raise_user_error:
-                raise UserError(
-                    gettext('babi.invalid_parameters',
-                    key=str(message)))
-            raise
+        for key, value in parameters.items():
+            expression = expression.replace('{%s}' % key, str(value))
         return expression
 
     def _format_query_parameter_value(self, parameter, value):

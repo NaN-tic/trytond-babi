@@ -1591,9 +1591,9 @@ msgstr "Die Ausführung \"%(execution)s\" verfügt über Filterparameter und Sie
 
 msgctxt "model:ir.message,text:invalid_parameters"
 msgid ""
-"Key \"%(key)s\" in domain or in python expression is not in the parameters "
+"Key \"%(key)s\" in domain, python expression or context is not in the parameters "
 "from filter of report."
-msgstr "Der Schlüssel \"%(key)s\" in der Domäne oder im Python-Ausdruck ist nicht in den Parametern des Berichtsfilters enthalten."
+msgstr "Der Schlüssel \"%(key)s\" in der Domäne, dem Python-Ausdruck oder dem Kontext ist nicht in den Parametern des Berichtsfilters enthalten."
 
 msgctxt "model:ir.message,text:msg_chart_limit"
 msgid ""
@@ -1810,9 +1810,9 @@ msgstr "Nur eine Messgrösse kann in Kuchendiagrammen verwendet werden."
 
 msgctxt "model:ir.message,text:parameter_not_found"
 msgid ""
-"Parameter \"%(parameter)s\" not found in Domain nor in Python Expression of "
+"Parameter \"%(parameter)s\" not found in Domain, Python Expression nor Context of "
 "filter \"%(filter)s\"."
-msgstr "Der Parameter \"%(parameter)s\" ​​wurde weder in der Domäne noch im Python-Ausdruck des Filters \"%(filter)s\" ​​gefunden."
+msgstr "Der Parameter \"%(parameter)s\" wurde weder in der Domäne noch im Python-Ausdruck oder im Kontext des Filters \"%(filter)s\" gefunden."
 
 msgctxt "model:ir.message,text:report_modification_warning"
 msgid ""
