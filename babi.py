@@ -216,6 +216,8 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
             if 'domain' in values:
                 values.setdefault('checked', False)
                 values.setdefault('domain_error')
+            if 'context' in values:
+                values.setdefault('checked', False)
         super().write(*args)
 
     @classmethod
@@ -308,9 +310,22 @@ class FilterParameter(ModelSQL, ModelView):
         Warning = Pool().get('res.user.warning')
 
         placeholder = '{%s}' % self.name
-        if ((self.filter.domain and placeholder not in self.filter.domain)
-                and (self.filter.python_expression
-                    and placeholder not in self.filter.python_expression)):
+        legacy_placeholder = '%%(%s)s' % self.name
+        if (((self.filter.domain
+                    and placeholder not in self.filter.domain
+                    and legacy_placeholder not in self.filter.domain)
+                or not self.filter.domain)
+                and ((self.filter.python_expression
+                        and placeholder not in self.filter.python_expression
+                        and legacy_placeholder
+                        not in self.filter.python_expression)
+                    or not self.filter.python_expression)
+                and ((self.filter.context
+                        and placeholder not in self.filter.context
+                        and legacy_placeholder not in self.filter.context)
+                    or not self.filter.context)
+                and (self.filter.domain or self.filter.python_expression
+                    or self.filter.context)):
             key = 'task_babi_check_parameter_in_filter.%d' % self.id
             if Warning.check(key):
                 raise UserWarning('babi_check_parameter_in_filter.{}'.format(
