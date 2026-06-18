@@ -978,21 +978,28 @@ class PivotSave(Endpoint):
             table, = tables
             access = table.check_access()
 
-        if (not access or not self.table_properties
-                or self.table_properties == 'null'):
+        if not access or not self.table_properties:
             return redirect(Index.url(table_name=self.table_name,
                 table_properties=self.table_properties))
 
         if not self.name:
             return redirect(Index.url(table_name=self.table_name,
                 table_properties=self.table_properties))
+
+        if self.table_properties == 'null':
+            pivots = [p for p in table.pivots if p.active]
+            cube = pivots[0].get_cube() if pivots else None
+            if not cube:
+                return redirect(Index.url(table_name=self.table_name,
+                    table_properties=self.table_properties))
+        else:
+            cube = Cube.parse_properties(self.table_properties, table.name)
+
         save_table = table.base_table or table
         pivot, = Pivot.create([{
                     'table': save_table.id,
                     'name': self.name,
                     }])
-
-        cube = Cube.parse_properties(self.table_properties, table.name)
         fields_by_internal = {
             f.internal_name: f for f in save_table.fields_
             }

@@ -636,7 +636,7 @@ class TestPivot(WebTestCase):
         self.assertEqual(len(base_table.pivots), 1)
 
         user = User.find([('login', '=', self.user)])[0]
-        param_table, = Table.copy([base_table], default={
+        param_table, = Table.duplicate([base_table], default={
                 'internal_name': 'parametrized_save_configuration',
                 'parameters': {'company': get_company().id},
                 'crons': [],
