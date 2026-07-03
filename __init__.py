@@ -35,6 +35,7 @@ def register():
         table.TableGroup,
         table.TableParameters,
         table.TableQueryParameter,
+        table.ParametrizeTableStart,
         table.Cluster,
         table.Table,
         table.Field,

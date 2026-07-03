@@ -21,6 +21,9 @@ contains the full copyright notices and license terms. -->
         <record model="res.group" id="group_babi_table">
             <field name="name">Business Intelligence Table</field>
         </record>
+        <record model="res.group" id="group_babi_table_compute">
+            <field name="name">Business Intelligence Compute Table</field>
+        </record>
 
         <!-- babi.expression -->
         <record model="ir.ui.view" id="babi_expression_form_view">
