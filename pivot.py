@@ -4,6 +4,7 @@ import secrets
 import tempfile
 from datetime import date, datetime
 from dominate.tags import (div, h1, p, pre, a, form, button, span, table, thead,
+
     tbody, tr, td, head, html, meta, title, script, h3, comment, select,
     option, main, th, style, details, summary, input_, label)
 from dominate.util import raw
@@ -17,7 +18,8 @@ from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.modules.voyager.voyager import Component, Endpoint
-from trytond.modules.voyager.i18n import _
+from trytond.modules.xgettext import _
+
 from .cube import Cube, CellType, capitalize
 from .table import datetime_to_company_tz
 from .tools import adjust_column_widths
@@ -30,7 +32,6 @@ def save_virtual_workbook(workbook):
         save_workbook(workbook, tmp.name)
         with open(tmp.name, 'rb') as f:
             return f.read()
-
 
 # Icons used in website
 COLLAPSE = '➖'
@@ -57,7 +58,6 @@ ORDER_ASC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBo
 ORDER_DESC_ICON = raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>')
 LOADING_SPINNER = raw('<svg aria-hidden="true" class="m-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>')
 
-
 def _get_filter_parameters(table):
     pool = Pool()
     Parameter = pool.get('babi.filter.parameter')
@@ -73,7 +73,6 @@ def _get_filter_parameters(table):
             logger.exception('Error checking parameter %s', parameter.id)
     return valid_parameters
 
-
 def _get_query_parameters(table):
     if not table:
         return []
@@ -87,18 +86,15 @@ def _get_query_parameters(table):
             logger.exception('Error checking query parameter %s', parameter.id)
     return valid_parameters
 
-
 def _get_table_parameters(table):
     if table and table.type in ('table', 'view'):
         return _get_query_parameters(table)
     return _get_filter_parameters(table)
 
-
 def _get_parameter_options(parameter):
     if parameter.ttype in ('selection', 'multiselection'):
         return parameter.get_values()
     return []
-
 
 def _format_parameter_value(parameter, value):
     if value is None:
@@ -117,7 +113,6 @@ def _format_parameter_value(parameter, value):
         if isinstance(value, (list, tuple)):
             return ', '.join(str(x) for x in value)
     return str(value)
-
 
 def _parse_parameter_value(parameter, raw_value):
     if raw_value is not None and not isinstance(raw_value, str):
@@ -146,12 +141,10 @@ def _parse_parameter_value(parameter, raw_value):
         return [x.strip() for x in raw_value.split(',') if x.strip()]
     return raw_value
 
-
 def _normalize_table_name(name):
     if name.startswith('__'):
         return name.split('__')[-1]
     return name
-
 
 def _measure_key(field_name, aggregate, percentile=None, over_field=None):
     key = (field_name, aggregate)
@@ -160,7 +153,6 @@ def _measure_key(field_name, aggregate, percentile=None, over_field=None):
     if over_field:
         key += (over_field,)
     return key
-
 
 def _measure_label(measure, field_names=None):
     parts = Cube.measure_parts(measure)
@@ -186,7 +178,6 @@ def _measure_label(measure, field_names=None):
         label = f"{label} / {capitalize(over_field)}"
     return label
 
-
 def _tooltip_attrs(label, cls=None):
     attrs = {
         'title': label,
@@ -195,7 +186,6 @@ def _tooltip_attrs(label, cls=None):
     if cls is not None:
         attrs['cls'] = cls
     return attrs
-
 
 def _cube_error_hint(error):
     message = str(error).lower()
@@ -217,12 +207,10 @@ def _cube_error_hint(error):
             return hint
     return None
 
-
 def _parse_field_reference(field):
     if field and field.startswith('('):
         return ast.literal_eval(field)
     return field
-
 
 class Site(metaclass=PoolMeta):
     __name__ = 'www.site'
@@ -253,7 +241,6 @@ class Site(metaclass=PoolMeta):
 
             context['language'] = language
         return context
-
 
 ###############################################################################
 #################################### SITE #####################################
@@ -303,13 +290,11 @@ class Layout(Component):
             main_body += self.main
         return html_layout
 
-
 class IndexMixin(object):
     __slots__ = ()
 
     table_name = fields.Char('Table Name')
     table_properties = fields.Char('Table Properties')
-
 
 class Index(IndexMixin, Endpoint):
     'Index'
@@ -709,7 +694,6 @@ class Index(IndexMixin, Endpoint):
         layout.main.add(index_section)
         return layout.tag()
 
-
 class PivotSidebarTables(Endpoint):
     'Pivot Sidebar Tables'
     __name__ = 'www.pivot_sidebar_tables'
@@ -790,7 +774,6 @@ class PivotSidebarTables(Endpoint):
             container.add(a(t.name, cls=row_cls, href=table_url))
         return container
 
-
 class IndexNull(IndexMixin, Endpoint):
     'Index Null'
     __name__ = 'www.index.pivot.null'
@@ -801,7 +784,6 @@ class IndexNull(IndexMixin, Endpoint):
         pool = Pool()
         Index = pool.get('www.index.pivot')
         return Index(self.table_name)
-
 
 class PivotCompute(Endpoint):
     'Pivot Compute'
@@ -908,7 +890,6 @@ class PivotCompute(Endpoint):
             return response
         return redirect(redirect_url)
 
-
 class PivotApply(Endpoint):
     'Pivot Apply'
     __name__ = 'www.pivot_apply'
@@ -944,7 +925,6 @@ class PivotApply(Endpoint):
 
         return redirect(Index.url(table_name=self.table_name,
             table_properties=self.table_properties))
-
 
 class PivotSave(Endpoint):
     'Pivot Save'
@@ -1084,7 +1064,6 @@ class PivotSave(Endpoint):
         return redirect(Index.url(table_name=self.table_name,
             table_properties=self.table_properties))
 
-
 # This class handle the row/columns table headers
 class PivotHeaderAxis(Endpoint):
     'Pivot Header Axis'
@@ -1187,7 +1166,6 @@ class PivotHeaderAxis(Endpoint):
                                                 "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(REMOVE_ICON)
         return header_axis
 
-
 # This class handle the measure table header
 class PivotHeaderMeasure(Endpoint):
     'Pivot Header Measure'
@@ -1262,7 +1240,6 @@ class PivotHeaderMeasure(Endpoint):
                                             **_tooltip_attrs(remove_label,
                                                 "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(REMOVE_ICON)
         return header_measure
-
 
 # This class handle the order table header
 class PivotHeaderOrder(Endpoint):
@@ -1353,7 +1330,6 @@ class PivotHeaderOrder(Endpoint):
                                                     "text-indigo-600 hover:text-indigo-700 active:text-indigo-800 active:scale-95 transition")).add(DOWN_ARROW)
         return header_order
 
-
 # This function handles the pup up that is show in every header table and add
 # the item to the table properties
 class PivotHeaderSelectionMixin(object):
@@ -1366,14 +1342,12 @@ class PivotHeaderSelectionMixin(object):
     percentile = fields.Float('Percentile')
     over_field = fields.Char('Over Field')
 
-
 class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
     'Pivot Header Selection'
     __name__ = 'www.pivot_header.selection'
     _url = '/<string:table_name>/open_field_selection/<string:header>/<string:table_properties>'
     _type = 'babi_pivot'
     _method = 'POST'
-
 
     def render(self):
         pool = Pool()
@@ -1504,7 +1478,6 @@ class PivotHeaderSelection(PivotHeaderSelectionMixin, Endpoint):
                                 cls="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto")
         return field_selection
 
-
 class PivotHeaderSelectionCloseField(PivotHeaderSelectionMixin, Endpoint):
     'Pivot Header Selection Close Field'
     __name__ = 'www.pivot_header.selection.close_field'
@@ -1530,7 +1503,6 @@ class PivotHeaderSelectionCloseField(PivotHeaderSelectionMixin, Endpoint):
 
         field_selection = div(id=name)
         return field_selection
-
 
 class PivotHeaderSelectionAddField(PivotHeaderSelectionMixin, Endpoint):
     'Pivot Header Selection Add Field'
@@ -1583,7 +1555,6 @@ class PivotHeaderSelectionAddField(PivotHeaderSelectionMixin, Endpoint):
         return redirect(Index.url(table_name=self.table_name,
             table_properties=cube.encode_properties()))
 
-
 # In this function we have some default options available in all the PivotHeader components (handle levels, remove items from header)
 class PivotHeaderMixin(object):
     __slots__ = ()
@@ -1593,7 +1564,6 @@ class PivotHeaderMixin(object):
     table_properties = fields.Char('Table Properties')
     level_action = fields.Char('Level Action')
     field = fields.Char('Field')
-
 
 class PivotHeaderRemoveField(PivotHeaderMixin, Endpoint):
     'Pivot Header'
@@ -1638,7 +1608,6 @@ class PivotHeaderRemoveField(PivotHeaderMixin, Endpoint):
             table_properties = 'null'
         return redirect(Index.url(table_name=self.table_name,
             table_properties=table_properties))
-
 
 class PivotHeaderLevelField(PivotHeaderMixin, Endpoint):
     'Pivot Header'
@@ -1690,7 +1659,6 @@ class PivotHeaderLevelField(PivotHeaderMixin, Endpoint):
         table_properties = cube.encode_properties()
         return redirect(Index.url(table_name=self.table_name,
             table_properties=table_properties))
-
 
 #This function handles the render of the cube into a table and the download button
 class PivotTable(Endpoint):
@@ -1870,7 +1838,6 @@ class PivotTable(Endpoint):
         table_container.add(pivot_table)
         pivot_div.add(table_container)
         return pivot_div
-
 
 class DownloadReport(Endpoint):
     'Download Report'
