@@ -1200,59 +1200,59 @@ msgstr ""
 "Márquelo si quiere que el modelo esté disponible para informes Business "
 "Intelligence"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "404"
 msgstr "404"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Add"
 msgstr "Agregar"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "All"
 msgstr "Todo"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Average"
 msgstr "Promedio"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Cancel"
 msgstr "Cancelar"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Close"
 msgstr "Cerca"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Columns"
 msgstr "Columnas"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Comma-separated IDs"
 msgstr "Identificadores separados por comas"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Compute"
 msgstr "Calcular"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Configuration"
 msgstr "Configuración"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Count"
 msgstr "Contar"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Down"
 msgstr "Abajo"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Error building the cube:"
 msgstr "Error al construir el cubo:"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid ""
 "HINT: You are trying to make average of a text type field, please try with a"
 " numeric type field or change the operation."
@@ -1260,7 +1260,7 @@ msgstr ""
 "SUGERENCIA: Está intentando calcular el promedio de un campo de tipo texto; "
 "intente con un campo de tipo numérico o cambie la operación."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid ""
 "HINT: You are trying to sum a text type field, please try with a numeric "
 "type field or change the operation."
@@ -1268,111 +1268,111 @@ msgstr ""
 "SUGERENCIA: Está intentando sumar un campo de tipo texto; pruebe con un "
 "campo de tipo numérico o cambie la operación."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Loading ..."
 msgstr "Cargando ..."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Max"
 msgstr "Máximo"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Maximum"
 msgstr "Máximo"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Measure fields"
 msgstr "Campos de medición"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Measure type"
 msgstr "Tipo de medida"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Median"
 msgstr "Mediana"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Min"
 msgstr "Min"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Minimum"
 msgstr "Mínimo"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Name"
 msgstr "Nombre"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "No parameters defined for this table."
 msgstr "No se han definido parámetros para esta tabla."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Order fields"
 msgstr "Campos de pedido"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Over Field"
 msgstr "Sobre el campo"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Page not found or you don't have access to it"
 msgstr "Página no encontrada o no tienes acceso a ella."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Page not found | Tryton"
 msgstr "Página no encontrada | Tryton"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Parameters"
 msgstr "Parámetros"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Percentile"
 msgstr "Percentil"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Pivot Table"
 msgstr "Tabla dinámica"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Properties"
 msgstr "Propiedades"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Record ID"
 msgstr "ID de registro"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Rows"
 msgstr "Filas"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Save Configuration"
 msgstr "Guardar configuración"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Search tables"
 msgstr "Tablas de búsqueda"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Select a field to add:"
 msgstr "Seleccione un campo para agregar:"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Show more details"
 msgstr "Mostrar más detalles"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Sorry, we couldn’t find the page you’re looking for."
 msgstr "Lo sentimos, no pudimos encontrar la página que buscas."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Sum"
 msgstr "Suma"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid ""
 "Table has not been computed. Click on the 'Compute' button or wait until the"
 " process has finished. Also ensure there is no 'Errors' tab in the table."
@@ -1381,19 +1381,19 @@ msgstr ""
 " finalice el proceso. Asegúrese también de que no haya ninguna pestaña de "
 "«Errores» en la tabla."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Tables"
 msgstr "Tablas"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Tags"
 msgstr "Etiquetas"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Up"
 msgstr "Arriba"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid ""
 "You need to select at least one measure and one row or one column to show "
 "the table."
@@ -1401,15 +1401,15 @@ msgstr ""
 "Debe seleccionar al menos una medida y una fila o una columna para mostrar "
 "la tabla."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "current data"
 msgstr "datos actuales"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "data from %s"
 msgstr "datos de %s"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "not calculated yet"
 msgstr "Aún no se ha calculado"
 
@@ -2681,75 +2681,7 @@ msgctxt "view:babi.widget:"
 msgid "Settings"
 msgstr "Ajustes"
 
-msgctxt "voyager:v:"
-msgid "404"
-msgstr "404"
-
-msgctxt "voyager:v:"
-msgid "Add"
-msgstr "Agregar"
-
-msgctxt "voyager:v:"
-msgid "All"
-msgstr "Todo"
-
-msgctxt "voyager:v:"
-msgid "Average"
-msgstr "Promedio"
-
-msgctxt "voyager:v:"
-msgid "Cancel"
-msgstr "Cancelar"
-
-msgctxt "voyager:v:"
-msgid "Close"
-msgstr "Cerrar"
-
-msgctxt "voyager:v:"
-msgid "Columns"
-msgstr "Columnas"
-
-msgctxt "voyager:v:"
-msgid "Comma-separated IDs"
-msgstr "Identificadores separados por comas"
-
-msgctxt "voyager:v:"
-msgid "Compute"
-msgstr "Calcular"
-
-msgctxt "voyager:v:"
-msgid "Configuration"
-msgstr "Configuración"
-
-msgctxt "voyager:v:"
-msgid "Count"
-msgstr "Contar"
-
-msgctxt "voyager:v:"
-msgid "Down"
-msgstr "Abajo"
-
-msgctxt "voyager:v:"
-msgid "Error building the cube:"
-msgstr "Error al construir el cubo:"
-
-msgctxt "voyager:v:"
-msgid ""
-"HINT: You are trying to make average of a text type field, please try with a"
-" numeric type field or change the operation."
-msgstr ""
-"PISTA: Estás intentando hacer la mediana de un campo de texto, por favor, "
-"prueba con un campo numérico o cambia el tipo de operación."
-
-msgctxt "voyager:v:"
-msgid ""
-"HINT: You are trying to sum a text type field, please try with a numeric "
-"type field or change the operation."
-msgstr ""
-"PISTA: Estás intentando sumar un campo de texto, por favor, prueba con un "
-"camp numérico o cambia el tipo de operación."
-
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid ""
 "HINT: You are trying to calculate percentile or median of a text type "
 "field, please try with a numeric type field or change the operation."
@@ -2758,254 +2690,109 @@ msgstr ""
 "texto, por favor, prueba con un campo numérico o cambia el tipo de "
 "operación."
 
-msgctxt "voyager:v:"
-msgid "Loading ..."
-msgstr "Cargando ..."
-
-msgctxt "voyager:v:"
-msgid "Max"
-msgstr "Máximo"
-
-msgctxt "voyager:v:"
-msgid "Maximum"
-msgstr "Máximo"
-
-msgctxt "voyager:v:"
-msgid "Measure fields"
-msgstr "Campos de medida"
-
-msgctxt "voyager:v:"
-msgid "Measure type"
-msgstr "Tipo de media"
-
-msgctxt "voyager:v:"
-msgid "Median"
-msgstr "Mediana"
-
-msgctxt "voyager:v:"
-msgid "Min"
-msgstr "Mínimo"
-
-msgctxt "voyager:v:"
-msgid "Minimum"
-msgstr "Mínimo"
-
-msgctxt "voyager:v:"
-msgid "Name"
-msgstr "Nombre"
-
-msgctxt "voyager:v:"
-msgid "No parameters defined for this table."
-msgstr "No se han definido parámetros para esta tabla."
-
-msgctxt "voyager:v:"
-msgid "Order fields"
-msgstr "Campos de orden"
-
-msgctxt "voyager:v:"
-msgid "Over Field"
-msgstr "Sobre el campo"
-
-msgctxt "voyager:v:"
-msgid "Page not found or you don't have access to it"
-msgstr "Página no encontrada o no tienes acceso a ella"
-
-msgctxt "voyager:v:"
-msgid "Page not found | Tryton"
-msgstr "Página no encontrada | Tryton"
-
-msgctxt "voyager:v:"
-msgid "Parameters"
-msgstr "Parámetros"
-
-msgctxt "voyager:v:"
-msgid "Percentile"
-msgstr "Percentil"
-
-msgctxt "voyager:v:"
-msgid "Pivot Table"
-msgstr "Tabla dinámica"
-
-msgctxt "voyager:v:"
-msgid "Properties"
-msgstr "Propiedades"
-
-msgctxt "voyager:v:"
-msgid "Record ID"
-msgstr "ID de registro"
-
-msgctxt "voyager:v:"
-msgid "Rows"
-msgstr "Filas"
-
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Clear configuration"
 msgstr "Limpiar configuración"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Hide sidebar"
 msgstr "Ocultar barra lateral"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Show sidebar"
 msgstr "Mostrar barra lateral"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Add row"
 msgstr "Añadir fila"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Add column"
 msgstr "Añadir columna"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Add property"
 msgstr "Añadir propiedad"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Add measure"
 msgstr "Añadir medida"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move row up"
 msgstr "Mover fila arriba"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move row down"
 msgstr "Mover fila abajo"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Remove row"
 msgstr "Eliminar fila"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move column up"
 msgstr "Mover columna arriba"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move column down"
 msgstr "Mover columna abajo"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Remove column"
 msgstr "Eliminar columna"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move property up"
 msgstr "Mover propiedad arriba"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move property down"
 msgstr "Mover propiedad abajo"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Remove property"
 msgstr "Eliminar propiedad"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move measure up"
 msgstr "Mover medida arriba"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move measure down"
 msgstr "Mover medida abajo"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Remove measure"
 msgstr "Eliminar medida"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Change order direction"
 msgstr "Cambiar dirección de ordenación"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move order up"
 msgstr "Mover orden arriba"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move order down"
 msgstr "Mover orden abajo"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Expand all"
 msgstr "Expandir todo"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Collapse all"
 msgstr "Colapsar todo"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Download"
 msgstr "Descargar"
 
-msgctxt "voyager:v:"
-msgid "Save Configuration"
-msgstr "Guardar configuración"
-
-msgctxt "voyager:v:"
-msgid "Search tables"
-msgstr "Tablas de búsqueda"
-
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Swap rows and columns"
 msgstr "Intercambiar filas y columnas"
-
-msgctxt "voyager:v:"
-msgid "Select a field to add:"
-msgstr "Seleccione un campo para agregar:"
-
-msgctxt "voyager:v:"
-msgid "Show more details"
-msgstr "Mostrar más detalles"
-
-msgctxt "voyager:v:"
-msgid "Sorry, we couldn’t find the page you’re looking for."
-msgstr "Lo sentimos, no pudimos encontrar la página que estás buscando."
-
-msgctxt "voyager:v:"
-msgid "Sum"
-msgstr "Suma"
-
-msgctxt "voyager:v:"
-msgid ""
-"Table has not been computed. Click on the 'Compute' button or wait until the"
-" process has finished. Also ensure there is no 'Errors' tab in the table."
-msgstr ""
-"La tabla no se ha calculado. Haz clic en el botón \"Calcular\" o espera a "
-"que finalice el proceso. Asegúrate también de que la tabla no tenga la "
-"pestaña \"Errores\"."
-
-msgctxt "voyager:v:"
-msgid "Tables"
-msgstr "Tablas"
-
-msgctxt "voyager:v:"
-msgid "Tags"
-msgstr "Etiquetas"
-
-msgctxt "voyager:v:"
-msgid "Up"
-msgstr "Arriba"
-
-msgctxt "voyager:v:"
-msgid ""
-"You need to select at least one measure and one row or one column to show "
-"the table."
-msgstr ""
-"Debe seleccionar al menos una medida y una fila o una columna para mostrar "
-"la tabla."
-
-msgctxt "voyager:v:"
-msgid "current data"
-msgstr "datos actuales"
-
-msgctxt "voyager:v:"
-msgid "data from %s"
-msgstr "datos del %s"
-
-msgctxt "voyager:v:"
-msgid "not calculated yet"
-msgstr "aún no calculado"
 
 msgctxt "wizard_button:babi.table.parametrize,start,create_table:"
 msgid "Create"
