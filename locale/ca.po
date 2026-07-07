@@ -1200,59 +1200,59 @@ msgstr ""
 "Marqueu-ho si voleu que aquest model estigui disponible pels informes "
 "Business Intelligence."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "404"
 msgstr "404"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Add"
 msgstr "Afegeix"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "All"
 msgstr "Tot"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Average"
 msgstr "Mitjana"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Cancel"
 msgstr "Cancel·la"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Close"
 msgstr "Tanca"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Columns"
 msgstr "Columnes"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Comma-separated IDs"
 msgstr "ID separats per comes"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Compute"
 msgstr "Càlcul"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Configuration"
 msgstr "Configuració"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Count"
 msgstr "Compte"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Down"
 msgstr "Avall"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Error building the cube:"
 msgstr "Error en construir el cub:"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid ""
 "HINT: You are trying to make average of a text type field, please try with a"
 " numeric type field or change the operation."
@@ -1260,7 +1260,7 @@ msgstr ""
 "CONSELL: Esteu intentant fer la mitjana d'un camp de tipus text. Proveu-ho "
 "amb un camp de tipus numèric o canvieu l'operació."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid ""
 "HINT: You are trying to sum a text type field, please try with a numeric "
 "type field or change the operation."
@@ -1268,111 +1268,111 @@ msgstr ""
 "CONSELL: Esteu intentant sumar un camp de tipus text. Si us plau, proveu-ho "
 "amb un camp de tipus numèric o canvieu l'operació."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Loading ..."
 msgstr "S'està carregant..."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Max"
 msgstr "Màxim"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Maximum"
 msgstr "Màxim"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Measure fields"
 msgstr "Camps de mesura"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Measure type"
 msgstr "Tipus de mesura"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Median"
 msgstr "Mediana"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Min"
 msgstr "Mín."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Minimum"
 msgstr "Mínim"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Name"
 msgstr "Nom"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "No parameters defined for this table."
 msgstr "No s'han definit paràmetres per a aquesta taula."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Order fields"
 msgstr "Camps de comanda"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Over Field"
 msgstr "Sobre el camp"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Page not found or you don't have access to it"
 msgstr "No s'ha trobat la pàgina o no hi teniu accés"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Page not found | Tryton"
 msgstr "Pàgina no trobada | Tryton"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Parameters"
 msgstr "Paràmetres"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Percentile"
 msgstr "Percentil"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Pivot Table"
 msgstr "Taula dinàmica"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Properties"
 msgstr "Propietats"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Record ID"
 msgstr "ID de registre"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Rows"
 msgstr "Files"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Save Configuration"
 msgstr "Desa la configuració"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Search tables"
 msgstr "Cerca taules"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Select a field to add:"
 msgstr "Seleccioneu un camp per afegir:"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Show more details"
 msgstr "Mostra més detalls"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Sorry, we couldn’t find the page you’re looking for."
 msgstr "Ho sentim, no hem pogut trobar la pàgina que busques."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Sum"
 msgstr "Suma"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid ""
 "Table has not been computed. Click on the 'Compute' button or wait until the"
 " process has finished. Also ensure there is no 'Errors' tab in the table."
@@ -1381,19 +1381,19 @@ msgstr ""
 "el procés hagi acabat. Assegureu-vos també que no hi hagi cap pestanya "
 "\"Errors\" a la taula."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Tables"
 msgstr "Taules"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Tags"
 msgstr "Etiquetes"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "Up"
 msgstr "Amunt"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid ""
 "You need to select at least one measure and one row or one column to show "
 "the table."
@@ -1401,15 +1401,15 @@ msgstr ""
 "Heu de seleccionar com a mínim una mesura i una fila o una columna per "
 "mostrar la taula."
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "current data"
 msgstr "dades actuals"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "data from %s"
 msgstr "dades de %s"
 
-msgctxt "html_report:h:"
+msgctxt "xgettext:x:"
 msgid "not calculated yet"
 msgstr "encara no calculat"
 
@@ -2680,75 +2680,7 @@ msgctxt "view:babi.widget:"
 msgid "Settings"
 msgstr "Configuració"
 
-msgctxt "voyager:v:"
-msgid "404"
-msgstr "404"
-
-msgctxt "voyager:v:"
-msgid "Add"
-msgstr "Afegeix"
-
-msgctxt "voyager:v:"
-msgid "All"
-msgstr "Tot"
-
-msgctxt "voyager:v:"
-msgid "Average"
-msgstr "Mitjana"
-
-msgctxt "voyager:v:"
-msgid "Cancel"
-msgstr "Cancel·la"
-
-msgctxt "voyager:v:"
-msgid "Close"
-msgstr "Tancar"
-
-msgctxt "voyager:v:"
-msgid "Columns"
-msgstr "Columnes"
-
-msgctxt "voyager:v:"
-msgid "Comma-separated IDs"
-msgstr "ID separats per comes"
-
-msgctxt "voyager:v:"
-msgid "Compute"
-msgstr "Calcula"
-
-msgctxt "voyager:v:"
-msgid "Configuration"
-msgstr "Configuració"
-
-msgctxt "voyager:v:"
-msgid "Count"
-msgstr "Comptador"
-
-msgctxt "voyager:v:"
-msgid "Down"
-msgstr "Avall"
-
-msgctxt "voyager:v:"
-msgid "Error building the cube:"
-msgstr "Error en construir el cub:"
-
-msgctxt "voyager:v:"
-msgid ""
-"HINT: You are trying to make average of a text type field, please try with a"
-" numeric type field or change the operation."
-msgstr ""
-"PISTA: Estàs intentat fer la mitjana d'un camp de text, si us plau, prova "
-"amb un camp numèric o canvia el tipus d'operació."
-
-msgctxt "voyager:v:"
-msgid ""
-"HINT: You are trying to sum a text type field, please try with a numeric "
-"type field or change the operation."
-msgstr ""
-"PISTA: Estàs intentant sumar un camp de text, si us plau, prova amb un camp "
-"numèric o canvia el tipus d'operació."
-
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid ""
 "HINT: You are trying to calculate percentile or median of a text type "
 "field, please try with a numeric type field or change the operation."
@@ -2756,254 +2688,109 @@ msgstr ""
 "PISTA: Estàs intentant calcular el percentil o la mediana d'un camp de "
 "text, si us plau, prova amb un camp numèric o canvia el tipus d'operació."
 
-msgctxt "voyager:v:"
-msgid "Loading ..."
-msgstr "Carregant ..."
-
-msgctxt "voyager:v:"
-msgid "Max"
-msgstr "Màx"
-
-msgctxt "voyager:v:"
-msgid "Maximum"
-msgstr "Màxim"
-
-msgctxt "voyager:v:"
-msgid "Measure fields"
-msgstr "Camps de mesura"
-
-msgctxt "voyager:v:"
-msgid "Measure type"
-msgstr "Tipus de mesura"
-
-msgctxt "voyager:v:"
-msgid "Median"
-msgstr "Mediana"
-
-msgctxt "voyager:v:"
-msgid "Min"
-msgstr "Min"
-
-msgctxt "voyager:v:"
-msgid "Minimum"
-msgstr "Mínim"
-
-msgctxt "voyager:v:"
-msgid "Name"
-msgstr "Nom"
-
-msgctxt "voyager:v:"
-msgid "No parameters defined for this table."
-msgstr "No s'han definit paràmetres per a aquesta taula."
-
-msgctxt "voyager:v:"
-msgid "Order fields"
-msgstr "Camps ordenació"
-
-msgctxt "voyager:v:"
-msgid "Over Field"
-msgstr "Sobre el camp"
-
-msgctxt "voyager:v:"
-msgid "Page not found or you don't have access to it"
-msgstr "No s'ha trobat la pàgina o no hi tens accés"
-
-msgctxt "voyager:v:"
-msgid "Page not found | Tryton"
-msgstr "No s'ha trobat la pàgina | Tryton"
-
-msgctxt "voyager:v:"
-msgid "Parameters"
-msgstr "Paràmetres"
-
-msgctxt "voyager:v:"
-msgid "Percentile"
-msgstr "Percentil"
-
-msgctxt "voyager:v:"
-msgid "Pivot Table"
-msgstr "Taula dinàmica"
-
-msgctxt "voyager:v:"
-msgid "Properties"
-msgstr "Propietats"
-
-msgctxt "voyager:v:"
-msgid "Record ID"
-msgstr "ID de registre"
-
-msgctxt "voyager:v:"
-msgid "Rows"
-msgstr "Files"
-
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Clear configuration"
 msgstr "Neteja la configuració"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Hide sidebar"
 msgstr "Amaga la barra lateral"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Show sidebar"
 msgstr "Mostra la barra lateral"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Add row"
 msgstr "Afegeix una fila"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Add column"
 msgstr "Afegeix una columna"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Add property"
 msgstr "Afegeix una propietat"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Add measure"
 msgstr "Afegeix una mesura"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move row up"
 msgstr "Mou la fila amunt"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move row down"
 msgstr "Mou la fila avall"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Remove row"
 msgstr "Elimina la fila"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move column up"
 msgstr "Mou la columna amunt"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move column down"
 msgstr "Mou la columna avall"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Remove column"
 msgstr "Elimina la columna"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move property up"
 msgstr "Mou la propietat amunt"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move property down"
 msgstr "Mou la propietat avall"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Remove property"
 msgstr "Elimina la propietat"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move measure up"
 msgstr "Mou la mesura amunt"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move measure down"
 msgstr "Mou la mesura avall"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Remove measure"
 msgstr "Elimina la mesura"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Change order direction"
 msgstr "Canvia la direcció de l'ordenació"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move order up"
 msgstr "Mou l'ordre amunt"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Move order down"
 msgstr "Mou l'ordre avall"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Expand all"
 msgstr "Expandeix-ho tot"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Collapse all"
 msgstr "Col·lapsa-ho tot"
 
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Download"
 msgstr "Descarrega"
 
-msgctxt "voyager:v:"
-msgid "Save Configuration"
-msgstr "Desa la configuració"
-
-msgctxt "voyager:v:"
-msgid "Search tables"
-msgstr "Cerca taules"
-
-msgctxt "voyager:v:"
+msgctxt "xgettext:x:"
 msgid "Swap rows and columns"
 msgstr "Intercanvia files i columnes"
-
-msgctxt "voyager:v:"
-msgid "Select a field to add:"
-msgstr "Seleccioneu un camp per afegir:"
-
-msgctxt "voyager:v:"
-msgid "Show more details"
-msgstr "Mostrar més detalls"
-
-msgctxt "voyager:v:"
-msgid "Sorry, we couldn’t find the page you’re looking for."
-msgstr "Ho sentim, no hem pogut trobar la pàgina que estàs cercant."
-
-msgctxt "voyager:v:"
-msgid "Sum"
-msgstr "Suma"
-
-msgctxt "voyager:v:"
-msgid ""
-"Table has not been computed. Click on the 'Compute' button or wait until the"
-" process has finished. Also ensure there is no 'Errors' tab in the table."
-msgstr ""
-"La taula no s'ha calculat. Fes clic al botó \"Calcula\" o espera fins que el"
-" procés hagi acabat. Assegura't també que no hi hagi cap pestanya \"Errors\""
-" a la taula."
-
-msgctxt "voyager:v:"
-msgid "Tables"
-msgstr "Taules"
-
-msgctxt "voyager:v:"
-msgid "Tags"
-msgstr "Etiquetes"
-
-msgctxt "voyager:v:"
-msgid "Up"
-msgstr "Amunt"
-
-msgctxt "voyager:v:"
-msgid ""
-"You need to select at least one measure and one row or one column to show "
-"the table."
-msgstr ""
-"Heu de seleccionar almenys una mesura i una fila o una columna per mostrar "
-"la taula."
-
-msgctxt "voyager:v:"
-msgid "current data"
-msgstr "dades actuals"
-
-msgctxt "voyager:v:"
-msgid "data from %s"
-msgstr "dades del %s"
-
-msgctxt "voyager:v:"
-msgid "not calculated yet"
-msgstr "encara no calculat"
 
 msgctxt "wizard_button:babi.table.parametrize,start,create_table:"
 msgid "Create"
