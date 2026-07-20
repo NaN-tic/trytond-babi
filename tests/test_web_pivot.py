@@ -3,7 +3,7 @@ import logging
 from unittest.mock import patch
 from playwright.sync_api import expect, sync_playwright
 from trytond import backend
-from trytond.config import config
+import trytond.config as config
 from trytond.modules.voyager.tests.tools import WebTestCase
 from proteus import Model
 from trytond.modules.company.tests.tools import create_company, get_company

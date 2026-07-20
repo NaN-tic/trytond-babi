@@ -17,7 +17,7 @@ from trytond.model.fields import depends
 from trytond.pyson import Bool, Eval, Not, PYSONDecoder
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
-from trytond.config import config as config_
+import trytond.config as config_
 from .babi_eval import babi_eval
 from trytond.i18n import gettext
 from trytond.exceptions import UserError, UserWarning

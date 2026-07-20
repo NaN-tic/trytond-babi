@@ -39,7 +39,7 @@ from trytond.model.exceptions import ValidationError
 from trytond.i18n import gettext
 from trytond.pyson import Bool, Eval, In, Not, PYSONEncoder
 from trytond.url import http_host
-from trytond.config import config
+import trytond.config as config
 from trytond.modules.company.model import (
     employee_field, reset_employee, set_employee)
 from trytond.report import Report
