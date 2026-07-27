@@ -22,7 +22,7 @@ contains the full copyright notices and license terms. -->
             <field name="name">Business Intelligence Table</field>
         </record>
         <record model="res.group" id="group_babi_table_compute">
-            <field name="name">Business Intelligence Compute Table</field>
+            <field name="name">Allow calculating tables</field>
         </record>
 
         <!-- babi.expression -->

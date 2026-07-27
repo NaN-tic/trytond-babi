@@ -1713,8 +1713,8 @@ msgid "Business Intelligence Table"
 msgstr "Taula de Business Intelligence"
 
 msgctxt "model:res.group,name:group_babi_table_compute"
-msgid "Business Intelligence Compute Table"
-msgstr "Taula de càlcul de Business Intelligence"
+msgid "Allow calculating tables"
+msgstr "Permetre calcular taules"
 
 msgctxt "model:www.download_report,name:"
 msgid "Download Report"
