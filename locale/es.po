@@ -1713,6 +1713,10 @@ msgctxt "model:res.group,name:group_babi_table"
 msgid "Business Intelligence Table"
 msgstr "Tabla de Business Intelligence"
 
+msgctxt "model:res.group,name:group_babi_table_compute"
+msgid "Allow calculating tables"
+msgstr "Permitir calcular tablas"
+
 msgctxt "model:www.download_report,name:"
 msgid "Download Report"
 msgstr "Descargar informe"
