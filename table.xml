@@ -151,6 +151,14 @@
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
+        <record model="ir.model.access" id="access_babi_table_babi_table_compute">
+            <field name="model">babi.table</field>
+            <field name="group" ref="group_babi_table_compute"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
 
         <record model="ir.rule.group" id="rule_group_babi_table">
             <field name="name">Babi Table</field>
@@ -175,6 +183,14 @@
             <field name="name">compute</field>
             <field name="string">Compute</field>
             <field name="model">babi.table</field>
+        </record>
+        <record model="ir.model.button-res.group" id="babi_table_calculate_button_group_babi_admin">
+            <field name="button" ref="babi_table_calculate_button"/>
+            <field name="group" ref="group_babi_admin"/>
+        </record>
+        <record model="ir.model.button-res.group" id="babi_table_calculate_button_group_babi_table_compute">
+            <field name="button" ref="babi_table_calculate_button"/>
+            <field name="group" ref="group_babi_table_compute"/>
         </record>
         <record model="ir.model.button" id="babi_table_calculate_warning_button">
             <field name="name">compute_warning</field>
@@ -426,6 +442,14 @@
         <record model="ir.action.wizard" id="table_parametrize_wizard">
             <field name="name">Parametrize Table</field>
             <field name="wiz_name">babi.table.parametrize</field>
+        </record>
+        <record model="ir.action-res.group" id="table_parametrize_wizard_group_babi_admin">
+            <field name="action" ref="table_parametrize_wizard"/>
+            <field name="group" ref="group_babi_admin"/>
+        </record>
+        <record model="ir.action-res.group" id="table_parametrize_wizard_group_babi_table_compute">
+            <field name="action" ref="table_parametrize_wizard"/>
+            <field name="group" ref="group_babi_table_compute"/>
         </record>
 
         <record model="ir.action.act_window" id="act_babi_table_parametrized">

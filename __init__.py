@@ -38,6 +38,7 @@ def register():
         table.TableQueryParameter,
         table.TableTag,
         table.TableTagRelation,
+        table.ParametrizeTableStart,
         table.Cluster,
         table.Table,
         table.Field,
