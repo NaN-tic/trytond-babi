@@ -2089,6 +2089,14 @@ msgctxt "model:www.download_report,string:"
 msgid "Component"
 msgstr "Componente"
 
+msgctxt "model:res.group,name:group_babi_table_compute"
+msgid "Allow calculating tables"
+msgstr "Permitir calcular tablas"
+
+msgctxt "model:www.download_report,name:"
+msgid "Download Report"
+msgstr "Descargar informe"
+
 msgctxt "model:www.index.pivot,string:"
 msgid "Component"
 msgstr "Componente"

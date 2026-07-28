@@ -6,6 +6,7 @@ import queue
 import time
 import traceback
 import datetime as mdatetime
+from contextlib import nullcontext
 from datetime import date, datetime, time as dt_time, timedelta
 import logging
 import sql
@@ -30,7 +31,7 @@ from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from simpleeval import EvalWithCompoundTypes
 from trytond import backend
 from trytond.bus import notify
-from trytond.transaction import Transaction
+from trytond.transaction import Transaction, without_check_access
 from trytond.pool import Pool
 from trytond.model import (Exclude, Model, ModelView, ModelSQL, fields,
     Unique, DeactivableMixin, sequence_ordered, Workflow)
@@ -805,6 +806,25 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         return 'xlsx'
 
     @classmethod
+    def _compute_access_context(cls):
+        pool = Pool()
+        ModelAccess = pool.get('ir.model.access')
+        ModelData = pool.get('ir.model.data')
+        User = pool.get('res.user')
+
+        transaction = Transaction()
+        if not transaction.user or ModelAccess.check(
+                cls.__name__, 'write', raise_exception=False):
+            return nullcontext()
+
+        group_babi_table_compute = ModelData.get_id(
+            'babi', 'group_babi_table_compute')
+        user = User(transaction.user)
+        if any(group.id == group_babi_table_compute for group in user.groups):
+            return without_check_access()
+        return nullcontext()
+
+    @classmethod
     def __setup__(cls):
         super().__setup__()
         cls._order.insert(0, ('name', 'ASC'))
@@ -1242,7 +1262,6 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         pool = Pool()
         ModelData = pool.get('ir.model.data')
         Action = pool.get('ir.action')
-
         for table in tables:
             if ((table.filter and table.filter.parameters
                     and not table.parameters)
@@ -1444,60 +1463,60 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         raise TimeoutException
 
     def _compute(self, compute_warnings=False, cluster=False):
-        self.clear_cache([self])
-        start_time = time.time()
-        try:
-            if self.type == 'model':
-                if not self.fields_:
-                    raise UserError(gettext('babi.msg_table_no_fields',
-                            table=self.name))
-                self._compute_model()
-            elif self.type == 'table':
-                self._compute_table()
-            elif self.type == 'view':
-                self._compute_view()
+        with self.__class__._compute_access_context():
+            self.clear_cache([self])
+            start_time = time.time()
+            try:
+                if self.type == 'model':
+                    if not self.fields_:
+                        raise UserError(gettext('babi.msg_table_no_fields',
+                                table=self.name))
+                    self._compute_model()
+                elif self.type == 'table':
+                    self._compute_table()
+                elif self.type == 'view':
+                    self._compute_view()
 
-        except Exception as e:
-            # In case there is a create view error or SQL typo,
-            # we do rollback to obtain a value from the gettext()
-            Transaction().connection.rollback()
-            notify(gettext('babi.msg_table_failed', table=self.rec_name))
-            self.compute_error = f'{e}\n{traceback.format_exc()}'
-            self.save()
+            except Exception as e:
+                # In case there is a create view error or SQL typo,
+                # we do rollback to obtain a value from the gettext()
+                Transaction().connection.rollback()
+                notify(gettext('babi.msg_table_failed', table=self.rec_name))
+                self.compute_error = f'{e}\n{traceback.format_exc()}'
+                self.save()
+                if cluster and self.cluster:
+                    self.cluster.computation_end_date = datetime.now()
+                    self.cluster.computation_state = 'failed'
+                    self.cluster.save()
+                return
+
             if cluster and self.cluster:
-                self.cluster.computation_end_date = datetime.now()
-                self.cluster.computation_state = 'failed'
-                self.cluster.save()
-            return
+                next_ = self.get_next_in_cluster()
+                if next_:
+                    next_.cluster_date = self.cluster_date
+                    next_.save()
+                    self.__class__.__queue__._compute(next_,
+                        compute_warnings=compute_warnings, cluster=cluster)
+                else:
+                    self.cluster.computation_end_date = datetime.now()
+                    self.cluster.computation_state = 'successful'
+                    self.cluster.save()
 
-        if cluster and self.cluster:
-            next_ = self.get_next_in_cluster()
-            if next_:
-                next_.cluster_date = self.cluster_date
-                next_.save()
-                self.__class__.__queue__._compute(next_,
-                    compute_warnings=compute_warnings, cluster=cluster)
-            else:
-                self.cluster.computation_end_date = datetime.now()
-                self.cluster.computation_state = 'successful'
-                self.cluster.save()
-
-        self.compute_error = None
-        self.compute_warning_error = None
-        end_time = time.time()
-        self.save()
-        notify(gettext('babi.msg_table_successful', table=self.rec_name))
-        self.calculation_date = datetime.now()
-        self.calculation_time = round(end_time - start_time,
-            self.__class__.calculation_time.digits[1])
-        self.save()
-        if compute_warnings:
-            self.__class__.__queue__.compute_warnings(self)
+            self.compute_error = None
+            self.compute_warning_error = None
+            end_time = time.time()
+            self.save()
+            notify(gettext('babi.msg_table_successful', table=self.rec_name))
+            self.calculation_date = datetime.now()
+            self.calculation_time = round(end_time - start_time,
+                self.__class__.calculation_time.digits[1])
+            self.save()
+            if compute_warnings:
+                self.__class__.__queue__.compute_warnings(self)
 
     def compute_warnings(self):
         pool = Pool()
         Warning = pool.get('babi.warning')
-
         self.compute_warning_error = None
         self.save()
         query = self.get_query()
@@ -3072,7 +3091,7 @@ class OpenExecutionFiltered(StateView):
                 Button('Cancel', 'end', 'tryton-cancel'),
                 Button('Create', 'create_table', 'tryton-ok', True),
                 ]
-        super().__init__('babi.table', 0, buttons)
+        super().__init__('babi.table.parametrize.start', 0, buttons)
 
     def get_view(self, wizard, state_name):
         pool = Pool()
@@ -3086,7 +3105,7 @@ class OpenExecutionFiltered(StateView):
         result = {}
         result['type'] = 'form'
         result['view_id'] = None
-        result['model'] = 'babi.table'
+        result['model'] = 'babi.table.parametrize.start'
         result['field_childs'] = None
         fields = {}
         parameter2report = {}
@@ -3189,6 +3208,11 @@ class CustomDict(dict):
 
     def __setattr__(self, name, value):
         self[name] = value
+
+
+class ParametrizeTableStart(ModelView):
+    'Babi Parametrize Table Start'
+    __name__ = 'babi.table.parametrize.start'
 
 
 class ParametrizeTable(Wizard):

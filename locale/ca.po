@@ -2088,6 +2088,14 @@ msgctxt "model:www.download_report,string:"
 msgid "Component"
 msgstr "Component"
 
+msgctxt "model:res.group,name:group_babi_table_compute"
+msgid "Allow calculating tables"
+msgstr "Permetre calcular taules"
+
+msgctxt "model:www.download_report,name:"
+msgid "Download Report"
+msgstr "Descarrega l'informe"
+
 msgctxt "model:www.index.pivot,string:"
 msgid "Component"
 msgstr "Component"
