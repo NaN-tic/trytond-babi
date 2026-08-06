@@ -4,6 +4,7 @@ import hashlib
 import json
 import base64
 import openpyxl
+import re
 import sql
 from collections import defaultdict
 from datetime import datetime, date, timedelta
@@ -122,6 +123,9 @@ class Percentile(sql.aggregate.Aggregate):
 
 class Cube:
     EXPAND_ALL = [('all',)]
+    _percentile_cont_re = re.compile(
+        r'PERCENTILE_CONT\(\s*([^,]+?)\s*,\s*([^)]+?)\s*\)',
+        re.IGNORECASE)
 
     def __init__(self, table=None, rows=None, columns=None, measures=None,
             properties=None, order=None, row_expansions=None,
@@ -208,6 +212,8 @@ class Cube:
     def get_data(self, query, orderby):
         cursor = Transaction().connection.cursor()
         query_string, params = tuple(query)
+        if backend.name == 'postgresql':
+            query_string = self._rewrite_percentile_cont(query_string)
 
         cursor.execute('SAVEPOINT babi_cube')
         try:
@@ -249,6 +255,15 @@ class Cube:
             cursor.execute('ROLLBACK TO SAVEPOINT babi_cube')
             raise
         return records
+
+    @classmethod
+    def _rewrite_percentile_cont(cls, query_string):
+        def repl(match):
+            percentile = match.group(1).strip()
+            expression = match.group(2).strip()
+            return ('PERCENTILE_CONT(%s) WITHIN GROUP (ORDER BY %s)'
+                % (percentile, expression))
+        return cls._percentile_cont_re.sub(repl, query_string)
 
     def get_query_list(self, list):
         '''
