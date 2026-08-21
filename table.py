@@ -1568,30 +1568,33 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                     % (self.model.name, count, checker.elapsed))
 
                 to_insert = []
-                for record in records:
-                    if python_filter:
-                        if not babi_eval(python_filter, record, convert_none=None):
-                            continue
-                    values = []
-                    for expression, ttype, digits in expressions:
-                        try:
-                            values.append(babi_eval(expression, record,
-                                    convert_none=None, digits=digits, ttype=ttype))
-                        except Exception as message:
-                            notify(gettext('babi.msg_compute_table_exception',
-                                    table=self.name, field=field.name,
-                                    record=record.id, error=repr(message)),
-                                priority=1)
-                            if self.babi_raise_user_error:
-                                raise UserError(gettext(
-                                    'babi.msg_compute_table_exception',
-                                    table=self.name,
-                                    field=field.name,
-                                    record=record.id,
-                                    error=repr(message)))
-                            raise
+                with Transaction().set_context(**context):
+                    for record in records:
+                        if python_filter:
+                            if not babi_eval(python_filter, record,
+                                    convert_none=None):
+                                continue
+                        values = []
+                        for expression, ttype, digits in expressions:
+                            try:
+                                values.append(babi_eval(expression, record,
+                                        convert_none=None, digits=digits,
+                                        ttype=ttype))
+                            except Exception as message:
+                                notify(gettext('babi.msg_compute_table_exception',
+                                        table=self.name, field=field.name,
+                                        record=record.id, error=repr(message)),
+                                    priority=1)
+                                if self.babi_raise_user_error:
+                                    raise UserError(gettext(
+                                        'babi.msg_compute_table_exception',
+                                        table=self.name,
+                                        field=field.name,
+                                        record=record.id,
+                                        error=repr(message)))
+                                raise
 
-                    to_insert.append(values)
+                        to_insert.append(values)
 
                 if to_insert:
                     cursor.execute(*table.insert(columns=columns, values=to_insert))
