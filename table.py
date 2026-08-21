@@ -1753,12 +1753,14 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 logger.info('Calculated %s, %s records in %s seconds'
                     % (self.model.name, count, checker.elapsed))
 
-                try:
-                    to_insert = compute_model_insert_values(records,
-                        python_filter, expression_specs, batch_expressions,
-                        batch_digits, batch_ttypes)
-                except ModelComputeFieldError as error:
-                    self._handle_model_compute_field_error(error)
+                with Transaction().set_context(**context):
+                    try:
+                        to_insert = compute_model_insert_values(records,
+                            python_filter, expression_specs, batch_expressions,
+                            batch_digits, batch_ttypes)
+                    except ModelComputeFieldError as error:
+                        self._handle_model_compute_field_error(error)
+
                 if to_insert:
                     cursor.execute(*table.insert(columns=columns,
                             values=to_insert))
