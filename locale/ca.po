@@ -1214,7 +1214,7 @@ msgstr "Tot"
 
 msgctxt "xgettext:x:"
 msgid "Average"
-msgstr "Mitjana"
+msgstr "Valor mitjà"
 
 msgctxt "xgettext:x:"
 msgid "Cancel"
@@ -2298,7 +2298,7 @@ msgstr "Numèric"
 
 msgctxt "selection:babi.pivot.measure,aggregate:"
 msgid "Average"
-msgstr "Mitjana"
+msgstr "Valor mitjà"
 
 msgctxt "selection:babi.pivot.measure,aggregate:"
 msgid "Count"
@@ -2546,7 +2546,7 @@ msgstr "Valor"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Average"
-msgstr "Mitjana"
+msgstr "Valor mitjà"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Count"
@@ -2558,7 +2558,7 @@ msgstr "Màxim"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Median"
-msgstr "Mitjana"
+msgstr "Mediana"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Minimum"

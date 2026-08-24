@@ -1214,7 +1214,7 @@ msgstr "Todo"
 
 msgctxt "xgettext:x:"
 msgid "Average"
-msgstr "Promedio"
+msgstr "Media"
 
 msgctxt "xgettext:x:"
 msgid "Cancel"
@@ -2299,7 +2299,7 @@ msgstr "Numérico"
 
 msgctxt "selection:babi.pivot.measure,aggregate:"
 msgid "Average"
-msgstr "Promedio"
+msgstr "Media"
 
 msgctxt "selection:babi.pivot.measure,aggregate:"
 msgid "Count"
@@ -2547,7 +2547,7 @@ msgstr "Valor"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Average"
-msgstr "Promedio"
+msgstr "Media"
 
 msgctxt "selection:babi.widget.parameter,aggregate:"
 msgid "Count"
