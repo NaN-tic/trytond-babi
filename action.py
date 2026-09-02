@@ -13,21 +13,29 @@ class _ChartValidator:
     def __init__(self, validator):
         self._validator = validator
 
+    def _base_validator(self):
+        validator = self._validator
+        while hasattr(validator, '_validator'):
+            validator = validator._validator
+        return validator
+
     def _prepare_tree(self, tree):
         tree = etree.fromstring(etree.tostring(tree))
         for field in tree.xpath('.//field[@widget="chart"]'):
             field.set('widget', 'text')
+        if hasattr(self._validator, '_prepare_tree'):
+            tree = self._validator._prepare_tree(tree)
         return tree
 
     def validate(self, tree):
-        return self._validator.validate(self._prepare_tree(tree))
+        return self._base_validator().validate(self._prepare_tree(tree))
 
     def assertValid(self, tree):
-        return self._validator.assertValid(self._prepare_tree(tree))
+        return self._base_validator().assertValid(self._prepare_tree(tree))
 
     @property
     def error_log(self):
-        return self._validator.error_log
+        return self._base_validator().error_log
 
 
 class View(metaclass=PoolMeta):
@@ -36,7 +44,8 @@ class View(metaclass=PoolMeta):
     @classmethod
     def _validator(cls, type_):
         validator = super()._validator(type_)
-        if type_ in {'form', 'list-form'}:
+        if type_ in {'form', 'list-form'} and not isinstance(
+                validator, _ChartValidator):
             validator = _ChartValidator(validator)
             key = (cls.__name__, type_)
             validator = cls._get_validator_cache.set(key, validator)
