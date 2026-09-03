@@ -13,29 +13,32 @@ class _ChartValidator:
     def __init__(self, validator):
         self._validator = validator
 
-    def _base_validator(self):
-        validator = self._validator
-        while hasattr(validator, '_validator'):
-            validator = validator._validator
-        return validator
-
     def _prepare_tree(self, tree):
         tree = etree.fromstring(etree.tostring(tree))
         for field in tree.xpath('.//field[@widget="chart"]'):
             field.set('widget', 'text')
-        if hasattr(self._validator, '_prepare_tree'):
-            tree = self._validator._prepare_tree(tree)
         return tree
 
+    def _validate_tree(self, tree, method):
+        validator = self._validator
+        tree = self._prepare_tree(tree)
+        while hasattr(validator, '_validator'):
+            tree = validator._prepare_tree(tree)
+            validator = validator._validator
+        return getattr(validator, method)(tree)
+
     def validate(self, tree):
-        return self._base_validator().validate(self._prepare_tree(tree))
+        return self._validate_tree(tree, 'validate')
 
     def assertValid(self, tree):
-        return self._base_validator().assertValid(self._prepare_tree(tree))
+        return self._validate_tree(tree, 'assertValid')
 
     @property
     def error_log(self):
-        return self._base_validator().error_log
+        validator = self._validator
+        while hasattr(validator, '_validator'):
+            validator = validator._validator
+        return validator.error_log
 
 
 class View(metaclass=PoolMeta):
