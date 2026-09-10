@@ -3,6 +3,7 @@
 from decimal import Decimal
 import datetime
 from functools import lru_cache
+from itertools import combinations
 import math
 from dateutil.relativedelta import relativedelta
 from simpleeval import EvalWithCompoundTypes
@@ -89,6 +90,12 @@ FUNCTIONS = {
     'float': float,
     'any': any,
     'all': all,
+    'combinations': combinations,
+    'range': range,
+    'len': len,
+    'sorted': sorted,
+    'set': set,
+    'list': list,
     'sum': sum,
     'min': min,
     'max': max,
