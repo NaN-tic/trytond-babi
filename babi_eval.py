@@ -87,6 +87,8 @@ FUNCTIONS = {
     'date': date,
     'int': int,
     'float': float,
+    'any': any,
+    'all': all,
     'sum': sum,
     'min': min,
     'max': max,
