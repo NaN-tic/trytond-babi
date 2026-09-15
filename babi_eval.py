@@ -88,6 +88,7 @@ FUNCTIONS = {
     'date': date,
     'int': int,
     'float': float,
+    'abs': abs,
     'any': any,
     'all': all,
     'combinations': combinations,
