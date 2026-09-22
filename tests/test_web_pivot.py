@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 class TestPivot(WebTestCase):
     modules = ['babi']
+    # Loading the pivot also waits for HTMX and Tailwind from external CDNs.
+    navigation_timeout = 120_000
 
     @classmethod
     def setUpClass(self):
@@ -78,6 +80,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -148,6 +151,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -181,6 +185,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -224,6 +229,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -270,6 +276,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -325,6 +332,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -399,6 +407,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(pivot_url)
             page.wait_for_load_state('load')
@@ -421,6 +430,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -532,6 +542,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -584,6 +595,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/__user/null')
             page.wait_for_load_state('load')
@@ -657,6 +669,7 @@ class TestPivot(WebTestCase):
                     "password": self.password,
                 }
             )
+            context.set_default_navigation_timeout(self.navigation_timeout)
             page = context.new_page()
             page.goto(f'{self.base_url}/{self.database}/babi/pivot/'
                 f'{param_table.table_name}/null')
