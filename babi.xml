@@ -6,16 +6,8 @@ contains the full copyright notices and license terms. -->
         <record model="res.group" id="group_babi_admin">
             <field name="name">Business Intelligence Administration</field>
         </record>
-        <record model="res.user-res.group" id="user_admin_group_babi_admin">
-            <field name="user" ref="res.user_admin"/>
-            <field name="group" ref="group_babi_admin"/>
-        </record>
         <record model="res.group" id="group_babi">
             <field name="name">Business Intelligence</field>
-        </record>
-        <record model="res.user-res.group" id="user_admin_group_babi">
-            <field name="user" ref="res.user_admin"/>
-            <field name="group" ref="group_babi"/>
         </record>
 
         <record model="res.group" id="group_babi_table">
