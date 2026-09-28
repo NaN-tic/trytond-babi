@@ -130,6 +130,7 @@ class Menu(metaclass=PoolMeta):
     def _get_action(cls, action_id):
         pool = Pool()
         Action = pool.get('ir.action')
+        ActionDashboard = pool.get('babi.action.dashboard')
         action = Action(action_id)
         if action.type == 'babi.action.dashboard':
             action = ActionDashboard(action_id)
