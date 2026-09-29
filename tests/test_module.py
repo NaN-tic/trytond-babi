@@ -381,6 +381,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
         pool = Pool()
         Table = pool.get('babi.table')
         TableExcel = pool.get('babi.table.excel', type='report')
+        User = pool.get('res.user')
 
         table = Table()
         table.type = 'view'
@@ -413,6 +414,7 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
                     TRUE AS bool_value,                    -- bool
                     NULL AS null_value;
                 """
+        table.access_users = [User(Transaction().user)]
         table.save()
         table._compute()
         Transaction().commit()

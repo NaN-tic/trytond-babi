@@ -798,6 +798,12 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         return config.default_timeout or 30
 
     @staticmethod
+    def default_access_users():
+        if Transaction().user:
+            return [Transaction().user]
+        return []
+
+    @staticmethod
     def default_preview_limit():
         return 10
 
@@ -844,6 +850,15 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                     },
                 'clear_cache': {},
                 })
+
+    @classmethod
+    def index_set_field(cls, name):
+        index = super().index_set_field(name)
+        if name in {'access_users', 'access_groups'}:
+            # Children inherit the table access rules through ``table``.
+            # Grant access to the table before creating those children.
+            index -= 1
+        return index
 
     @classmethod
     def __register__(cls, module_name):
@@ -931,7 +946,30 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         default.setdefault('user_field')
         default.setdefault('employee_field')
         default.setdefault('company_field')
+
+        for name in {
+                'compute_error', 'compute_warning_error', 'cluster_date',
+                'calculation_date', 'calculation_time',
+                'last_warning_execution'}:
+            default[name] = None
+        for name in {'parameters', 'base_table', 'parametrized_user'}:
+            default.setdefault(name)
+
+        readonly_defaults = {}
+        for name in {'parameters', 'base_table', 'parametrized_user'}:
+            if default[name] is not None:
+                readonly_defaults[name] = default.pop(name)
+
         new_tables = super().copy(tables, default=default)
+        if readonly_defaults:
+            with without_check_access():
+                for old, new in zip(tables, new_tables):
+                    values = {
+                        name: value(old) if callable(value) else value
+                        for name, value in readonly_defaults.items()
+                        }
+                    cls.write([new], values)
+
         to_save = []
         for old, new in zip(tables, new_tables):
             rel = {x.internal_name: x for x in new.fields_}
@@ -1277,7 +1315,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 table.compute_warning_error = None
                 table.calculation_date = None
                 table.calculation_time = None
-                table.save()
+                with without_check_access():
+                    table.save()
                 table.clear_cache([table])
                 table._drop()
                 action_id = Action.get_action_id(ModelData.get_id('babi',
@@ -1483,34 +1522,40 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
                 Transaction().connection.rollback()
                 notify(gettext('babi.msg_table_failed', table=self.rec_name))
                 self.compute_error = f'{e}\n{traceback.format_exc()}'
-                self.save()
+                with without_check_access():
+                    self.save()
                 if cluster and self.cluster:
                     self.cluster.computation_end_date = datetime.now()
                     self.cluster.computation_state = 'failed'
-                    self.cluster.save()
+                    with without_check_access():
+                        self.cluster.save()
                 return
 
             if cluster and self.cluster:
                 next_ = self.get_next_in_cluster()
                 if next_:
                     next_.cluster_date = self.cluster_date
-                    next_.save()
+                    with without_check_access():
+                        next_.save()
                     self.__class__.__queue__._compute(next_,
                         compute_warnings=compute_warnings, cluster=cluster)
                 else:
                     self.cluster.computation_end_date = datetime.now()
                     self.cluster.computation_state = 'successful'
-                    self.cluster.save()
+                    with without_check_access():
+                        self.cluster.save()
 
             self.compute_error = None
             self.compute_warning_error = None
             end_time = time.time()
-            self.save()
+            with without_check_access():
+                self.save()
             notify(gettext('babi.msg_table_successful', table=self.rec_name))
             self.calculation_date = datetime.now()
             self.calculation_time = round(end_time - start_time,
                 self.__class__.calculation_time.digits[1])
-            self.save()
+            with without_check_access():
+                self.save()
             if compute_warnings:
                 self.__class__.__queue__.compute_warnings(self)
 
@@ -1518,7 +1563,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
         pool = Pool()
         Warning = pool.get('babi.warning')
         self.compute_warning_error = None
-        self.save()
+        with without_check_access():
+            self.save()
         query = self.get_query()
         if query:
             user_id = None
@@ -1568,7 +1614,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
 
         to_create = []
         self.last_warning_execution = datetime.now()
-        self.save()
+        with without_check_access():
+            self.save()
         cursor = Transaction().connection.cursor()
         cursor.execute(query_full)
         query_last = cursor.fetchall()
@@ -1595,7 +1642,8 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             except (UserError, ValidationError, psycopg.Error) as e:
                 Transaction().connection.rollback()
                 self.compute_warning_error = f'{e}\n{traceback.format_exc()}'
-                self.save()
+                with without_check_access():
+                    self.save()
 
     def update_fields(self, field_names):
         pool = Pool()
