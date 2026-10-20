@@ -88,6 +88,8 @@ FUNCTIONS = {
     'date': date,
     'int': int,
     'float': float,
+    'round': round,
+    'ceil': math.ceil,
     'abs': abs,
     'any': any,
     'all': all,
