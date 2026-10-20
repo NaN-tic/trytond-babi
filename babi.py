@@ -16,7 +16,7 @@ from trytond.model import DeactivableMixin, ModelSQL, ModelView, fields
 from trytond.model.fields import depends
 from trytond.pyson import Bool, Eval, Not, PYSONDecoder
 from trytond.pool import Pool, PoolMeta
-from trytond.transaction import Transaction
+from trytond.transaction import Transaction, without_check_access
 import trytond.config as config_
 from .babi_eval import babi_eval
 from trytond.i18n import gettext
@@ -209,16 +209,27 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
     def write(cls, *args):
         args = [x.copy() for x in args]
         actions = iter(args)
+        reset_args = []
         for filters, values in zip(actions, actions):
+            reset_values = {}
             if 'python_expression' in values:
-                values.setdefault('checked', False)
-                values.setdefault('expression_error')
+                if 'checked' not in values:
+                    reset_values['checked'] = False
+                if 'expression_error' not in values:
+                    reset_values['expression_error'] = None
             if 'domain' in values:
-                values.setdefault('checked', False)
-                values.setdefault('domain_error')
-            if 'context' in values:
-                values.setdefault('checked', False)
+                if 'checked' not in values:
+                    reset_values['checked'] = False
+                if 'domain_error' not in values:
+                    reset_values['domain_error'] = None
+            if 'context' in values and 'checked' not in values:
+                reset_values['checked'] = False
+            if reset_values:
+                reset_args.extend((filters, reset_values))
         super().write(*args)
+        if reset_args:
+            with without_check_access():
+                super().write(*reset_args)
 
     @classmethod
     @ModelView.button
@@ -412,11 +423,20 @@ class Expression(DeactivableMixin, ModelSQL, ModelView):
     def write(cls, *args):
         args = [x.copy() for x in args]
         actions = iter(args)
-        for filters, values in zip(actions, actions):
+        reset_args = []
+        for expressions, values in zip(actions, actions):
             if 'expression' in values:
-                values.setdefault('checked', False)
-                values.setdefault('error')
+                reset_values = {}
+                if 'checked' not in values:
+                    reset_values['checked'] = False
+                if 'error' not in values:
+                    reset_values['error'] = None
+                if reset_values:
+                    reset_args.extend((expressions, reset_values))
         super().write(*args)
+        if reset_args:
+            with without_check_access():
+                super().write(*reset_args)
 
     @depends('model')
     def on_change_with_fields(self, name=None):
