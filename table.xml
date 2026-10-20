@@ -166,11 +166,11 @@
             <field name="global_p" eval="False"/>
         </record>
         <record model="ir.rule" id="rule_babi_table_access_users">
-            <field name="domain" eval="[('access_users', '=', Eval('user_id', -1))]" pyson="1"/>
+            <field name="domain" eval="[If(~Eval('is_administrator', False), ('access_users', '=', Eval('user_id', -1)), ())]" pyson="1"/>
             <field name="rule_group" ref="rule_group_babi_table"/>
         </record>
         <record model="ir.rule" id="rule_babi_table_access_groups">
-            <field name="domain" eval="[('access_groups', 'in', Eval('groups', [-1]))]" pyson="1"/>
+            <field name="domain" eval="[If(~Eval('is_administrator', False), ('access_groups', 'in', Eval('groups', [-1])), ())]" pyson="1"/>
             <field name="rule_group" ref="rule_group_babi_table"/>
         </record>
         <record model="ir.rule.group-res.group" id="rule_group_babi_table-group_babi">

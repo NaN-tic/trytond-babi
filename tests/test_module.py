@@ -13,6 +13,7 @@ from openpyxl import load_workbook
 from lxml import etree
 from trytond import backend
 from trytond.model.exceptions import ValidationError
+from trytond.model.modelstorage import AccessError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
@@ -36,6 +37,46 @@ class BabiCompanyTestMixin(CompanyTestMixin):
 class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
     'Test Babi module'
     module = 'babi'
+
+    @with_transaction()
+    def test_table_access_rule_administrator(self):
+        "Administrator is not restricted by table access lists"
+        pool = Pool()
+        ModelData = pool.get('ir.model.data')
+        Group = pool.get('res.group')
+        Table = pool.get('babi.table')
+        User = pool.get('res.user')
+
+        table, = Table.create([{
+                    'name': 'Restricted Table',
+                    'type': 'table',
+                    'internal_name': 'restricted_table',
+                    'query': 'SELECT 1 AS value',
+                    'access_users': [],
+                    'access_groups': [],
+                    }])
+        group = Group(ModelData.get_id('babi', 'group_babi_table'))
+        user, admin = User.create([{
+                    'name': 'BABI User',
+                    'login': 'babi-user',
+                    'groups': [('add', [group.id])],
+                    }, {
+                    'name': 'BABI Administrator',
+                    'login': 'babi-administrator',
+                    'administrator': True,
+                    }])
+
+        transaction = Transaction()
+        with transaction.set_user(user.id), \
+                transaction.set_context(_check_access=True):
+            with self.assertRaises(AccessError):
+                Table.read([table.id], ['name'])
+
+        with transaction.set_user(admin.id), \
+                transaction.set_context(_check_access=True):
+            self.assertEqual(
+                Table.read([table.id], ['name']),
+                [{'id': table.id, 'name': table.name}])
 
     @with_transaction()
     def test_validator_supports_chart_widget(self):
