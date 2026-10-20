@@ -138,7 +138,7 @@ class Filter(DeactivableMixin, ModelSQL, ModelView):
         'on_change_with_model_name')
     view_search = fields.Many2One('ir.ui.view_search', 'Search',
         domain=[('model', '=', Eval('model_name'))])
-    checked = fields.Boolean('Checked', states={'readonly': True})
+    checked = fields.Boolean('Checked', readonly=True)
     domain = fields.Char('Domain')
     domain_error = fields.Char('Domain Error', readonly=True, states={
             'invisible': ~Bool(Eval('domain_error')),
@@ -356,7 +356,7 @@ class Expression(DeactivableMixin, ModelSQL, ModelView):
     name = fields.Char('Name', required=True, translate=True)
     model = fields.Many2One('ir.model', 'Model', required=True,
         domain=[('babi_enabled', '=', True)])
-    checked = fields.Boolean('Checked', states={'readonly': True})
+    checked = fields.Boolean('Checked', readonly=True)
     error = fields.Char('Error', readonly=True, states={
             'invisible': ~Bool(Eval('error')),
             })
