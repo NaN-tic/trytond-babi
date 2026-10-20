@@ -56,6 +56,10 @@ class Cron(metaclass=PoolMeta):
                 ('babi.table.cluster|compute',
                     'Compute Business Intelligence Cluster'),
                 ])
+        cls.methods_company_needed.update({
+                'babi.table|_compute',
+                'babi.table.cluster|compute',
+                })
 
     @classmethod
     def default_get(
