@@ -34,15 +34,20 @@ FIELD_TYPES = [
     ('datetime', 'Date & Time'),
     ]
 
+DOMAIN_FUNCTIONS = {
+    'today': mdatetime.date.today,
+    }
+
 
 def eval_domain(domain):
     if '__' in domain:
         return PYSONDecoder().decode(domain)
-    evaluator = EvalWithCompoundTypes(names={
-            'datetime': mdatetime,
+    evaluator = EvalWithCompoundTypes(
+        names={
             'false': False,
             'true': True,
-            })
+            },
+        functions=DOMAIN_FUNCTIONS)
     return evaluator.eval(domain)
 
 
