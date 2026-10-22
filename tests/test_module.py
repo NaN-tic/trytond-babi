@@ -17,6 +17,7 @@ from trytond.model.modelstorage import AccessError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.transaction import Transaction
+from trytond.modules.babi.babi import DOMAIN_FUNCTIONS, eval_domain
 from trytond.modules.babi.babi_eval import babi_eval, babi_eval_batch
 from trytond.modules.babi.table import (
     ModelComputeFieldError, compute_model_insert_values)
@@ -37,6 +38,15 @@ class BabiCompanyTestMixin(CompanyTestMixin):
 class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
     'Test Babi module'
     module = 'babi'
+
+    def test_eval_domain_today(self):
+        'Test today function in domains'
+        today = datetime.date(2026, 10, 22)
+
+        with patch.dict(DOMAIN_FUNCTIONS, today=lambda: today):
+            self.assertEqual(
+                eval_domain("[('date', '<=', today())]"),
+                [('date', '<=', today)])
 
     @with_transaction()
     def test_table_access_rule_administrator(self):
