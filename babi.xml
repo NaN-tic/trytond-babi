@@ -226,6 +226,10 @@ contains the full copyright notices and license terms. -->
         <!-- Menus -->
         <menuitem id="menu_babi" name="Business Intelligence" sequence="100" icon="tryton-graph"/>
         <menuitem id="menu_configuration" name="Configuration" parent="menu_babi" sequence="10" icon="tryton-settings"/>
+        <record model="ir.ui.menu-res.group" id="menu_configuration_group_babi_admin">
+            <field name="menu" ref="menu_configuration"/>
+            <field name="group" ref="group_babi_admin"/>
+        </record>
         <menuitem action="act_babi_expression" id="menu_babi_expression" parent="menu_configuration" sequence="10" name="Expressions"/>
         <menuitem action="act_babi_filter" id="menu_babi_filter" parent="menu_configuration" sequence="20" name="Filters"/>
         <menuitem id="menu_babi_table_tag" parent="menu_configuration"
