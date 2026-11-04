@@ -1973,7 +1973,7 @@ msgstr "计算"
 
 msgctxt "model:ir.model.button,string:done_button"
 msgid "Do"
-msgstr "Do"
+msgstr "执行"
 
 msgctxt "model:ir.model.button,string:ignored_button"
 msgid "Ignore"
