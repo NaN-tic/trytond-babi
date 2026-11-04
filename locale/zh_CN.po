@@ -1,0 +1,3452 @@
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgctxt "field:babi.action.dashboard,action:"
+msgid "Action"
+msgstr "操作"
+
+msgctxt "field:babi.action.dashboard,dashboard:"
+msgid "Dashboard"
+msgstr "仪表板"
+
+msgctxt "field:babi.action.dashboard,groups:"
+msgid "Groups"
+msgstr "组"
+
+msgctxt "field:babi.action.dashboard,icon:"
+msgid "Icon"
+msgstr "图标"
+
+msgctxt "field:babi.action.dashboard,keywords:"
+msgid "Keywords"
+msgstr "关键词"
+
+msgctxt "field:babi.action.dashboard,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.action.dashboard,records:"
+msgid "Records"
+msgstr "记录"
+
+msgctxt "field:babi.action.dashboard,type:"
+msgid "Type"
+msgstr "科目"
+
+msgctxt "field:babi.action.dashboard,usage:"
+msgid "Usage"
+msgstr "用法"
+
+msgctxt "field:babi.configuration,default_timeout:"
+msgid "Timeout (s)"
+msgstr "超时（秒）"
+
+msgctxt "field:babi.configuration,report_cell_level:"
+msgid "Cell Level"
+msgstr "单元格层级"
+
+msgctxt "field:babi.dashboard,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.dashboard,view:"
+msgid "View"
+msgstr "视图"
+
+msgctxt "field:babi.dashboard,widgets:"
+msgid "Widgets"
+msgstr "组件"
+
+msgctxt "field:babi.dashboard.item,children:"
+msgid "Children"
+msgstr "子项"
+
+msgctxt "field:babi.dashboard.item,colspan:"
+msgid "Columns"
+msgstr "列"
+
+msgctxt "field:babi.dashboard.item,dashboard:"
+msgid "Dashboard"
+msgstr "仪表板"
+
+msgctxt "field:babi.dashboard.item,height:"
+msgid "Height"
+msgstr "高度"
+
+msgctxt "field:babi.dashboard.item,parent:"
+msgid "Parent"
+msgstr "上级"
+
+msgctxt "field:babi.dashboard.item,widget:"
+msgid "Widget"
+msgstr "组件"
+
+msgctxt "field:babi.expression,checked:"
+msgid "Checked"
+msgstr "已检查"
+
+msgctxt "field:babi.expression,decimal_digits:"
+msgid "Decimal Digits"
+msgstr "小数位数"
+
+msgctxt "field:babi.expression,error:"
+msgid "Error"
+msgstr "错误"
+
+msgctxt "field:babi.expression,expression:"
+msgid "Expression"
+msgstr "表达式"
+
+msgctxt "field:babi.expression,fields:"
+msgid "Model Fields"
+msgstr "模型字段"
+
+msgctxt "field:babi.expression,model:"
+msgid "Model"
+msgstr "模型"
+
+msgctxt "field:babi.expression,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.expression,related_model:"
+msgid "Related Model"
+msgstr "关联模型"
+
+msgctxt "field:babi.expression,ttype:"
+msgid "Field Type"
+msgstr "字段类型"
+
+msgctxt "field:babi.field,descending:"
+msgid "Descending"
+msgstr "降序"
+
+msgctxt "field:babi.field,expression:"
+msgid "Expression"
+msgstr "表达式"
+
+msgctxt "field:babi.field,internal_name:"
+msgid "Internal Name"
+msgstr "内部名称"
+
+msgctxt "field:babi.field,model:"
+msgid "Model"
+msgstr "模型"
+
+msgctxt "field:babi.field,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.field,order:"
+msgid "Order"
+msgstr "排序"
+
+msgctxt "field:babi.field,show:"
+msgid "Show"
+msgstr "显示"
+
+msgctxt "field:babi.field,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.field,table_type:"
+msgid "Table Type"
+msgstr "表类型"
+
+msgctxt "field:babi.field,type:"
+msgid "Type"
+msgstr "科目"
+
+msgctxt "field:babi.filter,checked:"
+msgid "Checked"
+msgstr "已检查"
+
+msgctxt "field:babi.filter,context:"
+msgid "Context"
+msgstr "上下文"
+
+msgctxt "field:babi.filter,domain:"
+msgid "Domain"
+msgstr "域"
+
+msgctxt "field:babi.filter,domain_error:"
+msgid "Domain Error"
+msgstr "筛选条件错误"
+
+msgctxt "field:babi.filter,expression_error:"
+msgid "Expression Error"
+msgstr "表达式错误"
+
+msgctxt "field:babi.filter,fields:"
+msgid "Model Fields"
+msgstr "模型字段"
+
+msgctxt "field:babi.filter,model:"
+msgid "Model"
+msgstr "模型"
+
+msgctxt "field:babi.filter,model_name:"
+msgid "Model Name"
+msgstr "模型名称"
+
+msgctxt "field:babi.filter,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.filter,parameters:"
+msgid "Parameters"
+msgstr "参数"
+
+msgctxt "field:babi.filter,python_expression:"
+msgid "Python Expression"
+msgstr "Python 表达式"
+
+msgctxt "field:babi.filter,view_search:"
+msgid "Search"
+msgstr "搜索"
+
+msgctxt "field:babi.filter.parameter,digits:"
+msgid "Digits"
+msgstr "数字"
+
+msgctxt "field:babi.filter.parameter,filter:"
+msgid "Filter"
+msgstr "筛选"
+
+msgctxt "field:babi.filter.parameter,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.filter.parameter,related_model:"
+msgid "Related Model"
+msgstr "关联模型"
+
+msgctxt "field:babi.filter.parameter,ttype:"
+msgid "Field Type"
+msgstr "字段类型"
+
+msgctxt "field:babi.pivot,active:"
+msgid "Active"
+msgstr "启用"
+
+msgctxt "field:babi.pivot,active_stored:"
+msgid "Active Stored"
+msgstr "存储的启用状态"
+
+msgctxt "field:babi.pivot,column_dimensions:"
+msgid "Column Dimensions"
+msgstr "列维度"
+
+msgctxt "field:babi.pivot,measures:"
+msgid "Measures"
+msgstr "度量"
+
+msgctxt "field:babi.pivot,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.pivot,order:"
+msgid "Order"
+msgstr "排序"
+
+msgctxt "field:babi.pivot,properties:"
+msgid "Properties"
+msgstr "属性"
+
+msgctxt "field:babi.pivot,row_dimensions:"
+msgid "Row Dimensions"
+msgstr "行维度"
+
+msgctxt "field:babi.pivot,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.pivot,url:"
+msgid "URL"
+msgstr "网址"
+
+msgctxt "field:babi.pivot.column_dimension,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:babi.pivot.column_dimension,pivot:"
+msgid "Pivot"
+msgstr "透视表"
+
+msgctxt "field:babi.pivot.column_dimension,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.pivot.measure,aggregate:"
+msgid "Aggregate"
+msgstr "聚合"
+
+msgctxt "field:babi.pivot.measure,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:babi.pivot.measure,over_field:"
+msgid "Over Field"
+msgstr "作用字段"
+
+msgctxt "field:babi.pivot.measure,percentile:"
+msgid "Percentile"
+msgstr "百分位数"
+
+msgctxt "field:babi.pivot.measure,pivot:"
+msgid "Pivot"
+msgstr "透视表"
+
+msgctxt "field:babi.pivot.measure,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.pivot.order,element:"
+msgid "Element"
+msgstr "元素"
+
+msgctxt "field:babi.pivot.order,order:"
+msgid "Order"
+msgstr "排序"
+
+msgctxt "field:babi.pivot.order,pivot:"
+msgid "Pivot"
+msgstr "透视表"
+
+msgctxt "field:babi.pivot.order,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.pivot.property,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:babi.pivot.property,pivot:"
+msgid "Pivot"
+msgstr "透视表"
+
+msgctxt "field:babi.pivot.property,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.pivot.row_dimension,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:babi.pivot.row_dimension,pivot:"
+msgid "Pivot"
+msgstr "透视表"
+
+msgctxt "field:babi.pivot.row_dimension,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.table,access_groups:"
+msgid "Access Groups"
+msgstr "有权访问的用户组"
+
+msgctxt "field:babi.table,access_users:"
+msgid "Access Users"
+msgstr "有权访问的用户"
+
+msgctxt "field:babi.table,babi_raise_user_error:"
+msgid "Raise User Error"
+msgstr "抛出用户错误"
+
+msgctxt "field:babi.table,base_table:"
+msgid "Base Table"
+msgstr "基础表"
+
+msgctxt "field:babi.table,calculation_date:"
+msgid "Date of calculation"
+msgstr "计算日期"
+
+msgctxt "field:babi.table,calculation_time:"
+msgid "Time taken to calculate (in seconds)"
+msgstr "计算耗时（秒）"
+
+msgctxt "field:babi.table,cluster:"
+msgid "Cluster"
+msgstr "集群"
+
+msgctxt "field:babi.table,cluster_date:"
+msgid "Request Date"
+msgstr "请求日期"
+
+msgctxt "field:babi.table,comment:"
+msgid "Comment"
+msgstr "备注"
+
+msgctxt "field:babi.table,company:"
+msgid "Company"
+msgstr "公司"
+
+msgctxt "field:babi.table,company_field:"
+msgid "Company Field"
+msgstr "公司字段"
+
+msgctxt "field:babi.table,compute_error:"
+msgid "Compute Error"
+msgstr "计算错误"
+
+msgctxt "field:babi.table,compute_warning_error:"
+msgid "Compute Warning Error"
+msgstr "警告计算错误"
+
+msgctxt "field:babi.table,crons:"
+msgid "Schedulers"
+msgstr "计划任务"
+
+msgctxt "field:babi.table,email_template:"
+msgid "Email Template"
+msgstr "电子邮件模板"
+
+msgctxt "field:babi.table,employee:"
+msgid "Employee"
+msgstr "雇员"
+
+msgctxt "field:babi.table,employee_field:"
+msgid "Employee Field"
+msgstr "员工字段"
+
+msgctxt "field:babi.table,fields_:"
+msgid "Fields"
+msgstr "字段"
+
+msgctxt "field:babi.table,filter:"
+msgid "Filter"
+msgstr "筛选"
+
+msgctxt "field:babi.table,group:"
+msgid "Group"
+msgstr "组"
+
+msgctxt "field:babi.table,internal_name:"
+msgid "Internal Name"
+msgstr "内部名称"
+
+msgctxt "field:babi.table,last_warning_execution:"
+msgid "Last Warning Execution"
+msgstr "上次警告执行"
+
+msgctxt "field:babi.table,model:"
+msgid "Model"
+msgstr "模型"
+
+msgctxt "field:babi.table,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.table,output_format:"
+msgid "Output Format"
+msgstr "输出格式"
+
+msgctxt "field:babi.table,parameters:"
+msgid "Parameters"
+msgstr "参数"
+
+msgctxt "field:babi.table,parametrized_user:"
+msgid "Parametrized User"
+msgstr "参数化用户"
+
+msgctxt "field:babi.table,party:"
+msgid "Party"
+msgstr "参与者"
+
+msgctxt "field:babi.table,party_field:"
+msgid "Party Field"
+msgstr "往来单位字段"
+
+msgctxt "field:babi.table,pivot_table:"
+msgid "Pivot Table"
+msgstr "数据透视表"
+
+msgctxt "field:babi.table,pivots:"
+msgid "Pivot Tables"
+msgstr "数据透视表"
+
+msgctxt "field:babi.table,preview:"
+msgid "Preview"
+msgstr "预览"
+
+msgctxt "field:babi.table,preview_filename:"
+msgid "Preview Filename"
+msgstr "预览文件名"
+
+msgctxt "field:babi.table,preview_limit:"
+msgid "Preview Limit"
+msgstr "预览限制"
+
+msgctxt "field:babi.table,query:"
+msgid "Query"
+msgstr "查询"
+
+msgctxt "field:babi.table,query_parameters:"
+msgid "Query Parameters"
+msgstr "查询参数"
+
+msgctxt "field:babi.table,related_field:"
+msgid "Related Field"
+msgstr "关联字段"
+
+msgctxt "field:babi.table,related_model:"
+msgid "Related Model"
+msgstr "关联模型"
+
+msgctxt "field:babi.table,required_by:"
+msgid "Required By"
+msgstr "被依赖于"
+
+msgctxt "field:babi.table,required_by_tables:"
+msgid "Required By Tables"
+msgstr "依赖此表的表"
+
+msgctxt "field:babi.table,requires:"
+msgid "Requires"
+msgstr "依赖项"
+
+msgctxt "field:babi.table,requires_tables:"
+msgid "Requires Tables"
+msgstr "所依赖的表"
+
+msgctxt "field:babi.table,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:babi.table,tags:"
+msgid "Tags"
+msgstr "标签"
+
+msgctxt "field:babi.table,timeout:"
+msgid "Timeout"
+msgstr "超时"
+
+msgctxt "field:babi.table,type:"
+msgid "Type"
+msgstr "科目"
+
+msgctxt "field:babi.table,user:"
+msgid "User"
+msgstr "用户"
+
+msgctxt "field:babi.table,user_field:"
+msgid "User Field"
+msgstr "用户字段"
+
+msgctxt "field:babi.table,warn:"
+msgid "Warn"
+msgstr "发出警告"
+
+msgctxt "field:babi.table,warning_description:"
+msgid "Description"
+msgstr "描述"
+
+msgctxt "field:babi.table-babi.table.tag,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.table-babi.table.tag,tag:"
+msgid "Tag"
+msgstr "标签"
+
+msgctxt "field:babi.table-res.group,babi_table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.table-res.group,user:"
+msgid "Group"
+msgstr "组"
+
+msgctxt "field:babi.table-res.user,babi_table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.table-res.user,user:"
+msgid "User"
+msgstr "用户"
+
+msgctxt "field:babi.table.cluster,active:"
+msgid "Active"
+msgstr "启用"
+
+msgctxt "field:babi.table.cluster,computation_end_date:"
+msgid "Computation End Date"
+msgstr "计算结束日期"
+
+msgctxt "field:babi.table.cluster,computation_start_date:"
+msgid "Computation Start Date"
+msgstr "计算开始日期"
+
+msgctxt "field:babi.table.cluster,computation_state:"
+msgid "State"
+msgstr "状态"
+
+msgctxt "field:babi.table.cluster,crons:"
+msgid "Schedulers"
+msgstr "计划任务"
+
+msgctxt "field:babi.table.cluster,elapsed:"
+msgid "Elapsed"
+msgstr "已耗时"
+
+msgctxt "field:babi.table.cluster,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.table.cluster,root_tables:"
+msgid "Tables"
+msgstr "表"
+
+msgctxt "field:babi.table.cluster,tables:"
+msgid "Tables"
+msgstr "表"
+
+msgctxt "field:babi.table.dependency,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.table.dependency,required_by:"
+msgid "Required By"
+msgstr "被依赖于"
+
+msgctxt "field:babi.table.dependency,table:"
+msgid "Requires"
+msgstr "依赖项"
+
+msgctxt "field:babi.table.query_parameter,digits:"
+msgid "Digits"
+msgstr "数字"
+
+msgctxt "field:babi.table.query_parameter,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.table.query_parameter,related_model:"
+msgid "Related Model"
+msgstr "关联模型"
+
+msgctxt "field:babi.table.query_parameter,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.table.query_parameter,ttype:"
+msgid "Field Type"
+msgstr "字段类型"
+
+msgctxt "field:babi.table.query_parameter,values_query:"
+msgid "Values Query"
+msgstr "取值查询"
+
+msgctxt "field:babi.table.tag,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.test,amount:"
+msgid "Amount"
+msgstr "数额"
+
+msgctxt "field:babi.test,category:"
+msgid "Category"
+msgstr "类别"
+
+msgctxt "field:babi.test,date:"
+msgid "Date"
+msgstr "日期"
+
+msgctxt "field:babi.warning,company:"
+msgid "Company"
+msgstr "公司"
+
+msgctxt "field:babi.warning,count:"
+msgid "Records found"
+msgstr "找到的记录"
+
+msgctxt "field:babi.warning,description:"
+msgid "Description"
+msgstr "描述"
+
+msgctxt "field:babi.warning,done_by:"
+msgid "Done By"
+msgstr "完成人"
+
+msgctxt "field:babi.warning,emails:"
+msgid "E-mails"
+msgstr "电子邮件"
+
+msgctxt "field:babi.warning,employee:"
+msgid "Employee"
+msgstr "雇员"
+
+msgctxt "field:babi.warning,group:"
+msgid "Group"
+msgstr "组"
+
+msgctxt "field:babi.warning,has_related_records:"
+msgid "Has Related Field"
+msgstr "有关联字段"
+
+msgctxt "field:babi.warning,ignored_by:"
+msgid "Ignored By"
+msgstr "忽略者"
+
+msgctxt "field:babi.warning,party:"
+msgid "Party"
+msgstr "参与者"
+
+msgctxt "field:babi.warning,preview:"
+msgid "Preview"
+msgstr "预览"
+
+msgctxt "field:babi.warning,preview_filename:"
+msgid "Preview Filename"
+msgstr "预览文件名"
+
+msgctxt "field:babi.warning,state:"
+msgid "State"
+msgstr "状态"
+
+msgctxt "field:babi.warning,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.warning,table_to_show:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.warning,timestamp:"
+msgid "Timestamp"
+msgstr "时间戳"
+
+msgctxt "field:babi.warning,user:"
+msgid "User"
+msgstr "用户"
+
+msgctxt "field:babi.warning,users:"
+msgid "Users"
+msgstr "用户"
+
+msgctxt "field:babi.widget,box_points:"
+msgid "Box Points"
+msgstr "箱线图数据点"
+
+msgctxt "field:babi.widget,chart:"
+msgid "Chart"
+msgstr "图表"
+
+msgctxt "field:babi.widget,help:"
+msgid "Help"
+msgstr "帮助"
+
+msgctxt "field:babi.widget,image_format:"
+msgid "Image Format"
+msgstr "图像格式"
+
+msgctxt "field:babi.widget,limit:"
+msgid "Limit"
+msgstr "限制"
+
+msgctxt "field:babi.widget,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.widget,parameters:"
+msgid "Parameters"
+msgstr "参数"
+
+msgctxt "field:babi.widget,show_legend:"
+msgid "Show Legend"
+msgstr "显示图例"
+
+msgctxt "field:babi.widget,show_title:"
+msgid "Show Title"
+msgstr "显示标题"
+
+msgctxt "field:babi.widget,show_toolbox:"
+msgid "Show Toolbox"
+msgstr "显示工具栏"
+
+msgctxt "field:babi.widget,static:"
+msgid "Static"
+msgstr "静态"
+
+msgctxt "field:babi.widget,table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:babi.widget,timeout:"
+msgid "Timeout (s)"
+msgstr "超时（秒）"
+
+msgctxt "field:babi.widget,total_branch_values:"
+msgid "Total Branch Values"
+msgstr "分支值合计"
+
+msgctxt "field:babi.widget,type:"
+msgid "Type"
+msgstr "科目"
+
+msgctxt "field:babi.widget,where:"
+msgid "Where"
+msgstr "条件"
+
+msgctxt "field:babi.widget,zoom:"
+msgid "Zoom"
+msgstr "缩放"
+
+msgctxt "field:babi.widget.parameter,aggregate:"
+msgid "Aggregate"
+msgstr "聚合"
+
+msgctxt "field:babi.widget.parameter,aggregate_invisible:"
+msgid "Aggregate Invisible"
+msgstr "聚合不可见"
+
+msgctxt "field:babi.widget.parameter,aggregate_required:"
+msgid "Aggregate Required"
+msgstr "必须聚合"
+
+msgctxt "field:babi.widget.parameter,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:babi.widget.parameter,type:"
+msgid "Type"
+msgstr "科目"
+
+msgctxt "field:babi.widget.parameter,widget:"
+msgid "Widget"
+msgstr "组件"
+
+msgctxt "field:ir.cron,babi_cluster:"
+msgid "Cluster"
+msgstr "集群"
+
+msgctxt "field:ir.cron,babi_compute_warnings:"
+msgid "Compute Warnings"
+msgstr "计算警告"
+
+msgctxt "field:ir.cron,babi_table:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "field:ir.model,babi_enabled:"
+msgid "BI Enabled"
+msgstr "启用商业智能"
+
+msgctxt "field:www.download_report,output_format:"
+msgid "Output Format"
+msgstr "输出格式"
+
+msgctxt "field:www.download_report,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.download_report,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.index.pivot,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.index.pivot,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.index.pivot.null,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.index.pivot.null,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.layout.pivot,title:"
+msgid "Title"
+msgstr "标题"
+
+msgctxt "field:www.pivot_apply,pivot:"
+msgid "Pivot"
+msgstr "透视表"
+
+msgctxt "field:www.pivot_apply,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_apply,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_compute,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_compute,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_header.axis,axis:"
+msgid "Axis"
+msgstr "坐标轴"
+
+msgctxt "field:www.pivot_header.axis,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header.axis,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header.axis,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_header.level_field,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:www.pivot_header.level_field,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header.level_field,level_action:"
+msgid "Level Action"
+msgstr "层级动作"
+
+msgctxt "field:www.pivot_header.level_field,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header.level_field,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_header.measure,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header.measure,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header.measure,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_header.order,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header.order,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header.order,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_header.remove_field,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:www.pivot_header.remove_field,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header.remove_field,level_action:"
+msgid "Level Action"
+msgstr "层级动作"
+
+msgctxt "field:www.pivot_header.remove_field,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header.remove_field,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_header.selection,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header.selection,measure:"
+msgid "Measure"
+msgstr "度量"
+
+msgctxt "field:www.pivot_header.selection,over_field:"
+msgid "Over Field"
+msgstr "作用字段"
+
+msgctxt "field:www.pivot_header.selection,percentile:"
+msgid "Percentile"
+msgstr "百分位数"
+
+msgctxt "field:www.pivot_header.selection,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header.selection,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_header.selection.add_field,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:www.pivot_header.selection.add_field,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header.selection.add_field,measure:"
+msgid "Measure"
+msgstr "度量"
+
+msgctxt "field:www.pivot_header.selection.add_field,over_field:"
+msgid "Over Field"
+msgstr "作用字段"
+
+msgctxt "field:www.pivot_header.selection.add_field,percentile:"
+msgid "Percentile"
+msgstr "百分位数"
+
+msgctxt "field:www.pivot_header.selection.add_field,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header.selection.add_field,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_header.selection.close_field,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:www.pivot_header.selection.close_field,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header.selection.close_field,measure:"
+msgid "Measure"
+msgstr "度量"
+
+msgctxt "field:www.pivot_header.selection.close_field,over_field:"
+msgid "Over Field"
+msgstr "作用字段"
+
+msgctxt "field:www.pivot_header.selection.close_field,percentile:"
+msgid "Percentile"
+msgstr "百分位数"
+
+msgctxt "field:www.pivot_header.selection.close_field,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header.selection.close_field,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_save,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:www.pivot_save,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_save,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_sidebar_tables,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_sidebar_tables,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "field:www.pivot_table,output_format:"
+msgid "Output Format"
+msgstr "输出格式"
+
+msgctxt "field:www.pivot_table,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_table,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "help:babi.action.dashboard,records:"
+msgid "The records on which the action runs."
+msgstr "运行操作的记录。"
+
+msgctxt "help:babi.configuration,report_cell_level:"
+msgid "Start cell level that not has indentation"
+msgstr "不缩进的起始单元格层级"
+
+msgctxt "help:babi.dashboard.item,height:"
+msgid "The default is 450px"
+msgstr "默认值为 450px"
+
+msgctxt "help:babi.expression,expression:"
+msgid ""
+"Python expression that will return the value to be used.\n"
+"The expression can include the following variables:\n"
+"\n"
+"- \"o\": A reference to the current record being processed. For  example: \"o.party.name\"\n"
+"\n"
+"And the following functions apply to dates and timestamps:\n"
+"\n"
+"- \"y()\": Returns the year (as a string)\n"
+"- \"m()\": Returns the month (as a string)\n"
+"- \"w()\": Returns the week (as a string)\n"
+"- \"d()\": Returns the day (as a string)\n"
+"- \"ym()\": Returns the year-month (as a string)\n"
+"- \"ymd()\": Returns the year-month-day (as a string).\n"
+msgstr ""
+"返回待使用值的 Python 表达式。\n"
+"表达式可包含以下变量：\n"
+"\n"
+"- \"o\"：当前正在处理的记录引用。例如：\"o.party.name\"\n"
+"\n"
+"以下函数适用于日期和时间戳：\n"
+"\n"
+"- \"y()\"：返回年份（字符串）\n"
+"- \"m()\"：返回月份（字符串）\n"
+"- \"w()\"：返回周数（字符串）\n"
+"- \"d()\"：返回日期中的日（字符串）\n"
+"- \"ym()\"：返回年-月（字符串）\n"
+"- \"ymd()\"：返回年-月-日（字符串）。\n"
+
+msgctxt "help:babi.field,order:"
+msgid ""
+"Positive integer. Indicates if the field must be sorted and in which "
+"position. Field with order 1 will be sorted before 2, etc. Order is computed"
+" in memory so it can be slow with many records."
+msgstr "正整数。表示字段是否参与排序及其排序优先级。序号为 1 的字段先于序号为 2 的字段排序，依此类推。排序在内存中进行，记录较多时可能较慢。"
+
+msgctxt "help:babi.field,show:"
+msgid ""
+"Indicates if the field must be shown in the preview and exported in the "
+"Excel report."
+msgstr "表示是否在预览中显示该字段并将其导出到 Excel 报表。"
+
+msgctxt "help:babi.filter,context:"
+msgid ""
+"A dict to eval context:\n"
+"- date: eval string to date. Format: %Y-%m-%d.\n"
+"  Example: {'stock_date_end': date('2023-12-01')}\n"
+"- datetime: eval string to date time. Format %Y-%m-%d %H:%M:%S.\n"
+"  Example: {'name': datetime('2023-12-01 10:00:00')}\n"
+"- today: eval current date\n"
+"  Example: {'stock_date_end': today}"
+msgstr ""
+"用于计算上下文的字典：\n"
+"- date：将字符串转换为日期。格式：%Y-%m-%d。\n"
+"  示例：{'stock_date_end': date('2023-12-01')}\n"
+"- datetime：将字符串转换为日期时间。格式：%Y-%m-%d %H:%M:%S。\n"
+"  示例：{'name': datetime('2023-12-01 10:00:00')}\n"
+"- today：当前日期\n"
+"  示例：{'stock_date_end': today}"
+
+msgctxt "help:babi.filter,python_expression:"
+msgid ""
+"The python expression introduced will be evaluated. If the result is True "
+"the record will be included, it will be discarded otherwise."
+msgstr "将计算输入的 Python 表达式。如果结果为 True，则包含该记录，否则将其排除。"
+
+msgctxt "help:babi.filter.parameter,name:"
+msgid "Name used on the domain substitution"
+msgstr "筛选条件替换中使用的名称"
+
+msgctxt "help:babi.table,babi_raise_user_error:"
+msgid "Will raise a UserError in case of an error in the table."
+msgstr "表中发生错误时抛出 UserError。"
+
+msgctxt "help:babi.table,timeout:"
+msgid ""
+"If table calculation should take more than the specified timeout (in "
+"seconds) the process will be stopped automatically."
+msgstr "如果表计算时间超过指定的超时时间（秒），进程将自动停止。"
+
+msgctxt "help:babi.table.query_parameter,name:"
+msgid "Name used on the query substitution"
+msgstr "查询替换中使用的名称"
+
+msgctxt "help:babi.table.query_parameter,values_query:"
+msgid "SQL query that returns two columns: value and label."
+msgstr "返回 value 和 label 两列的 SQL 查询。"
+
+msgctxt "help:babi.widget,limit:"
+msgid "Limit the number of rows"
+msgstr "限制行数"
+
+msgctxt "help:ir.model,babi_enabled:"
+msgid ""
+"Check if you want this model to be available in Business Intelligence "
+"reports."
+msgstr "勾选后，此模型可用于商业智能报表。"
+
+msgctxt "xgettext:x:"
+msgid "404"
+msgstr "404"
+
+msgctxt "xgettext:x:"
+msgid "Add"
+msgstr "添加"
+
+msgctxt "xgettext:x:"
+msgid "All"
+msgstr "全部"
+
+msgctxt "xgettext:x:"
+msgid "Average"
+msgstr "平均成本价法"
+
+msgctxt "xgettext:x:"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "xgettext:x:"
+msgid "Close"
+msgstr "结账"
+
+msgctxt "xgettext:x:"
+msgid "Columns"
+msgstr "列"
+
+msgctxt "xgettext:x:"
+msgid "Comma-separated IDs"
+msgstr "以逗号分隔的 ID"
+
+msgctxt "xgettext:x:"
+msgid "Compute"
+msgstr "计算"
+
+msgctxt "xgettext:x:"
+msgid "Configuration"
+msgstr "设置"
+
+msgctxt "xgettext:x:"
+msgid "Count"
+msgstr "计数"
+
+msgctxt "xgettext:x:"
+msgid "Down"
+msgstr "下移"
+
+msgctxt "xgettext:x:"
+msgid "Error building the cube:"
+msgstr "构建数据立方体时出错："
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to make average of a text type field, please try with a"
+" numeric type field or change the operation."
+msgstr "提示：您正在对文本类型字段求平均值，请改用数值类型字段或更改运算。"
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to sum a text type field, please try with a numeric "
+"type field or change the operation."
+msgstr "提示：您正在对文本类型字段求和，请改用数值类型字段或更改运算。"
+
+msgctxt "xgettext:x:"
+msgid "Loading ..."
+msgstr "加载中……"
+
+msgctxt "xgettext:x:"
+msgid "Max"
+msgstr "最大值"
+
+msgctxt "xgettext:x:"
+msgid "Maximum"
+msgstr "最大值"
+
+msgctxt "xgettext:x:"
+msgid "Measure fields"
+msgstr "度量字段"
+
+msgctxt "xgettext:x:"
+msgid "Measure type"
+msgstr "度量类型"
+
+msgctxt "xgettext:x:"
+msgid "Median"
+msgstr "中位数"
+
+msgctxt "xgettext:x:"
+msgid "Min"
+msgstr "最小值"
+
+msgctxt "xgettext:x:"
+msgid "Minimum"
+msgstr "最小值"
+
+msgctxt "xgettext:x:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "xgettext:x:"
+msgid "No parameters defined for this table."
+msgstr "此表未定义参数。"
+
+msgctxt "xgettext:x:"
+msgid "Order fields"
+msgstr "排序字段"
+
+msgctxt "xgettext:x:"
+msgid "Over Field"
+msgstr "作用字段"
+
+msgctxt "xgettext:x:"
+msgid "Page not found or you don't have access to it"
+msgstr "页面不存在或您无权访问"
+
+msgctxt "xgettext:x:"
+msgid "Page not found | Tryton"
+msgstr "页面不存在 | Tryton"
+
+msgctxt "xgettext:x:"
+msgid "Parameters"
+msgstr "参数"
+
+msgctxt "xgettext:x:"
+msgid "Percentile"
+msgstr "百分位数"
+
+msgctxt "xgettext:x:"
+msgid "Pivot Table"
+msgstr "数据透视表"
+
+msgctxt "xgettext:x:"
+msgid "Properties"
+msgstr "属性"
+
+msgctxt "xgettext:x:"
+msgid "Record ID"
+msgstr "记录 ID"
+
+msgctxt "xgettext:x:"
+msgid "Rows"
+msgstr "行"
+
+msgctxt "xgettext:x:"
+msgid "Save Configuration"
+msgstr "保存配置"
+
+msgctxt "xgettext:x:"
+msgid "Search tables"
+msgstr "搜索表"
+
+msgctxt "xgettext:x:"
+msgid "Select a field to add:"
+msgstr "请选择要添加的字段："
+
+msgctxt "xgettext:x:"
+msgid "Show more details"
+msgstr "显示更多详情"
+
+msgctxt "xgettext:x:"
+msgid "Sorry, we couldn’t find the page you’re looking for."
+msgstr "抱歉，找不到您要访问的页面。"
+
+msgctxt "xgettext:x:"
+msgid "Sum"
+msgstr "求和"
+
+msgctxt "xgettext:x:"
+msgid ""
+"Table has not been computed. Click on the 'Compute' button or wait until the"
+" process has finished. Also ensure there is no 'Errors' tab in the table."
+msgstr "此表尚未计算。请点击“计算”按钮或等待处理完成，同时确认表中没有“错误”选项卡。"
+
+msgctxt "xgettext:x:"
+msgid "Tables"
+msgstr "表"
+
+msgctxt "xgettext:x:"
+msgid "Tags"
+msgstr "标签"
+
+msgctxt "xgettext:x:"
+msgid "Up"
+msgstr "上移"
+
+msgctxt "xgettext:x:"
+msgid ""
+"You need to select at least one measure and one row or one column to show "
+"the table."
+msgstr "必须至少选择一个度量以及一个行或列才能显示表。"
+
+msgctxt "xgettext:x:"
+msgid "current data"
+msgstr "当前数据"
+
+msgctxt "xgettext:x:"
+msgid "data from %s"
+msgstr "%s 的数据"
+
+msgctxt "xgettext:x:"
+msgid "not calculated yet"
+msgstr "尚未计算"
+
+msgctxt "model:babi.action.dashboard,string:"
+msgid "Babi Action Dashboard"
+msgstr "BABI 动作仪表板"
+
+msgctxt "model:babi.configuration,string:"
+msgid "Babi Configuration"
+msgstr "BABI 配置"
+
+msgctxt "model:babi.dashboard,string:"
+msgid "Babi Dashboard"
+msgstr "BABI 仪表板"
+
+msgctxt "model:babi.dashboard.item,string:"
+msgid "Babi Dashboard Item"
+msgstr "BABI 仪表板项目"
+
+msgctxt "model:babi.expression,string:"
+msgid "Babi Expression"
+msgstr "BABI 表达式"
+
+msgctxt "model:babi.field,string:"
+msgid "Babi Field"
+msgstr "BABI 字段"
+
+msgctxt "model:babi.filter,string:"
+msgid "Babi Filter"
+msgstr "BABI 筛选器"
+
+msgctxt "model:babi.filter.parameter,string:"
+msgid "Babi Filter Parameter"
+msgstr "BABI 筛选参数"
+
+msgctxt "model:babi.pivot,string:"
+msgid "Babi Pivot"
+msgstr "BABI 透视表"
+
+msgctxt "model:babi.pivot.column_dimension,string:"
+msgid "Babi Pivot Column Dimension"
+msgstr "BABI 透视表列维度"
+
+msgctxt "model:babi.pivot.measure,string:"
+msgid "Babi Pivot Measure"
+msgstr "BABI 透视表度量"
+
+msgctxt "model:babi.pivot.order,string:"
+msgid "Babi Pivot Order"
+msgstr "BABI 透视表排序"
+
+msgctxt "model:babi.pivot.property,string:"
+msgid "Babi Pivot Property"
+msgstr "BABI 透视表属性"
+
+msgctxt "model:babi.pivot.row_dimension,string:"
+msgid "Babi Pivot Row Dimension"
+msgstr "BABI 透视表行维度"
+
+msgctxt "model:babi.table,string:"
+msgid "Babi Table"
+msgstr "BABI 表"
+
+msgctxt "model:babi.table-babi.table.tag,string:"
+msgid "Babi Table - Babi Table Tag"
+msgstr "BABI 表 - BABI 表标签"
+
+msgctxt "model:babi.table-res.group,string:"
+msgid "Babi Table - Group"
+msgstr "BABI 表 - 用户组"
+
+msgctxt "model:babi.table-res.user,string:"
+msgid "Babi Table - User"
+msgstr "BABI 表 - 用户"
+
+msgctxt "model:babi.table.cluster,string:"
+msgid "Babi Table Cluster"
+msgstr "BABI 表集群"
+
+msgctxt "model:babi.table.dependency,string:"
+msgid "Babi Table Dependency"
+msgstr "BABI 表依赖关系"
+
+msgctxt "model:babi.table.parameters,string:"
+msgid "Babi Table Parameters"
+msgstr "BABI 表参数"
+
+msgctxt "model:babi.table.query_parameter,string:"
+msgid "Babi Table Query Parameter"
+msgstr "BABI 表查询参数"
+
+msgctxt "model:babi.table.tag,string:"
+msgid "Babi Table Tag"
+msgstr "BABI 表标签"
+
+msgctxt "model:babi.test,string:"
+msgid "Babi Test"
+msgstr "BABI 测试"
+
+msgctxt "model:babi.warning,string:"
+msgid "Babi Warning"
+msgstr "BABI 警告"
+
+msgctxt "model:babi.widget,string:"
+msgid "Babi Widget"
+msgstr "BABI 组件"
+
+msgctxt "model:babi.widget.parameter,string:"
+msgid "Babi Widget Parameter"
+msgstr "BABI 组件参数"
+
+msgctxt "model:ir.action,name:act_action_dashboard_form"
+msgid "Dashboards"
+msgstr "仪表板"
+
+msgctxt "model:ir.action,name:act_babi_configuration_form"
+msgid "Configuration"
+msgstr "设置"
+
+msgctxt "model:ir.action,name:act_babi_dashboard"
+msgid "Dashboards"
+msgstr "仪表板"
+
+msgctxt "model:ir.action,name:act_babi_dashboard_item"
+msgid "Dashboard Items"
+msgstr "仪表板项目"
+
+msgctxt "model:ir.action,name:act_babi_expression"
+msgid "Expressions"
+msgstr "表达式"
+
+msgctxt "model:ir.action,name:act_babi_field"
+msgid "Fields"
+msgstr "字段"
+
+msgctxt "model:ir.action,name:act_babi_filter"
+msgid "Filters"
+msgstr "筛选器"
+
+msgctxt "model:ir.action,name:act_babi_pivot"
+msgid "Pivot Tables"
+msgstr "数据透视表"
+
+msgctxt "model:ir.action,name:act_babi_table"
+msgid "Tables"
+msgstr "表"
+
+msgctxt "model:ir.action,name:act_babi_table_cluster"
+msgid "Clusters"
+msgstr "集群"
+
+msgctxt "model:ir.action,name:act_babi_table_parametrized"
+msgid "Parametrized Table"
+msgstr "参数化表"
+
+msgctxt "model:ir.action,name:act_babi_table_tag"
+msgid "Table Tags"
+msgstr "表标签"
+
+msgctxt "model:ir.action,name:act_babi_warning"
+msgid "Warnings"
+msgstr "警告"
+
+msgctxt "model:ir.action,name:act_babi_widget"
+msgid "Widgets"
+msgstr "组件"
+
+msgctxt "model:ir.action,name:act_warning_relate"
+msgid "Warnings"
+msgstr "警告"
+
+msgctxt "model:ir.action,name:act_widget_table"
+msgid "Widgets"
+msgstr "组件"
+
+msgctxt "model:ir.action,name:report_pivot_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_table_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_warning_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_warning_pivot_excel"
+msgid "Pivot Excel"
+msgstr "透视表 Excel"
+
+msgctxt "model:ir.action,name:table_parametrize_wizard"
+msgid "Parametrize Table"
+msgstr "设置表参数"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_all"
+msgid "All"
+msgstr "全部"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_no_warn"
+msgid "Without Warning"
+msgstr "无警告"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_parametrized"
+msgid "Parametrized"
+msgstr "已参数化"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_warn"
+msgid "With Warning"
+msgstr "有警告"
+
+msgctxt "model:ir.action.act_window.domain,name:act_warning_domain_all"
+msgid "All"
+msgstr "全部"
+
+msgctxt "model:ir.action.act_window.domain,name:act_warning_domain_pending"
+msgid "Pending"
+msgstr "待定"
+
+msgctxt "model:ir.message,text:cannot_create_order_entry"
+msgid "Order entries are created automatically"
+msgstr "排序条目自动创建"
+
+msgctxt "model:ir.message,text:cannot_remove_order_entry"
+msgid "Order entries are deleted automatically"
+msgstr "排序条目自动删除"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception"
+msgid "An Exception Occurred: %(error)s"
+msgstr "发生异常：%(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception_dimension"
+msgid ""
+"An Exception Occurred: On dimensions, with expression %(expression)s on record %(record)s.\n"
+"Exception: %(error)s"
+msgstr ""
+"维度发生异常：记录 %(record)s 上的表达式 %(expression)s。\n"
+"异常：%(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception_measures"
+msgid ""
+"An Exception Occurred: On measures, with expression %(expression)s on record %(record)s.\n"
+"Exception: %(error)s"
+msgstr ""
+"度量发生异常：记录 %(record)s 上的表达式 %(expression)s。\n"
+"异常：%(error)s"
+
+msgctxt "model:ir.message,text:false"
+msgid "False"
+msgstr "假"
+
+#, python-format
+msgctxt "model:ir.message,text:filter_parameters"
+msgid ""
+"Execution \"%(execution)s\" has filter parameters and you did not provide "
+"any of them. Please execute it from the menu."
+msgstr "执行“%(execution)s”需要筛选参数，但您未提供任何参数。请从菜单执行。"
+
+#, python-format
+msgctxt "model:ir.message,text:invalid_parameters"
+msgid ""
+"Key \"%(key)s\" in domain, python expression or context is not in the "
+"parameters from filter of report."
+msgstr "筛选条件、Python 表达式或上下文中的键“%(key)s”不在报表筛选器的参数中。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_chart_limit"
+msgid ""
+"The number of records \"%(count)s\" exceeds the limit \"%(limit)s\" for "
+"chart \"%(widget)s\". You must either narrow the query or increase the "
+"limit."
+msgstr "记录数“%(count)s”超过图表“%(widget)s”的限制“%(limit)s”。请缩小查询范围或提高限制。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_circular_dependency"
+msgid ""
+"Circular dependency with the following table sequence:\n"
+"\n"
+"\"%(sequence)s\""
+msgstr ""
+"以下表序列存在循环依赖：\n"
+"\n"
+"“%(sequence)s”"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_compute_table_exception"
+msgid ""
+"An exception occurred while computing the value for field \"%(field)s\" in table \"%(table)s\", record \"%(record)s\". The error was:\n"
+"\n"
+"%(error)s"
+msgstr ""
+"计算表“%(table)s”中记录“%(record)s”的字段“%(field)s”值时发生异常。错误为：\n"
+"\n"
+"%(error)s"
+
+msgctxt "model:ir.message,text:msg_copy"
+msgid "copy"
+msgstr "副本"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_error_obtaining_records"
+msgid ""
+"An error occurred while obtaining the records for table \"%(table)s\":\n"
+"\n"
+"%(error)s"
+msgstr ""
+"获取表“%(table)s”的记录时出错：\n"
+"\n"
+"%(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_aggregate"
+msgid ""
+"Aggregates \"Sum\" and \"Average\" are not supported in non numeric fields "
+"in parameter \"%(parameter)s\" in widget \"%(widget)s\"."
+msgstr "组件“%(widget)s”的参数“%(parameter)s”中的非数值字段不支持“求和”和“平均值”聚合。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_field_internal_name"
+msgid "Invalid internal name \"%(internal_name)s\" in field \"%(field)s\"."
+msgstr "字段“%(field)s”的内部名称“%(internal_name)s”无效。"
+
+#, python-format
+msgctxt ""
+"model:ir.message,text:msg_invalid_field_internal_name_first_character"
+msgid ""
+"Invalid first character in internal name \"%(internal_name)s\" in field "
+"\"%(field)s\"."
+msgstr "字段“%(field)s”的内部名称“%(internal_name)s”的首字符无效。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_parameter_type"
+msgid ""
+"Parameter \"%(parameter)s\" is not valid in widget \"%(widget)s\". Only the "
+"following types can be used: \"%(types)s\"."
+msgstr "组件“%(widget)s”中的参数“%(parameter)s”无效。只能使用以下类型：“%(types)s”。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_table_internal_name"
+msgid "Invalid internal name \"%(internal_name)s\" in table \"%(table)s\"."
+msgstr "表“%(table)s”的内部名称“%(internal_name)s”无效。"
+
+#, python-format
+msgctxt ""
+"model:ir.message,text:msg_invalid_table_internal_name_first_character"
+msgid ""
+"Invalid first character in internal name \"%(internal_name)s\" in table "
+"\"%(table)s\"."
+msgstr "表“%(table)s”的内部名称“%(internal_name)s”的首字符无效。"
+
+msgctxt "model:ir.message,text:msg_no"
+msgid "No"
+msgstr "否"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_not_converted"
+msgid ""
+"Some field of the field %(field)s is not numeric and cannot be converted. "
+"Please check the query."
+msgstr "字段 %(field)s 中有些值不是数值且无法转换。请检查查询。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_not_enough_parameters"
+msgid ""
+"There must be at least \"%(min)s\" parameters of type \"%(type)s\" in "
+"\"%(widget)s\"."
+msgstr "“%(widget)s”中至少需要“%(min)s”个“%(type)s”类型的参数。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_only_one_table_with_parameters"
+msgid ""
+"Table \"%(table)s\" requires parameters but you tried to compute more than "
+"one table at once. Tables with parameters must be computed individually."
+msgstr "表“%(table)s”需要参数，但您尝试同时计算多个表。带参数的表必须单独计算。"
+
+msgctxt "model:ir.message,text:msg_open_warning_single"
+msgid ""
+"You can only open records for several warnings if they are all of the same "
+"type."
+msgstr "仅当多个警告均属于同一类型时，才能同时打开其记录。"
+
+msgctxt "model:ir.message,text:msg_pivots_filename"
+msgid "pivot-tables"
+msgstr "pivot-tables"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_render_report_columns"
+msgid ""
+"Print report \"%(report)s\" has dimensions in columns and is not supported."
+msgstr "报表“%(report)s”包含列维度，不支持打印。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_failed"
+msgid "Calculation of report \"%(report)s\" failed."
+msgstr "报表“%(report)s”计算失败。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_successful"
+msgid "Report \"%(report)s\" successfully calculated."
+msgstr "报表“%(report)s”计算成功。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_timeout"
+msgid ""
+"Calculation of report \"%(report)s\" aborted because it took more thant "
+"%(seconds)s to compute."
+msgstr "报表“%(report)s”的计算耗时超过 %(seconds)s，已中止。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_failed"
+msgid "Computation of \"%(table)s\" failed."
+msgstr "“%(table)s”计算失败。"
+
+msgctxt "model:ir.message,text:msg_table_internal_name_unique"
+msgid "Table's internal name must be unique."
+msgstr "表的内部名称必须唯一。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_limit"
+msgid "(limited to %(number)s)"
+msgstr "（最多 %(number)s 条）"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_no_fields"
+msgid "Table \"%(table)s\" cannot be computed because it has no fields."
+msgstr "表“%(table)s”没有字段，无法计算。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_rows"
+msgid "%(count)s rows"
+msgstr "%(count)s 行"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_successful"
+msgid "Computation of \"%(table)s\" finished successfully."
+msgstr "“%(table)s”计算成功。"
+
+msgctxt "model:ir.message,text:msg_tables_filename"
+msgid "tables"
+msgstr "表"
+
+msgctxt "model:ir.message,text:msg_tables_not_created"
+msgid "Warning: tables could not be created. Please check your query."
+msgstr "警告：无法创建表。请检查查询。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_too_many_parameters"
+msgid ""
+"There can not be more than \"%(max)s\" parameters of type \"%(type)s\" in "
+"\"%(widget)s\"."
+msgstr "“%(widget)s”中“%(type)s”类型的参数不能超过“%(max)s”个。"
+
+msgctxt "model:ir.message,text:msg_waiting_for_computation"
+msgid "Waiting for computation of table to finish."
+msgstr "正在等待表计算完成。"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_widget_help"
+msgid ""
+"The following is the list of valid parameter types wth the number of minimum and maximum occurrences allowed:\n"
+"\n"
+"%(list)s"
+msgstr ""
+"以下为有效参数类型及其允许的最少和最多出现次数：\n"
+"\n"
+"%(list)s"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_wrong_info"
+msgid ""
+"The information returned from the field %(field)s is not correct or you don't have enough permissions to access it.             Records found by query: %(query_count)s\n"
+"            Records found by Model: %(model_query_count)s\n"
+"            "
+msgstr ""
+"字段 %(field)s 返回的信息不正确，或您没有足够的访问权限。             查询找到的记录数：%(query_count)s\n"
+"            模型找到的记录数：%(model_query_count)s\n"
+"            "
+
+msgctxt "model:ir.message,text:msg_yes"
+msgid "Yes"
+msgstr "是"
+
+#, python-format
+msgctxt "model:ir.message,text:no_dimensions"
+msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
+msgstr "报表“%(report)s”没有维度。至少需要一个维度。"
+
+msgctxt "model:ir.message,text:no_execution"
+msgid ""
+"No execution found for current record. Execute the update data wizard in "
+"order to create one."
+msgstr "未找到当前记录的执行记录。请运行更新数据向导以创建执行记录。"
+
+#, python-format
+msgctxt "model:ir.message,text:no_measures"
+msgid "Report \"%(report)s\" has no measures. At least one is needed."
+msgstr "报表“%(report)s”没有度量。至少需要一个度量。"
+
+#, python-format
+msgctxt "model:ir.message,text:no_menus"
+msgid ""
+"No menus found for report %(report)s. In order to view its data you must "
+"create menu entries."
+msgstr "未找到报表 %(report)s 的菜单。必须创建菜单项才能查看数据。"
+
+msgctxt "model:ir.message,text:no_report"
+msgid "No report found for current execution"
+msgstr "未找到当前执行对应的报表"
+
+msgctxt "model:ir.message,text:one_measure_in_pie_charts"
+msgid "Only one measure can be used in pie charts"
+msgstr "饼图只能使用一个度量"
+
+#, python-format
+msgctxt "model:ir.message,text:parameter_not_found"
+msgid ""
+"Parameter \"%(parameter)s\" not found in Domain, Python Expression nor "
+"Context of filter \"%(filter)s\"."
+msgstr "在筛选器“%(filter)s”的筛选条件、Python 表达式和上下文中均未找到参数“%(parameter)s”。"
+
+#, python-format
+msgctxt "model:ir.message,text:report_modification_warning"
+msgid ""
+"Report \"%(report)s\" will be renamed, but if you want to also rename the "
+"menus you should create the menus again. Are you sure you want to continue "
+"with this action?"
+msgstr "将重命名报表“%(report)s”。如果也要重命名菜单，请重新创建菜单。确定要继续此操作吗？"
+
+#, python-format
+msgctxt "model:ir.message,text:report_not_exists"
+msgid ""
+"Report \"%(report)s\" no longer exists or you do not have the rights to "
+"access it."
+msgstr "报表“%(report)s”已不存在，或您无权访问。"
+
+msgctxt "model:ir.message,text:timeout_exception"
+msgid ""
+"Report computation timed out. You may consider increasing the timeout of "
+"this report."
+msgstr "报表计算超时。可考虑延长此报表的超时时间。"
+
+msgctxt "model:ir.message,text:true"
+msgid "True"
+msgstr "真"
+
+msgctxt "model:ir.model.button,string:"
+msgid "AI"
+msgstr "AI"
+
+msgctxt "model:ir.model.button,string:babi_expression_check_button"
+msgid "Check"
+msgstr "检查"
+
+msgctxt "model:ir.model.button,string:babi_filter_check_button"
+msgid "Check"
+msgstr "检查"
+
+msgctxt "model:ir.model.button,string:babi_table_calculate_button"
+msgid "Compute"
+msgstr "计算"
+
+msgctxt "model:ir.model.button,string:babi_table_calculate_warning_button"
+msgid "Compute Warning"
+msgstr "计算警告"
+
+msgctxt "model:ir.model.button,string:babi_table_clear_cache_button"
+msgid "Clear Cache"
+msgstr "清除缓存"
+
+msgctxt "model:ir.model.button,string:babi_table_cluster_compute_button"
+msgid "Compute"
+msgstr "计算"
+
+msgctxt "model:ir.model.button,string:done_button"
+msgid "Do"
+msgstr "Do"
+
+msgctxt "model:ir.model.button,string:ignored_button"
+msgid "Ignore"
+msgstr "忽略"
+
+msgctxt "model:ir.model.button,string:open_button"
+msgid "Open Records"
+msgstr "打开记录"
+
+msgctxt "model:ir.model.button,string:pending_button"
+msgid "Pending"
+msgstr "待定"
+
+msgctxt "model:ir.model.button,string:show_dashboard_button"
+msgid "Show"
+msgstr "显示"
+
+msgctxt "model:ir.rule.group,name:rule_group_babi_table"
+msgid "Babi Table"
+msgstr "BABI 表"
+
+msgctxt "model:ir.rule.group,name:rule_group_user_warning"
+msgid "User in Warning"
+msgstr "警告中的用户"
+
+msgctxt "model:ir.ui.menu,name:menu_action_dashboard"
+msgid "Dashboards"
+msgstr "仪表板"
+
+msgctxt "model:ir.ui.menu,name:menu_babi"
+msgid "Business Intelligence"
+msgstr "商业智能"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_configuration"
+msgid "Configuration"
+msgstr "设置"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_expression"
+msgid "Expressions"
+msgstr "表达式"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_field"
+msgid "Fields"
+msgstr "字段"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_filter"
+msgid "Filters"
+msgstr "筛选器"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_pivot"
+msgid "Pivot Tables"
+msgstr "数据透视表"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table"
+msgid "Tables"
+msgstr "表"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table_cluster"
+msgid "Clusters"
+msgstr "集群"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table_tag"
+msgid "Table Tags"
+msgstr "表标签"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_warning"
+msgid "Warnings"
+msgstr "警告"
+
+msgctxt "model:ir.ui.menu,name:menu_configuration"
+msgid "Configuration"
+msgstr "设置"
+
+msgctxt "model:ir.ui.menu,name:menu_dashboard"
+msgid "Dashboards"
+msgstr "仪表板"
+
+msgctxt "model:ir.ui.menu,name:menu_widget"
+msgid "Widgets"
+msgstr "组件"
+
+msgctxt "model:res.group,name:group_babi"
+msgid "Business Intelligence"
+msgstr "商业智能"
+
+msgctxt "model:res.group,name:group_babi_admin"
+msgid "Business Intelligence Administration"
+msgstr "商业智能管理"
+
+msgctxt "model:res.group,name:group_babi_table"
+msgid "Business Intelligence Table"
+msgstr "商业智能表"
+
+msgctxt "model:www.download_report,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:res.group,name:group_babi_table_compute"
+msgid "Allow calculating tables"
+msgstr "允许计算表"
+
+msgctxt "model:www.download_report,name:"
+msgid "Download Report"
+msgstr "下载报表"
+
+msgctxt "model:www.index.pivot,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.index.pivot.null,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.layout.pivot,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_apply,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_compute,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_header.axis,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_header.level_field,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_header.measure,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_header.order,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_header.remove_field,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_header.selection,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_header.selection.add_field,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_header.selection.close_field,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_save,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_sidebar_tables,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "model:www.pivot_table,string:"
+msgid "Component"
+msgstr "组件"
+
+msgctxt "selection:babi.action.dashboard,records:"
+msgid "Listed"
+msgstr "已列出"
+
+msgctxt "selection:babi.action.dashboard,records:"
+msgid "Selected"
+msgstr "已选"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "URL"
+msgstr "网址"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Window"
+msgstr "窗口"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Wizard"
+msgstr "向导"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Boolean"
+msgstr "布尔型"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Char"
+msgstr "字符"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Date"
+msgstr "日期"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Date & Time"
+msgstr "日期和时间"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Float"
+msgstr "浮点型"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Integer"
+msgstr "整型"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Many To One"
+msgstr "多对一"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Numeric"
+msgstr "数字"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Model"
+msgstr "模型"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "View"
+msgstr "视图"
+
+msgctxt "selection:babi.field,type:"
+msgid "Boolean"
+msgstr "布尔型"
+
+msgctxt "selection:babi.field,type:"
+msgid "Char"
+msgstr "字符"
+
+msgctxt "selection:babi.field,type:"
+msgid "Date"
+msgstr "日期"
+
+msgctxt "selection:babi.field,type:"
+msgid "Date & Time"
+msgstr "日期和时间"
+
+msgctxt "selection:babi.field,type:"
+msgid "Float"
+msgstr "浮点型"
+
+msgctxt "selection:babi.field,type:"
+msgid "Integer"
+msgstr "整型"
+
+msgctxt "selection:babi.field,type:"
+msgid "Many To One"
+msgstr "多对一"
+
+msgctxt "selection:babi.field,type:"
+msgid "Numeric"
+msgstr "数字"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Boolean"
+msgstr "布尔型"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Char"
+msgstr "字符"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Date"
+msgstr "日期"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Date & Time"
+msgstr "日期和时间"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Float"
+msgstr "浮点型"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Integer"
+msgstr "整型"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Many To Many"
+msgstr "多对多"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Many To One"
+msgstr "多对一"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Numeric"
+msgstr "数字"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Average"
+msgstr "平均成本价法"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Count"
+msgstr "计数"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Max"
+msgstr "最大值"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Median"
+msgstr "中位数"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Min"
+msgstr "最小值"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Percentile"
+msgstr "百分位数"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Sum"
+msgstr "求和"
+
+msgctxt "selection:babi.pivot.order,order:"
+msgid "Ascending"
+msgstr "升序"
+
+msgctxt "selection:babi.pivot.order,order:"
+msgid "Descending"
+msgstr "降序"
+
+msgctxt "selection:babi.table,output_format:"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "selection:babi.table,output_format:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt "selection:babi.table,type:"
+msgid "Model"
+msgstr "模型"
+
+msgctxt "selection:babi.table,type:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "selection:babi.table,type:"
+msgid "View"
+msgstr "视图"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Always"
+msgstr "总是"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Never"
+msgstr "从不"
+
+msgctxt "selection:babi.table,warn:"
+msgid "No Records Found"
+msgstr "未找到记录"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Records Found"
+msgstr "找到记录"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "Not Computed"
+msgstr "尚未计算"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "⌛ Computing"
+msgstr "⌛ 计算中"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "✅ Successful"
+msgstr "✅ 成功"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "🔥 Failed"
+msgstr "🔥 失败"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Boolean"
+msgstr "布尔型"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Char"
+msgstr "字符"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Date"
+msgstr "日期"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Date & Time"
+msgstr "日期和时间"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Float"
+msgstr "浮点型"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Integer"
+msgstr "整型"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Many To Many"
+msgstr "多对多"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Many To One"
+msgstr "多对一"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Multi Selection"
+msgstr "多选"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Numeric"
+msgstr "数字"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Selection"
+msgstr "选择"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Done"
+msgstr "完成"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Ignored"
+msgstr "已忽略"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Pending"
+msgstr "待定"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "All"
+msgstr "全部"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "None"
+msgstr "无"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "Outliers"
+msgstr "异常值"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "Suspected Outliers"
+msgstr "疑似异常值"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "JPEG"
+msgstr "JPEG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "PNG"
+msgstr "PNG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "SVG"
+msgstr "SVG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "WebP"
+msgstr "WebP"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "Always"
+msgstr "总是"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "Never"
+msgstr "从不"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "On Hover"
+msgstr "悬停时"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Area"
+msgstr "阿尔塔州"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Bar"
+msgstr "条形图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Box"
+msgstr "箱线图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Bubble"
+msgstr "气泡图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Country Map"
+msgstr "国家地图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Doughnut"
+msgstr "环形图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Funnel"
+msgstr "漏斗图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Gauge"
+msgstr "仪表图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Line"
+msgstr "明细"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Pie"
+msgstr "饼图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Scatter"
+msgstr "散点图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Scatter Map"
+msgstr "散点地图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Sunburst"
+msgstr "旭日图"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Table"
+msgstr "表"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Value"
+msgstr "取值"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Average"
+msgstr "平均成本价法"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Count"
+msgstr "计数"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Maximum"
+msgstr "最大值"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Median"
+msgstr "中位数"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Minimum"
+msgstr "最小值"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Sum"
+msgstr "求和"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Colors"
+msgstr "颜色"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Labels"
+msgstr "标签"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Latitude"
+msgstr "纬度"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Locations"
+msgstr "库位"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Longitude"
+msgstr "经度"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Maximum"
+msgstr "最大值"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Minimum"
+msgstr "最小值"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Parents"
+msgstr "父级"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Reference"
+msgstr "参考"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Sizes"
+msgstr "大小"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Value"
+msgstr "取值"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Values"
+msgstr "数值"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "X"
+msgstr "X"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Y"
+msgstr "年"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Z"
+msgstr "Z"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Compute Business Intelligence Cluster"
+msgstr "计算商业智能集群"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Compute Business Intelligence Table"
+msgstr "计算商业智能表"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Delete Tables with Parameters"
+msgstr "删除带参数的表"
+
+msgctxt "selection:www.site,type:"
+msgid "Pivot"
+msgstr "透视表"
+
+msgctxt "view:babi.action.dashboard:"
+msgid "General"
+msgstr "普通"
+
+msgctxt "view:babi.configuration:"
+msgid "Business Intelligence Configuration"
+msgstr "商业智能配置"
+
+msgctxt "view:babi.expression:"
+msgid "Expression"
+msgstr "表达式"
+
+msgctxt "view:babi.filter.parameter:"
+msgid "Filter Parameter"
+msgstr "筛选参数"
+
+msgctxt "view:babi.filter:"
+msgid "Filter"
+msgstr "筛选"
+
+msgctxt "view:babi.table:"
+msgid "Access"
+msgstr "访问权限"
+
+msgctxt "view:babi.table:"
+msgid "Configuration"
+msgstr "设置"
+
+msgctxt "view:babi.table:"
+msgid "Dependencies"
+msgstr "依赖"
+
+msgctxt "view:babi.table:"
+msgid "Last Execution"
+msgstr "上次执行"
+
+msgctxt "view:babi.table:"
+msgid "Warning"
+msgstr "警告"
+
+msgctxt "view:babi.widget:"
+msgid "Settings"
+msgstr "设置"
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to calculate percentile or median of a text type field,"
+" please try with a numeric type field or change the operation."
+msgstr "提示：您正在对文本类型字段计算百分位数或中位数，请改用数值类型字段或更改运算。"
+
+msgctxt "xgettext:x:"
+msgid "Clear configuration"
+msgstr "清除配置"
+
+msgctxt "xgettext:x:"
+msgid "Hide sidebar"
+msgstr "隐藏侧边栏"
+
+msgctxt "xgettext:x:"
+msgid "Show sidebar"
+msgstr "显示侧边栏"
+
+msgctxt "xgettext:x:"
+msgid "Add row"
+msgstr "添加行"
+
+msgctxt "xgettext:x:"
+msgid "Add column"
+msgstr "添加列"
+
+msgctxt "xgettext:x:"
+msgid "Add property"
+msgstr "添加属性"
+
+msgctxt "xgettext:x:"
+msgid "Add measure"
+msgstr "添加度量"
+
+msgctxt "xgettext:x:"
+msgid "Move row up"
+msgstr "上移行"
+
+msgctxt "xgettext:x:"
+msgid "Move row down"
+msgstr "下移行"
+
+msgctxt "xgettext:x:"
+msgid "Remove row"
+msgstr "移除行"
+
+msgctxt "xgettext:x:"
+msgid "Move column up"
+msgstr "上移列"
+
+msgctxt "xgettext:x:"
+msgid "Move column down"
+msgstr "下移列"
+
+msgctxt "xgettext:x:"
+msgid "Remove column"
+msgstr "移除列"
+
+msgctxt "xgettext:x:"
+msgid "Move property up"
+msgstr "上移属性"
+
+msgctxt "xgettext:x:"
+msgid "Move property down"
+msgstr "下移属性"
+
+msgctxt "xgettext:x:"
+msgid "Remove property"
+msgstr "移除属性"
+
+msgctxt "xgettext:x:"
+msgid "Move measure up"
+msgstr "上移度量"
+
+msgctxt "xgettext:x:"
+msgid "Move measure down"
+msgstr "下移度量"
+
+msgctxt "xgettext:x:"
+msgid "Remove measure"
+msgstr "移除度量"
+
+msgctxt "xgettext:x:"
+msgid "Change order direction"
+msgstr "更改排序方向"
+
+msgctxt "xgettext:x:"
+msgid "Move order up"
+msgstr "上移排序项"
+
+msgctxt "xgettext:x:"
+msgid "Move order down"
+msgstr "下移排序项"
+
+msgctxt "xgettext:x:"
+msgid "Expand all"
+msgstr "全部展开"
+
+msgctxt "xgettext:x:"
+msgid "Collapse all"
+msgstr "全部折叠"
+
+msgctxt "xgettext:x:"
+msgid "Download"
+msgstr "下载"
+
+msgctxt "xgettext:x:"
+msgid "Swap rows and columns"
+msgstr "交换行列"
+
+msgctxt "wizard_button:babi.table.parametrize,start,create_table:"
+msgid "Create"
+msgstr "创建"
+
+msgctxt "wizard_button:babi.table.parametrize,start,end:"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "field:babi.clean_executions.start,date:"
+msgid "Date"
+msgstr "日期"
+
+msgctxt "field:babi.dimension.column,expand:"
+msgid "Expand"
+msgstr "展开"
+
+msgctxt "field:babi.dimension.column,expression:"
+msgid "Expression"
+msgstr "表达式"
+
+msgctxt "field:babi.dimension.column,internal_name:"
+msgid "Internal Name"
+msgstr "内部名称"
+
+msgctxt "field:babi.dimension.column,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.dimension.column,report:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "field:babi.dimension,expand:"
+msgid "Expand"
+msgstr "展开"
+
+msgctxt "field:babi.dimension,expression:"
+msgid "Expression"
+msgstr "表达式"
+
+msgctxt "field:babi.dimension,internal_name:"
+msgid "Internal Name"
+msgstr "内部名称"
+
+msgctxt "field:babi.dimension,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.dimension,report:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "field:babi.internal.measure,aggregate:"
+msgid "Aggregate"
+msgstr "聚合"
+
+msgctxt "field:babi.internal.measure,decimal_digits:"
+msgid "Decimal Digits"
+msgstr "小数位数"
+
+msgctxt "field:babi.internal.measure,expand:"
+msgid "Expand"
+msgstr "展开"
+
+msgctxt "field:babi.internal.measure,expression:"
+msgid "Expression"
+msgstr "表达式"
+
+msgctxt "field:babi.internal.measure,internal_name:"
+msgid "Internal Name"
+msgstr "内部名称"
+
+msgctxt "field:babi.internal.measure,measure:"
+msgid "Measure"
+msgstr "度量"
+
+msgctxt "field:babi.internal.measure,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.internal.measure,related_model:"
+msgid "Related Model"
+msgstr "关联模型"
+
+msgctxt "field:babi.internal.measure,ttype:"
+msgid "Field Type"
+msgstr "字段类型"
+
+msgctxt "field:babi.measure,aggregate:"
+msgid "Aggregate"
+msgstr "聚合"
+
+msgctxt "field:babi.measure,expand:"
+msgid "Expand"
+msgstr "展开"
+
+msgctxt "field:babi.measure,expression:"
+msgid "Expression"
+msgstr "表达式"
+
+msgctxt "field:babi.measure,internal_name:"
+msgid "Internal Name"
+msgstr "内部名称"
+
+msgctxt "field:babi.measure,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.measure,report:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "field:babi.open_chart.start,dimension:"
+msgid "Dimension"
+msgstr "维度"
+
+msgctxt "field:babi.open_chart.start,execution:"
+msgid "Execution"
+msgstr "执行"
+
+msgctxt "field:babi.open_chart.start,measures:"
+msgid "Measures"
+msgstr "度量"
+
+msgctxt "field:babi.open_chart.start,report:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "field:babi.open_chart.start,show_legend:"
+msgid "Show Legend"
+msgstr "显示图例"
+
+msgctxt "field:babi.order,dimension:"
+msgid "Dimension"
+msgstr "维度"
+
+msgctxt "field:babi.order,measure:"
+msgid "Measure"
+msgstr "度量"
+
+msgctxt "field:babi.order,order:"
+msgid "Order"
+msgstr "排序"
+
+msgctxt "field:babi.order,report:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "field:babi.report,babi_raise_user_error:"
+msgid "Raise User Error"
+msgstr "抛出用户错误"
+
+msgctxt "field:babi.report,crons:"
+msgid "Schedulers"
+msgstr "计划任务"
+
+msgctxt "field:babi.report,dimensions:"
+msgid "Dimensions"
+msgstr "维度"
+
+msgctxt "field:babi.report,email:"
+msgid "E-mail"
+msgstr "电子邮件"
+
+msgctxt "field:babi.report.execution,babi_model:"
+msgid "BI Model"
+msgstr "商业智能模型"
+
+msgctxt "field:babi.report.execution,company:"
+msgid "Company"
+msgstr "公司"
+
+msgctxt "field:babi.report.execution,filtered:"
+msgid "Filtered"
+msgstr "已筛选"
+
+msgctxt "field:babi.report.execution,internal_name:"
+msgid "Internal Name"
+msgstr "内部名称"
+
+msgctxt "field:babi.report.execution.open.select,execution:"
+msgid "Execution"
+msgstr "执行"
+
+msgctxt "field:babi.report.execution.open.select,report:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "field:babi.report.execution,report:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "field:babi.report.execution,state:"
+msgid "State"
+msgstr "状态"
+
+msgctxt "field:babi.report.execution,timeout:"
+msgid "Timeout"
+msgstr "超时"
+
+msgctxt "field:babi.report,filter:"
+msgid "Filter"
+msgstr "筛选"
+
+msgctxt "field:babi.report,groups:"
+msgid "Groups"
+msgstr "组"
+
+msgctxt "field:babi.report,internal_name:"
+msgid "Internal Name"
+msgstr "内部名称"
+
+msgctxt "field:babi.report,measures:"
+msgid "Measures"
+msgstr "度量"
+
+msgctxt "field:babi.report,menus:"
+msgid "Menus"
+msgstr "菜单"
+
+msgctxt "field:babi.report,model:"
+msgid "Model"
+msgstr "模型"
+
+msgctxt "field:babi.report,model_name:"
+msgid "Model Name"
+msgstr "模型名称"
+
+msgctxt "field:babi.report,name:"
+msgid "Name"
+msgstr "名称"
+
+msgctxt "field:babi.report,order:"
+msgid "Order"
+msgstr "排序"
+
+msgctxt "field:babi.report,report_cell_level:"
+msgid "Cell Level"
+msgstr "单元格层级"
+
+msgctxt "field:babi.report-res.group,group:"
+msgid "Group"
+msgstr "组"
+
+msgctxt "field:babi.report-res.group,report:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "field:babi.report,timeout:"
+msgid "Timeout"
+msgstr "超时"
+
+msgctxt "field:babi.report,to:"
+msgid "To"
+msgstr "到"
+
+msgctxt "field:babi.table,url:"
+msgid "URL"
+msgstr "网址"
+
+msgctxt "field:babi.voyager.open_session,expiration_date:"
+msgid "Expiration Date"
+msgstr "到期日期"
+
+msgctxt "field:babi.voyager.open_session,token:"
+msgid "Token"
+msgstr "令牌"
+
+msgctxt "field:babi.voyager.open_session,user:"
+msgid "User"
+msgstr "用户"
+
+msgctxt "field:www.pivot_header,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:www.pivot_header,header:"
+msgid "Header"
+msgstr "页眉"
+
+msgctxt "field:www.pivot_header,level_action:"
+msgid "Level Action"
+msgstr "层级动作"
+
+msgctxt "field:www.pivot_header.selection,field:"
+msgid "Field"
+msgstr "字段"
+
+msgctxt "field:www.pivot_header,table_name:"
+msgid "Table Name"
+msgstr "表名"
+
+msgctxt "field:www.pivot_header,table_properties:"
+msgid "Table Properties"
+msgstr "表属性"
+
+msgctxt "help:babi.dashboard.item,colspan:"
+msgid ""
+"Number of columns to occupy in the dashboard. The default is 1, the maximum "
+"4."
+msgstr "在仪表板中占用的列数。默认值为 1，最大值为 4。"
+
+msgctxt "help:babi.report,report_cell_level:"
+msgid "Start cell level that not has indentation"
+msgstr "不缩进的起始单元格层级"
+
+msgctxt "model:babi.action.dashboard,name:"
+msgid "Action Act Dashboard"
+msgstr "仪表板动作"
+
+msgctxt "model:babi.configuration,name:"
+msgid "Business Intelligence Configuration"
+msgstr "商业智能配置"
+
+msgctxt "model:babi.dashboard.item,name:"
+msgid "Dashboard Item"
+msgstr "仪表板项目"
+
+msgctxt "model:babi.dashboard,name:"
+msgid "Dashboard"
+msgstr "仪表板"
+
+msgctxt "model:babi.dimension.column,name:"
+msgid "Column Dimension"
+msgstr "列维度"
+
+msgctxt "model:babi.dimension,name:"
+msgid "Dimension"
+msgstr "维度"
+
+msgctxt "model:babi.expression,name:"
+msgid "Expression"
+msgstr "表达式"
+
+msgctxt "model:babi.field,name:"
+msgid "BABI Field"
+msgstr "BABI 字段"
+
+msgctxt "model:babi.filter,name:"
+msgid "Filter"
+msgstr "筛选"
+
+msgctxt "model:babi.filter.parameter,name:"
+msgid "Filter Parameter"
+msgstr "筛选参数"
+
+msgctxt "model:babi.measure,name:"
+msgid "Measure"
+msgstr "度量"
+
+msgctxt "model:babi.order,name:"
+msgid "Order"
+msgstr "排序"
+
+msgctxt "model:babi.pivot.column_dimension,name:"
+msgid "Pivot Column Dimension"
+msgstr "透视表列维度"
+
+msgctxt "model:babi.pivot.measure,name:"
+msgid "Pivot Measure"
+msgstr "透视表度量"
+
+msgctxt "model:babi.pivot,name:"
+msgid "Pivot Table"
+msgstr "数据透视表"
+
+msgctxt "model:babi.pivot.order,name:"
+msgid "Pivot Order"
+msgstr "透视表排序"
+
+msgctxt "model:babi.pivot.property,name:"
+msgid "Pivot Property"
+msgstr "透视表属性"
+
+msgctxt "model:babi.pivot.row_dimension,name:"
+msgid "Pivot Row Dimension"
+msgstr "透视表行维度"
+
+msgctxt "model:babi.report,name:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "model:babi.table.cluster,name:"
+msgid "BABI Table Cluster"
+msgstr "BABI 表集群"
+
+msgctxt "model:babi.table.dependency,name:"
+msgid "BABI Table Dependency"
+msgstr "BABI 表依赖关系"
+
+msgctxt "model:babi.table,name:"
+msgid "BABI Table"
+msgstr "BABI 表"
+
+msgctxt "model:babi.table.parameters,name:"
+msgid "Table Parameters"
+msgstr "表参数"
+
+msgctxt "model:babi.table.query_parameter,name:"
+msgid "Table Query Parameter"
+msgstr "表查询参数"
+
+msgctxt "model:babi.table-res.group,name:"
+msgid "BABI Table Group"
+msgstr "BABI 表用户组"
+
+msgctxt "model:babi.table-res.user,name:"
+msgid "BABI Table User"
+msgstr "BABI 表用户"
+
+msgctxt "model:babi.test,name:"
+msgid "Test BABI Model"
+msgstr "测试 BABI 模型"
+
+msgctxt "model:babi.voyager.open_session,string:"
+msgid "Babi Voyager Open Session"
+msgstr "BABI Voyager 打开会话"
+
+msgctxt "model:babi.warning,name:"
+msgid "BABI Warning"
+msgstr "BABI 警告"
+
+msgctxt "model:babi.widget,name:"
+msgid "Widget"
+msgstr "组件"
+
+msgctxt "model:babi.widget.parameter,name:"
+msgid "Widget Parameter"
+msgstr "组件参数"
+
+msgctxt "model:ir.action,name:act_babi_voyager_url"
+msgid "Pivot Tables"
+msgstr "数据透视表"
+
+msgctxt "model:ir.action,name:act_babi_open_voyager"
+msgid "Pivot Tables"
+msgstr "数据透视表"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_open_voyager"
+msgid "Pivot Tables"
+msgstr "数据透视表"
+
+msgctxt "model:www.index.pivot,name:"
+msgid "Index"
+msgstr "索引"
+
+msgctxt "model:www.index.pivot.null,name:"
+msgid "Index Null"
+msgstr "空索引"
+
+msgctxt "model:www.layout.pivot,name:"
+msgid "Layout"
+msgstr "布局"
+
+msgctxt "model:www.pivot_header.axis,name:"
+msgid "Pivot Header Axis"
+msgstr "透视表表头坐标轴"
+
+msgctxt "model:www.pivot_header.level_field,name:"
+msgid "Pivot Header"
+msgstr "透视表表头"
+
+msgctxt "model:www.pivot_header.measure,name:"
+msgid "Pivot Header Measure"
+msgstr "透视表表头度量"
+
+msgctxt "model:www.pivot_header,name:"
+msgid "Pivot Header"
+msgstr "透视表表头"
+
+msgctxt "model:www.pivot_header.order,name:"
+msgid "Pivot Header Component"
+msgstr "透视表表头组件"
+
+msgctxt "model:www.pivot_header.remove_field,name:"
+msgid "Pivot Header"
+msgstr "透视表表头"
+
+msgctxt "model:www.pivot_header.selection.add_field,name:"
+msgid "Pivot Header Selection Add Field"
+msgstr "透视表表头选择添加字段"
+
+msgctxt "model:www.pivot_header.selection.close_field,name:"
+msgid "Pivot Header Selection Close Field"
+msgstr "透视表表头选择关闭字段"
+
+msgctxt "model:www.pivot_header.selection,name:"
+msgid "Pivot Header Selection"
+msgstr "透视表表头选择"
+
+msgctxt "model:www.pivot_table,name:"
+msgid "Pivot Table"
+msgstr "数据透视表"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Query"
+msgstr "查询"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Min"
+msgstr "最小值"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Sum"
+msgstr "求和"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Count"
+msgstr "计数"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Average"
+msgstr "平均成本价法"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Max"
+msgstr "最大值"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Numeric"
+msgstr "数字"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Boolean"
+msgstr "布尔型"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Integer"
+msgstr "整型"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Char"
+msgstr "字符"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Float"
+msgstr "浮点型"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Many To One"
+msgstr "多对一"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Date"
+msgstr "日期"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Date & Time"
+msgstr "日期和时间"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Sum"
+msgstr "求和"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Min"
+msgstr "最小值"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Average"
+msgstr "平均成本价法"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Max"
+msgstr "最大值"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Count"
+msgstr "计数"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Pie"
+msgstr "饼图"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Line"
+msgstr "明细"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Report"
+msgstr "报告"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "HTML"
+msgstr "HTML"
+
+msgctxt "selection:babi.order,order:"
+msgid "Ascending"
+msgstr "升序"
+
+msgctxt "selection:babi.order,order:"
+msgid "Descending"
+msgstr "降序"
+
+msgctxt "selection:babi.report.execution.open.select,view_type:"
+msgid "List"
+msgstr "列表"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Calculated"
+msgstr "已计算"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Timeout"
+msgstr "超时"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Failed"
+msgstr "失败"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Pending"
+msgstr "待定"
+
+msgctxt "selection:babi.table,type:"
+msgid "Query"
+msgstr "查询"
+
+msgctxt "selection:ir.ui.menu,babi_type:"
+msgid "List"
+msgstr "列表"
+
+msgctxt "selection:ir.ui.menu,babi_type:"
+msgid "Wizard"
+msgstr "向导"
+
+msgctxt "wizard_button:babi.clean_executions,start,end:"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "wizard_button:babi.open_chart,start,end:"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "wizard_button:babi.open_chart,start,open_:"
+msgid "Open"
+msgstr "打开"
+
+msgctxt "wizard_button:babi.open_chart,start,print_:"
+msgid "Print"
+msgstr "打印"
+
+msgctxt "wizard_button:babi.report.execution.open,filtered,create_execution:"
+msgid "Open"
+msgstr "打开"
+
+msgctxt "wizard_button:babi.report.execution.open,filtered,end:"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "wizard_button:babi.report.execution.open,select,end:"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "wizard_button:babi.report.execution.open,select,open_view:"
+msgid "Open"
+msgstr "打开"
+
+msgctxt "wizard_button:babi.report.execution.open,update_start,end:"
+msgid "Cancel"
+msgstr "取消"
