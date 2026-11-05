@@ -21,6 +21,7 @@ from trytond.modules.babi.babi_eval import babi_eval, babi_eval_batch
 from trytond.modules.babi.table import (
     ModelComputeFieldError, compute_model_insert_values)
 from trytond.modules.babi.cube import Cube
+from trytond.modules.babi.dashboard import Result, ResultSet
 from trytond.pyson import PYSONEncoder
 from trytond.modules.company.tests import CompanyTestMixin
 
@@ -649,5 +650,33 @@ class BabiTestCase(BabiCompanyTestMixin, ModuleTestCase):
 
         with self.assertRaises(ValidationError):
             ColumnDimension(pivot=pivot, field=fields['company']).save()
+
+    def test_resultset_z_values_on_x_y_missing_y(self):
+        values = ResultSet(
+            [('x', 'Year'), ('z', 'Category'), ('values', 'Amount')],
+            [
+                ['2024', 'odd', 10],
+                ['2025', 'even', 20],
+            ])
+
+        result = values.z_values_on_x_y()
+
+        self.assertEqual(result.results, [])
+
+    def test_resultset_z_values_on_x_y_unaligned_lengths(self):
+        values = ResultSet()
+        values.results = [
+            Result('x', 'Year', ['2024', '2025']),
+            Result('y', 'Amount', [10]),
+            Result('z', 'Category', ['odd', 'even']),
+        ]
+
+        result = values.z_values_on_x_y()
+
+        self.assertEqual(len(result.results), 3)
+        self.assertEqual(result.values_by_type('x').values, ['2024'])
+        self.assertEqual(
+            [x.values for x in result.value_list_by_type('y')],
+            [[10], [None]])
 
 del ModuleTestCase
