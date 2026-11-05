@@ -141,8 +141,12 @@ class ResultSet:
         ys = self.values_by_type('y')
         zs = self.values_by_type('z')
 
+        if not ys or not zs:
+            return ResultSet()
+
         indexed = OrderedDict()
-        for pos in range(len(ys.values)):
+        size = min(len(ys.values), len(zs.values))
+        for pos in range(size):
             y = ys.values[pos]
             z = zs.values[pos]
             indexed.setdefault(z, []).append(y)
@@ -163,12 +167,17 @@ class ResultSet:
         xs = self.values_by_type('x')
         ys = self.values_by_type('y')
         zs = self.values_by_type('z')
+
+        if not xs or not ys or not zs:
+            return ResultSet()
+
         zz = OrderedDict()
         for z in zs.values:
             zz.setdefault(z)
 
         indexed = OrderedDict()
-        for pos in range(len(xs.values)):
+        size = min(len(xs.values), len(ys.values), len(zs.values))
+        for pos in range(size):
             x = xs.values[pos]
             y = ys.values[pos]
             z = zs.values[pos]
