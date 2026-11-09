@@ -1,0 +1,3520 @@
+#
+msgid ""
+msgstr ""
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "field:babi.action.dashboard,action:"
+msgid "Action"
+msgstr "Művelet"
+
+msgctxt "field:babi.action.dashboard,dashboard:"
+msgid "Dashboard"
+msgstr "Irányítópult"
+
+msgctxt "field:babi.action.dashboard,groups:"
+msgid "Groups"
+msgstr "Csoportok"
+
+msgctxt "field:babi.action.dashboard,icon:"
+msgid "Icon"
+msgstr "Ikon"
+
+msgctxt "field:babi.action.dashboard,keywords:"
+msgid "Keywords"
+msgstr "Kulcsszavak"
+
+msgctxt "field:babi.action.dashboard,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.action.dashboard,records:"
+msgid "Records"
+msgstr "Rekordok"
+
+msgctxt "field:babi.action.dashboard,type:"
+msgid "Type"
+msgstr "Típus"
+
+msgctxt "field:babi.action.dashboard,usage:"
+msgid "Usage"
+msgstr "Használat"
+
+msgctxt "field:babi.configuration,default_timeout:"
+msgid "Timeout (s)"
+msgstr "Időkorlát (s)"
+
+msgctxt "field:babi.configuration,report_cell_level:"
+msgid "Cell Level"
+msgstr "Cellaszint"
+
+msgctxt "field:babi.dashboard,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.dashboard,view:"
+msgid "View"
+msgstr "Nézet"
+
+msgctxt "field:babi.dashboard,widgets:"
+msgid "Widgets"
+msgstr "Vezérlők"
+
+msgctxt "field:babi.dashboard.item,children:"
+msgid "Children"
+msgstr "Alárendelt rekordok"
+
+msgctxt "field:babi.dashboard.item,colspan:"
+msgid "Columns"
+msgstr "Oszlopok"
+
+msgctxt "field:babi.dashboard.item,dashboard:"
+msgid "Dashboard"
+msgstr "Irányítópult"
+
+msgctxt "field:babi.dashboard.item,height:"
+msgid "Height"
+msgstr "Magasság"
+
+msgctxt "field:babi.dashboard.item,parent:"
+msgid "Parent"
+msgstr "Fölérendelt"
+
+msgctxt "field:babi.dashboard.item,widget:"
+msgid "Widget"
+msgstr "Vezérlő"
+
+msgctxt "field:babi.expression,checked:"
+msgid "Checked"
+msgstr "Ellenőrizve"
+
+msgctxt "field:babi.expression,decimal_digits:"
+msgid "Decimal Digits"
+msgstr "Tizedesjegyek száma"
+
+msgctxt "field:babi.expression,error:"
+msgid "Error"
+msgstr "Hiba"
+
+msgctxt "field:babi.expression,expression:"
+msgid "Expression"
+msgstr "Kifejezés"
+
+msgctxt "field:babi.expression,fields:"
+msgid "Model Fields"
+msgstr "Modellmezők"
+
+msgctxt "field:babi.expression,model:"
+msgid "Model"
+msgstr "Minta"
+
+msgctxt "field:babi.expression,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.expression,related_model:"
+msgid "Related Model"
+msgstr "Kapcsolódó modell"
+
+msgctxt "field:babi.expression,ttype:"
+msgid "Field Type"
+msgstr "Mezőtípus"
+
+msgctxt "field:babi.field,descending:"
+msgid "Descending"
+msgstr "Csökkenő"
+
+msgctxt "field:babi.field,expression:"
+msgid "Expression"
+msgstr "Kifejezés"
+
+msgctxt "field:babi.field,internal_name:"
+msgid "Internal Name"
+msgstr "Belső név"
+
+msgctxt "field:babi.field,model:"
+msgid "Model"
+msgstr "Minta"
+
+msgctxt "field:babi.field,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.field,order:"
+msgid "Order"
+msgstr "Sorrend"
+
+msgctxt "field:babi.field,show:"
+msgid "Show"
+msgstr "Megjelenítés"
+
+msgctxt "field:babi.field,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.field,table_type:"
+msgid "Table Type"
+msgstr "Tábla típusa"
+
+msgctxt "field:babi.field,type:"
+msgid "Type"
+msgstr "Típus"
+
+msgctxt "field:babi.filter,checked:"
+msgid "Checked"
+msgstr "Ellenőrizve"
+
+msgctxt "field:babi.filter,context:"
+msgid "Context"
+msgstr "Kontextus"
+
+msgctxt "field:babi.filter,domain:"
+msgid "Domain"
+msgstr "Érvényesség"
+
+msgctxt "field:babi.filter,domain_error:"
+msgid "Domain Error"
+msgstr "Szűrési tartomány hibája"
+
+msgctxt "field:babi.filter,expression_error:"
+msgid "Expression Error"
+msgstr "Kifejezés hibája"
+
+msgctxt "field:babi.filter,fields:"
+msgid "Model Fields"
+msgstr "Modellmezők"
+
+msgctxt "field:babi.filter,model:"
+msgid "Model"
+msgstr "Minta"
+
+msgctxt "field:babi.filter,model_name:"
+msgid "Model Name"
+msgstr "Mintanév"
+
+msgctxt "field:babi.filter,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.filter,parameters:"
+msgid "Parameters"
+msgstr "Paraméterek"
+
+msgctxt "field:babi.filter,python_expression:"
+msgid "Python Expression"
+msgstr "Python-kifejezés"
+
+msgctxt "field:babi.filter,view_search:"
+msgid "Search"
+msgstr "Keresés"
+
+msgctxt "field:babi.filter.parameter,digits:"
+msgid "Digits"
+msgstr "Tizedesjegyek"
+
+msgctxt "field:babi.filter.parameter,filter:"
+msgid "Filter"
+msgstr "Szűrő"
+
+msgctxt "field:babi.filter.parameter,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.filter.parameter,related_model:"
+msgid "Related Model"
+msgstr "Kapcsolódó modell"
+
+msgctxt "field:babi.filter.parameter,ttype:"
+msgid "Field Type"
+msgstr "Mezőtípus"
+
+msgctxt "field:babi.pivot,active:"
+msgid "Active"
+msgstr "Aktív"
+
+msgctxt "field:babi.pivot,active_stored:"
+msgid "Active Stored"
+msgstr "Tárolt aktív állapot"
+
+msgctxt "field:babi.pivot,column_dimensions:"
+msgid "Column Dimensions"
+msgstr "Oszlopdimenziók"
+
+msgctxt "field:babi.pivot,measures:"
+msgid "Measures"
+msgstr "Mérőszámok"
+
+msgctxt "field:babi.pivot,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.pivot,order:"
+msgid "Order"
+msgstr "Sorrend"
+
+msgctxt "field:babi.pivot,properties:"
+msgid "Properties"
+msgstr "Tulajdonságok"
+
+msgctxt "field:babi.pivot,row_dimensions:"
+msgid "Row Dimensions"
+msgstr "Sordimenziók"
+
+msgctxt "field:babi.pivot,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.pivot,url:"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "field:babi.pivot.column_dimension,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:babi.pivot.column_dimension,pivot:"
+msgid "Pivot"
+msgstr "Kimutatás"
+
+msgctxt "field:babi.pivot.column_dimension,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.pivot.measure,aggregate:"
+msgid "Aggregate"
+msgstr "Összesítés"
+
+msgctxt "field:babi.pivot.measure,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:babi.pivot.measure,over_field:"
+msgid "Over Field"
+msgstr "Alapul szolgáló mező"
+
+msgctxt "field:babi.pivot.measure,percentile:"
+msgid "Percentile"
+msgstr "Percentilis"
+
+msgctxt "field:babi.pivot.measure,pivot:"
+msgid "Pivot"
+msgstr "Kimutatás"
+
+msgctxt "field:babi.pivot.measure,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.pivot.order,element:"
+msgid "Element"
+msgstr "Elem"
+
+msgctxt "field:babi.pivot.order,order:"
+msgid "Order"
+msgstr "Sorrend"
+
+msgctxt "field:babi.pivot.order,pivot:"
+msgid "Pivot"
+msgstr "Kimutatás"
+
+msgctxt "field:babi.pivot.order,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.pivot.property,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:babi.pivot.property,pivot:"
+msgid "Pivot"
+msgstr "Kimutatás"
+
+msgctxt "field:babi.pivot.property,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.pivot.row_dimension,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:babi.pivot.row_dimension,pivot:"
+msgid "Pivot"
+msgstr "Kimutatás"
+
+msgctxt "field:babi.pivot.row_dimension,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.table,access_groups:"
+msgid "Access Groups"
+msgstr "Hozzáférő csoportok"
+
+msgctxt "field:babi.table,access_users:"
+msgid "Access Users"
+msgstr "Hozzáférő felhasználók"
+
+msgctxt "field:babi.table,babi_raise_user_error:"
+msgid "Raise User Error"
+msgstr "Felhasználói hiba jelzése"
+
+msgctxt "field:babi.table,base_table:"
+msgid "Base Table"
+msgstr "Alaptábla"
+
+msgctxt "field:babi.table,calculation_date:"
+msgid "Date of calculation"
+msgstr "Számítás dátuma"
+
+msgctxt "field:babi.table,calculation_time:"
+msgid "Time taken to calculate (in seconds)"
+msgstr "Számítás időtartama (másodpercben)"
+
+msgctxt "field:babi.table,cluster:"
+msgid "Cluster"
+msgstr "Fürt"
+
+msgctxt "field:babi.table,cluster_date:"
+msgid "Request Date"
+msgstr "Kérés dátuma"
+
+msgctxt "field:babi.table,comment:"
+msgid "Comment"
+msgstr "Megjegyzés"
+
+msgctxt "field:babi.table,company:"
+msgid "Company"
+msgstr "Cég"
+
+msgctxt "field:babi.table,company_field:"
+msgid "Company Field"
+msgstr "Vállalatmező"
+
+msgctxt "field:babi.table,compute_error:"
+msgid "Compute Error"
+msgstr "Számítási hiba"
+
+msgctxt "field:babi.table,compute_warning_error:"
+msgid "Compute Warning Error"
+msgstr "Figyelmeztetés számítási hibája"
+
+msgctxt "field:babi.table,crons:"
+msgid "Schedulers"
+msgstr "Ütemezők"
+
+msgctxt "field:babi.table,email_template:"
+msgid "Email Template"
+msgstr "E-mail-sablon"
+
+msgctxt "field:babi.table,employee:"
+msgid "Employee"
+msgstr "Alkalmazott"
+
+msgctxt "field:babi.table,employee_field:"
+msgid "Employee Field"
+msgstr "Munkavállalómező"
+
+msgctxt "field:babi.table,fields_:"
+msgid "Fields"
+msgstr "Mezők"
+
+msgctxt "field:babi.table,filter:"
+msgid "Filter"
+msgstr "Szűrő"
+
+msgctxt "field:babi.table,group:"
+msgid "Group"
+msgstr "Csoport"
+
+msgctxt "field:babi.table,internal_name:"
+msgid "Internal Name"
+msgstr "Belső név"
+
+msgctxt "field:babi.table,last_warning_execution:"
+msgid "Last Warning Execution"
+msgstr "Utolsó figyelmeztetés-végrehajtás"
+
+msgctxt "field:babi.table,model:"
+msgid "Model"
+msgstr "Minta"
+
+msgctxt "field:babi.table,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.table,output_format:"
+msgid "Output Format"
+msgstr "Kimeneti formátum"
+
+msgctxt "field:babi.table,parameters:"
+msgid "Parameters"
+msgstr "Paraméterek"
+
+msgctxt "field:babi.table,parametrized_user:"
+msgid "Parametrized User"
+msgstr "Paraméterezett felhasználó"
+
+msgctxt "field:babi.table,party:"
+msgid "Party"
+msgstr "Ügyfél"
+
+msgctxt "field:babi.table,party_field:"
+msgid "Party Field"
+msgstr "Partnermező"
+
+msgctxt "field:babi.table,pivot_table:"
+msgid "Pivot Table"
+msgstr "Kimutatástábla"
+
+msgctxt "field:babi.table,pivots:"
+msgid "Pivot Tables"
+msgstr "Kimutatástáblák"
+
+msgctxt "field:babi.table,preview:"
+msgid "Preview"
+msgstr "Előnézet"
+
+msgctxt "field:babi.table,preview_filename:"
+msgid "Preview Filename"
+msgstr "Előnézet fájlneve"
+
+msgctxt "field:babi.table,preview_limit:"
+msgid "Preview Limit"
+msgstr "Előnézeti korlát"
+
+msgctxt "field:babi.table,query:"
+msgid "Query"
+msgstr "Lekérdezés"
+
+msgctxt "field:babi.table,query_parameters:"
+msgid "Query Parameters"
+msgstr "Lekérdezési paraméterek"
+
+msgctxt "field:babi.table,related_field:"
+msgid "Related Field"
+msgstr "Kapcsolódó mező"
+
+msgctxt "field:babi.table,related_model:"
+msgid "Related Model"
+msgstr "Kapcsolódó modell"
+
+msgctxt "field:babi.table,required_by:"
+msgid "Required By"
+msgstr "Függő elemek"
+
+msgctxt "field:babi.table,required_by_tables:"
+msgid "Required By Tables"
+msgstr "Ettől függő táblák"
+
+msgctxt "field:babi.table,requires:"
+msgid "Requires"
+msgstr "Függőségek"
+
+msgctxt "field:babi.table,requires_tables:"
+msgid "Requires Tables"
+msgstr "Szükséges táblák"
+
+msgctxt "field:babi.table,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:babi.table,tags:"
+msgid "Tags"
+msgstr "Címkék"
+
+msgctxt "field:babi.table,timeout:"
+msgid "Timeout"
+msgstr "Időkorlát"
+
+msgctxt "field:babi.table,type:"
+msgid "Type"
+msgstr "Típus"
+
+msgctxt "field:babi.table,user:"
+msgid "User"
+msgstr "Felhasználó"
+
+msgctxt "field:babi.table,user_field:"
+msgid "User Field"
+msgstr "Felhasználómező"
+
+msgctxt "field:babi.table,warn:"
+msgid "Warn"
+msgstr "Figyelmeztetés"
+
+msgctxt "field:babi.table,warning_description:"
+msgid "Description"
+msgstr "Leírás"
+
+msgctxt "field:babi.table-babi.table.tag,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.table-babi.table.tag,tag:"
+msgid "Tag"
+msgstr "Címke"
+
+msgctxt "field:babi.table-res.group,babi_table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.table-res.group,user:"
+msgid "Group"
+msgstr "Csoport"
+
+msgctxt "field:babi.table-res.user,babi_table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.table-res.user,user:"
+msgid "User"
+msgstr "Felhasználó"
+
+msgctxt "field:babi.table.cluster,active:"
+msgid "Active"
+msgstr "Aktív"
+
+msgctxt "field:babi.table.cluster,computation_end_date:"
+msgid "Computation End Date"
+msgstr "Számítás befejezésének dátuma"
+
+msgctxt "field:babi.table.cluster,computation_start_date:"
+msgid "Computation Start Date"
+msgstr "Számítás kezdésének dátuma"
+
+msgctxt "field:babi.table.cluster,computation_state:"
+msgid "State"
+msgstr "Állapot"
+
+msgctxt "field:babi.table.cluster,crons:"
+msgid "Schedulers"
+msgstr "Ütemezők"
+
+msgctxt "field:babi.table.cluster,elapsed:"
+msgid "Elapsed"
+msgstr "Eltelt idő"
+
+msgctxt "field:babi.table.cluster,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.table.cluster,root_tables:"
+msgid "Tables"
+msgstr "Táblák"
+
+msgctxt "field:babi.table.cluster,tables:"
+msgid "Tables"
+msgstr "Táblák"
+
+msgctxt "field:babi.table.dependency,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.table.dependency,required_by:"
+msgid "Required By"
+msgstr "Függő elemek"
+
+msgctxt "field:babi.table.dependency,table:"
+msgid "Requires"
+msgstr "Függőségek"
+
+msgctxt "field:babi.table.query_parameter,digits:"
+msgid "Digits"
+msgstr "Tizedesjegyek"
+
+msgctxt "field:babi.table.query_parameter,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.table.query_parameter,related_model:"
+msgid "Related Model"
+msgstr "Kapcsolódó modell"
+
+msgctxt "field:babi.table.query_parameter,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.table.query_parameter,ttype:"
+msgid "Field Type"
+msgstr "Mezőtípus"
+
+msgctxt "field:babi.table.query_parameter,values_query:"
+msgid "Values Query"
+msgstr "Értékek lekérdezése"
+
+msgctxt "field:babi.table.tag,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.test,amount:"
+msgid "Amount"
+msgstr "Összeg"
+
+msgctxt "field:babi.test,category:"
+msgid "Category"
+msgstr "Kategória"
+
+msgctxt "field:babi.test,date:"
+msgid "Date"
+msgstr "Dátum"
+
+msgctxt "field:babi.warning,company:"
+msgid "Company"
+msgstr "Cég"
+
+msgctxt "field:babi.warning,count:"
+msgid "Records found"
+msgstr "Talált rekordok"
+
+msgctxt "field:babi.warning,description:"
+msgid "Description"
+msgstr "Leírás"
+
+msgctxt "field:babi.warning,done_by:"
+msgid "Done By"
+msgstr "Befejezte"
+
+msgctxt "field:babi.warning,emails:"
+msgid "E-mails"
+msgstr "E-mailek"
+
+msgctxt "field:babi.warning,employee:"
+msgid "Employee"
+msgstr "Alkalmazott"
+
+msgctxt "field:babi.warning,group:"
+msgid "Group"
+msgstr "Csoport"
+
+msgctxt "field:babi.warning,has_related_records:"
+msgid "Has Related Field"
+msgstr "Van kapcsolódó mező"
+
+msgctxt "field:babi.warning,ignored_by:"
+msgid "Ignored By"
+msgstr "Figyelmen kívül hagyta"
+
+msgctxt "field:babi.warning,party:"
+msgid "Party"
+msgstr "Ügyfél"
+
+msgctxt "field:babi.warning,preview:"
+msgid "Preview"
+msgstr "Előnézet"
+
+msgctxt "field:babi.warning,preview_filename:"
+msgid "Preview Filename"
+msgstr "Előnézet fájlneve"
+
+msgctxt "field:babi.warning,state:"
+msgid "State"
+msgstr "Állapot"
+
+msgctxt "field:babi.warning,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.warning,table_to_show:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.warning,timestamp:"
+msgid "Timestamp"
+msgstr "Időbélyeg"
+
+msgctxt "field:babi.warning,user:"
+msgid "User"
+msgstr "Felhasználó"
+
+msgctxt "field:babi.warning,users:"
+msgid "Users"
+msgstr "Felhasználók"
+
+msgctxt "field:babi.widget,box_points:"
+msgid "Box Points"
+msgstr "Dobozdiagram pontjai"
+
+msgctxt "field:babi.widget,chart:"
+msgid "Chart"
+msgstr "Diagram"
+
+msgctxt "field:babi.widget,help:"
+msgid "Help"
+msgstr "Súgó"
+
+msgctxt "field:babi.widget,image_format:"
+msgid "Image Format"
+msgstr "Képformátum"
+
+msgctxt "field:babi.widget,limit:"
+msgid "Limit"
+msgstr "Korlát"
+
+msgctxt "field:babi.widget,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.widget,parameters:"
+msgid "Parameters"
+msgstr "Paraméterek"
+
+msgctxt "field:babi.widget,show_legend:"
+msgid "Show Legend"
+msgstr "Jelmagyarázat megjelenítése"
+
+msgctxt "field:babi.widget,show_title:"
+msgid "Show Title"
+msgstr "Cím megjelenítése"
+
+msgctxt "field:babi.widget,show_toolbox:"
+msgid "Show Toolbox"
+msgstr "Eszköztár megjelenítése"
+
+msgctxt "field:babi.widget,static:"
+msgid "Static"
+msgstr "Statikus"
+
+msgctxt "field:babi.widget,table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:babi.widget,timeout:"
+msgid "Timeout (s)"
+msgstr "Időkorlát (s)"
+
+msgctxt "field:babi.widget,total_branch_values:"
+msgid "Total Branch Values"
+msgstr "Ágértékek összesen"
+
+msgctxt "field:babi.widget,type:"
+msgid "Type"
+msgstr "Típus"
+
+msgctxt "field:babi.widget,where:"
+msgid "Where"
+msgstr "Feltétel"
+
+msgctxt "field:babi.widget,zoom:"
+msgid "Zoom"
+msgstr "Nagyítás"
+
+msgctxt "field:babi.widget.parameter,aggregate:"
+msgid "Aggregate"
+msgstr "Összesítés"
+
+msgctxt "field:babi.widget.parameter,aggregate_invisible:"
+msgid "Aggregate Invisible"
+msgstr "Összesítés láthatatlan"
+
+msgctxt "field:babi.widget.parameter,aggregate_required:"
+msgid "Aggregate Required"
+msgstr "Összesítés kötelező"
+
+msgctxt "field:babi.widget.parameter,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:babi.widget.parameter,type:"
+msgid "Type"
+msgstr "Típus"
+
+msgctxt "field:babi.widget.parameter,widget:"
+msgid "Widget"
+msgstr "Vezérlő"
+
+msgctxt "field:ir.cron,babi_cluster:"
+msgid "Cluster"
+msgstr "Fürt"
+
+msgctxt "field:ir.cron,babi_compute_warnings:"
+msgid "Compute Warnings"
+msgstr "Figyelmeztetések kiszámítása"
+
+msgctxt "field:ir.cron,babi_table:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "field:ir.model,babi_enabled:"
+msgid "BI Enabled"
+msgstr "BI engedélyezve"
+
+msgctxt "field:www.download_report,output_format:"
+msgid "Output Format"
+msgstr "Kimeneti formátum"
+
+msgctxt "field:www.download_report,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.download_report,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.index.pivot,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.index.pivot,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.index.pivot.null,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.index.pivot.null,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.layout.pivot,title:"
+msgid "Title"
+msgstr "Címsor"
+
+msgctxt "field:www.pivot_apply,pivot:"
+msgid "Pivot"
+msgstr "Kimutatás"
+
+msgctxt "field:www.pivot_apply,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_apply,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_compute,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_compute,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_header.axis,axis:"
+msgid "Axis"
+msgstr "Tengely"
+
+msgctxt "field:www.pivot_header.axis,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header.axis,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header.axis,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_header.level_field,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:www.pivot_header.level_field,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header.level_field,level_action:"
+msgid "Level Action"
+msgstr "Szint művelete"
+
+msgctxt "field:www.pivot_header.level_field,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header.level_field,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_header.measure,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header.measure,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header.measure,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_header.order,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header.order,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header.order,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_header.remove_field,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:www.pivot_header.remove_field,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header.remove_field,level_action:"
+msgid "Level Action"
+msgstr "Szint művelete"
+
+msgctxt "field:www.pivot_header.remove_field,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header.remove_field,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_header.selection,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header.selection,measure:"
+msgid "Measure"
+msgstr "Mérőszám"
+
+msgctxt "field:www.pivot_header.selection,over_field:"
+msgid "Over Field"
+msgstr "Alapul szolgáló mező"
+
+msgctxt "field:www.pivot_header.selection,percentile:"
+msgid "Percentile"
+msgstr "Percentilis"
+
+msgctxt "field:www.pivot_header.selection,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header.selection,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_header.selection.add_field,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:www.pivot_header.selection.add_field,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header.selection.add_field,measure:"
+msgid "Measure"
+msgstr "Mérőszám"
+
+msgctxt "field:www.pivot_header.selection.add_field,over_field:"
+msgid "Over Field"
+msgstr "Alapul szolgáló mező"
+
+msgctxt "field:www.pivot_header.selection.add_field,percentile:"
+msgid "Percentile"
+msgstr "Percentilis"
+
+msgctxt "field:www.pivot_header.selection.add_field,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header.selection.add_field,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_header.selection.close_field,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:www.pivot_header.selection.close_field,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header.selection.close_field,measure:"
+msgid "Measure"
+msgstr "Mérőszám"
+
+msgctxt "field:www.pivot_header.selection.close_field,over_field:"
+msgid "Over Field"
+msgstr "Alapul szolgáló mező"
+
+msgctxt "field:www.pivot_header.selection.close_field,percentile:"
+msgid "Percentile"
+msgstr "Percentilis"
+
+msgctxt "field:www.pivot_header.selection.close_field,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header.selection.close_field,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_save,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:www.pivot_save,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_save,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_sidebar_tables,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_sidebar_tables,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "field:www.pivot_table,output_format:"
+msgid "Output Format"
+msgstr "Kimeneti formátum"
+
+msgctxt "field:www.pivot_table,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_table,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "help:babi.action.dashboard,records:"
+msgid "The records on which the action runs."
+msgstr "A rekordok, amelyeken a művelet fut."
+
+msgctxt "help:babi.configuration,report_cell_level:"
+msgid "Start cell level that not has indentation"
+msgstr "Behúzás nélküli kezdő cellaszint"
+
+msgctxt "help:babi.dashboard.item,height:"
+msgid "The default is 450px"
+msgstr "Az alapértelmezett érték 450px"
+
+msgctxt "help:babi.expression,expression:"
+msgid ""
+"Python expression that will return the value to be used.\n"
+"The expression can include the following variables:\n"
+"\n"
+"- \"o\": A reference to the current record being processed. For  example: \"o.party.name\"\n"
+"\n"
+"And the following functions apply to dates and timestamps:\n"
+"\n"
+"- \"y()\": Returns the year (as a string)\n"
+"- \"m()\": Returns the month (as a string)\n"
+"- \"w()\": Returns the week (as a string)\n"
+"- \"d()\": Returns the day (as a string)\n"
+"- \"ym()\": Returns the year-month (as a string)\n"
+"- \"ymd()\": Returns the year-month-day (as a string).\n"
+msgstr ""
+"A használandó értéket visszaadó Python-kifejezés.\n"
+"A kifejezés az alábbi változókat tartalmazhatja:\n"
+"\n"
+"- \"o\": Hivatkozás az éppen feldolgozott rekordra. Például: \"o.party.name\"\n"
+"\n"
+"Dátumokra és időbélyegekre az alábbi függvények használhatók:\n"
+"\n"
+"- \"y()\": Visszaadja az évet (szövegként)\n"
+"- \"m()\": Visszaadja a hónapot (szövegként)\n"
+"- \"w()\": Visszaadja a hetet (szövegként)\n"
+"- \"d()\": Visszaadja a napot (szövegként)\n"
+"- \"ym()\": Visszaadja az év-hónap értéket (szövegként)\n"
+"- \"ymd()\": Visszaadja az év-hónap-nap értéket (szövegként).\n"
+
+msgctxt "help:babi.field,order:"
+msgid ""
+"Positive integer. Indicates if the field must be sorted and in which "
+"position. Field with order 1 will be sorted before 2, etc. Order is computed"
+" in memory so it can be slow with many records."
+msgstr ""
+"Pozitív egész szám. Jelzi, hogy a mező szerint kell-e rendezni, és milyen "
+"sorrendben. Az 1-es sorszámú mező a 2-es előtt rendeződik, és így tovább. A "
+"rendezés memóriában történik, ezért sok rekord esetén lassú lehet."
+
+msgctxt "help:babi.field,show:"
+msgid ""
+"Indicates if the field must be shown in the preview and exported in the "
+"Excel report."
+msgstr ""
+"Jelzi, hogy a mező megjelenjen-e az előnézetben és exportálódjon-e az Excel-"
+"jelentésbe."
+
+msgctxt "help:babi.filter,context:"
+msgid ""
+"A dict to eval context:\n"
+"- date: eval string to date. Format: %Y-%m-%d.\n"
+"  Example: {'stock_date_end': date('2023-12-01')}\n"
+"- datetime: eval string to date time. Format %Y-%m-%d %H:%M:%S.\n"
+"  Example: {'name': datetime('2023-12-01 10:00:00')}\n"
+"- today: eval current date\n"
+"  Example: {'stock_date_end': today}"
+msgstr ""
+"Szótár a kontextus kiértékeléséhez:\n"
+"- date: szöveg átalakítása dátummá. Formátum: %Y-%m-%d.\n"
+"  Példa: {'stock_date_end': date('2023-12-01')}\n"
+"- datetime: szöveg átalakítása dátummá és idővé. Formátum: %Y-%m-%d %H:%M:%S.\n"
+"  Példa: {'name': datetime('2023-12-01 10:00:00')}\n"
+"- today: az aktuális dátum\n"
+"  Példa: {'stock_date_end': today}"
+
+msgctxt "help:babi.filter,python_expression:"
+msgid ""
+"The python expression introduced will be evaluated. If the result is True "
+"the record will be included, it will be discarded otherwise."
+msgstr ""
+"A megadott Python-kifejezés kiértékelődik. Ha az eredmény True, a rekord "
+"bekerül, ellenkező esetben kimarad."
+
+msgctxt "help:babi.filter.parameter,name:"
+msgid "Name used on the domain substitution"
+msgstr "A szűrési tartomány helyettesítésében használt név"
+
+msgctxt "help:babi.table,babi_raise_user_error:"
+msgid "Will raise a UserError in case of an error in the table."
+msgstr "A táblában fellépő hiba esetén UserError hibát jelez."
+
+msgctxt "help:babi.table,timeout:"
+msgid ""
+"If table calculation should take more than the specified timeout (in "
+"seconds) the process will be stopped automatically."
+msgstr ""
+"Ha a tábla számítása meghaladja a megadott időkorlátot (másodpercben), a "
+"folyamat automatikusan leáll."
+
+msgctxt "help:babi.table.query_parameter,name:"
+msgid "Name used on the query substitution"
+msgstr "A lekérdezés helyettesítésében használt név"
+
+msgctxt "help:babi.table.query_parameter,values_query:"
+msgid "SQL query that returns two columns: value and label."
+msgstr "Két oszlopot visszaadó SQL-lekérdezés: value és label."
+
+msgctxt "help:babi.widget,limit:"
+msgid "Limit the number of rows"
+msgstr "Sorok számának korlátozása"
+
+msgctxt "help:ir.model,babi_enabled:"
+msgid ""
+"Check if you want this model to be available in Business Intelligence "
+"reports."
+msgstr ""
+"Jelölje be, ha ezt a modellt üzletiintelligencia-jelentésekben is elérhetővé"
+" szeretné tenni."
+
+msgctxt "xgettext:x:"
+msgid "404"
+msgstr "404"
+
+msgctxt "xgettext:x:"
+msgid "Add"
+msgstr "Hozzáad"
+
+msgctxt "xgettext:x:"
+msgid "All"
+msgstr "összes"
+
+msgctxt "xgettext:x:"
+msgid "Average"
+msgstr "Átlag"
+
+msgctxt "xgettext:x:"
+msgid "Cancel"
+msgstr "Mégse"
+
+msgctxt "xgettext:x:"
+msgid "Close"
+msgstr "Bezárás"
+
+msgctxt "xgettext:x:"
+msgid "Columns"
+msgstr "Oszlopok"
+
+msgctxt "xgettext:x:"
+msgid "Comma-separated IDs"
+msgstr "Vesszővel elválasztott azonosítók"
+
+msgctxt "xgettext:x:"
+msgid "Compute"
+msgstr "Számítás"
+
+msgctxt "xgettext:x:"
+msgid "Configuration"
+msgstr "Beállítások"
+
+msgctxt "xgettext:x:"
+msgid "Count"
+msgstr "Megszámolás"
+
+msgctxt "xgettext:x:"
+msgid "Down"
+msgstr "Le"
+
+msgctxt "xgettext:x:"
+msgid "Error building the cube:"
+msgstr "Hiba az adatkocka felépítésekor:"
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to make average of a text type field, please try with a"
+" numeric type field or change the operation."
+msgstr ""
+"TIPP: Szöveges mező átlagát próbálja kiszámítani. Használjon numerikus "
+"mezőt, vagy módosítsa a műveletet."
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to sum a text type field, please try with a numeric "
+"type field or change the operation."
+msgstr ""
+"TIPP: Szöveges mezőt próbál összegezni. Használjon numerikus mezőt, vagy "
+"módosítsa a műveletet."
+
+msgctxt "xgettext:x:"
+msgid "Loading ..."
+msgstr "Betöltés…"
+
+msgctxt "xgettext:x:"
+msgid "Max"
+msgstr "Max."
+
+msgctxt "xgettext:x:"
+msgid "Maximum"
+msgstr "Maximum"
+
+msgctxt "xgettext:x:"
+msgid "Measure fields"
+msgstr "Mérőszámmezők"
+
+msgctxt "xgettext:x:"
+msgid "Measure type"
+msgstr "Mérőszám típusa"
+
+msgctxt "xgettext:x:"
+msgid "Median"
+msgstr "Medián"
+
+msgctxt "xgettext:x:"
+msgid "Min"
+msgstr "Min."
+
+msgctxt "xgettext:x:"
+msgid "Minimum"
+msgstr "Minimum"
+
+msgctxt "xgettext:x:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "xgettext:x:"
+msgid "No parameters defined for this table."
+msgstr "Ehhez a táblához nincsenek paraméterek megadva."
+
+msgctxt "xgettext:x:"
+msgid "Order fields"
+msgstr "Rendezési mezők"
+
+msgctxt "xgettext:x:"
+msgid "Over Field"
+msgstr "Alapul szolgáló mező"
+
+msgctxt "xgettext:x:"
+msgid "Page not found or you don't have access to it"
+msgstr "Az oldal nem található, vagy nincs hozzáférése"
+
+msgctxt "xgettext:x:"
+msgid "Page not found | Tryton"
+msgstr "Az oldal nem található | Tryton"
+
+msgctxt "xgettext:x:"
+msgid "Parameters"
+msgstr "Paraméterek"
+
+msgctxt "xgettext:x:"
+msgid "Percentile"
+msgstr "Percentilis"
+
+msgctxt "xgettext:x:"
+msgid "Pivot Table"
+msgstr "Kimutatástábla"
+
+msgctxt "xgettext:x:"
+msgid "Properties"
+msgstr "Tulajdonságok"
+
+msgctxt "xgettext:x:"
+msgid "Record ID"
+msgstr "Adat ID"
+
+msgctxt "xgettext:x:"
+msgid "Rows"
+msgstr "Sorok"
+
+msgctxt "xgettext:x:"
+msgid "Save Configuration"
+msgstr "Beállítások mentése"
+
+msgctxt "xgettext:x:"
+msgid "Search tables"
+msgstr "Táblák keresése"
+
+msgctxt "xgettext:x:"
+msgid "Select a field to add:"
+msgstr "Válassza ki a hozzáadandó mezőt:"
+
+msgctxt "xgettext:x:"
+msgid "Show more details"
+msgstr "További részletek"
+
+msgctxt "xgettext:x:"
+msgid "Sorry, we couldn’t find the page you’re looking for."
+msgstr "Sajnáljuk, a keresett oldal nem található."
+
+msgctxt "xgettext:x:"
+msgid "Sum"
+msgstr "Összeg"
+
+msgctxt "xgettext:x:"
+msgid ""
+"Table has not been computed. Click on the 'Compute' button or wait until the"
+" process has finished. Also ensure there is no 'Errors' tab in the table."
+msgstr ""
+"A tábla még nincs kiszámítva. Kattintson a „Számítás” gombra, vagy várja meg"
+" a folyamat befejezését. Ellenőrizze azt is, hogy nincs-e „Hibák” lap a "
+"táblán."
+
+msgctxt "xgettext:x:"
+msgid "Tables"
+msgstr "Táblák"
+
+msgctxt "xgettext:x:"
+msgid "Tags"
+msgstr "Címkék"
+
+msgctxt "xgettext:x:"
+msgid "Up"
+msgstr "Fel"
+
+msgctxt "xgettext:x:"
+msgid ""
+"You need to select at least one measure and one row or one column to show "
+"the table."
+msgstr ""
+"A tábla megjelenítéséhez legalább egy mérőszámot és egy sort vagy oszlopot "
+"ki kell választania."
+
+msgctxt "xgettext:x:"
+msgid "current data"
+msgstr "aktuális adatok"
+
+msgctxt "xgettext:x:"
+msgid "data from %s"
+msgstr "adatok innen: %s"
+
+msgctxt "xgettext:x:"
+msgid "not calculated yet"
+msgstr "még nincs kiszámítva"
+
+msgctxt "model:babi.action.dashboard,string:"
+msgid "Babi Action Dashboard"
+msgstr "BABI irányítópult-művelet"
+
+msgctxt "model:babi.configuration,string:"
+msgid "Babi Configuration"
+msgstr "BABI-beállítások"
+
+msgctxt "model:babi.dashboard,string:"
+msgid "Babi Dashboard"
+msgstr "BABI-irányítópult"
+
+msgctxt "model:babi.dashboard.item,string:"
+msgid "Babi Dashboard Item"
+msgstr "BABI-irányítópult eleme"
+
+msgctxt "model:babi.expression,string:"
+msgid "Babi Expression"
+msgstr "BABI-kifejezés"
+
+msgctxt "model:babi.field,string:"
+msgid "Babi Field"
+msgstr "BABI-mező"
+
+msgctxt "model:babi.filter,string:"
+msgid "Babi Filter"
+msgstr "BABI-szűrő"
+
+msgctxt "model:babi.filter.parameter,string:"
+msgid "Babi Filter Parameter"
+msgstr "BABI-szűrőparaméter"
+
+msgctxt "model:babi.pivot,string:"
+msgid "Babi Pivot"
+msgstr "BABI-kimutatás"
+
+msgctxt "model:babi.pivot.column_dimension,string:"
+msgid "Babi Pivot Column Dimension"
+msgstr "BABI-kimutatás oszlopdimenziója"
+
+msgctxt "model:babi.pivot.measure,string:"
+msgid "Babi Pivot Measure"
+msgstr "BABI-kimutatás mérőszáma"
+
+msgctxt "model:babi.pivot.order,string:"
+msgid "Babi Pivot Order"
+msgstr "BABI-kimutatás rendezése"
+
+msgctxt "model:babi.pivot.property,string:"
+msgid "Babi Pivot Property"
+msgstr "BABI-kimutatás tulajdonsága"
+
+msgctxt "model:babi.pivot.row_dimension,string:"
+msgid "Babi Pivot Row Dimension"
+msgstr "BABI-kimutatás sordimenziója"
+
+msgctxt "model:babi.table,string:"
+msgid "Babi Table"
+msgstr "BABI-tábla"
+
+msgctxt "model:babi.table-babi.table.tag,string:"
+msgid "Babi Table - Babi Table Tag"
+msgstr "BABI-tábla – BABI-táblacímke"
+
+msgctxt "model:babi.table-res.group,string:"
+msgid "Babi Table - Group"
+msgstr "BABI-tábla – csoport"
+
+msgctxt "model:babi.table-res.user,string:"
+msgid "Babi Table - User"
+msgstr "BABI-tábla – felhasználó"
+
+msgctxt "model:babi.table.cluster,string:"
+msgid "Babi Table Cluster"
+msgstr "BABI-táblafürt"
+
+msgctxt "model:babi.table.dependency,string:"
+msgid "Babi Table Dependency"
+msgstr "BABI-táblafüggőség"
+
+msgctxt "model:babi.table.parameters,string:"
+msgid "Babi Table Parameters"
+msgstr "BABI-tábla paraméterei"
+
+msgctxt "model:babi.table.query_parameter,string:"
+msgid "Babi Table Query Parameter"
+msgstr "BABI-tábla lekérdezési paramétere"
+
+msgctxt "model:babi.table.tag,string:"
+msgid "Babi Table Tag"
+msgstr "BABI-táblacímke"
+
+msgctxt "model:babi.test,string:"
+msgid "Babi Test"
+msgstr "BABI-teszt"
+
+msgctxt "model:babi.warning,string:"
+msgid "Babi Warning"
+msgstr "BABI-figyelmeztetés"
+
+msgctxt "model:babi.widget,string:"
+msgid "Babi Widget"
+msgstr "BABI-vezérlő"
+
+msgctxt "model:babi.widget.parameter,string:"
+msgid "Babi Widget Parameter"
+msgstr "BABI-vezérlő paramétere"
+
+msgctxt "model:ir.action,name:act_action_dashboard_form"
+msgid "Dashboards"
+msgstr "Irányítópultok"
+
+msgctxt "model:ir.action,name:act_babi_configuration_form"
+msgid "Configuration"
+msgstr "Beállítások"
+
+msgctxt "model:ir.action,name:act_babi_dashboard"
+msgid "Dashboards"
+msgstr "Irányítópultok"
+
+msgctxt "model:ir.action,name:act_babi_dashboard_item"
+msgid "Dashboard Items"
+msgstr "Irányítópult elemei"
+
+msgctxt "model:ir.action,name:act_babi_expression"
+msgid "Expressions"
+msgstr "Kifejezések"
+
+msgctxt "model:ir.action,name:act_babi_field"
+msgid "Fields"
+msgstr "Mezők"
+
+msgctxt "model:ir.action,name:act_babi_filter"
+msgid "Filters"
+msgstr "Szűrők"
+
+msgctxt "model:ir.action,name:act_babi_pivot"
+msgid "Pivot Tables"
+msgstr "Kimutatástáblák"
+
+msgctxt "model:ir.action,name:act_babi_table"
+msgid "Tables"
+msgstr "Táblák"
+
+msgctxt "model:ir.action,name:act_babi_table_cluster"
+msgid "Clusters"
+msgstr "Fürtök"
+
+msgctxt "model:ir.action,name:act_babi_table_parametrized"
+msgid "Parametrized Table"
+msgstr "Paraméterezett tábla"
+
+msgctxt "model:ir.action,name:act_babi_table_tag"
+msgid "Table Tags"
+msgstr "Táblacímkék"
+
+msgctxt "model:ir.action,name:act_babi_warning"
+msgid "Warnings"
+msgstr "Figyelmeztetések"
+
+msgctxt "model:ir.action,name:act_babi_widget"
+msgid "Widgets"
+msgstr "Vezérlők"
+
+msgctxt "model:ir.action,name:act_warning_relate"
+msgid "Warnings"
+msgstr "Figyelmeztetések"
+
+msgctxt "model:ir.action,name:act_widget_table"
+msgid "Widgets"
+msgstr "Vezérlők"
+
+msgctxt "model:ir.action,name:report_pivot_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_table_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_warning_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_warning_pivot_excel"
+msgid "Pivot Excel"
+msgstr "Excel-kimutatás"
+
+msgctxt "model:ir.action,name:table_parametrize_wizard"
+msgid "Parametrize Table"
+msgstr "Tábla paraméterezése"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_all"
+msgid "All"
+msgstr "összes"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_no_warn"
+msgid "Without Warning"
+msgstr "Figyelmeztetés nélkül"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_parametrized"
+msgid "Parametrized"
+msgstr "Paraméterezett"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_warn"
+msgid "With Warning"
+msgstr "Figyelmeztetéssel"
+
+msgctxt "model:ir.action.act_window.domain,name:act_warning_domain_all"
+msgid "All"
+msgstr "összes"
+
+msgctxt "model:ir.action.act_window.domain,name:act_warning_domain_pending"
+msgid "Pending"
+msgstr "Függőben"
+
+msgctxt "model:ir.message,text:cannot_create_order_entry"
+msgid "Order entries are created automatically"
+msgstr "A rendezési bejegyzések automatikusan jönnek létre"
+
+msgctxt "model:ir.message,text:cannot_remove_order_entry"
+msgid "Order entries are deleted automatically"
+msgstr "A rendezési bejegyzések automatikusan törlődnek"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception"
+msgid "An Exception Occurred: %(error)s"
+msgstr "Kivétel történt: %(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception_dimension"
+msgid ""
+"An Exception Occurred: On dimensions, with expression %(expression)s on record %(record)s.\n"
+"Exception: %(error)s"
+msgstr ""
+"Kivétel történt a dimenzióknál, a(z) %(record)s rekord %(expression)s kifejezésénél.\n"
+"Kivétel: %(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception_measures"
+msgid ""
+"An Exception Occurred: On measures, with expression %(expression)s on record %(record)s.\n"
+"Exception: %(error)s"
+msgstr ""
+"Kivétel történt a mérőszámoknál, a(z) %(record)s rekord %(expression)s kifejezésénél.\n"
+"Kivétel: %(error)s"
+
+msgctxt "model:ir.message,text:false"
+msgid "False"
+msgstr "Hamis"
+
+#, python-format
+msgctxt "model:ir.message,text:filter_parameters"
+msgid ""
+"Execution \"%(execution)s\" has filter parameters and you did not provide "
+"any of them. Please execute it from the menu."
+msgstr ""
+"A(z) „%(execution)s” végrehajtásnak vannak szűrőparaméterei, de egyet sem "
+"adott meg. Indítsa a menüből."
+
+#, python-format
+msgctxt "model:ir.message,text:invalid_parameters"
+msgid ""
+"Key \"%(key)s\" in domain, python expression or context is not in the "
+"parameters from filter of report."
+msgstr ""
+"A szűrési tartományban, Python-kifejezésben vagy kontextusban szereplő "
+"„%(key)s” kulcs nincs a jelentés szűrőparaméterei között."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_chart_limit"
+msgid ""
+"The number of records \"%(count)s\" exceeds the limit \"%(limit)s\" for "
+"chart \"%(widget)s\". You must either narrow the query or increase the "
+"limit."
+msgstr ""
+"A rekordok száma („%(count)s”) meghaladja a(z) „%(widget)s” diagram "
+"„%(limit)s” korlátját. Szűkítse a lekérdezést, vagy növelje a korlátot."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_circular_dependency"
+msgid ""
+"Circular dependency with the following table sequence:\n"
+"\n"
+"\"%(sequence)s\""
+msgstr ""
+"Körkörös függőség az alábbi táblasorrenddel:\n"
+"\n"
+"„%(sequence)s”"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_compute_table_exception"
+msgid ""
+"An exception occurred while computing the value for field \"%(field)s\" in table \"%(table)s\", record \"%(record)s\". The error was:\n"
+"\n"
+"%(error)s"
+msgstr ""
+"Kivétel történt a(z) „%(table)s” tábla „%(record)s” rekordjának „%(field)s” mezőértéke kiszámításakor. A hiba:\n"
+"\n"
+"%(error)s"
+
+msgctxt "model:ir.message,text:msg_copy"
+msgid "copy"
+msgstr "másolat"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_error_obtaining_records"
+msgid ""
+"An error occurred while obtaining the records for table \"%(table)s\":\n"
+"\n"
+"%(error)s"
+msgstr ""
+"Hiba történt a(z) „%(table)s” tábla rekordjainak lekérésekor:\n"
+"\n"
+"%(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_aggregate"
+msgid ""
+"Aggregates \"Sum\" and \"Average\" are not supported in non numeric fields "
+"in parameter \"%(parameter)s\" in widget \"%(widget)s\"."
+msgstr ""
+"Az „Összeg” és „Átlag” összesítések nem használhatók a(z) „%(widget)s” "
+"vezérlő „%(parameter)s” paraméterének nem numerikus mezőin."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_field_internal_name"
+msgid "Invalid internal name \"%(internal_name)s\" in field \"%(field)s\"."
+msgstr "Érvénytelen belső név („%(internal_name)s”) a(z) „%(field)s” mezőben."
+
+#, python-format
+msgctxt ""
+"model:ir.message,text:msg_invalid_field_internal_name_first_character"
+msgid ""
+"Invalid first character in internal name \"%(internal_name)s\" in field "
+"\"%(field)s\"."
+msgstr ""
+"A(z) „%(field)s” mező „%(internal_name)s” belső nevének első karaktere "
+"érvénytelen."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_parameter_type"
+msgid ""
+"Parameter \"%(parameter)s\" is not valid in widget \"%(widget)s\". Only the "
+"following types can be used: \"%(types)s\"."
+msgstr ""
+"A(z) „%(parameter)s” paraméter érvénytelen a(z) „%(widget)s” vezérlőben. "
+"Csak az alábbi típusok használhatók: „%(types)s”."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_table_internal_name"
+msgid "Invalid internal name \"%(internal_name)s\" in table \"%(table)s\"."
+msgstr ""
+"Érvénytelen belső név („%(internal_name)s”) a(z) „%(table)s” táblában."
+
+#, python-format
+msgctxt ""
+"model:ir.message,text:msg_invalid_table_internal_name_first_character"
+msgid ""
+"Invalid first character in internal name \"%(internal_name)s\" in table "
+"\"%(table)s\"."
+msgstr ""
+"A(z) „%(table)s” tábla „%(internal_name)s” belső nevének első karaktere "
+"érvénytelen."
+
+msgctxt "model:ir.message,text:msg_no"
+msgid "No"
+msgstr "Nem"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_not_converted"
+msgid ""
+"Some field of the field %(field)s is not numeric and cannot be converted. "
+"Please check the query."
+msgstr ""
+"A(z) %(field)s mező egyes értékei nem numerikusak és nem alakíthatók át. "
+"Ellenőrizze a lekérdezést."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_not_enough_parameters"
+msgid ""
+"There must be at least \"%(min)s\" parameters of type \"%(type)s\" in "
+"\"%(widget)s\"."
+msgstr ""
+"A(z) „%(widget)s” vezérlőben legalább „%(min)s” darab „%(type)s” típusú "
+"paraméter szükséges."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_only_one_table_with_parameters"
+msgid ""
+"Table \"%(table)s\" requires parameters but you tried to compute more than "
+"one table at once. Tables with parameters must be computed individually."
+msgstr ""
+"A(z) „%(table)s” tábla paramétereket igényel, de egyszerre több táblát "
+"próbált kiszámítani. A paraméteres táblákat egyenként kell kiszámítani."
+
+msgctxt "model:ir.message,text:msg_open_warning_single"
+msgid ""
+"You can only open records for several warnings if they are all of the same "
+"type."
+msgstr ""
+"Több figyelmeztetés rekordjai csak akkor nyithatók meg egyszerre, ha mind "
+"azonos típusúak."
+
+msgctxt "model:ir.message,text:msg_pivots_filename"
+msgid "pivot-tables"
+msgstr "pivot-tables"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_render_report_columns"
+msgid ""
+"Print report \"%(report)s\" has dimensions in columns and is not supported."
+msgstr ""
+"A(z) „%(report)s” jelentés oszlopdimenziókat tartalmaz, ezért nyomtatása nem"
+" támogatott."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_failed"
+msgid "Calculation of report \"%(report)s\" failed."
+msgstr "A(z) „%(report)s” jelentés számítása sikertelen."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_successful"
+msgid "Report \"%(report)s\" successfully calculated."
+msgstr "A(z) „%(report)s” jelentés számítása sikeres."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_timeout"
+msgid ""
+"Calculation of report \"%(report)s\" aborted because it took more thant "
+"%(seconds)s to compute."
+msgstr ""
+"A(z) „%(report)s” jelentés számítása megszakadt, mert tovább tartott, mint "
+"%(seconds)s."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_failed"
+msgid "Computation of \"%(table)s\" failed."
+msgstr "A(z) „%(table)s” számítása sikertelen."
+
+msgctxt "model:ir.message,text:msg_table_internal_name_unique"
+msgid "Table's internal name must be unique."
+msgstr "A tábla belső nevének egyedinek kell lennie."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_limit"
+msgid "(limited to %(number)s)"
+msgstr "(legfeljebb %(number)s)"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_no_fields"
+msgid "Table \"%(table)s\" cannot be computed because it has no fields."
+msgstr "A(z) „%(table)s” tábla nem számítható ki, mert nincsenek mezői."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_rows"
+msgid "%(count)s rows"
+msgstr "%(count)s sor"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_successful"
+msgid "Computation of \"%(table)s\" finished successfully."
+msgstr "A(z) „%(table)s” számítása sikeresen befejeződött."
+
+msgctxt "model:ir.message,text:msg_tables_filename"
+msgid "tables"
+msgstr "táblák"
+
+msgctxt "model:ir.message,text:msg_tables_not_created"
+msgid "Warning: tables could not be created. Please check your query."
+msgstr ""
+"Figyelmeztetés: a táblák nem hozhatók létre. Ellenőrizze a lekérdezést."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_too_many_parameters"
+msgid ""
+"There can not be more than \"%(max)s\" parameters of type \"%(type)s\" in "
+"\"%(widget)s\"."
+msgstr ""
+"A(z) „%(widget)s” vezérlőben legfeljebb „%(max)s” darab „%(type)s” típusú "
+"paraméter lehet."
+
+msgctxt "model:ir.message,text:msg_waiting_for_computation"
+msgid "Waiting for computation of table to finish."
+msgstr "Várakozás a tábla számításának befejezésére."
+
+#, python-format
+msgctxt "model:ir.message,text:msg_widget_help"
+msgid ""
+"The following is the list of valid parameter types wth the number of minimum and maximum occurrences allowed:\n"
+"\n"
+"%(list)s"
+msgstr ""
+"Az alábbi lista az érvényes paramétertípusokat és megengedett minimális, illetve maximális előfordulásszámukat tartalmazza:\n"
+"\n"
+"%(list)s"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_wrong_info"
+msgid ""
+"The information returned from the field %(field)s is not correct or you don't have enough permissions to access it.             Records found by query: %(query_count)s\n"
+"            Records found by Model: %(model_query_count)s\n"
+"            "
+msgstr ""
+"A(z) %(field)s mezőből visszaadott adatok hibásak, vagy nincs megfelelő hozzáférési jogosultsága.             A lekérdezés által talált rekordok: %(query_count)s\n"
+"            A modell által talált rekordok: %(model_query_count)s\n"
+"            "
+
+msgctxt "model:ir.message,text:msg_yes"
+msgid "Yes"
+msgstr "Igen"
+
+#, python-format
+msgctxt "model:ir.message,text:no_dimensions"
+msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
+msgstr ""
+"A(z) „%(report)s” jelentésnek nincsenek dimenziói. Legalább egy szükséges."
+
+msgctxt "model:ir.message,text:no_execution"
+msgid ""
+"No execution found for current record. Execute the update data wizard in "
+"order to create one."
+msgstr ""
+"Az aktuális rekordhoz nem található végrehajtás. Létrehozásához indítsa el "
+"az adatfrissítési varázslót."
+
+#, python-format
+msgctxt "model:ir.message,text:no_measures"
+msgid "Report \"%(report)s\" has no measures. At least one is needed."
+msgstr ""
+"A(z) „%(report)s” jelentésnek nincsenek mérőszámai. Legalább egy szükséges."
+
+#, python-format
+msgctxt "model:ir.message,text:no_menus"
+msgid ""
+"No menus found for report %(report)s. In order to view its data you must "
+"create menu entries."
+msgstr ""
+"A(z) %(report)s jelentéshez nem található menü. Az adatok megtekintéséhez "
+"hozzon létre menüpontokat."
+
+msgctxt "model:ir.message,text:no_report"
+msgid "No report found for current execution"
+msgstr "Az aktuális végrehajtáshoz nem található jelentés"
+
+msgctxt "model:ir.message,text:one_measure_in_pie_charts"
+msgid "Only one measure can be used in pie charts"
+msgstr "Kördiagramon csak egy mérőszám használható"
+
+#, python-format
+msgctxt "model:ir.message,text:parameter_not_found"
+msgid ""
+"Parameter \"%(parameter)s\" not found in Domain, Python Expression nor "
+"Context of filter \"%(filter)s\"."
+msgstr ""
+"A(z) „%(parameter)s” paraméter nem található a(z) „%(filter)s” szűrő "
+"tartományában, Python-kifejezésében vagy kontextusában."
+
+#, python-format
+msgctxt "model:ir.message,text:report_modification_warning"
+msgid ""
+"Report \"%(report)s\" will be renamed, but if you want to also rename the "
+"menus you should create the menus again. Are you sure you want to continue "
+"with this action?"
+msgstr ""
+"A(z) „%(report)s” jelentés átnevezésre kerül. Ha a menüket is át szeretné "
+"nevezni, újra létre kell hoznia őket. Biztosan folytatja?"
+
+#, python-format
+msgctxt "model:ir.message,text:report_not_exists"
+msgid ""
+"Report \"%(report)s\" no longer exists or you do not have the rights to "
+"access it."
+msgstr ""
+"A(z) „%(report)s” jelentés már nem létezik, vagy nincs hozzáférési "
+"jogosultsága."
+
+msgctxt "model:ir.message,text:timeout_exception"
+msgid ""
+"Report computation timed out. You may consider increasing the timeout of "
+"this report."
+msgstr ""
+"A jelentés számítása túllépte az időkorlátot. Érdemes lehet megnövelni a "
+"jelentés időkorlátját."
+
+msgctxt "model:ir.message,text:true"
+msgid "True"
+msgstr "Igaz"
+
+msgctxt "model:ir.model.button,string:"
+msgid "AI"
+msgstr "AI"
+
+msgctxt "model:ir.model.button,string:babi_expression_check_button"
+msgid "Check"
+msgstr "Ellenőrzés"
+
+msgctxt "model:ir.model.button,string:babi_filter_check_button"
+msgid "Check"
+msgstr "Ellenőrzés"
+
+msgctxt "model:ir.model.button,string:babi_table_calculate_button"
+msgid "Compute"
+msgstr "Számítás"
+
+msgctxt "model:ir.model.button,string:babi_table_calculate_warning_button"
+msgid "Compute Warning"
+msgstr "Figyelmeztetés kiszámítása"
+
+msgctxt "model:ir.model.button,string:babi_table_clear_cache_button"
+msgid "Clear Cache"
+msgstr "Gyorsítótár törlése"
+
+msgctxt "model:ir.model.button,string:babi_table_cluster_compute_button"
+msgid "Compute"
+msgstr "Számítás"
+
+msgctxt "model:ir.model.button,string:done_button"
+msgid "Do"
+msgstr "Végrehajtás"
+
+msgctxt "model:ir.model.button,string:ignored_button"
+msgid "Ignore"
+msgstr "Kihagyás"
+
+msgctxt "model:ir.model.button,string:open_button"
+msgid "Open Records"
+msgstr "Rekordok megnyitása"
+
+msgctxt "model:ir.model.button,string:pending_button"
+msgid "Pending"
+msgstr "Függőben"
+
+msgctxt "model:ir.model.button,string:show_dashboard_button"
+msgid "Show"
+msgstr "Megjelenítés"
+
+msgctxt "model:ir.rule.group,name:rule_group_babi_table"
+msgid "Babi Table"
+msgstr "BABI-tábla"
+
+msgctxt "model:ir.rule.group,name:rule_group_user_warning"
+msgid "User in Warning"
+msgstr "Felhasználó a figyelmeztetésben"
+
+msgctxt "model:ir.ui.menu,name:menu_action_dashboard"
+msgid "Dashboards"
+msgstr "Irányítópultok"
+
+msgctxt "model:ir.ui.menu,name:menu_babi"
+msgid "Business Intelligence"
+msgstr "Üzleti intelligencia"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_configuration"
+msgid "Configuration"
+msgstr "Beállítások"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_expression"
+msgid "Expressions"
+msgstr "Kifejezések"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_field"
+msgid "Fields"
+msgstr "Mezők"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_filter"
+msgid "Filters"
+msgstr "Szűrők"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_pivot"
+msgid "Pivot Tables"
+msgstr "Kimutatástáblák"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table"
+msgid "Tables"
+msgstr "Táblák"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table_cluster"
+msgid "Clusters"
+msgstr "Fürtök"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table_tag"
+msgid "Table Tags"
+msgstr "Táblacímkék"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_warning"
+msgid "Warnings"
+msgstr "Figyelmeztetések"
+
+msgctxt "model:ir.ui.menu,name:menu_configuration"
+msgid "Configuration"
+msgstr "Beállítások"
+
+msgctxt "model:ir.ui.menu,name:menu_dashboard"
+msgid "Dashboards"
+msgstr "Irányítópultok"
+
+msgctxt "model:ir.ui.menu,name:menu_widget"
+msgid "Widgets"
+msgstr "Vezérlők"
+
+msgctxt "model:res.group,name:group_babi"
+msgid "Business Intelligence"
+msgstr "Üzleti intelligencia"
+
+msgctxt "model:res.group,name:group_babi_admin"
+msgid "Business Intelligence Administration"
+msgstr "Üzleti intelligencia kezelése"
+
+msgctxt "model:res.group,name:group_babi_table"
+msgid "Business Intelligence Table"
+msgstr "Üzletiintelligencia-tábla"
+
+msgctxt "model:www.download_report,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:res.group,name:group_babi_table_compute"
+msgid "Allow calculating tables"
+msgstr "Táblák számításának engedélyezése"
+
+msgctxt "model:www.download_report,name:"
+msgid "Download Report"
+msgstr "Jelentés letöltése"
+
+msgctxt "model:www.index.pivot,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.index.pivot.null,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.layout.pivot,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_apply,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_compute,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_header.axis,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_header.level_field,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_header.measure,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_header.order,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_header.remove_field,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_header.selection,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_header.selection.add_field,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_header.selection.close_field,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_save,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_sidebar_tables,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "model:www.pivot_table,string:"
+msgid "Component"
+msgstr "Összetevő"
+
+msgctxt "selection:babi.action.dashboard,records:"
+msgid "Listed"
+msgstr "Listázott"
+
+msgctxt "selection:babi.action.dashboard,records:"
+msgid "Selected"
+msgstr "Kiválasztott"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Window"
+msgstr "Ablak"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Wizard"
+msgstr "Varázsló"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Boolean"
+msgstr "igen/nem"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Char"
+msgstr "szöveg"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Date"
+msgstr "Dátum"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Date & Time"
+msgstr "Dátum és idő"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Float"
+msgstr "lebegőpontos szám"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Integer"
+msgstr "egész szám"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Many To One"
+msgstr "Több az egyhez"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Numeric"
+msgstr "szám"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Model"
+msgstr "Minta"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "View"
+msgstr "Nézet"
+
+msgctxt "selection:babi.field,type:"
+msgid "Boolean"
+msgstr "igen/nem"
+
+msgctxt "selection:babi.field,type:"
+msgid "Char"
+msgstr "szöveg"
+
+msgctxt "selection:babi.field,type:"
+msgid "Date"
+msgstr "Dátum"
+
+msgctxt "selection:babi.field,type:"
+msgid "Date & Time"
+msgstr "Dátum és idő"
+
+msgctxt "selection:babi.field,type:"
+msgid "Float"
+msgstr "lebegőpontos szám"
+
+msgctxt "selection:babi.field,type:"
+msgid "Integer"
+msgstr "egész szám"
+
+msgctxt "selection:babi.field,type:"
+msgid "Many To One"
+msgstr "Több az egyhez"
+
+msgctxt "selection:babi.field,type:"
+msgid "Numeric"
+msgstr "szám"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Boolean"
+msgstr "igen/nem"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Char"
+msgstr "szöveg"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Date"
+msgstr "Dátum"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Date & Time"
+msgstr "Dátum és idő"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Float"
+msgstr "lebegőpontos szám"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Integer"
+msgstr "egész szám"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Many To Many"
+msgstr "Több a többhöz"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Many To One"
+msgstr "Több az egyhez"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Numeric"
+msgstr "szám"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Average"
+msgstr "Átlag"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Count"
+msgstr "Megszámolás"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Max"
+msgstr "Max."
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Median"
+msgstr "Medián"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Min"
+msgstr "Min."
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Percentile"
+msgstr "Percentilis"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Sum"
+msgstr "Összeg"
+
+msgctxt "selection:babi.pivot.order,order:"
+msgid "Ascending"
+msgstr "Növekvő"
+
+msgctxt "selection:babi.pivot.order,order:"
+msgid "Descending"
+msgstr "Csökkenő"
+
+msgctxt "selection:babi.table,output_format:"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "selection:babi.table,output_format:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt "selection:babi.table,type:"
+msgid "Model"
+msgstr "Minta"
+
+msgctxt "selection:babi.table,type:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "selection:babi.table,type:"
+msgid "View"
+msgstr "Nézet"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Always"
+msgstr "Mindig"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Never"
+msgstr "Soha"
+
+msgctxt "selection:babi.table,warn:"
+msgid "No Records Found"
+msgstr "Nem található rekord"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Records Found"
+msgstr "Talált rekordok"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "Not Computed"
+msgstr "Nincs kiszámítva"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "⌛ Computing"
+msgstr "⌛ Számítás folyamatban"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "✅ Successful"
+msgstr "✅ Sikeres"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "🔥 Failed"
+msgstr "🔥 Sikertelen"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Boolean"
+msgstr "igen/nem"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Char"
+msgstr "szöveg"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Date"
+msgstr "Dátum"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Date & Time"
+msgstr "Dátum és idő"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Float"
+msgstr "lebegőpontos szám"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Integer"
+msgstr "egész szám"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Many To Many"
+msgstr "Több a többhöz"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Many To One"
+msgstr "Több az egyhez"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Multi Selection"
+msgstr "Többszörös kijelölés"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Numeric"
+msgstr "szám"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Selection"
+msgstr "Fuvarozó kiválasztása"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Done"
+msgstr "Kész"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Ignored"
+msgstr "figyelmen kívül hagyva"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Pending"
+msgstr "Függőben"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "All"
+msgstr "összes"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "None"
+msgstr "nincs"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "Outliers"
+msgstr "Kiugró értékek"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "Suspected Outliers"
+msgstr "Feltételezett kiugró értékek"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "JPEG"
+msgstr "JPEG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "PNG"
+msgstr "PNG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "SVG"
+msgstr "SVG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "WebP"
+msgstr "WebP"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "Always"
+msgstr "Mindig"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "Never"
+msgstr "Soha"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "On Hover"
+msgstr "Rámutatáskor"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Area"
+msgstr "Terület"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Bar"
+msgstr "Oszlopdiagram"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Box"
+msgstr "Dobozdiagram"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Bubble"
+msgstr "Buborékdiagram"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Country Map"
+msgstr "Országtérkép"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Doughnut"
+msgstr "Gyűrűdiagram"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Funnel"
+msgstr "Tölcsérdiagram"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Gauge"
+msgstr "Mérőműszer"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Line"
+msgstr "Sor"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Pie"
+msgstr "Kördiagram"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Scatter"
+msgstr "Pontdiagram"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Scatter Map"
+msgstr "Ponttérkép"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Sunburst"
+msgstr "Napsugárdiagram"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Table"
+msgstr "Tábla"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Value"
+msgstr "Érték"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Average"
+msgstr "Átlag"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Count"
+msgstr "Megszámolás"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Maximum"
+msgstr "Maximum"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Median"
+msgstr "Medián"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Minimum"
+msgstr "Minimum"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Sum"
+msgstr "Összeg"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Colors"
+msgstr "Színek"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Labels"
+msgstr "Címkék"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Latitude"
+msgstr "Földrajzi szélesség"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Locations"
+msgstr "Tárhelyek"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Longitude"
+msgstr "Földrajzi hosszúság"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Maximum"
+msgstr "Maximum"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Minimum"
+msgstr "Minimum"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Parents"
+msgstr "Fölérendelt (modul)"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Reference"
+msgstr "Hivatkozás"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Sizes"
+msgstr "Méretek"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Value"
+msgstr "Érték"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Values"
+msgstr "Értékek"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "X"
+msgstr "X"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Y"
+msgstr "É"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Z"
+msgstr "Z"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Compute Business Intelligence Cluster"
+msgstr "Üzletiintelligencia-fürt számítása"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Compute Business Intelligence Table"
+msgstr "Üzletiintelligencia-tábla számítása"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Delete Tables with Parameters"
+msgstr "Paraméteres táblák törlése"
+
+msgctxt "selection:www.site,type:"
+msgid "Pivot"
+msgstr "Kimutatás"
+
+msgctxt "view:babi.action.dashboard:"
+msgid "General"
+msgstr "Általános"
+
+msgctxt "view:babi.configuration:"
+msgid "Business Intelligence Configuration"
+msgstr "Üzleti intelligencia beállításai"
+
+msgctxt "view:babi.expression:"
+msgid "Expression"
+msgstr "Kifejezés"
+
+msgctxt "view:babi.filter.parameter:"
+msgid "Filter Parameter"
+msgstr "Szűrőparaméter"
+
+msgctxt "view:babi.filter:"
+msgid "Filter"
+msgstr "Szűrő"
+
+msgctxt "view:babi.table:"
+msgid "Access"
+msgstr "Hozzáférés"
+
+msgctxt "view:babi.table:"
+msgid "Configuration"
+msgstr "Beállítások"
+
+msgctxt "view:babi.table:"
+msgid "Dependencies"
+msgstr "Függőségek"
+
+msgctxt "view:babi.table:"
+msgid "Last Execution"
+msgstr "Utolsó végrehajtás"
+
+msgctxt "view:babi.table:"
+msgid "Warning"
+msgstr "Figyelmeztetés"
+
+msgctxt "view:babi.widget:"
+msgid "Settings"
+msgstr "Beállítások"
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to calculate percentile or median of a text type field,"
+" please try with a numeric type field or change the operation."
+msgstr ""
+"TIPP: Szöveges mező percentilisét vagy mediánját próbálja kiszámítani. "
+"Használjon numerikus mezőt, vagy módosítsa a műveletet."
+
+msgctxt "xgettext:x:"
+msgid "Clear configuration"
+msgstr "Beállítások törlése"
+
+msgctxt "xgettext:x:"
+msgid "Hide sidebar"
+msgstr "Oldalsáv elrejtése"
+
+msgctxt "xgettext:x:"
+msgid "Show sidebar"
+msgstr "Oldalsáv megjelenítése"
+
+msgctxt "xgettext:x:"
+msgid "Add row"
+msgstr "Sor hozzáadása"
+
+msgctxt "xgettext:x:"
+msgid "Add column"
+msgstr "Oszlop hozzáadása"
+
+msgctxt "xgettext:x:"
+msgid "Add property"
+msgstr "Tulajdonság hozzáadása"
+
+msgctxt "xgettext:x:"
+msgid "Add measure"
+msgstr "Mérőszám hozzáadása"
+
+msgctxt "xgettext:x:"
+msgid "Move row up"
+msgstr "Sor mozgatása felfelé"
+
+msgctxt "xgettext:x:"
+msgid "Move row down"
+msgstr "Sor mozgatása lefelé"
+
+msgctxt "xgettext:x:"
+msgid "Remove row"
+msgstr "Sor eltávolítása"
+
+msgctxt "xgettext:x:"
+msgid "Move column up"
+msgstr "Oszlop mozgatása felfelé"
+
+msgctxt "xgettext:x:"
+msgid "Move column down"
+msgstr "Oszlop mozgatása lefelé"
+
+msgctxt "xgettext:x:"
+msgid "Remove column"
+msgstr "Oszlop eltávolítása"
+
+msgctxt "xgettext:x:"
+msgid "Move property up"
+msgstr "Tulajdonság mozgatása felfelé"
+
+msgctxt "xgettext:x:"
+msgid "Move property down"
+msgstr "Tulajdonság mozgatása lefelé"
+
+msgctxt "xgettext:x:"
+msgid "Remove property"
+msgstr "Tulajdonság eltávolítása"
+
+msgctxt "xgettext:x:"
+msgid "Move measure up"
+msgstr "Mérőszám mozgatása felfelé"
+
+msgctxt "xgettext:x:"
+msgid "Move measure down"
+msgstr "Mérőszám mozgatása lefelé"
+
+msgctxt "xgettext:x:"
+msgid "Remove measure"
+msgstr "Mérőszám eltávolítása"
+
+msgctxt "xgettext:x:"
+msgid "Change order direction"
+msgstr "Rendezési irány módosítása"
+
+msgctxt "xgettext:x:"
+msgid "Move order up"
+msgstr "Rendezés mozgatása felfelé"
+
+msgctxt "xgettext:x:"
+msgid "Move order down"
+msgstr "Rendezés mozgatása lefelé"
+
+msgctxt "xgettext:x:"
+msgid "Expand all"
+msgstr "Összes kibontása"
+
+msgctxt "xgettext:x:"
+msgid "Collapse all"
+msgstr "Összes összecsukása"
+
+msgctxt "xgettext:x:"
+msgid "Download"
+msgstr "Letöltés"
+
+msgctxt "xgettext:x:"
+msgid "Swap rows and columns"
+msgstr "Sorok és oszlopok felcserélése"
+
+msgctxt "wizard_button:babi.table.parametrize,start,create_table:"
+msgid "Create"
+msgstr "Létrehozás"
+
+msgctxt "wizard_button:babi.table.parametrize,start,end:"
+msgid "Cancel"
+msgstr "Mégse"
+
+msgctxt "field:babi.clean_executions.start,date:"
+msgid "Date"
+msgstr "Dátum"
+
+msgctxt "field:babi.dimension.column,expand:"
+msgid "Expand"
+msgstr "Kibontás"
+
+msgctxt "field:babi.dimension.column,expression:"
+msgid "Expression"
+msgstr "Kifejezés"
+
+msgctxt "field:babi.dimension.column,internal_name:"
+msgid "Internal Name"
+msgstr "Belső név"
+
+msgctxt "field:babi.dimension.column,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.dimension.column,report:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "field:babi.dimension,expand:"
+msgid "Expand"
+msgstr "Kibontás"
+
+msgctxt "field:babi.dimension,expression:"
+msgid "Expression"
+msgstr "Kifejezés"
+
+msgctxt "field:babi.dimension,internal_name:"
+msgid "Internal Name"
+msgstr "Belső név"
+
+msgctxt "field:babi.dimension,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.dimension,report:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "field:babi.internal.measure,aggregate:"
+msgid "Aggregate"
+msgstr "Összesítés"
+
+msgctxt "field:babi.internal.measure,decimal_digits:"
+msgid "Decimal Digits"
+msgstr "Tizedesjegyek száma"
+
+msgctxt "field:babi.internal.measure,expand:"
+msgid "Expand"
+msgstr "Kibontás"
+
+msgctxt "field:babi.internal.measure,expression:"
+msgid "Expression"
+msgstr "Kifejezés"
+
+msgctxt "field:babi.internal.measure,internal_name:"
+msgid "Internal Name"
+msgstr "Belső név"
+
+msgctxt "field:babi.internal.measure,measure:"
+msgid "Measure"
+msgstr "Mérőszám"
+
+msgctxt "field:babi.internal.measure,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.internal.measure,related_model:"
+msgid "Related Model"
+msgstr "Kapcsolódó modell"
+
+msgctxt "field:babi.internal.measure,ttype:"
+msgid "Field Type"
+msgstr "Mezőtípus"
+
+msgctxt "field:babi.measure,aggregate:"
+msgid "Aggregate"
+msgstr "Összesítés"
+
+msgctxt "field:babi.measure,expand:"
+msgid "Expand"
+msgstr "Kibontás"
+
+msgctxt "field:babi.measure,expression:"
+msgid "Expression"
+msgstr "Kifejezés"
+
+msgctxt "field:babi.measure,internal_name:"
+msgid "Internal Name"
+msgstr "Belső név"
+
+msgctxt "field:babi.measure,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.measure,report:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "field:babi.open_chart.start,dimension:"
+msgid "Dimension"
+msgstr "Dimenzió"
+
+msgctxt "field:babi.open_chart.start,execution:"
+msgid "Execution"
+msgstr "Végrehajtás"
+
+msgctxt "field:babi.open_chart.start,measures:"
+msgid "Measures"
+msgstr "Mérőszámok"
+
+msgctxt "field:babi.open_chart.start,report:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "field:babi.open_chart.start,show_legend:"
+msgid "Show Legend"
+msgstr "Jelmagyarázat megjelenítése"
+
+msgctxt "field:babi.order,dimension:"
+msgid "Dimension"
+msgstr "Dimenzió"
+
+msgctxt "field:babi.order,measure:"
+msgid "Measure"
+msgstr "Mérőszám"
+
+msgctxt "field:babi.order,order:"
+msgid "Order"
+msgstr "Sorrend"
+
+msgctxt "field:babi.order,report:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "field:babi.report,babi_raise_user_error:"
+msgid "Raise User Error"
+msgstr "Felhasználói hiba jelzése"
+
+msgctxt "field:babi.report,crons:"
+msgid "Schedulers"
+msgstr "Ütemezők"
+
+msgctxt "field:babi.report,dimensions:"
+msgid "Dimensions"
+msgstr "Dimenziók"
+
+msgctxt "field:babi.report,email:"
+msgid "E-mail"
+msgstr "E-mail"
+
+msgctxt "field:babi.report.execution,babi_model:"
+msgid "BI Model"
+msgstr "BI-modell"
+
+msgctxt "field:babi.report.execution,company:"
+msgid "Company"
+msgstr "Cég"
+
+msgctxt "field:babi.report.execution,filtered:"
+msgid "Filtered"
+msgstr "Szűrve"
+
+msgctxt "field:babi.report.execution,internal_name:"
+msgid "Internal Name"
+msgstr "Belső név"
+
+msgctxt "field:babi.report.execution.open.select,execution:"
+msgid "Execution"
+msgstr "Végrehajtás"
+
+msgctxt "field:babi.report.execution.open.select,report:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "field:babi.report.execution,report:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "field:babi.report.execution,state:"
+msgid "State"
+msgstr "Állapot"
+
+msgctxt "field:babi.report.execution,timeout:"
+msgid "Timeout"
+msgstr "Időkorlát"
+
+msgctxt "field:babi.report,filter:"
+msgid "Filter"
+msgstr "Szűrő"
+
+msgctxt "field:babi.report,groups:"
+msgid "Groups"
+msgstr "Csoportok"
+
+msgctxt "field:babi.report,internal_name:"
+msgid "Internal Name"
+msgstr "Belső név"
+
+msgctxt "field:babi.report,measures:"
+msgid "Measures"
+msgstr "Mérőszámok"
+
+msgctxt "field:babi.report,menus:"
+msgid "Menus"
+msgstr "Menük"
+
+msgctxt "field:babi.report,model:"
+msgid "Model"
+msgstr "Minta"
+
+msgctxt "field:babi.report,model_name:"
+msgid "Model Name"
+msgstr "Mintanév"
+
+msgctxt "field:babi.report,name:"
+msgid "Name"
+msgstr "Név"
+
+msgctxt "field:babi.report,order:"
+msgid "Order"
+msgstr "Sorrend"
+
+msgctxt "field:babi.report,report_cell_level:"
+msgid "Cell Level"
+msgstr "Cellaszint"
+
+msgctxt "field:babi.report-res.group,group:"
+msgid "Group"
+msgstr "Csoport"
+
+msgctxt "field:babi.report-res.group,report:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "field:babi.report,timeout:"
+msgid "Timeout"
+msgstr "Időkorlát"
+
+msgctxt "field:babi.report,to:"
+msgid "To"
+msgstr "Címzett"
+
+msgctxt "field:babi.table,url:"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "field:babi.voyager.open_session,expiration_date:"
+msgid "Expiration Date"
+msgstr "Lejárati dátum"
+
+msgctxt "field:babi.voyager.open_session,token:"
+msgid "Token"
+msgstr "Token"
+
+msgctxt "field:babi.voyager.open_session,user:"
+msgid "User"
+msgstr "Felhasználó"
+
+msgctxt "field:www.pivot_header,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:www.pivot_header,header:"
+msgid "Header"
+msgstr "Fejléc"
+
+msgctxt "field:www.pivot_header,level_action:"
+msgid "Level Action"
+msgstr "Szint művelete"
+
+msgctxt "field:www.pivot_header.selection,field:"
+msgid "Field"
+msgstr "Mező"
+
+msgctxt "field:www.pivot_header,table_name:"
+msgid "Table Name"
+msgstr "Tábla neve"
+
+msgctxt "field:www.pivot_header,table_properties:"
+msgid "Table Properties"
+msgstr "Tábla tulajdonságai"
+
+msgctxt "help:babi.dashboard.item,colspan:"
+msgid ""
+"Number of columns to occupy in the dashboard. The default is 1, the maximum "
+"4."
+msgstr ""
+"Az irányítópulton elfoglalt oszlopok száma. Az alapértelmezett érték 1, a "
+"maximum 4."
+
+msgctxt "help:babi.report,report_cell_level:"
+msgid "Start cell level that not has indentation"
+msgstr "Behúzás nélküli kezdő cellaszint"
+
+msgctxt "model:babi.action.dashboard,name:"
+msgid "Action Act Dashboard"
+msgstr "Irányítópult-művelet"
+
+msgctxt "model:babi.configuration,name:"
+msgid "Business Intelligence Configuration"
+msgstr "Üzleti intelligencia beállításai"
+
+msgctxt "model:babi.dashboard.item,name:"
+msgid "Dashboard Item"
+msgstr "Irányítópult eleme"
+
+msgctxt "model:babi.dashboard,name:"
+msgid "Dashboard"
+msgstr "Irányítópult"
+
+msgctxt "model:babi.dimension.column,name:"
+msgid "Column Dimension"
+msgstr "Oszlopdimenzió"
+
+msgctxt "model:babi.dimension,name:"
+msgid "Dimension"
+msgstr "Dimenzió"
+
+msgctxt "model:babi.expression,name:"
+msgid "Expression"
+msgstr "Kifejezés"
+
+msgctxt "model:babi.field,name:"
+msgid "BABI Field"
+msgstr "BABI-mező"
+
+msgctxt "model:babi.filter,name:"
+msgid "Filter"
+msgstr "Szűrő"
+
+msgctxt "model:babi.filter.parameter,name:"
+msgid "Filter Parameter"
+msgstr "Szűrőparaméter"
+
+msgctxt "model:babi.measure,name:"
+msgid "Measure"
+msgstr "Mérőszám"
+
+msgctxt "model:babi.order,name:"
+msgid "Order"
+msgstr "Sorrend"
+
+msgctxt "model:babi.pivot.column_dimension,name:"
+msgid "Pivot Column Dimension"
+msgstr "Kimutatás oszlopdimenziója"
+
+msgctxt "model:babi.pivot.measure,name:"
+msgid "Pivot Measure"
+msgstr "Kimutatás mérőszáma"
+
+msgctxt "model:babi.pivot,name:"
+msgid "Pivot Table"
+msgstr "Kimutatástábla"
+
+msgctxt "model:babi.pivot.order,name:"
+msgid "Pivot Order"
+msgstr "Kimutatás rendezése"
+
+msgctxt "model:babi.pivot.property,name:"
+msgid "Pivot Property"
+msgstr "Kimutatás tulajdonsága"
+
+msgctxt "model:babi.pivot.row_dimension,name:"
+msgid "Pivot Row Dimension"
+msgstr "Kimutatás sordimenziója"
+
+msgctxt "model:babi.report,name:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "model:babi.table.cluster,name:"
+msgid "BABI Table Cluster"
+msgstr "BABI-táblafürt"
+
+msgctxt "model:babi.table.dependency,name:"
+msgid "BABI Table Dependency"
+msgstr "BABI-táblafüggőség"
+
+msgctxt "model:babi.table,name:"
+msgid "BABI Table"
+msgstr "BABI-tábla"
+
+msgctxt "model:babi.table.parameters,name:"
+msgid "Table Parameters"
+msgstr "Táblaparaméterek"
+
+msgctxt "model:babi.table.query_parameter,name:"
+msgid "Table Query Parameter"
+msgstr "Tábla lekérdezési paramétere"
+
+msgctxt "model:babi.table-res.group,name:"
+msgid "BABI Table Group"
+msgstr "BABI-táblacsoport"
+
+msgctxt "model:babi.table-res.user,name:"
+msgid "BABI Table User"
+msgstr "BABI-tábla felhasználója"
+
+msgctxt "model:babi.test,name:"
+msgid "Test BABI Model"
+msgstr "BABI-modell tesztelése"
+
+msgctxt "model:babi.voyager.open_session,string:"
+msgid "Babi Voyager Open Session"
+msgstr "BABI Voyager munkamenet megnyitása"
+
+msgctxt "model:babi.warning,name:"
+msgid "BABI Warning"
+msgstr "BABI-figyelmeztetés"
+
+msgctxt "model:babi.widget,name:"
+msgid "Widget"
+msgstr "Vezérlő"
+
+msgctxt "model:babi.widget.parameter,name:"
+msgid "Widget Parameter"
+msgstr "Vezérlő paramétere"
+
+msgctxt "model:ir.action,name:act_babi_voyager_url"
+msgid "Pivot Tables"
+msgstr "Kimutatástáblák"
+
+msgctxt "model:ir.action,name:act_babi_open_voyager"
+msgid "Pivot Tables"
+msgstr "Kimutatástáblák"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_open_voyager"
+msgid "Pivot Tables"
+msgstr "Kimutatástáblák"
+
+msgctxt "model:www.index.pivot,name:"
+msgid "Index"
+msgstr "Index"
+
+msgctxt "model:www.index.pivot.null,name:"
+msgid "Index Null"
+msgstr "Üres index"
+
+msgctxt "model:www.layout.pivot,name:"
+msgid "Layout"
+msgstr "Elrendezés"
+
+msgctxt "model:www.pivot_header.axis,name:"
+msgid "Pivot Header Axis"
+msgstr "Kimutatás fejlécének tengelye"
+
+msgctxt "model:www.pivot_header.level_field,name:"
+msgid "Pivot Header"
+msgstr "Kimutatás fejléce"
+
+msgctxt "model:www.pivot_header.measure,name:"
+msgid "Pivot Header Measure"
+msgstr "Kimutatás fejlécének mérőszáma"
+
+msgctxt "model:www.pivot_header,name:"
+msgid "Pivot Header"
+msgstr "Kimutatás fejléce"
+
+msgctxt "model:www.pivot_header.order,name:"
+msgid "Pivot Header Component"
+msgstr "Kimutatás fejlécének összetevője"
+
+msgctxt "model:www.pivot_header.remove_field,name:"
+msgid "Pivot Header"
+msgstr "Kimutatás fejléce"
+
+msgctxt "model:www.pivot_header.selection.add_field,name:"
+msgid "Pivot Header Selection Add Field"
+msgstr "Kimutatásfejléc kijelölése – mező hozzáadása"
+
+msgctxt "model:www.pivot_header.selection.close_field,name:"
+msgid "Pivot Header Selection Close Field"
+msgstr "Kimutatásfejléc kijelölése – mező bezárása"
+
+msgctxt "model:www.pivot_header.selection,name:"
+msgid "Pivot Header Selection"
+msgstr "Kimutatásfejléc kijelölése"
+
+msgctxt "model:www.pivot_table,name:"
+msgid "Pivot Table"
+msgstr "Kimutatástábla"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Query"
+msgstr "Lekérdezés"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Min"
+msgstr "Min."
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Sum"
+msgstr "Összeg"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Count"
+msgstr "Megszámolás"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Average"
+msgstr "Átlag"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Max"
+msgstr "Max."
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Numeric"
+msgstr "szám"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Boolean"
+msgstr "igen/nem"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Integer"
+msgstr "egész szám"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Char"
+msgstr "szöveg"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Float"
+msgstr "lebegőpontos szám"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Many To One"
+msgstr "Több az egyhez"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Date"
+msgstr "Dátum"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Date & Time"
+msgstr "Dátum és idő"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Sum"
+msgstr "Összeg"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Min"
+msgstr "Min."
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Average"
+msgstr "Átlag"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Max"
+msgstr "Max."
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Count"
+msgstr "Megszámolás"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Pie"
+msgstr "Kördiagram"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Line"
+msgstr "Sor"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Report"
+msgstr "Nyomtatvány"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "HTML"
+msgstr "HTML"
+
+msgctxt "selection:babi.order,order:"
+msgid "Ascending"
+msgstr "Növekvő"
+
+msgctxt "selection:babi.order,order:"
+msgid "Descending"
+msgstr "Csökkenő"
+
+msgctxt "selection:babi.report.execution.open.select,view_type:"
+msgid "List"
+msgstr "Lista"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Calculated"
+msgstr "Kiszámítva"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Timeout"
+msgstr "Időkorlát"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Failed"
+msgstr "Sikertelen"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Pending"
+msgstr "Függőben"
+
+msgctxt "selection:babi.table,type:"
+msgid "Query"
+msgstr "Lekérdezés"
+
+msgctxt "selection:ir.ui.menu,babi_type:"
+msgid "List"
+msgstr "Lista"
+
+msgctxt "selection:ir.ui.menu,babi_type:"
+msgid "Wizard"
+msgstr "Varázsló"
+
+msgctxt "wizard_button:babi.clean_executions,start,end:"
+msgid "Cancel"
+msgstr "Mégse"
+
+msgctxt "wizard_button:babi.open_chart,start,end:"
+msgid "Cancel"
+msgstr "Mégse"
+
+msgctxt "wizard_button:babi.open_chart,start,open_:"
+msgid "Open"
+msgstr "nyitott"
+
+msgctxt "wizard_button:babi.open_chart,start,print_:"
+msgid "Print"
+msgstr "Nyomtatás"
+
+msgctxt "wizard_button:babi.report.execution.open,filtered,create_execution:"
+msgid "Open"
+msgstr "nyitott"
+
+msgctxt "wizard_button:babi.report.execution.open,filtered,end:"
+msgid "Cancel"
+msgstr "Mégse"
+
+msgctxt "wizard_button:babi.report.execution.open,select,end:"
+msgid "Cancel"
+msgstr "Mégse"
+
+msgctxt "wizard_button:babi.report.execution.open,select,open_view:"
+msgid "Open"
+msgstr "nyitott"
+
+msgctxt "wizard_button:babi.report.execution.open,update_start,end:"
+msgid "Cancel"
+msgstr "Mégse"
