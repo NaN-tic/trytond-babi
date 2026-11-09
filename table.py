@@ -38,7 +38,7 @@ from trytond.model import (Exclude, Model, ModelView, ModelSQL, fields,
 from trytond.exceptions import UserError
 from trytond.model.exceptions import ValidationError
 from trytond.i18n import gettext
-from trytond.pyson import Bool, Eval, In, Not, PYSONEncoder
+from trytond.pyson import Bool, Eval, Id, In, Not, PYSONEncoder
 from trytond.url import http_host
 import trytond.config as config
 from trytond.modules.company.model import (
@@ -52,6 +52,10 @@ from .babi import (
 from .babi_eval import babi_eval, babi_eval_batch
 from .cube import Cube
 from .tools import adjust_column_widths
+
+
+IS_BABI_TABLE_USER = Id('babi', 'group_babi_table').in_(
+    Eval('context', {}).get('groups', []))
 
 RETENTION_DAYS = config.getint('babi', 'retention_days', default=30)
 VALID_FIRST_SYMBOLS = '_abcdefghijklmnopqrstuvwxyz'
@@ -768,9 +772,13 @@ class Table(DeactivableMixin, ModelSQL, ModelView):
             })
     pivot_table = fields.Function(fields.Char('Pivot Table'), 'get_pivot_table')
     access_users = fields.Many2Many('babi.table-res.user', 'babi_table', 'user',
-        'Access Users')
+        'Access Users', states={
+            'required': IS_BABI_TABLE_USER & ~Bool(Eval('access_groups')),
+            })
     access_groups = fields.Many2Many('babi.table-res.group', 'babi_table', 'user',
-        'Access Groups')
+        'Access Groups', states={
+            'required': IS_BABI_TABLE_USER & ~Bool(Eval('access_users')),
+            })
     tags = fields.Many2Many('babi.table-babi.table.tag', 'table', 'tag', 'Tags')
     pivots = fields.One2Many('babi.pivot', 'table', 'Pivot Tables')
     comment = fields.Text('Comment')
