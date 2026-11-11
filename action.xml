@@ -89,4 +89,18 @@
             <field name="group" ref="group_babi_admin"/>
         </record>
     </data>
+    <data>
+        <record model="ir.action-res.group" id="open_voyager_group_babi">
+            <field name="action" ref="act_babi_open_voyager"/>
+            <field name="group" ref="group_babi"/>
+        </record>
+        <record model="ir.action-res.group" id="open_voyager_group_babi_table">
+            <field name="action" ref="act_babi_open_voyager"/>
+            <field name="group" ref="group_babi_table"/>
+        </record>
+        <record model="ir.action-res.group" id="open_voyager_group_babi_admin">
+            <field name="action" ref="act_babi_open_voyager"/>
+            <field name="group" ref="group_babi_admin"/>
+        </record>
+    </data>
 </tryton>
