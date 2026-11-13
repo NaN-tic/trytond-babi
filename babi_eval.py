@@ -53,6 +53,13 @@ def week(text):
         '%Y-%m-%d').strftime('%W')
 
 
+def week_iso(text):
+    if not text:
+        return None
+    return datetime.datetime.strptime(year_month_day(text),
+        '%Y-%m-%d').strftime('%V')
+
+
 def date(text):
     if not text:
         return None
@@ -83,6 +90,7 @@ FUNCTIONS = {
     'm': month,
     'd': day,
     'w': week,
+    'w_iso': week_iso,
     'ym': year_month,
     'ymd': year_month_day,
     'date': date,
