@@ -65,14 +65,14 @@ class Cron(metaclass=PoolMeta):
             with_rec_name=with_rec_name,
             with_default=with_default)
         context = Transaction().context
-        res['interval_type'] = 'days'
-        res['interval_number'] = 1
-        res['minute'] = 0
-        res['hour'] = 5
+        defaults = {'interval_type': 'days', 'interval_number': 1,
+            'minute': 0, 'hour': 5}
         if context.get('babi_table'):
-            res['method'] = 'babi.table|_compute'
+            defaults['method'] = 'babi.table|_compute'
         if context.get('babi_cluster'):
-            res['method'] = 'babi.table.cluster|compute'
+            defaults['method'] = 'babi.table.cluster|compute'
+        res.update((name, value) for name, value in defaults.items()
+            if fields_names is None or name in fields_names)
         return res
 
     @dualmethod
