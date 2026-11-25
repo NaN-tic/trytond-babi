@@ -1,0 +1,3501 @@
+#
+msgid ""
+msgstr ""
+"Language: km\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgctxt "field:babi.action.dashboard,action:"
+msgid "Action"
+msgstr "សកម្មភាព"
+
+msgctxt "field:babi.action.dashboard,dashboard:"
+msgid "Dashboard"
+msgstr "ផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "field:babi.action.dashboard,groups:"
+msgid "Groups"
+msgstr "ក្រុម"
+
+msgctxt "field:babi.action.dashboard,icon:"
+msgid "Icon"
+msgstr "រូបតំណាង"
+
+msgctxt "field:babi.action.dashboard,keywords:"
+msgid "Keywords"
+msgstr "ពាក្យគន្លឹះ"
+
+msgctxt "field:babi.action.dashboard,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.action.dashboard,records:"
+msgid "Records"
+msgstr "កំណត់ត្រា"
+
+msgctxt "field:babi.action.dashboard,type:"
+msgid "Type"
+msgstr "ប្រភេទ"
+
+msgctxt "field:babi.action.dashboard,usage:"
+msgid "Usage"
+msgstr "ការប្រើប្រាស់"
+
+msgctxt "field:babi.configuration,default_timeout:"
+msgid "Timeout (s)"
+msgstr "ពេលអស់កំណត់ (វិនាទី)"
+
+msgctxt "field:babi.configuration,report_cell_level:"
+msgid "Cell Level"
+msgstr "កម្រិតក្រឡា"
+
+msgctxt "field:babi.dashboard,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.dashboard,view:"
+msgid "View"
+msgstr "ទិដ្ឋភាព"
+
+msgctxt "field:babi.dashboard,widgets:"
+msgid "Widgets"
+msgstr "ធាតុបង្ហាញ"
+
+msgctxt "field:babi.dashboard.item,children:"
+msgid "Children"
+msgstr "កូន"
+
+msgctxt "field:babi.dashboard.item,colspan:"
+msgid "Columns"
+msgstr "ជួរឈរ"
+
+msgctxt "field:babi.dashboard.item,dashboard:"
+msgid "Dashboard"
+msgstr "ផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "field:babi.dashboard.item,height:"
+msgid "Height"
+msgstr "កម្ពស់"
+
+msgctxt "field:babi.dashboard.item,parent:"
+msgid "Parent"
+msgstr "គំរូមេ"
+
+msgctxt "field:babi.dashboard.item,widget:"
+msgid "Widget"
+msgstr "ធាតុបង្ហាញ"
+
+msgctxt "field:babi.expression,checked:"
+msgid "Checked"
+msgstr "បានធីក"
+
+msgctxt "field:babi.expression,decimal_digits:"
+msgid "Decimal Digits"
+msgstr "ចំនួនខ្ទង់ទសភាគ"
+
+msgctxt "field:babi.expression,error:"
+msgid "Error"
+msgstr "កំហុស"
+
+msgctxt "field:babi.expression,expression:"
+msgid "Expression"
+msgstr "កន្សោម"
+
+msgctxt "field:babi.expression,fields:"
+msgid "Model Fields"
+msgstr "វាលម៉ូដែល"
+
+msgctxt "field:babi.expression,model:"
+msgid "Model"
+msgstr "ម៉ូដែល"
+
+msgctxt "field:babi.expression,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.expression,related_model:"
+msgid "Related Model"
+msgstr "ម៉ូដែលពាក់ព័ន្ធ"
+
+msgctxt "field:babi.expression,ttype:"
+msgid "Field Type"
+msgstr "ប្រភេទវាល"
+
+msgctxt "field:babi.field,descending:"
+msgid "Descending"
+msgstr "លំដាប់ចុះ"
+
+msgctxt "field:babi.field,expression:"
+msgid "Expression"
+msgstr "កន្សោម"
+
+msgctxt "field:babi.field,internal_name:"
+msgid "Internal Name"
+msgstr "ឈ្មោះផ្ទៃក្នុង"
+
+msgctxt "field:babi.field,model:"
+msgid "Model"
+msgstr "ម៉ូដែល"
+
+msgctxt "field:babi.field,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.field,order:"
+msgid "Order"
+msgstr "លំដាប់តម្រៀប"
+
+msgctxt "field:babi.field,show:"
+msgid "Show"
+msgstr "បង្ហាញ"
+
+msgctxt "field:babi.field,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.field,table_type:"
+msgid "Table Type"
+msgstr "ប្រភេទតារាង"
+
+msgctxt "field:babi.field,type:"
+msgid "Type"
+msgstr "ប្រភេទ"
+
+msgctxt "field:babi.filter,checked:"
+msgid "Checked"
+msgstr "បានធីក"
+
+msgctxt "field:babi.filter,context:"
+msgid "Context"
+msgstr "បរិបទ"
+
+msgctxt "field:babi.filter,domain:"
+msgid "Domain"
+msgstr "ដែន"
+
+msgctxt "field:babi.filter,domain_error:"
+msgid "Domain Error"
+msgstr "កំហុសលក្ខខណ្ឌតម្រង"
+
+msgctxt "field:babi.filter,expression_error:"
+msgid "Expression Error"
+msgstr "កំហុសកន្សោម"
+
+msgctxt "field:babi.filter,fields:"
+msgid "Model Fields"
+msgstr "វាលម៉ូដែល"
+
+msgctxt "field:babi.filter,model:"
+msgid "Model"
+msgstr "ម៉ូដែល"
+
+msgctxt "field:babi.filter,model_name:"
+msgid "Model Name"
+msgstr "ឈ្មោះម៉ូដែល"
+
+msgctxt "field:babi.filter,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.filter,parameters:"
+msgid "Parameters"
+msgstr "ប៉ារ៉ាម៉ែត្រ"
+
+msgctxt "field:babi.filter,python_expression:"
+msgid "Python Expression"
+msgstr "កន្សោម Python"
+
+msgctxt "field:babi.filter,view_search:"
+msgid "Search"
+msgstr "ស្វែងរក"
+
+msgctxt "field:babi.filter.parameter,digits:"
+msgid "Digits"
+msgstr "ខ្ទង់"
+
+msgctxt "field:babi.filter.parameter,filter:"
+msgid "Filter"
+msgstr "តម្រង"
+
+msgctxt "field:babi.filter.parameter,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.filter.parameter,related_model:"
+msgid "Related Model"
+msgstr "ម៉ូដែលពាក់ព័ន្ធ"
+
+msgctxt "field:babi.filter.parameter,ttype:"
+msgid "Field Type"
+msgstr "ប្រភេទវាល"
+
+msgctxt "field:babi.pivot,active:"
+msgid "Active"
+msgstr "សកម្ម"
+
+msgctxt "field:babi.pivot,active_stored:"
+msgid "Active Stored"
+msgstr "ស្ថានភាពសកម្មដែលបានរក្សាទុក"
+
+msgctxt "field:babi.pivot,column_dimensions:"
+msgid "Column Dimensions"
+msgstr "វិមាត្រជួរឈរ"
+
+msgctxt "field:babi.pivot,measures:"
+msgid "Measures"
+msgstr "រង្វាស់"
+
+msgctxt "field:babi.pivot,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.pivot,order:"
+msgid "Order"
+msgstr "លំដាប់តម្រៀប"
+
+msgctxt "field:babi.pivot,properties:"
+msgid "Properties"
+msgstr "លក្ខណសម្បត្តិ"
+
+msgctxt "field:babi.pivot,row_dimensions:"
+msgid "Row Dimensions"
+msgstr "វិមាត្រជួរដេក"
+
+msgctxt "field:babi.pivot,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.pivot,url:"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "field:babi.pivot.column_dimension,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:babi.pivot.column_dimension,pivot:"
+msgid "Pivot"
+msgstr "តារាងបង្វិល"
+
+msgctxt "field:babi.pivot.column_dimension,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.pivot.measure,aggregate:"
+msgid "Aggregate"
+msgstr "ការប្រមូលផ្ដុំ"
+
+msgctxt "field:babi.pivot.measure,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:babi.pivot.measure,over_field:"
+msgid "Over Field"
+msgstr "វាលសម្រាប់បែងចែកក្រុម"
+
+msgctxt "field:babi.pivot.measure,percentile:"
+msgid "Percentile"
+msgstr "ភាគរយទី"
+
+msgctxt "field:babi.pivot.measure,pivot:"
+msgid "Pivot"
+msgstr "តារាងបង្វិល"
+
+msgctxt "field:babi.pivot.measure,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.pivot.order,element:"
+msgid "Element"
+msgstr "ធាតុ"
+
+msgctxt "field:babi.pivot.order,order:"
+msgid "Order"
+msgstr "លំដាប់តម្រៀប"
+
+msgctxt "field:babi.pivot.order,pivot:"
+msgid "Pivot"
+msgstr "តារាងបង្វិល"
+
+msgctxt "field:babi.pivot.order,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.pivot.property,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:babi.pivot.property,pivot:"
+msgid "Pivot"
+msgstr "តារាងបង្វិល"
+
+msgctxt "field:babi.pivot.property,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.pivot.row_dimension,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:babi.pivot.row_dimension,pivot:"
+msgid "Pivot"
+msgstr "តារាងបង្វិល"
+
+msgctxt "field:babi.pivot.row_dimension,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.table,access_groups:"
+msgid "Access Groups"
+msgstr "ក្រុមដែលមានសិទ្ធិចូលប្រើ"
+
+msgctxt "field:babi.table,access_users:"
+msgid "Access Users"
+msgstr "អ្នកប្រើដែលមានសិទ្ធិចូលប្រើ"
+
+msgctxt "field:babi.table,babi_raise_user_error:"
+msgid "Raise User Error"
+msgstr "បង្ហាញកំហុសអ្នកប្រើប្រាស់"
+
+msgctxt "field:babi.table,base_table:"
+msgid "Base Table"
+msgstr "តារាងគោល"
+
+msgctxt "field:babi.table,calculation_date:"
+msgid "Date of calculation"
+msgstr "កាលបរិច្ឆេទគណនា"
+
+msgctxt "field:babi.table,calculation_time:"
+msgid "Time taken to calculate (in seconds)"
+msgstr "រយៈពេលគណនា (គិតជាវិនាទី)"
+
+msgctxt "field:babi.table,cluster:"
+msgid "Cluster"
+msgstr "ក្រុមតារាង"
+
+msgctxt "field:babi.table,cluster_date:"
+msgid "Request Date"
+msgstr "កាលបរិច្ឆេទស្នើសុំ"
+
+msgctxt "field:babi.table,comment:"
+msgid "Comment"
+msgstr "មតិយោបល់"
+
+msgctxt "field:babi.table,company:"
+msgid "Company"
+msgstr "ក្រុមហ៊ុន"
+
+msgctxt "field:babi.table,company_field:"
+msgid "Company Field"
+msgstr "វាលក្រុមហ៊ុន"
+
+msgctxt "field:babi.table,compute_error:"
+msgid "Compute Error"
+msgstr "កំហុសគណនា"
+
+msgctxt "field:babi.table,compute_warning_error:"
+msgid "Compute Warning Error"
+msgstr "កំហុសគណនាការព្រមាន"
+
+msgctxt "field:babi.table,crons:"
+msgid "Schedulers"
+msgstr "កម្មវិធីកំណត់កាលវិភាគ"
+
+msgctxt "field:babi.table,email_template:"
+msgid "Email Template"
+msgstr "គំរូអ៊ីមែល"
+
+msgctxt "field:babi.table,employee:"
+msgid "Employee"
+msgstr "និយោជិត"
+
+msgctxt "field:babi.table,employee_field:"
+msgid "Employee Field"
+msgstr "វាលនិយោជិត"
+
+msgctxt "field:babi.table,fields_:"
+msgid "Fields"
+msgstr "វាល"
+
+msgctxt "field:babi.table,filter:"
+msgid "Filter"
+msgstr "តម្រង"
+
+msgctxt "field:babi.table,group:"
+msgid "Group"
+msgstr "ក្រុម"
+
+msgctxt "field:babi.table,internal_name:"
+msgid "Internal Name"
+msgstr "ឈ្មោះផ្ទៃក្នុង"
+
+msgctxt "field:babi.table,last_warning_execution:"
+msgid "Last Warning Execution"
+msgstr "ការដំណើរការការព្រមានចុងក្រោយ"
+
+msgctxt "field:babi.table,model:"
+msgid "Model"
+msgstr "ម៉ូដែល"
+
+msgctxt "field:babi.table,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.table,output_format:"
+msgid "Output Format"
+msgstr "ទ្រង់ទ្រាយលទ្ធផល"
+
+msgctxt "field:babi.table,parameters:"
+msgid "Parameters"
+msgstr "ប៉ារ៉ាម៉ែត្រ"
+
+msgctxt "field:babi.table,parametrized_user:"
+msgid "Parametrized User"
+msgstr "អ្នកប្រើដែលកំណត់ប៉ារ៉ាម៉ែត្រ"
+
+msgctxt "field:babi.table,party:"
+msgid "Party"
+msgstr "ភាគី"
+
+msgctxt "field:babi.table,party_field:"
+msgid "Party Field"
+msgstr "វាលភាគី"
+
+msgctxt "field:babi.table,pivot_table:"
+msgid "Pivot Table"
+msgstr "តារាងបង្វិល"
+
+msgctxt "field:babi.table,pivots:"
+msgid "Pivot Tables"
+msgstr "តារាងបង្វិល"
+
+msgctxt "field:babi.table,preview:"
+msgid "Preview"
+msgstr "មើលជាមុន"
+
+msgctxt "field:babi.table,preview_filename:"
+msgid "Preview Filename"
+msgstr "ឈ្មោះឯកសារសម្រាប់មើលជាមុន"
+
+msgctxt "field:babi.table,preview_limit:"
+msgid "Preview Limit"
+msgstr "ចំនួនអតិបរមាសម្រាប់មើលជាមុន"
+
+msgctxt "field:babi.table,query:"
+msgid "Query"
+msgstr "សំណួរទិន្នន័យ"
+
+msgctxt "field:babi.table,query_parameters:"
+msgid "Query Parameters"
+msgstr "ប៉ារ៉ាម៉ែត្រសំណួរទិន្នន័យ"
+
+msgctxt "field:babi.table,related_field:"
+msgid "Related Field"
+msgstr "វាលពាក់ព័ន្ធ"
+
+msgctxt "field:babi.table,related_model:"
+msgid "Related Model"
+msgstr "ម៉ូដែលពាក់ព័ន្ធ"
+
+msgctxt "field:babi.table,required_by:"
+msgid "Required By"
+msgstr "ត្រូវការដោយ"
+
+msgctxt "field:babi.table,required_by_tables:"
+msgid "Required By Tables"
+msgstr "តារាងដែលត្រូវការតារាងនេះ"
+
+msgctxt "field:babi.table,requires:"
+msgid "Requires"
+msgstr "ត្រូវការ"
+
+msgctxt "field:babi.table,requires_tables:"
+msgid "Requires Tables"
+msgstr "តារាងដែលត្រូវការ"
+
+msgctxt "field:babi.table,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:babi.table,tags:"
+msgid "Tags"
+msgstr "ស្លាក"
+
+msgctxt "field:babi.table,timeout:"
+msgid "Timeout"
+msgstr "រយៈពេលរង់ចាំអតិបរមា"
+
+msgctxt "field:babi.table,type:"
+msgid "Type"
+msgstr "ប្រភេទ"
+
+msgctxt "field:babi.table,user:"
+msgid "User"
+msgstr "អ្នកប្រើប្រាស់"
+
+msgctxt "field:babi.table,user_field:"
+msgid "User Field"
+msgstr "វាលអ្នកប្រើប្រាស់"
+
+msgctxt "field:babi.table,warn:"
+msgid "Warn"
+msgstr "ព្រមាន"
+
+msgctxt "field:babi.table,warning_description:"
+msgid "Description"
+msgstr "សេចក្តីពិពណ៌នា"
+
+msgctxt "field:babi.table-babi.table.tag,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.table-babi.table.tag,tag:"
+msgid "Tag"
+msgstr "ស្លាក"
+
+msgctxt "field:babi.table-res.group,babi_table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.table-res.group,user:"
+msgid "Group"
+msgstr "ក្រុម"
+
+msgctxt "field:babi.table-res.user,babi_table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.table-res.user,user:"
+msgid "User"
+msgstr "អ្នកប្រើប្រាស់"
+
+msgctxt "field:babi.table.cluster,active:"
+msgid "Active"
+msgstr "សកម្ម"
+
+msgctxt "field:babi.table.cluster,computation_end_date:"
+msgid "Computation End Date"
+msgstr "កាលបរិច្ឆេទបញ្ចប់ការគណនា"
+
+msgctxt "field:babi.table.cluster,computation_start_date:"
+msgid "Computation Start Date"
+msgstr "កាលបរិច្ឆេទចាប់ផ្ដើមការគណនា"
+
+msgctxt "field:babi.table.cluster,computation_state:"
+msgid "State"
+msgstr "ស្ថានភាព"
+
+msgctxt "field:babi.table.cluster,crons:"
+msgid "Schedulers"
+msgstr "កម្មវិធីកំណត់កាលវិភាគ"
+
+msgctxt "field:babi.table.cluster,elapsed:"
+msgid "Elapsed"
+msgstr "រយៈពេលដែលបានកន្លងផុត"
+
+msgctxt "field:babi.table.cluster,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.table.cluster,root_tables:"
+msgid "Tables"
+msgstr "តារាង"
+
+msgctxt "field:babi.table.cluster,tables:"
+msgid "Tables"
+msgstr "តារាង"
+
+msgctxt "field:babi.table.dependency,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.table.dependency,required_by:"
+msgid "Required By"
+msgstr "ត្រូវការដោយ"
+
+msgctxt "field:babi.table.dependency,table:"
+msgid "Requires"
+msgstr "ត្រូវការ"
+
+msgctxt "field:babi.table.query_parameter,digits:"
+msgid "Digits"
+msgstr "ខ្ទង់"
+
+msgctxt "field:babi.table.query_parameter,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.table.query_parameter,related_model:"
+msgid "Related Model"
+msgstr "ម៉ូដែលពាក់ព័ន្ធ"
+
+msgctxt "field:babi.table.query_parameter,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.table.query_parameter,ttype:"
+msgid "Field Type"
+msgstr "ប្រភេទវាល"
+
+msgctxt "field:babi.table.query_parameter,values_query:"
+msgid "Values Query"
+msgstr "សំណួរទិន្នន័យសម្រាប់តម្លៃ"
+
+msgctxt "field:babi.table.tag,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.test,amount:"
+msgid "Amount"
+msgstr "ចំនួនទឹកប្រាក់"
+
+msgctxt "field:babi.test,category:"
+msgid "Category"
+msgstr "ប្រភេទ"
+
+msgctxt "field:babi.test,date:"
+msgid "Date"
+msgstr "កាលបរិច្ឆេទ"
+
+msgctxt "field:babi.warning,company:"
+msgid "Company"
+msgstr "ក្រុមហ៊ុន"
+
+msgctxt "field:babi.warning,count:"
+msgid "Records found"
+msgstr "កំណត់ត្រាដែលបានរកឃើញ"
+
+msgctxt "field:babi.warning,description:"
+msgid "Description"
+msgstr "សេចក្តីពិពណ៌នា"
+
+msgctxt "field:babi.warning,done_by:"
+msgid "Done By"
+msgstr "បញ្ចប់ដោយ"
+
+msgctxt "field:babi.warning,emails:"
+msgid "E-mails"
+msgstr "អ៊ីមែល"
+
+msgctxt "field:babi.warning,employee:"
+msgid "Employee"
+msgstr "និយោជិត"
+
+msgctxt "field:babi.warning,group:"
+msgid "Group"
+msgstr "ក្រុម"
+
+msgctxt "field:babi.warning,has_related_records:"
+msgid "Has Related Field"
+msgstr "មានវាលពាក់ព័ន្ធ"
+
+msgctxt "field:babi.warning,ignored_by:"
+msgid "Ignored By"
+msgstr "មិនអើពើដោយ"
+
+msgctxt "field:babi.warning,party:"
+msgid "Party"
+msgstr "ភាគី"
+
+msgctxt "field:babi.warning,preview:"
+msgid "Preview"
+msgstr "មើលជាមុន"
+
+msgctxt "field:babi.warning,preview_filename:"
+msgid "Preview Filename"
+msgstr "ឈ្មោះឯកសារសម្រាប់មើលជាមុន"
+
+msgctxt "field:babi.warning,state:"
+msgid "State"
+msgstr "ស្ថានភាព"
+
+msgctxt "field:babi.warning,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.warning,table_to_show:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.warning,timestamp:"
+msgid "Timestamp"
+msgstr "ត្រាពេលវេលា"
+
+msgctxt "field:babi.warning,user:"
+msgid "User"
+msgstr "អ្នកប្រើប្រាស់"
+
+msgctxt "field:babi.warning,users:"
+msgid "Users"
+msgstr "អ្នកប្រើប្រាស់"
+
+msgctxt "field:babi.widget,box_points:"
+msgid "Box Points"
+msgstr "ចំណុចក្នុងគំនូសតាងប្រអប់"
+
+msgctxt "field:babi.widget,chart:"
+msgid "Chart"
+msgstr "គំនូសតាង"
+
+msgctxt "field:babi.widget,help:"
+msgid "Help"
+msgstr "ជំនួយ"
+
+msgctxt "field:babi.widget,image_format:"
+msgid "Image Format"
+msgstr "ទ្រង់ទ្រាយរូបភាព"
+
+msgctxt "field:babi.widget,limit:"
+msgid "Limit"
+msgstr "ដែនកំណត់"
+
+msgctxt "field:babi.widget,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.widget,parameters:"
+msgid "Parameters"
+msgstr "ប៉ារ៉ាម៉ែត្រ"
+
+msgctxt "field:babi.widget,show_legend:"
+msgid "Show Legend"
+msgstr "បង្ហាញសេចក្តីពន្យល់និមិត្តសញ្ញា"
+
+msgctxt "field:babi.widget,show_title:"
+msgid "Show Title"
+msgstr "បង្ហាញចំណងជើង"
+
+msgctxt "field:babi.widget,show_toolbox:"
+msgid "Show Toolbox"
+msgstr "បង្ហាញប្រអប់ឧបករណ៍"
+
+msgctxt "field:babi.widget,static:"
+msgid "Static"
+msgstr "ថេរ"
+
+msgctxt "field:babi.widget,table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:babi.widget,timeout:"
+msgid "Timeout (s)"
+msgstr "ពេលអស់កំណត់ (វិនាទី)"
+
+msgctxt "field:babi.widget,total_branch_values:"
+msgid "Total Branch Values"
+msgstr "តម្លៃសាខាសរុប"
+
+msgctxt "field:babi.widget,type:"
+msgid "Type"
+msgstr "ប្រភេទ"
+
+msgctxt "field:babi.widget,where:"
+msgid "Where"
+msgstr "លក្ខខណ្ឌចម្រោះ"
+
+msgctxt "field:babi.widget,zoom:"
+msgid "Zoom"
+msgstr "ពង្រីក ឬបង្រួម"
+
+msgctxt "field:babi.widget.parameter,aggregate:"
+msgid "Aggregate"
+msgstr "ការប្រមូលផ្ដុំ"
+
+msgctxt "field:babi.widget.parameter,aggregate_invisible:"
+msgid "Aggregate Invisible"
+msgstr "លាក់ការប្រមូលផ្ដុំ"
+
+msgctxt "field:babi.widget.parameter,aggregate_required:"
+msgid "Aggregate Required"
+msgstr "តម្រូវឱ្យប្រមូលផ្ដុំ"
+
+msgctxt "field:babi.widget.parameter,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:babi.widget.parameter,type:"
+msgid "Type"
+msgstr "ប្រភេទ"
+
+msgctxt "field:babi.widget.parameter,widget:"
+msgid "Widget"
+msgstr "ធាតុបង្ហាញ"
+
+msgctxt "field:ir.cron,babi_cluster:"
+msgid "Cluster"
+msgstr "ក្រុមតារាង"
+
+msgctxt "field:ir.cron,babi_compute_warnings:"
+msgid "Compute Warnings"
+msgstr "គណនាការព្រមាន"
+
+msgctxt "field:ir.cron,babi_table:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "field:ir.model,babi_enabled:"
+msgid "BI Enabled"
+msgstr "បានបើកការវិភាគទិន្នន័យអាជីវកម្ម (BI)"
+
+msgctxt "field:www.download_report,output_format:"
+msgid "Output Format"
+msgstr "ទ្រង់ទ្រាយលទ្ធផល"
+
+msgctxt "field:www.download_report,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.download_report,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.index.pivot,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.index.pivot,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.index.pivot.null,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.index.pivot.null,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.layout.pivot,title:"
+msgid "Title"
+msgstr "ចំណងជើង"
+
+msgctxt "field:www.pivot_apply,pivot:"
+msgid "Pivot"
+msgstr "តារាងបង្វិល"
+
+msgctxt "field:www.pivot_apply,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_apply,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_compute,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_compute,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_header.axis,axis:"
+msgid "Axis"
+msgstr "អ័ក្ស"
+
+msgctxt "field:www.pivot_header.axis,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header.axis,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header.axis,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_header.level_field,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:www.pivot_header.level_field,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header.level_field,level_action:"
+msgid "Level Action"
+msgstr "សកម្មភាពតាមកម្រិត"
+
+msgctxt "field:www.pivot_header.level_field,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header.level_field,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_header.measure,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header.measure,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header.measure,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_header.order,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header.order,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header.order,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_header.remove_field,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:www.pivot_header.remove_field,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header.remove_field,level_action:"
+msgid "Level Action"
+msgstr "សកម្មភាពតាមកម្រិត"
+
+msgctxt "field:www.pivot_header.remove_field,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header.remove_field,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_header.selection,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header.selection,measure:"
+msgid "Measure"
+msgstr "រង្វាស់"
+
+msgctxt "field:www.pivot_header.selection,over_field:"
+msgid "Over Field"
+msgstr "វាលសម្រាប់បែងចែកក្រុម"
+
+msgctxt "field:www.pivot_header.selection,percentile:"
+msgid "Percentile"
+msgstr "ភាគរយទី"
+
+msgctxt "field:www.pivot_header.selection,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header.selection,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_header.selection.add_field,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:www.pivot_header.selection.add_field,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header.selection.add_field,measure:"
+msgid "Measure"
+msgstr "រង្វាស់"
+
+msgctxt "field:www.pivot_header.selection.add_field,over_field:"
+msgid "Over Field"
+msgstr "វាលសម្រាប់បែងចែកក្រុម"
+
+msgctxt "field:www.pivot_header.selection.add_field,percentile:"
+msgid "Percentile"
+msgstr "ភាគរយទី"
+
+msgctxt "field:www.pivot_header.selection.add_field,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header.selection.add_field,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_header.selection.close_field,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:www.pivot_header.selection.close_field,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header.selection.close_field,measure:"
+msgid "Measure"
+msgstr "រង្វាស់"
+
+msgctxt "field:www.pivot_header.selection.close_field,over_field:"
+msgid "Over Field"
+msgstr "វាលសម្រាប់បែងចែកក្រុម"
+
+msgctxt "field:www.pivot_header.selection.close_field,percentile:"
+msgid "Percentile"
+msgstr "ភាគរយទី"
+
+msgctxt "field:www.pivot_header.selection.close_field,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header.selection.close_field,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_save,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:www.pivot_save,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_save,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_sidebar_tables,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_sidebar_tables,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "field:www.pivot_table,output_format:"
+msgid "Output Format"
+msgstr "ទ្រង់ទ្រាយលទ្ធផល"
+
+msgctxt "field:www.pivot_table,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_table,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "help:babi.action.dashboard,records:"
+msgid "The records on which the action runs."
+msgstr "កំណត់ត្រាដែលសកម្មភាពនេះដំណើរការលើ។"
+
+msgctxt "help:babi.configuration,report_cell_level:"
+msgid "Start cell level that not has indentation"
+msgstr "កម្រិតក្រឡាដំបូងដែលមិនចូលបន្ទាត់"
+
+msgctxt "help:babi.dashboard.item,height:"
+msgid "The default is 450px"
+msgstr "តម្លៃលំនាំដើមគឺ 450px"
+
+msgctxt "help:babi.expression,expression:"
+msgid ""
+"Python expression that will return the value to be used.\n"
+"The expression can include the following variables:\n"
+"\n"
+"- \"o\": A reference to the current record being processed. For  example: \"o.party.name\"\n"
+"\n"
+"And the following functions apply to dates and timestamps:\n"
+"\n"
+"- \"y()\": Returns the year (as a string)\n"
+"- \"m()\": Returns the month (as a string)\n"
+"- \"w()\": Returns the week (as a string)\n"
+"- \"d()\": Returns the day (as a string)\n"
+"- \"ym()\": Returns the year-month (as a string)\n"
+"- \"ymd()\": Returns the year-month-day (as a string).\n"
+msgstr ""
+"កន្សោម Python ដែលផ្ដល់តម្លៃត្រូវប្រើ។\n"
+"កន្សោមអាចរួមបញ្ចូលអថេរខាងក្រោម៖\n"
+"\n"
+"- \"o\": ឯកសារយោងទៅកំណត់ត្រាដែលកំពុងដំណើរការ។ ឧទាហរណ៍៖ \"o.party.name\"\n"
+"\n"
+"អនុគមន៍ខាងក្រោមអនុវត្តលើកាលបរិច្ឆេទ និងត្រាពេលវេលា៖\n"
+"\n"
+"- \"y()\": ផ្ដល់ឆ្នាំ (ជាខ្សែអក្សរ)\n"
+"- \"m()\": ផ្ដល់ខែ (ជាខ្សែអក្សរ)\n"
+"- \"w()\": ផ្ដល់សប្តាហ៍ (ជាខ្សែអក្សរ)\n"
+"- \"d()\": ផ្ដល់ថ្ងៃ (ជាខ្សែអក្សរ)\n"
+"- \"ym()\": ផ្ដល់ឆ្នាំ-ខែ (ជាខ្សែអក្សរ)\n"
+"- \"ymd()\": ផ្ដល់ឆ្នាំ-ខែ-ថ្ងៃ (ជាខ្សែអក្សរ)។\n"
+
+msgctxt "help:babi.field,order:"
+msgid ""
+"Positive integer. Indicates if the field must be sorted and in which "
+"position. Field with order 1 will be sorted before 2, etc. Order is computed "
+"in memory so it can be slow with many records."
+msgstr ""
+"ចំនួនគត់វិជ្ជមានដែលកំណត់ថាតើត្រូវតម្រៀបតាមវាលនេះ ឬទេ និងនៅលំដាប់ណា។ វាលលំដាប់"
+" 1 ត្រូវប្រើមុនលំដាប់ 2 ជាដើម។ ការតម្រៀបធ្វើក្នុងអង្គចងចាំ "
+"ដូច្នេះអាចយឺតបើមានកំណត់ត្រាច្រើន។"
+
+msgctxt "help:babi.field,show:"
+msgid ""
+"Indicates if the field must be shown in the preview and exported in the Excel"
+" report."
+msgstr ""
+"បញ្ជាក់ថាតើត្រូវបង្ហាញវាលក្នុងការមើលជាមុន និងនាំចេញក្នុងរបាយការណ៍ Excel ឬទេ។"
+
+msgctxt "help:babi.filter,context:"
+msgid ""
+"A dict to eval context:\n"
+"- date: eval string to date. Format: %Y-%m-%d.\n"
+"  Example: {'stock_date_end': date('2023-12-01')}\n"
+"- datetime: eval string to date time. Format %Y-%m-%d %H:%M:%S.\n"
+"  Example: {'name': datetime('2023-12-01 10:00:00')}\n"
+"- today: eval current date\n"
+"  Example: {'stock_date_end': today}"
+msgstr ""
+"វចនានុក្រមសម្រាប់វាយតម្លៃបរិបទ៖\n"
+"- date: បម្លែងខ្សែអក្សរទៅកាលបរិច្ឆេទ។ ទ្រង់ទ្រាយ៖ %Y-%m-%d។\n"
+"  ឧទាហរណ៍៖ {'stock_date_end': date('2023-12-01')}\n"
+"- datetime: បម្លែងខ្សែអក្សរទៅកាលបរិច្ឆេទ និងពេលវេលា។ ទ្រង់ទ្រាយ %Y-%m-%d %H:%M:%S។\n"
+"  ឧទាហរណ៍៖ {'name': datetime('2023-12-01 10:00:00')}\n"
+"- today: ប្រើកាលបរិច្ឆេទបច្ចុប្បន្ន\n"
+"  ឧទាហរណ៍៖ {'stock_date_end': today}"
+
+msgctxt "help:babi.filter,python_expression:"
+msgid ""
+"The python expression introduced will be evaluated. If the result is True the"
+" record will be included, it will be discarded otherwise."
+msgstr ""
+"ប្រព័ន្ធនឹងវាយតម្លៃកន្សោម Python ដែលបានបញ្ចូល។ ប្រសិនបើលទ្ធផលគឺ True "
+"ប្រព័ន្ធនឹងបញ្ចូលកំណត់ត្រា។ បើមិនដូច្នោះទេ ប្រព័ន្ធនឹងរំលងកំណត់ត្រានោះ។"
+
+msgctxt "help:babi.filter.parameter,name:"
+msgid "Name used on the domain substitution"
+msgstr "ឈ្មោះដែលប្រើសម្រាប់ជំនួសតម្លៃក្នុងលក្ខខណ្ឌតម្រង"
+
+msgctxt "help:babi.table,babi_raise_user_error:"
+msgid "Will raise a UserError in case of an error in the table."
+msgstr ""
+"ប្រព័ន្ធនឹងបង្ហាញកំហុសអ្នកប្រើប្រាស់ (UserError) ប្រសិនបើមានកំហុសក្នុងតារាង។"
+
+msgctxt "help:babi.table,timeout:"
+msgid ""
+"If table calculation should take more than the specified timeout (in seconds)"
+" the process will be stopped automatically."
+msgstr ""
+"ប្រសិនបើការគណនាតារាងចំណាយពេលលើសពីពេលកំណត់ (គិតជាវិនាទី) "
+"ដំណើរការនឹងត្រូវបានបញ្ឈប់ដោយស្វ័យប្រវត្តិ។"
+
+msgctxt "help:babi.table.query_parameter,name:"
+msgid "Name used on the query substitution"
+msgstr "ឈ្មោះដែលប្រើសម្រាប់ជំនួសតម្លៃក្នុងសំណួរទិន្នន័យ"
+
+msgctxt "help:babi.table.query_parameter,values_query:"
+msgid "SQL query that returns two columns: value and label."
+msgstr "សំណួរ SQL ដែលផ្ដល់ជួរឈរពីរ៖ តម្លៃ និងស្លាក។"
+
+msgctxt "help:babi.widget,limit:"
+msgid "Limit the number of rows"
+msgstr "កំណត់ចំនួនជួរដេក"
+
+msgctxt "help:ir.model,babi_enabled:"
+msgid ""
+"Check if you want this model to be available in Business Intelligence "
+"reports."
+msgstr "ធីកដើម្បីអនុញ្ញាតឱ្យប្រើម៉ូដែលនេះក្នុងរបាយការណ៍វិភាគទិន្នន័យអាជីវកម្ម។"
+
+msgctxt "xgettext:x:"
+msgid "404"
+msgstr "404"
+
+msgctxt "xgettext:x:"
+msgid "Add"
+msgstr "បន្ថែម"
+
+msgctxt "xgettext:x:"
+msgid "All"
+msgstr "ទាំងអស់"
+
+msgctxt "xgettext:x:"
+msgid "Average"
+msgstr "មធ្យម"
+
+msgctxt "xgettext:x:"
+msgid "Cancel"
+msgstr "បោះបង់"
+
+msgctxt "xgettext:x:"
+msgid "Close"
+msgstr "បិទ"
+
+msgctxt "xgettext:x:"
+msgid "Columns"
+msgstr "ជួរឈរ"
+
+msgctxt "xgettext:x:"
+msgid "Comma-separated IDs"
+msgstr "លេខសម្គាល់បំបែកដោយសញ្ញាក្បៀស"
+
+msgctxt "xgettext:x:"
+msgid "Compute"
+msgstr "គណនា"
+
+msgctxt "xgettext:x:"
+msgid "Configuration"
+msgstr "ការកំណត់រចនាសម្ព័ន្ធ"
+
+msgctxt "xgettext:x:"
+msgid "Count"
+msgstr "ចំនួន"
+
+msgctxt "xgettext:x:"
+msgid "Down"
+msgstr "ចុះក្រោម"
+
+msgctxt "xgettext:x:"
+msgid "Error building the cube:"
+msgstr "កំហុសក្នុងការបង្កើតគូបវិភាគ៖"
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to make average of a text type field, please try with a "
+"numeric type field or change the operation."
+msgstr ""
+"គន្លឹះ៖ អ្នកកំពុងគណនាមធ្យមលើវាលអត្ថបទ។ សូមប្រើវាលជាលេខ ឬប្ដូរប្រតិបត្តិការ។"
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to sum a text type field, please try with a numeric type"
+" field or change the operation."
+msgstr ""
+"គន្លឹះ៖ អ្នកកំពុងគណនាផលបូកលើវាលអត្ថបទ។ សូមប្រើវាលជាលេខ ឬប្ដូរប្រតិបត្តិការ។"
+
+msgctxt "xgettext:x:"
+msgid "Loading ..."
+msgstr "កំពុងផ្ទុក ..."
+
+msgctxt "xgettext:x:"
+msgid "Max"
+msgstr "អតិបរមា"
+
+msgctxt "xgettext:x:"
+msgid "Maximum"
+msgstr "អតិបរមា"
+
+msgctxt "xgettext:x:"
+msgid "Measure fields"
+msgstr "វាលរង្វាស់"
+
+msgctxt "xgettext:x:"
+msgid "Measure type"
+msgstr "ប្រភេទរង្វាស់"
+
+msgctxt "xgettext:x:"
+msgid "Median"
+msgstr "មេដ្យាន"
+
+msgctxt "xgettext:x:"
+msgid "Min"
+msgstr "អប្បបរមា"
+
+msgctxt "xgettext:x:"
+msgid "Minimum"
+msgstr "អប្បបរមា"
+
+msgctxt "xgettext:x:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "xgettext:x:"
+msgid "No parameters defined for this table."
+msgstr "មិនទាន់កំណត់ប៉ារ៉ាម៉ែត្រសម្រាប់តារាងនេះទេ។"
+
+msgctxt "xgettext:x:"
+msgid "Order fields"
+msgstr "វាលសម្រាប់តម្រៀប"
+
+msgctxt "xgettext:x:"
+msgid "Over Field"
+msgstr "វាលសម្រាប់បែងចែកក្រុម"
+
+msgctxt "xgettext:x:"
+msgid "Page not found or you don't have access to it"
+msgstr "រកមិនឃើញទំព័រ ឬអ្នកគ្មានសិទ្ធិចូលប្រើ"
+
+msgctxt "xgettext:x:"
+msgid "Page not found | Tryton"
+msgstr "រកមិនឃើញទំព័រ | Tryton"
+
+msgctxt "xgettext:x:"
+msgid "Parameters"
+msgstr "ប៉ារ៉ាម៉ែត្រ"
+
+msgctxt "xgettext:x:"
+msgid "Percentile"
+msgstr "ភាគរយទី"
+
+msgctxt "xgettext:x:"
+msgid "Pivot Table"
+msgstr "តារាងបង្វិល"
+
+msgctxt "xgettext:x:"
+msgid "Properties"
+msgstr "លក្ខណសម្បត្តិ"
+
+msgctxt "xgettext:x:"
+msgid "Record ID"
+msgstr "ID កំណត់ត្រា"
+
+msgctxt "xgettext:x:"
+msgid "Rows"
+msgstr "ជួរដេក"
+
+msgctxt "xgettext:x:"
+msgid "Save Configuration"
+msgstr "រក្សាទុកការកំណត់"
+
+msgctxt "xgettext:x:"
+msgid "Search tables"
+msgstr "ស្វែងរកតារាង"
+
+msgctxt "xgettext:x:"
+msgid "Select a field to add:"
+msgstr "ជ្រើសរើសវាលដើម្បីបន្ថែម៖"
+
+msgctxt "xgettext:x:"
+msgid "Show more details"
+msgstr "បង្ហាញព័ត៌មានលម្អិតបន្ថែម"
+
+msgctxt "xgettext:x:"
+msgid "Sorry, we couldn’t find the page you’re looking for."
+msgstr "រកមិនឃើញទំព័រដែលអ្នកកំពុងស្វែងរក។"
+
+msgctxt "xgettext:x:"
+msgid "Sum"
+msgstr "ផលបូក"
+
+msgctxt "xgettext:x:"
+msgid ""
+"Table has not been computed. Click on the 'Compute' button or wait until the "
+"process has finished. Also ensure there is no 'Errors' tab in the table."
+msgstr ""
+"មិនទាន់បានគណនាតារាង។ ចុច «គណនា» ឬរង់ចាំរហូតដល់ដំណើរការបញ្ចប់។ "
+"សូមពិនិត្យផងដែរថាតារាងមិនមានផ្ទាំង «កំហុស»។"
+
+msgctxt "xgettext:x:"
+msgid "Tables"
+msgstr "តារាង"
+
+msgctxt "xgettext:x:"
+msgid "Tags"
+msgstr "ស្លាក"
+
+msgctxt "xgettext:x:"
+msgid "Up"
+msgstr "ឡើងលើ"
+
+msgctxt "xgettext:x:"
+msgid ""
+"You need to select at least one measure and one row or one column to show the"
+" table."
+msgstr ""
+"ជ្រើសរើសរង្វាស់យ៉ាងហោចណាស់មួយ និងជួរដេក ឬជួរឈរយ៉ាងហោចណាស់មួយ "
+"ដើម្បីបង្ហាញតារាង។"
+
+msgctxt "xgettext:x:"
+msgid "current data"
+msgstr "ទិន្នន័យបច្ចុប្បន្ន"
+
+msgctxt "xgettext:x:"
+msgid "data from %s"
+msgstr "ទិន្នន័យពី %s"
+
+msgctxt "xgettext:x:"
+msgid "not calculated yet"
+msgstr "មិនទាន់គណនា"
+
+msgctxt "model:babi.action.dashboard,string:"
+msgid "Babi Action Dashboard"
+msgstr "សកម្មភាពផ្ទាំងគ្រប់គ្រង Babi"
+
+msgctxt "model:babi.configuration,string:"
+msgid "Babi Configuration"
+msgstr "ការកំណត់ Babi"
+
+msgctxt "model:babi.dashboard,string:"
+msgid "Babi Dashboard"
+msgstr "ផ្ទាំងគ្រប់គ្រង Babi"
+
+msgctxt "model:babi.dashboard.item,string:"
+msgid "Babi Dashboard Item"
+msgstr "ធាតុផ្ទាំងគ្រប់គ្រង Babi"
+
+msgctxt "model:babi.expression,string:"
+msgid "Babi Expression"
+msgstr "កន្សោម Babi"
+
+msgctxt "model:babi.field,string:"
+msgid "Babi Field"
+msgstr "វាល Babi"
+
+msgctxt "model:babi.filter,string:"
+msgid "Babi Filter"
+msgstr "តម្រង Babi"
+
+msgctxt "model:babi.filter.parameter,string:"
+msgid "Babi Filter Parameter"
+msgstr "ប៉ារ៉ាម៉ែត្រតម្រង Babi"
+
+msgctxt "model:babi.pivot,string:"
+msgid "Babi Pivot"
+msgstr "តារាងបង្វិល Babi"
+
+msgctxt "model:babi.pivot.column_dimension,string:"
+msgid "Babi Pivot Column Dimension"
+msgstr "វិមាត្រជួរឈរតារាងបង្វិល Babi"
+
+msgctxt "model:babi.pivot.measure,string:"
+msgid "Babi Pivot Measure"
+msgstr "រង្វាស់តារាងបង្វិល Babi"
+
+msgctxt "model:babi.pivot.order,string:"
+msgid "Babi Pivot Order"
+msgstr "លំដាប់តម្រៀបតារាងបង្វិល Babi"
+
+msgctxt "model:babi.pivot.property,string:"
+msgid "Babi Pivot Property"
+msgstr "លក្ខណសម្បត្តិតារាងបង្វិល Babi"
+
+msgctxt "model:babi.pivot.row_dimension,string:"
+msgid "Babi Pivot Row Dimension"
+msgstr "វិមាត្រជួរដេកតារាងបង្វិល Babi"
+
+msgctxt "model:babi.table,string:"
+msgid "Babi Table"
+msgstr "តារាង Babi"
+
+msgctxt "model:babi.table-babi.table.tag,string:"
+msgid "Babi Table - Babi Table Tag"
+msgstr "តារាង Babi - ស្លាកតារាង Babi"
+
+msgctxt "model:babi.table-res.group,string:"
+msgid "Babi Table - Group"
+msgstr "តារាង Babi - ក្រុម"
+
+msgctxt "model:babi.table-res.user,string:"
+msgid "Babi Table - User"
+msgstr "តារាង Babi - អ្នកប្រើប្រាស់"
+
+msgctxt "model:babi.table.cluster,string:"
+msgid "Babi Table Cluster"
+msgstr "ក្រុមតារាង Babi"
+
+msgctxt "model:babi.table.dependency,string:"
+msgid "Babi Table Dependency"
+msgstr "ភាពអាស្រ័យតារាង Babi"
+
+msgctxt "model:babi.table.parameters,string:"
+msgid "Babi Table Parameters"
+msgstr "ប៉ារ៉ាម៉ែត្រតារាង Babi"
+
+msgctxt "model:babi.table.query_parameter,string:"
+msgid "Babi Table Query Parameter"
+msgstr "ប៉ារ៉ាម៉ែត្រសំណួរទិន្នន័យនៃតារាង Babi"
+
+msgctxt "model:babi.table.tag,string:"
+msgid "Babi Table Tag"
+msgstr "ស្លាកតារាង Babi"
+
+msgctxt "model:babi.test,string:"
+msgid "Babi Test"
+msgstr "តេស្ត Babi"
+
+msgctxt "model:babi.warning,string:"
+msgid "Babi Warning"
+msgstr "ការព្រមាន Babi"
+
+msgctxt "model:babi.widget,string:"
+msgid "Babi Widget"
+msgstr "ធាតុបង្ហាញ Babi"
+
+msgctxt "model:babi.widget.parameter,string:"
+msgid "Babi Widget Parameter"
+msgstr "ប៉ារ៉ាម៉ែត្រធាតុបង្ហាញ Babi"
+
+msgctxt "model:ir.action,name:act_action_dashboard_form"
+msgid "Dashboards"
+msgstr "ផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "model:ir.action,name:act_babi_configuration_form"
+msgid "Configuration"
+msgstr "ការកំណត់រចនាសម្ព័ន្ធ"
+
+msgctxt "model:ir.action,name:act_babi_dashboard"
+msgid "Dashboards"
+msgstr "ផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "model:ir.action,name:act_babi_dashboard_item"
+msgid "Dashboard Items"
+msgstr "ធាតុផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "model:ir.action,name:act_babi_expression"
+msgid "Expressions"
+msgstr "កន្សោម"
+
+msgctxt "model:ir.action,name:act_babi_field"
+msgid "Fields"
+msgstr "វាល"
+
+msgctxt "model:ir.action,name:act_babi_filter"
+msgid "Filters"
+msgstr "តម្រង"
+
+msgctxt "model:ir.action,name:act_babi_pivot"
+msgid "Pivot Tables"
+msgstr "តារាងបង្វិល"
+
+msgctxt "model:ir.action,name:act_babi_table"
+msgid "Tables"
+msgstr "តារាង"
+
+msgctxt "model:ir.action,name:act_babi_table_cluster"
+msgid "Clusters"
+msgstr "ក្រុមតារាង"
+
+msgctxt "model:ir.action,name:act_babi_table_parametrized"
+msgid "Parametrized Table"
+msgstr "តារាងដែលបានកំណត់ប៉ារ៉ាម៉ែត្រ"
+
+msgctxt "model:ir.action,name:act_babi_table_tag"
+msgid "Table Tags"
+msgstr "ស្លាកតារាង"
+
+msgctxt "model:ir.action,name:act_babi_warning"
+msgid "Warnings"
+msgstr "ការព្រមាន"
+
+msgctxt "model:ir.action,name:act_babi_widget"
+msgid "Widgets"
+msgstr "ធាតុបង្ហាញ"
+
+msgctxt "model:ir.action,name:act_warning_relate"
+msgid "Warnings"
+msgstr "ការព្រមាន"
+
+msgctxt "model:ir.action,name:act_widget_table"
+msgid "Widgets"
+msgstr "ធាតុបង្ហាញ"
+
+msgctxt "model:ir.action,name:report_pivot_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_table_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_warning_excel"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "model:ir.action,name:report_warning_pivot_excel"
+msgid "Pivot Excel"
+msgstr "តារាងបង្វិល Excel"
+
+msgctxt "model:ir.action,name:table_parametrize_wizard"
+msgid "Parametrize Table"
+msgstr "កំណត់ប៉ារ៉ាម៉ែត្រតារាង"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_all"
+msgid "All"
+msgstr "ទាំងអស់"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_no_warn"
+msgid "Without Warning"
+msgstr "គ្មានការព្រមាន"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_parametrized"
+msgid "Parametrized"
+msgstr "បានកំណត់ប៉ារ៉ាម៉ែត្រ"
+
+msgctxt "model:ir.action.act_window.domain,name:act_show_warn"
+msgid "With Warning"
+msgstr "មានការព្រមាន"
+
+msgctxt "model:ir.action.act_window.domain,name:act_warning_domain_all"
+msgid "All"
+msgstr "ទាំងអស់"
+
+msgctxt "model:ir.action.act_window.domain,name:act_warning_domain_pending"
+msgid "Pending"
+msgstr "កំពុងរង់ចាំ"
+
+msgctxt "model:ir.message,text:cannot_create_order_entry"
+msgid "Order entries are created automatically"
+msgstr "ធាតុតម្រៀបត្រូវបានបង្កើតដោយស្វ័យប្រវត្តិ"
+
+msgctxt "model:ir.message,text:cannot_remove_order_entry"
+msgid "Order entries are deleted automatically"
+msgstr "ធាតុតម្រៀបត្រូវបានលុបដោយស្វ័យប្រវត្តិ"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception"
+msgid "An Exception Occurred: %(error)s"
+msgstr "មានករណីលើកលែង៖ %(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception_dimension"
+msgid ""
+"An Exception Occurred: On dimensions, with expression %(expression)s on record %(record)s.\n"
+"Exception: %(error)s"
+msgstr ""
+"មានករណីលើកលែងក្នុងវិមាត្រ ដោយប្រើកន្សោម %(expression)s លើកំណត់ត្រា %(record)s។\n"
+"ករណីលើកលែង៖ %(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:create_data_exception_measures"
+msgid ""
+"An Exception Occurred: On measures, with expression %(expression)s on record %(record)s.\n"
+"Exception: %(error)s"
+msgstr ""
+"មានករណីលើកលែងក្នុងរង្វាស់ ដោយប្រើកន្សោម %(expression)s លើកំណត់ត្រា %(record)s។\n"
+"ករណីលើកលែង៖ %(error)s"
+
+msgctxt "model:ir.message,text:false"
+msgid "False"
+msgstr "មិនពិត"
+
+#, python-format
+msgctxt "model:ir.message,text:filter_parameters"
+msgid ""
+"Execution \"%(execution)s\" has filter parameters and you did not provide any"
+" of them. Please execute it from the menu."
+msgstr ""
+"ការដំណើរការ «%(execution)s» មានប៉ារ៉ាម៉ែត្រតម្រង "
+"ហើយអ្នកមិនទាន់ផ្ដល់ប៉ារ៉ាម៉ែត្រណាមួយទេ។ សូមដំណើរការពីម៉ឺនុយ។"
+
+#, python-format
+msgctxt "model:ir.message,text:invalid_parameters"
+msgid ""
+"Key \"%(key)s\" in domain, python expression or context is not in the "
+"parameters from filter of report."
+msgstr ""
+"កូនសោ «%(key)s» ក្នុងលក្ខខណ្ឌតម្រង កន្សោម Python ឬបរិបទ "
+"មិនមានក្នុងប៉ារ៉ាម៉ែត្រតម្រងរបាយការណ៍ទេ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_chart_limit"
+msgid ""
+"The number of records \"%(count)s\" exceeds the limit \"%(limit)s\" for chart"
+" \"%(widget)s\". You must either narrow the query or increase the limit."
+msgstr ""
+"ចំនួនកំណត់ត្រា «%(count)s» លើសកម្រិត «%(limit)s» សម្រាប់គំនូសតាង "
+"«%(widget)s»។ សូមបង្រួមសំណួរទិន្នន័យ ឬបង្កើនកម្រិត។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_circular_dependency"
+msgid ""
+"Circular dependency with the following table sequence:\n"
+"\n"
+"\"%(sequence)s\""
+msgstr ""
+"ភាពអាស្រ័យជារង្វង់ក្នុងលំដាប់តារាងខាងក្រោម៖\n"
+"\n"
+"«%(sequence)s»"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_compute_table_exception"
+msgid ""
+"An exception occurred while computing the value for field \"%(field)s\" in table \"%(table)s\", record \"%(record)s\". The error was:\n"
+"\n"
+"%(error)s"
+msgstr ""
+"មានកំហុសពេលគណនាតម្លៃសម្រាប់វាល «%(field)s» ក្នុងតារាង «%(table)s» កំណត់ត្រា «%(record)s»។ កំហុស៖\n"
+"\n"
+"%(error)s"
+
+msgctxt "model:ir.message,text:msg_copy"
+msgid "copy"
+msgstr "ច្បាប់ចម្លង"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_error_obtaining_records"
+msgid ""
+"An error occurred while obtaining the records for table \"%(table)s\":\n"
+"\n"
+"%(error)s"
+msgstr ""
+"មានកំហុសពេលទាញយកកំណត់ត្រាសម្រាប់តារាង «%(table)s»៖\n"
+"\n"
+"%(error)s"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_aggregate"
+msgid ""
+"Aggregates \"Sum\" and \"Average\" are not supported in non numeric fields in"
+" parameter \"%(parameter)s\" in widget \"%(widget)s\"."
+msgstr ""
+"ការប្រមូលផ្ដុំ «ផលបូក» និង «មធ្យម» "
+"មិនគាំទ្រវាលដែលមិនមែនជាលេខក្នុងប៉ារ៉ាម៉ែត្រ «%(parameter)s» នៃធាតុបង្ហាញ "
+"«%(widget)s» ទេ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_field_internal_name"
+msgid "Invalid internal name \"%(internal_name)s\" in field \"%(field)s\"."
+msgstr "ឈ្មោះផ្ទៃក្នុង «%(internal_name)s» ក្នុងវាល «%(field)s» មិនត្រឹមត្រូវ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_field_internal_name_first_character"
+msgid ""
+"Invalid first character in internal name \"%(internal_name)s\" in field "
+"\"%(field)s\"."
+msgstr ""
+"តួអក្សរដំបូងក្នុងឈ្មោះផ្ទៃក្នុង «%(internal_name)s» នៃវាល «%(field)s» "
+"មិនត្រឹមត្រូវ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_parameter_type"
+msgid ""
+"Parameter \"%(parameter)s\" is not valid in widget \"%(widget)s\". Only the "
+"following types can be used: \"%(types)s\"."
+msgstr ""
+"ប៉ារ៉ាម៉ែត្រ «%(parameter)s» មិនត្រឹមត្រូវក្នុងធាតុបង្ហាញ «%(widget)s»។ "
+"អាចប្រើតែប្រភេទខាងក្រោម៖ «%(types)s»។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_table_internal_name"
+msgid "Invalid internal name \"%(internal_name)s\" in table \"%(table)s\"."
+msgstr ""
+"ឈ្មោះផ្ទៃក្នុង «%(internal_name)s» ក្នុងតារាង «%(table)s» មិនត្រឹមត្រូវ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_invalid_table_internal_name_first_character"
+msgid ""
+"Invalid first character in internal name \"%(internal_name)s\" in table "
+"\"%(table)s\"."
+msgstr ""
+"តួអក្សរដំបូងក្នុងឈ្មោះផ្ទៃក្នុង «%(internal_name)s» នៃតារាង «%(table)s» "
+"មិនត្រឹមត្រូវ។"
+
+msgctxt "model:ir.message,text:msg_no"
+msgid "No"
+msgstr "ទេ"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_not_converted"
+msgid ""
+"Some field of the field %(field)s is not numeric and cannot be converted. "
+"Please check the query."
+msgstr ""
+"តម្លៃមួយក្នុងវាល %(field)s មិនមែនជាលេខ ហើយមិនអាចបម្លែងបានទេ។ "
+"សូមពិនិត្យសំណួរទិន្នន័យ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_not_enough_parameters"
+msgid ""
+"There must be at least \"%(min)s\" parameters of type \"%(type)s\" in "
+"\"%(widget)s\"."
+msgstr ""
+"ត្រូវមានប៉ារ៉ាម៉ែត្រប្រភេទ «%(type)s» យ៉ាងហោចណាស់ «%(min)s» ក្នុង "
+"«%(widget)s»។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_only_one_table_with_parameters"
+msgid ""
+"Table \"%(table)s\" requires parameters but you tried to compute more than "
+"one table at once. Tables with parameters must be computed individually."
+msgstr ""
+"តារាង «%(table)s» ត្រូវការប៉ារ៉ាម៉ែត្រ "
+"ប៉ុន្តែអ្នកបានព្យាយាមគណនាតារាងច្រើនក្នុងពេលតែមួយ។ "
+"ត្រូវគណនាតារាងដែលមានប៉ារ៉ាម៉ែត្រម្តងមួយ។"
+
+msgctxt "model:ir.message,text:msg_open_warning_single"
+msgid ""
+"You can only open records for several warnings if they are all of the same "
+"type."
+msgstr ""
+"អាចបើកកំណត់ត្រាសម្រាប់ការព្រមានច្រើនបាន "
+"លុះត្រាតែការព្រមានទាំងអស់មានប្រភេទដូចគ្នា។"
+
+msgctxt "model:ir.message,text:msg_pivots_filename"
+msgid "pivot-tables"
+msgstr "តារាងបង្វិល"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_render_report_columns"
+msgid "Print report \"%(report)s\" has dimensions in columns and is not supported."
+msgstr "មិនគាំទ្រការបោះពុម្ពរបាយការណ៍ «%(report)s» ដែលមានវិមាត្រក្នុងជួរឈរទេ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_failed"
+msgid "Calculation of report \"%(report)s\" failed."
+msgstr "ការគណនារបាយការណ៍ «%(report)s» បានបរាជ័យ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_successful"
+msgid "Report \"%(report)s\" successfully calculated."
+msgstr "គណនារបាយការណ៍ «%(report)s» បានជោគជ័យ។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_report_timeout"
+msgid ""
+"Calculation of report \"%(report)s\" aborted because it took more thant "
+"%(seconds)s to compute."
+msgstr "ការគណនារបាយការណ៍ «%(report)s» បានបញ្ឈប់ ព្រោះចំណាយពេលលើស %(seconds)s។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_failed"
+msgid "Computation of \"%(table)s\" failed."
+msgstr "ការគណនា «%(table)s» បានបរាជ័យ។"
+
+msgctxt "model:ir.message,text:msg_table_internal_name_unique"
+msgid "Table's internal name must be unique."
+msgstr "ឈ្មោះផ្ទៃក្នុងរបស់តារាងត្រូវមានតែមួយគត់។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_limit"
+msgid "(limited to %(number)s)"
+msgstr "(កំណត់ត្រឹម %(number)s)"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_no_fields"
+msgid "Table \"%(table)s\" cannot be computed because it has no fields."
+msgstr "មិនអាចគណនាតារាង «%(table)s» បានទេ ព្រោះវាគ្មានវាល។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_rows"
+msgid "%(count)s rows"
+msgstr "%(count)s ជួរដេក"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_table_successful"
+msgid "Computation of \"%(table)s\" finished successfully."
+msgstr "ការគណនា «%(table)s» បានបញ្ចប់ដោយជោគជ័យ។"
+
+msgctxt "model:ir.message,text:msg_tables_filename"
+msgid "tables"
+msgstr "តារាង"
+
+msgctxt "model:ir.message,text:msg_tables_not_created"
+msgid "Warning: tables could not be created. Please check your query."
+msgstr "ការព្រមាន៖ មិនអាចបង្កើតតារាងបានទេ។ សូមពិនិត្យសំណួរទិន្នន័យរបស់អ្នក។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_too_many_parameters"
+msgid ""
+"There can not be more than \"%(max)s\" parameters of type \"%(type)s\" in "
+"\"%(widget)s\"."
+msgstr ""
+"មិនអាចមានប៉ារ៉ាម៉ែត្រប្រភេទ «%(type)s» លើសពី «%(max)s» ក្នុង «%(widget)s»។"
+
+msgctxt "model:ir.message,text:msg_waiting_for_computation"
+msgid "Waiting for computation of table to finish."
+msgstr "កំពុងរង់ចាំការគណនាតារាងបញ្ចប់។"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_widget_help"
+msgid ""
+"The following is the list of valid parameter types wth the number of minimum and maximum occurrences allowed:\n"
+"\n"
+"%(list)s"
+msgstr ""
+"ខាងក្រោមនេះជាបញ្ជីប្រភេទប៉ារ៉ាម៉ែត្រដែលអាចប្រើបាន ព្រមទាំងចំនួនអប្បបរមា និងអតិបរមាដែលអនុញ្ញាត៖\n"
+"\n"
+"%(list)s"
+
+#, python-format
+msgctxt "model:ir.message,text:msg_wrong_info"
+msgid ""
+"The information returned from the field %(field)s is not correct or you don't have enough permissions to access it.             Records found by query: %(query_count)s\n"
+"            Records found by Model: %(model_query_count)s\n"
+"            "
+msgstr ""
+"ព័ត៌មានដែលវាល %(field)s ផ្ដល់មិនត្រឹមត្រូវ ឬអ្នកមិនមានសិទ្ធិគ្រប់គ្រាន់ដើម្បីចូលប្រើវា។             កំណត់ត្រាដែលរកឃើញតាមសំណួរទិន្នន័យ៖ %(query_count)s\n"
+"            កំណត់ត្រាដែលរកឃើញតាមម៉ូដែល៖ %(model_query_count)s\n"
+"            "
+
+msgctxt "model:ir.message,text:msg_yes"
+msgid "Yes"
+msgstr "បាទ/ចាស"
+
+#, python-format
+msgctxt "model:ir.message,text:no_dimensions"
+msgid "Report \"%(report)s\" has no dimensions. At least one is needed."
+msgstr "របាយការណ៍ «%(report)s» មិនមានវិមាត្រ។ ត្រូវមានយ៉ាងហោចណាស់មួយ។"
+
+msgctxt "model:ir.message,text:no_execution"
+msgid ""
+"No execution found for current record. Execute the update data wizard in "
+"order to create one."
+msgstr ""
+"រកមិនឃើញការដំណើរការសម្រាប់កំណត់ត្រាបច្ចុប្បន្នទេ។ "
+"បើកជំនួយការធ្វើបច្ចុប្បន្នភាពទិន្នន័យដើម្បីបង្កើត។"
+
+#, python-format
+msgctxt "model:ir.message,text:no_measures"
+msgid "Report \"%(report)s\" has no measures. At least one is needed."
+msgstr "របាយការណ៍ «%(report)s» មិនមានរង្វាស់។ ត្រូវមានយ៉ាងហោចណាស់មួយ។"
+
+#, python-format
+msgctxt "model:ir.message,text:no_menus"
+msgid ""
+"No menus found for report %(report)s. In order to view its data you must "
+"create menu entries."
+msgstr ""
+"រកមិនឃើញម៉ឺនុយសម្រាប់របាយការណ៍ %(report)s ទេ។ "
+"បង្កើតធាតុម៉ឺនុយដើម្បីមើលទិន្នន័យរបស់របាយការណ៍នេះ។"
+
+msgctxt "model:ir.message,text:no_report"
+msgid "No report found for current execution"
+msgstr "រកមិនឃើញរបាយការណ៍សម្រាប់ការដំណើរការបច្ចុប្បន្ន"
+
+msgctxt "model:ir.message,text:one_measure_in_pie_charts"
+msgid "Only one measure can be used in pie charts"
+msgstr "អាចប្រើរង្វាស់តែមួយក្នុងគំនូសតាងរាងចំណិត។"
+
+#, python-format
+msgctxt "model:ir.message,text:parameter_not_found"
+msgid ""
+"Parameter \"%(parameter)s\" not found in Domain, Python Expression nor "
+"Context of filter \"%(filter)s\"."
+msgstr ""
+"រកមិនឃើញប៉ារ៉ាម៉ែត្រ «%(parameter)s» ក្នុងលក្ខខណ្ឌតម្រង កន្សោម Python "
+"ឬបរិបទនៃតម្រង «%(filter)s»។"
+
+#, python-format
+msgctxt "model:ir.message,text:report_modification_warning"
+msgid ""
+"Report \"%(report)s\" will be renamed, but if you want to also rename the "
+"menus you should create the menus again. Are you sure you want to continue "
+"with this action?"
+msgstr ""
+"ប្រព័ន្ធនឹងប្ដូរឈ្មោះរបាយការណ៍ «%(report)s»។ បើអ្នកចង់ប្ដូរឈ្មោះម៉ឺនុយផងដែរ "
+"ត្រូវបង្កើតម៉ឺនុយឡើងវិញ។ តើអ្នកពិតជាចង់បន្តឬទេ?"
+
+#, python-format
+msgctxt "model:ir.message,text:report_not_exists"
+msgid ""
+"Report \"%(report)s\" no longer exists or you do not have the rights to "
+"access it."
+msgstr "របាយការណ៍ «%(report)s» លែងមាន ឬអ្នកមិនមានសិទ្ធិចូលប្រើវា។"
+
+msgctxt "model:ir.message,text:timeout_exception"
+msgid ""
+"Report computation timed out. You may consider increasing the timeout of this"
+" report."
+msgstr ""
+"ការគណនារបាយការណ៍បានអស់ពេលកំណត់។ អ្នកអាចបង្កើនពេលកំណត់សម្រាប់របាយការណ៍នេះ។"
+
+msgctxt "model:ir.message,text:true"
+msgid "True"
+msgstr "ពិត"
+
+msgctxt "model:ir.model.button,string:"
+msgid "AI"
+msgstr "AI"
+
+msgctxt "model:ir.model.button,string:babi_expression_check_button"
+msgid "Check"
+msgstr "មូលប្បទានប័ត្រ"
+
+msgctxt "model:ir.model.button,string:babi_filter_check_button"
+msgid "Check"
+msgstr "មូលប្បទានប័ត្រ"
+
+msgctxt "model:ir.model.button,string:babi_table_calculate_button"
+msgid "Compute"
+msgstr "គណនា"
+
+msgctxt "model:ir.model.button,string:babi_table_calculate_warning_button"
+msgid "Compute Warning"
+msgstr "គណនាការព្រមាន"
+
+msgctxt "model:ir.model.button,string:babi_table_clear_cache_button"
+msgid "Clear Cache"
+msgstr "សម្អាតឃ្លាំងបណ្ដោះអាសន្ន"
+
+msgctxt "model:ir.model.button,string:babi_table_cluster_compute_button"
+msgid "Compute"
+msgstr "គណនា"
+
+msgctxt "model:ir.model.button,string:done_button"
+msgid "Do"
+msgstr "អនុវត្ត"
+
+msgctxt "model:ir.model.button,string:ignored_button"
+msgid "Ignore"
+msgstr "មិនអើពើ"
+
+msgctxt "model:ir.model.button,string:open_button"
+msgid "Open Records"
+msgstr "បើកកំណត់ត្រា"
+
+msgctxt "model:ir.model.button,string:pending_button"
+msgid "Pending"
+msgstr "កំពុងរង់ចាំ"
+
+msgctxt "model:ir.model.button,string:show_dashboard_button"
+msgid "Show"
+msgstr "បង្ហាញ"
+
+msgctxt "model:ir.rule.group,name:rule_group_babi_table"
+msgid "Babi Table"
+msgstr "តារាង Babi"
+
+msgctxt "model:ir.rule.group,name:rule_group_user_warning"
+msgid "User in Warning"
+msgstr "អ្នកប្រើប្រាស់ក្នុងការព្រមាន"
+
+msgctxt "model:ir.ui.menu,name:menu_action_dashboard"
+msgid "Dashboards"
+msgstr "ផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "model:ir.ui.menu,name:menu_babi"
+msgid "Business Intelligence"
+msgstr "ការវិភាគទិន្នន័យអាជីវកម្ម"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_configuration"
+msgid "Configuration"
+msgstr "ការកំណត់រចនាសម្ព័ន្ធ"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_expression"
+msgid "Expressions"
+msgstr "កន្សោម"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_field"
+msgid "Fields"
+msgstr "វាល"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_filter"
+msgid "Filters"
+msgstr "តម្រង"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_pivot"
+msgid "Pivot Tables"
+msgstr "តារាងបង្វិល"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table"
+msgid "Tables"
+msgstr "តារាង"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table_cluster"
+msgid "Clusters"
+msgstr "ក្រុមតារាង"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_table_tag"
+msgid "Table Tags"
+msgstr "ស្លាកតារាង"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_warning"
+msgid "Warnings"
+msgstr "ការព្រមាន"
+
+msgctxt "model:ir.ui.menu,name:menu_configuration"
+msgid "Configuration"
+msgstr "ការកំណត់រចនាសម្ព័ន្ធ"
+
+msgctxt "model:ir.ui.menu,name:menu_dashboard"
+msgid "Dashboards"
+msgstr "ផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "model:ir.ui.menu,name:menu_widget"
+msgid "Widgets"
+msgstr "ធាតុបង្ហាញ"
+
+msgctxt "model:res.group,name:group_babi"
+msgid "Business Intelligence"
+msgstr "ការវិភាគទិន្នន័យអាជីវកម្ម"
+
+msgctxt "model:res.group,name:group_babi_admin"
+msgid "Business Intelligence Administration"
+msgstr "ការគ្រប់គ្រងការវិភាគទិន្នន័យអាជីវកម្ម"
+
+msgctxt "model:res.group,name:group_babi_table"
+msgid "Business Intelligence Table"
+msgstr "តារាងវិភាគទិន្នន័យអាជីវកម្ម"
+
+msgctxt "model:www.download_report,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:res.group,name:group_babi_table_compute"
+msgid "Allow calculating tables"
+msgstr "អនុញ្ញាតឱ្យគណនាតារាង"
+
+msgctxt "model:www.download_report,name:"
+msgid "Download Report"
+msgstr "ទាញយករបាយការណ៍"
+
+msgctxt "model:www.index.pivot,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.index.pivot.null,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.layout.pivot,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_apply,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_compute,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_header.axis,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_header.level_field,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_header.measure,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_header.order,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_header.remove_field,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_header.selection,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_header.selection.add_field,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_header.selection.close_field,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_save,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_sidebar_tables,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "model:www.pivot_table,string:"
+msgid "Component"
+msgstr "សមាសភាគ"
+
+msgctxt "selection:babi.action.dashboard,records:"
+msgid "Listed"
+msgstr "បានរាយក្នុងបញ្ជី"
+
+msgctxt "selection:babi.action.dashboard,records:"
+msgid "Selected"
+msgstr "បានជ្រើសរើស"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Window"
+msgstr "បង្អួច"
+
+msgctxt "selection:babi.action.dashboard,type:"
+msgid "Wizard"
+msgstr "ជំនួយការណែនាំ"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Boolean"
+msgstr "ប៊ូលីន"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Char"
+msgstr "តួអក្សរ"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Date"
+msgstr "កាលបរិច្ឆេទ"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Date & Time"
+msgstr "កាលបរិច្ឆេទ និងពេលវេលា"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Float"
+msgstr "ចំនួនទសភាគ"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Integer"
+msgstr "ចំនួនគត់"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Many To One"
+msgstr "ច្រើនទៅមួយ"
+
+msgctxt "selection:babi.expression,ttype:"
+msgid "Numeric"
+msgstr "ជាលេខ"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Model"
+msgstr "ម៉ូដែល"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "View"
+msgstr "ទិដ្ឋភាព"
+
+msgctxt "selection:babi.field,type:"
+msgid "Boolean"
+msgstr "ប៊ូលីន"
+
+msgctxt "selection:babi.field,type:"
+msgid "Char"
+msgstr "តួអក្សរ"
+
+msgctxt "selection:babi.field,type:"
+msgid "Date"
+msgstr "កាលបរិច្ឆេទ"
+
+msgctxt "selection:babi.field,type:"
+msgid "Date & Time"
+msgstr "កាលបរិច្ឆេទ និងពេលវេលា"
+
+msgctxt "selection:babi.field,type:"
+msgid "Float"
+msgstr "ចំនួនទសភាគ"
+
+msgctxt "selection:babi.field,type:"
+msgid "Integer"
+msgstr "ចំនួនគត់"
+
+msgctxt "selection:babi.field,type:"
+msgid "Many To One"
+msgstr "ច្រើនទៅមួយ"
+
+msgctxt "selection:babi.field,type:"
+msgid "Numeric"
+msgstr "ជាលេខ"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Boolean"
+msgstr "ប៊ូលីន"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Char"
+msgstr "តួអក្សរ"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Date"
+msgstr "កាលបរិច្ឆេទ"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Date & Time"
+msgstr "កាលបរិច្ឆេទ និងពេលវេលា"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Float"
+msgstr "ចំនួនទសភាគ"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Integer"
+msgstr "ចំនួនគត់"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Many To Many"
+msgstr "ច្រើនទៅច្រើន"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Many To One"
+msgstr "ច្រើនទៅមួយ"
+
+msgctxt "selection:babi.filter.parameter,ttype:"
+msgid "Numeric"
+msgstr "ជាលេខ"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Average"
+msgstr "មធ្យម"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Count"
+msgstr "ចំនួន"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Max"
+msgstr "អតិបរមា"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Median"
+msgstr "មេដ្យាន"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Min"
+msgstr "អប្បបរមា"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Percentile"
+msgstr "ភាគរយទី"
+
+msgctxt "selection:babi.pivot.measure,aggregate:"
+msgid "Sum"
+msgstr "ផលបូក"
+
+msgctxt "selection:babi.pivot.order,order:"
+msgid "Ascending"
+msgstr "លំដាប់ឡើង"
+
+msgctxt "selection:babi.pivot.order,order:"
+msgid "Descending"
+msgstr "លំដាប់ចុះ"
+
+msgctxt "selection:babi.table,output_format:"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "selection:babi.table,output_format:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt "selection:babi.table,type:"
+msgid "Model"
+msgstr "ម៉ូដែល"
+
+msgctxt "selection:babi.table,type:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "selection:babi.table,type:"
+msgid "View"
+msgstr "ទិដ្ឋភាព"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Always"
+msgstr "ជានិច្ច"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Never"
+msgstr "មិនដែល"
+
+msgctxt "selection:babi.table,warn:"
+msgid "No Records Found"
+msgstr "រកមិនឃើញកំណត់ត្រា"
+
+msgctxt "selection:babi.table,warn:"
+msgid "Records Found"
+msgstr "បានរកឃើញកំណត់ត្រា"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "Not Computed"
+msgstr "មិនទាន់គណនា"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "⌛ Computing"
+msgstr "⌛ កំពុងគណនា"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "✅ Successful"
+msgstr "✅ បានជោគជ័យ"
+
+msgctxt "selection:babi.table.cluster,computation_state:"
+msgid "🔥 Failed"
+msgstr "🔥 បរាជ័យ"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Boolean"
+msgstr "ប៊ូលីន"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Char"
+msgstr "តួអក្សរ"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Date"
+msgstr "កាលបរិច្ឆេទ"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Date & Time"
+msgstr "កាលបរិច្ឆេទ និងពេលវេលា"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Float"
+msgstr "ចំនួនទសភាគ"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Integer"
+msgstr "ចំនួនគត់"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Many To Many"
+msgstr "ច្រើនទៅច្រើន"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Many To One"
+msgstr "ច្រើនទៅមួយ"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Multi Selection"
+msgstr "ជម្រើសច្រើន"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Numeric"
+msgstr "ជាលេខ"
+
+msgctxt "selection:babi.table.query_parameter,ttype:"
+msgid "Selection"
+msgstr "ជម្រើស"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Done"
+msgstr "បានបញ្ចប់"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Ignored"
+msgstr "មិនអើពើ"
+
+msgctxt "selection:babi.warning,state:"
+msgid "Pending"
+msgstr "កំពុងរង់ចាំ"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "All"
+msgstr "ទាំងអស់"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "None"
+msgstr "គ្មាន"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "Outliers"
+msgstr "តម្លៃខុសពីក្រុម"
+
+msgctxt "selection:babi.widget,box_points:"
+msgid "Suspected Outliers"
+msgstr "តម្លៃសង្ស័យថាខុសពីក្រុម"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "JPEG"
+msgstr "JPEG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "PNG"
+msgstr "PNG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "SVG"
+msgstr "SVG"
+
+msgctxt "selection:babi.widget,image_format:"
+msgid "WebP"
+msgstr "WebP"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "Always"
+msgstr "ជានិច្ច"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "Never"
+msgstr "មិនដែល"
+
+msgctxt "selection:babi.widget,show_toolbox:"
+msgid "On Hover"
+msgstr "ពេលដាក់ទ្រនិចពីលើ"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Area"
+msgstr "តំបន់"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Bar"
+msgstr "គំនូសតាងរបារ"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Box"
+msgstr "ប្រអប់"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Bubble"
+msgstr "គំនូសតាងពពុះ"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Country Map"
+msgstr "ផែនទីប្រទេស"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Doughnut"
+msgstr "គំនូសតាងរង្វង់មានរន្ធកណ្ដាល"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Funnel"
+msgstr "គំនូសតាងរាងចីវលោ"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Gauge"
+msgstr "គំនូសតាងរង្វាស់"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Line"
+msgstr "បន្ទាត់"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Pie"
+msgstr "គំនូសតាងរាងចំណិត"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Scatter"
+msgstr "គំនូសតាងបាចចំណុច"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Scatter Map"
+msgstr "ផែនទីបាចចំណុច"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Sunburst"
+msgstr "គំនូសតាងរង្វង់ជាន់ៗ"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Table"
+msgstr "តារាង"
+
+msgctxt "selection:babi.widget,type:"
+msgid "Value"
+msgstr "តម្លៃ"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Average"
+msgstr "មធ្យម"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Count"
+msgstr "ចំនួន"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Maximum"
+msgstr "អតិបរមា"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Median"
+msgstr "មេដ្យាន"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Minimum"
+msgstr "អប្បបរមា"
+
+msgctxt "selection:babi.widget.parameter,aggregate:"
+msgid "Sum"
+msgstr "ផលបូក"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Colors"
+msgstr "ពណ៌"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Labels"
+msgstr "ស្លាក"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Latitude"
+msgstr "រយៈទទឹង"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Locations"
+msgstr "ទីតាំង"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Longitude"
+msgstr "រយៈបណ្ដោយ"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Maximum"
+msgstr "អតិបរមា"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Minimum"
+msgstr "អប្បបរមា"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Parents"
+msgstr "ធាតុមេ"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Reference"
+msgstr "ឯកសារយោង"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Sizes"
+msgstr "ទំហំ"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Value"
+msgstr "តម្លៃ"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Values"
+msgstr "តម្លៃ"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "X"
+msgstr "X"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Y"
+msgstr "ឆ្នាំ"
+
+msgctxt "selection:babi.widget.parameter,type:"
+msgid "Z"
+msgstr "Z"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Compute Business Intelligence Cluster"
+msgstr "គណនាក្រុមតារាងវិភាគទិន្នន័យអាជីវកម្ម"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Compute Business Intelligence Table"
+msgstr "គណនាតារាងវិភាគទិន្នន័យអាជីវកម្ម"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Delete Tables with Parameters"
+msgstr "លុបតារាងដែលមានប៉ារ៉ាម៉ែត្រ"
+
+msgctxt "selection:www.site,type:"
+msgid "Pivot"
+msgstr "តារាងបង្វិល"
+
+msgctxt "view:babi.action.dashboard:"
+msgid "General"
+msgstr "ទូទៅ"
+
+msgctxt "view:babi.configuration:"
+msgid "Business Intelligence Configuration"
+msgstr "ការកំណត់ការវិភាគទិន្នន័យអាជីវកម្ម"
+
+msgctxt "view:babi.expression:"
+msgid "Expression"
+msgstr "កន្សោម"
+
+msgctxt "view:babi.filter.parameter:"
+msgid "Filter Parameter"
+msgstr "ប៉ារ៉ាម៉ែត្រតម្រង"
+
+msgctxt "view:babi.filter:"
+msgid "Filter"
+msgstr "តម្រង"
+
+msgctxt "view:babi.table:"
+msgid "Access"
+msgstr "សិទ្ធិចូលប្រើ"
+
+msgctxt "view:babi.table:"
+msgid "Configuration"
+msgstr "ការកំណត់រចនាសម្ព័ន្ធ"
+
+msgctxt "view:babi.table:"
+msgid "Dependencies"
+msgstr "ភាពអាស្រ័យ"
+
+msgctxt "view:babi.table:"
+msgid "Last Execution"
+msgstr "ការដំណើរការចុងក្រោយ"
+
+msgctxt "view:babi.table:"
+msgid "Warning"
+msgstr "ការព្រមាន"
+
+msgctxt "view:babi.widget:"
+msgid "Settings"
+msgstr "ការកំណត់"
+
+msgctxt "xgettext:x:"
+msgid ""
+"HINT: You are trying to calculate percentile or median of a text type field, "
+"please try with a numeric type field or change the operation."
+msgstr ""
+"គន្លឹះ៖ អ្នកកំពុងគណនាភាគរយទី ឬមេដ្យានលើវាលអត្ថបទ។ សូមប្រើវាលជាលេខ "
+"ឬប្ដូរប្រតិបត្តិការ។"
+
+msgctxt "xgettext:x:"
+msgid "Clear configuration"
+msgstr "សម្អាតការកំណត់"
+
+msgctxt "xgettext:x:"
+msgid "Hide sidebar"
+msgstr "លាក់របារចំហៀង"
+
+msgctxt "xgettext:x:"
+msgid "Show sidebar"
+msgstr "បង្ហាញរបារចំហៀង"
+
+msgctxt "xgettext:x:"
+msgid "Add row"
+msgstr "បន្ថែមជួរដេក"
+
+msgctxt "xgettext:x:"
+msgid "Add column"
+msgstr "បន្ថែមជួរឈរ"
+
+msgctxt "xgettext:x:"
+msgid "Add property"
+msgstr "បន្ថែមលក្ខណសម្បត្តិ"
+
+msgctxt "xgettext:x:"
+msgid "Add measure"
+msgstr "បន្ថែមរង្វាស់"
+
+msgctxt "xgettext:x:"
+msgid "Move row up"
+msgstr "ផ្លាស់ទីជួរដេកឡើង"
+
+msgctxt "xgettext:x:"
+msgid "Move row down"
+msgstr "ផ្លាស់ទីជួរដេកចុះ"
+
+msgctxt "xgettext:x:"
+msgid "Remove row"
+msgstr "ដកជួរដេកចេញ"
+
+msgctxt "xgettext:x:"
+msgid "Move column up"
+msgstr "ផ្លាស់ទីជួរឈរឡើង"
+
+msgctxt "xgettext:x:"
+msgid "Move column down"
+msgstr "ផ្លាស់ទីជួរឈរចុះ"
+
+msgctxt "xgettext:x:"
+msgid "Remove column"
+msgstr "ដកជួរឈរចេញ"
+
+msgctxt "xgettext:x:"
+msgid "Move property up"
+msgstr "ផ្លាស់ទីលក្ខណសម្បត្តិឡើង"
+
+msgctxt "xgettext:x:"
+msgid "Move property down"
+msgstr "ផ្លាស់ទីលក្ខណសម្បត្តិចុះ"
+
+msgctxt "xgettext:x:"
+msgid "Remove property"
+msgstr "ដកលក្ខណសម្បត្តិចេញ"
+
+msgctxt "xgettext:x:"
+msgid "Move measure up"
+msgstr "ផ្លាស់ទីរង្វាស់ឡើង"
+
+msgctxt "xgettext:x:"
+msgid "Move measure down"
+msgstr "ផ្លាស់ទីរង្វាស់ចុះ"
+
+msgctxt "xgettext:x:"
+msgid "Remove measure"
+msgstr "ដករង្វាស់ចេញ"
+
+msgctxt "xgettext:x:"
+msgid "Change order direction"
+msgstr "ប្ដូរទិសតម្រៀប"
+
+msgctxt "xgettext:x:"
+msgid "Move order up"
+msgstr "ផ្លាស់ទីធាតុតម្រៀបឡើង"
+
+msgctxt "xgettext:x:"
+msgid "Move order down"
+msgstr "ផ្លាស់ទីធាតុតម្រៀបចុះ"
+
+msgctxt "xgettext:x:"
+msgid "Expand all"
+msgstr "ពង្រីកទាំងអស់"
+
+msgctxt "xgettext:x:"
+msgid "Collapse all"
+msgstr "បង្រួមទាំងអស់"
+
+msgctxt "xgettext:x:"
+msgid "Download"
+msgstr "ទាញយក"
+
+msgctxt "xgettext:x:"
+msgid "Swap rows and columns"
+msgstr "ប្ដូរទីតាំងជួរដេក និងជួរឈរ"
+
+msgctxt "wizard_button:babi.table.parametrize,start,create_table:"
+msgid "Create"
+msgstr "បង្កើត"
+
+msgctxt "wizard_button:babi.table.parametrize,start,end:"
+msgid "Cancel"
+msgstr "បោះបង់"
+
+msgctxt "field:babi.clean_executions.start,date:"
+msgid "Date"
+msgstr "កាលបរិច្ឆេទ"
+
+msgctxt "field:babi.dimension.column,expand:"
+msgid "Expand"
+msgstr "ពង្រីក"
+
+msgctxt "field:babi.dimension.column,expression:"
+msgid "Expression"
+msgstr "កន្សោម"
+
+msgctxt "field:babi.dimension.column,internal_name:"
+msgid "Internal Name"
+msgstr "ឈ្មោះផ្ទៃក្នុង"
+
+msgctxt "field:babi.dimension.column,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.dimension.column,report:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "field:babi.dimension,expand:"
+msgid "Expand"
+msgstr "ពង្រីក"
+
+msgctxt "field:babi.dimension,expression:"
+msgid "Expression"
+msgstr "កន្សោម"
+
+msgctxt "field:babi.dimension,internal_name:"
+msgid "Internal Name"
+msgstr "ឈ្មោះផ្ទៃក្នុង"
+
+msgctxt "field:babi.dimension,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.dimension,report:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "field:babi.internal.measure,aggregate:"
+msgid "Aggregate"
+msgstr "ការប្រមូលផ្ដុំ"
+
+msgctxt "field:babi.internal.measure,decimal_digits:"
+msgid "Decimal Digits"
+msgstr "ចំនួនខ្ទង់ទសភាគ"
+
+msgctxt "field:babi.internal.measure,expand:"
+msgid "Expand"
+msgstr "ពង្រីក"
+
+msgctxt "field:babi.internal.measure,expression:"
+msgid "Expression"
+msgstr "កន្សោម"
+
+msgctxt "field:babi.internal.measure,internal_name:"
+msgid "Internal Name"
+msgstr "ឈ្មោះផ្ទៃក្នុង"
+
+msgctxt "field:babi.internal.measure,measure:"
+msgid "Measure"
+msgstr "រង្វាស់"
+
+msgctxt "field:babi.internal.measure,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.internal.measure,related_model:"
+msgid "Related Model"
+msgstr "ម៉ូដែលពាក់ព័ន្ធ"
+
+msgctxt "field:babi.internal.measure,ttype:"
+msgid "Field Type"
+msgstr "ប្រភេទវាល"
+
+msgctxt "field:babi.measure,aggregate:"
+msgid "Aggregate"
+msgstr "ការប្រមូលផ្ដុំ"
+
+msgctxt "field:babi.measure,expand:"
+msgid "Expand"
+msgstr "ពង្រីក"
+
+msgctxt "field:babi.measure,expression:"
+msgid "Expression"
+msgstr "កន្សោម"
+
+msgctxt "field:babi.measure,internal_name:"
+msgid "Internal Name"
+msgstr "ឈ្មោះផ្ទៃក្នុង"
+
+msgctxt "field:babi.measure,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.measure,report:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "field:babi.open_chart.start,dimension:"
+msgid "Dimension"
+msgstr "វិមាត្រ"
+
+msgctxt "field:babi.open_chart.start,execution:"
+msgid "Execution"
+msgstr "ការដំណើរការ"
+
+msgctxt "field:babi.open_chart.start,measures:"
+msgid "Measures"
+msgstr "រង្វាស់"
+
+msgctxt "field:babi.open_chart.start,report:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "field:babi.open_chart.start,show_legend:"
+msgid "Show Legend"
+msgstr "បង្ហាញសេចក្តីពន្យល់និមិត្តសញ្ញា"
+
+msgctxt "field:babi.order,dimension:"
+msgid "Dimension"
+msgstr "វិមាត្រ"
+
+msgctxt "field:babi.order,measure:"
+msgid "Measure"
+msgstr "រង្វាស់"
+
+msgctxt "field:babi.order,order:"
+msgid "Order"
+msgstr "លំដាប់តម្រៀប"
+
+msgctxt "field:babi.order,report:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "field:babi.report,babi_raise_user_error:"
+msgid "Raise User Error"
+msgstr "បង្ហាញកំហុសអ្នកប្រើប្រាស់"
+
+msgctxt "field:babi.report,crons:"
+msgid "Schedulers"
+msgstr "កម្មវិធីកំណត់កាលវិភាគ"
+
+msgctxt "field:babi.report,dimensions:"
+msgid "Dimensions"
+msgstr "វិមាត្រ"
+
+msgctxt "field:babi.report,email:"
+msgid "E-mail"
+msgstr "អ៊ីមែល"
+
+msgctxt "field:babi.report.execution,babi_model:"
+msgid "BI Model"
+msgstr "ម៉ូដែលវិភាគទិន្នន័យអាជីវកម្ម (BI)"
+
+msgctxt "field:babi.report.execution,company:"
+msgid "Company"
+msgstr "ក្រុមហ៊ុន"
+
+msgctxt "field:babi.report.execution,filtered:"
+msgid "Filtered"
+msgstr "បានចម្រោះ"
+
+msgctxt "field:babi.report.execution,internal_name:"
+msgid "Internal Name"
+msgstr "ឈ្មោះផ្ទៃក្នុង"
+
+msgctxt "field:babi.report.execution.open.select,execution:"
+msgid "Execution"
+msgstr "ការដំណើរការ"
+
+msgctxt "field:babi.report.execution.open.select,report:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "field:babi.report.execution,report:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "field:babi.report.execution,state:"
+msgid "State"
+msgstr "ស្ថានភាព"
+
+msgctxt "field:babi.report.execution,timeout:"
+msgid "Timeout"
+msgstr "រយៈពេលរង់ចាំអតិបរមា"
+
+msgctxt "field:babi.report,filter:"
+msgid "Filter"
+msgstr "តម្រង"
+
+msgctxt "field:babi.report,groups:"
+msgid "Groups"
+msgstr "ក្រុម"
+
+msgctxt "field:babi.report,internal_name:"
+msgid "Internal Name"
+msgstr "ឈ្មោះផ្ទៃក្នុង"
+
+msgctxt "field:babi.report,measures:"
+msgid "Measures"
+msgstr "រង្វាស់"
+
+msgctxt "field:babi.report,menus:"
+msgid "Menus"
+msgstr "ម៉ឺនុយ"
+
+msgctxt "field:babi.report,model:"
+msgid "Model"
+msgstr "ម៉ូដែល"
+
+msgctxt "field:babi.report,model_name:"
+msgid "Model Name"
+msgstr "ឈ្មោះម៉ូដែល"
+
+msgctxt "field:babi.report,name:"
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+msgctxt "field:babi.report,order:"
+msgid "Order"
+msgstr "លំដាប់តម្រៀប"
+
+msgctxt "field:babi.report,report_cell_level:"
+msgid "Cell Level"
+msgstr "កម្រិតក្រឡា"
+
+msgctxt "field:babi.report-res.group,group:"
+msgid "Group"
+msgstr "ក្រុម"
+
+msgctxt "field:babi.report-res.group,report:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "field:babi.report,timeout:"
+msgid "Timeout"
+msgstr "រយៈពេលរង់ចាំអតិបរមា"
+
+msgctxt "field:babi.report,to:"
+msgid "To"
+msgstr "ដល់"
+
+msgctxt "field:babi.table,url:"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "field:babi.voyager.open_session,expiration_date:"
+msgid "Expiration Date"
+msgstr "កាលបរិច្ឆេទផុតកំណត់"
+
+msgctxt "field:babi.voyager.open_session,token:"
+msgid "Token"
+msgstr "ថូខិន"
+
+msgctxt "field:babi.voyager.open_session,user:"
+msgid "User"
+msgstr "អ្នកប្រើប្រាស់"
+
+msgctxt "field:www.pivot_header,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:www.pivot_header,header:"
+msgid "Header"
+msgstr "ក្បាលទំព័រ"
+
+msgctxt "field:www.pivot_header,level_action:"
+msgid "Level Action"
+msgstr "សកម្មភាពតាមកម្រិត"
+
+msgctxt "field:www.pivot_header.selection,field:"
+msgid "Field"
+msgstr "វាល"
+
+msgctxt "field:www.pivot_header,table_name:"
+msgid "Table Name"
+msgstr "ឈ្មោះតារាង"
+
+msgctxt "field:www.pivot_header,table_properties:"
+msgid "Table Properties"
+msgstr "លក្ខណៈសម្បត្តិរបស់តារាង"
+
+msgctxt "help:babi.dashboard.item,colspan:"
+msgid ""
+"Number of columns to occupy in the dashboard. The default is 1, the maximum "
+"4."
+msgstr ""
+"ចំនួនជួរឈរដែលត្រូវប្រើក្នុងផ្ទាំងគ្រប់គ្រង។ លំនាំដើមគឺ 1 និងអតិបរមាគឺ 4។"
+
+msgctxt "help:babi.report,report_cell_level:"
+msgid "Start cell level that not has indentation"
+msgstr "កម្រិតក្រឡាដំបូងដែលមិនចូលបន្ទាត់"
+
+msgctxt "model:babi.action.dashboard,name:"
+msgid "Action Act Dashboard"
+msgstr "សកម្មភាពបើកផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "model:babi.configuration,name:"
+msgid "Business Intelligence Configuration"
+msgstr "ការកំណត់ការវិភាគទិន្នន័យអាជីវកម្ម"
+
+msgctxt "model:babi.dashboard.item,name:"
+msgid "Dashboard Item"
+msgstr "ធាតុផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "model:babi.dashboard,name:"
+msgid "Dashboard"
+msgstr "ផ្ទាំងគ្រប់គ្រង"
+
+msgctxt "model:babi.dimension.column,name:"
+msgid "Column Dimension"
+msgstr "វិមាត្រជួរឈរ"
+
+msgctxt "model:babi.dimension,name:"
+msgid "Dimension"
+msgstr "វិមាត្រ"
+
+msgctxt "model:babi.expression,name:"
+msgid "Expression"
+msgstr "កន្សោម"
+
+msgctxt "model:babi.field,name:"
+msgid "BABI Field"
+msgstr "វាល BABI"
+
+msgctxt "model:babi.filter,name:"
+msgid "Filter"
+msgstr "តម្រង"
+
+msgctxt "model:babi.filter.parameter,name:"
+msgid "Filter Parameter"
+msgstr "ប៉ារ៉ាម៉ែត្រតម្រង"
+
+msgctxt "model:babi.measure,name:"
+msgid "Measure"
+msgstr "រង្វាស់"
+
+msgctxt "model:babi.order,name:"
+msgid "Order"
+msgstr "លំដាប់តម្រៀប"
+
+msgctxt "model:babi.pivot.column_dimension,name:"
+msgid "Pivot Column Dimension"
+msgstr "វិមាត្រជួរឈរតារាងបង្វិល"
+
+msgctxt "model:babi.pivot.measure,name:"
+msgid "Pivot Measure"
+msgstr "រង្វាស់តារាងបង្វិល"
+
+msgctxt "model:babi.pivot,name:"
+msgid "Pivot Table"
+msgstr "តារាងបង្វិល"
+
+msgctxt "model:babi.pivot.order,name:"
+msgid "Pivot Order"
+msgstr "លំដាប់តម្រៀបតារាងបង្វិល"
+
+msgctxt "model:babi.pivot.property,name:"
+msgid "Pivot Property"
+msgstr "លក្ខណសម្បត្តិតារាងបង្វិល"
+
+msgctxt "model:babi.pivot.row_dimension,name:"
+msgid "Pivot Row Dimension"
+msgstr "វិមាត្រជួរដេកតារាងបង្វិល"
+
+msgctxt "model:babi.report,name:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "model:babi.table.cluster,name:"
+msgid "BABI Table Cluster"
+msgstr "ក្រុមតារាង BABI"
+
+msgctxt "model:babi.table.dependency,name:"
+msgid "BABI Table Dependency"
+msgstr "ភាពអាស្រ័យតារាង BABI"
+
+msgctxt "model:babi.table,name:"
+msgid "BABI Table"
+msgstr "តារាង BABI"
+
+msgctxt "model:babi.table.parameters,name:"
+msgid "Table Parameters"
+msgstr "ប៉ារ៉ាម៉ែត្រតារាង"
+
+msgctxt "model:babi.table.query_parameter,name:"
+msgid "Table Query Parameter"
+msgstr "ប៉ារ៉ាម៉ែត្រសំណួរទិន្នន័យរបស់តារាង"
+
+msgctxt "model:babi.table-res.group,name:"
+msgid "BABI Table Group"
+msgstr "ក្រុមអ្នកប្រើប្រាស់តារាង BABI"
+
+msgctxt "model:babi.table-res.user,name:"
+msgid "BABI Table User"
+msgstr "អ្នកប្រើប្រាស់តារាង BABI"
+
+msgctxt "model:babi.test,name:"
+msgid "Test BABI Model"
+msgstr "សាកល្បងម៉ូដែល BABI"
+
+msgctxt "model:babi.voyager.open_session,string:"
+msgid "Babi Voyager Open Session"
+msgstr "បើកសម័យប្រើប្រាស់ Babi Voyager"
+
+msgctxt "model:babi.warning,name:"
+msgid "BABI Warning"
+msgstr "ការព្រមាន BABI"
+
+msgctxt "model:babi.widget,name:"
+msgid "Widget"
+msgstr "ធាតុបង្ហាញ"
+
+msgctxt "model:babi.widget.parameter,name:"
+msgid "Widget Parameter"
+msgstr "ប៉ារ៉ាម៉ែត្រធាតុបង្ហាញ"
+
+msgctxt "model:ir.action,name:act_babi_voyager_url"
+msgid "Pivot Tables"
+msgstr "តារាងបង្វិល"
+
+msgctxt "model:ir.action,name:act_babi_open_voyager"
+msgid "Pivot Tables"
+msgstr "តារាងបង្វិល"
+
+msgctxt "model:ir.ui.menu,name:menu_babi_open_voyager"
+msgid "Pivot Tables"
+msgstr "តារាងបង្វិល"
+
+msgctxt "model:www.index.pivot,name:"
+msgid "Index"
+msgstr "លិបិក្រម"
+
+msgctxt "model:www.index.pivot.null,name:"
+msgid "Index Null"
+msgstr "លិបិក្រមគ្មានតម្លៃ"
+
+msgctxt "model:www.layout.pivot,name:"
+msgid "Layout"
+msgstr "ប្លង់"
+
+msgctxt "model:www.pivot_header.axis,name:"
+msgid "Pivot Header Axis"
+msgstr "អ័ក្សបឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_header.level_field,name:"
+msgid "Pivot Header"
+msgstr "បឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_header.measure,name:"
+msgid "Pivot Header Measure"
+msgstr "រង្វាស់បឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_header,name:"
+msgid "Pivot Header"
+msgstr "បឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_header.order,name:"
+msgid "Pivot Header Component"
+msgstr "សមាសភាគបឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_header.remove_field,name:"
+msgid "Pivot Header"
+msgstr "បឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_header.selection.add_field,name:"
+msgid "Pivot Header Selection Add Field"
+msgstr "បន្ថែមវាលទៅជម្រើសបឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_header.selection.close_field,name:"
+msgid "Pivot Header Selection Close Field"
+msgstr "បិទវាលក្នុងជម្រើសបឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_header.selection,name:"
+msgid "Pivot Header Selection"
+msgstr "ជម្រើសបឋមកថាតារាងបង្វិល"
+
+msgctxt "model:www.pivot_table,name:"
+msgid "Pivot Table"
+msgstr "តារាងបង្វិល"
+
+msgctxt "selection:babi.field,table_type:"
+msgid "Query"
+msgstr "សំណួរទិន្នន័យ"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Min"
+msgstr "អប្បបរមា"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Sum"
+msgstr "ផលបូក"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Count"
+msgstr "ចំនួន"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Average"
+msgstr "មធ្យម"
+
+msgctxt "selection:babi.internal.measure,aggregate:"
+msgid "Max"
+msgstr "អតិបរមា"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Numeric"
+msgstr "ជាលេខ"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Boolean"
+msgstr "ប៊ូលីន"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Integer"
+msgstr "ចំនួនគត់"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Char"
+msgstr "តួអក្សរ"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Float"
+msgstr "ចំនួនទសភាគ"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Many To One"
+msgstr "ច្រើនទៅមួយ"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Date"
+msgstr "កាលបរិច្ឆេទ"
+
+msgctxt "selection:babi.internal.measure,ttype:"
+msgid "Date & Time"
+msgstr "កាលបរិច្ឆេទ និងពេលវេលា"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Sum"
+msgstr "ផលបូក"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Min"
+msgstr "អប្បបរមា"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Average"
+msgstr "មធ្យម"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Max"
+msgstr "អតិបរមា"
+
+msgctxt "selection:babi.measure,aggregate:"
+msgid "Count"
+msgstr "ចំនួន"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Pie"
+msgstr "គំនូសតាងរាងចំណិត"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Line"
+msgstr "បន្ទាត់"
+
+msgctxt "selection:babi.open_chart.start,graph_type:"
+msgid "Report"
+msgstr "របាយការណ៍"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "Excel"
+msgstr "Excel"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "PDF"
+msgstr "PDF"
+
+msgctxt "selection:babi.open_chart.start,graph_type_report:"
+msgid "HTML"
+msgstr "HTML"
+
+msgctxt "selection:babi.order,order:"
+msgid "Ascending"
+msgstr "លំដាប់ឡើង"
+
+msgctxt "selection:babi.order,order:"
+msgid "Descending"
+msgstr "លំដាប់ចុះ"
+
+msgctxt "selection:babi.report.execution.open.select,view_type:"
+msgid "List"
+msgstr "បញ្ជី"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Calculated"
+msgstr "បានគណនា"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Timeout"
+msgstr "រយៈពេលរង់ចាំអតិបរមា"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Failed"
+msgstr "បរាជ័យ"
+
+msgctxt "selection:babi.report.execution,state:"
+msgid "Pending"
+msgstr "កំពុងរង់ចាំ"
+
+msgctxt "selection:babi.table,type:"
+msgid "Query"
+msgstr "សំណួរទិន្នន័យ"
+
+msgctxt "selection:ir.ui.menu,babi_type:"
+msgid "List"
+msgstr "បញ្ជី"
+
+msgctxt "selection:ir.ui.menu,babi_type:"
+msgid "Wizard"
+msgstr "ជំនួយការណែនាំ"
+
+msgctxt "wizard_button:babi.clean_executions,start,end:"
+msgid "Cancel"
+msgstr "បោះបង់"
+
+msgctxt "wizard_button:babi.open_chart,start,end:"
+msgid "Cancel"
+msgstr "បោះបង់"
+
+msgctxt "wizard_button:babi.open_chart,start,open_:"
+msgid "Open"
+msgstr "បើក"
+
+msgctxt "wizard_button:babi.open_chart,start,print_:"
+msgid "Print"
+msgstr "បោះពុម្ព"
+
+msgctxt "wizard_button:babi.report.execution.open,filtered,create_execution:"
+msgid "Open"
+msgstr "បើក"
+
+msgctxt "wizard_button:babi.report.execution.open,filtered,end:"
+msgid "Cancel"
+msgstr "បោះបង់"
+
+msgctxt "wizard_button:babi.report.execution.open,select,end:"
+msgid "Cancel"
+msgstr "បោះបង់"
+
+msgctxt "wizard_button:babi.report.execution.open,select,open_view:"
+msgid "Open"
+msgstr "បើក"
+
+msgctxt "wizard_button:babi.report.execution.open,update_start,end:"
+msgid "Cancel"
+msgstr "បោះបង់"
